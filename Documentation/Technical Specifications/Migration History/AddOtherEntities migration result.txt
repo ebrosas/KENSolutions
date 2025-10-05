@@ -1,0 +1,79 @@
+PM> Add-Migration AddOtherEntities -Context AppDbContext -Project KenHRApp.Infrastructure -StartupProject KenHRApp.Web -Verbose
+Using project 'KenHRApp.Infrastructure'.
+Using startup project 'KenHRApp.Web'.
+Build started...
+Build succeeded.
+C:\Program Files\dotnet\dotnet.exe exec --depsfile "C:\NET Projects\KenHRSolution\KenHRApp.Web\KenHRApp.Web\bin\Debug\net8.0\KenHRApp.Web.deps.json" --additionalprobingpath C:\Users\Toshiba\.nuget\packages --additionalprobingpath "C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages" --runtimeconfig "C:\NET Projects\KenHRSolution\KenHRApp.Web\KenHRApp.Web\bin\Debug\net8.0\KenHRApp.Web.runtimeconfig.json" C:\Users\Toshiba\.nuget\packages\microsoft.entityframeworkcore.tools\8.0.17\tools\netcoreapp2.0\any\ef.dll migrations add AddOtherEntities --json --context AppDbContext --verbose --no-color --prefix-output --assembly "C:\NET Projects\KenHRSolution\KenHRApp.Web\KenHRApp.Web\bin\Debug\net8.0\KenHRApp.Infrastructure.dll" --project "C:\NET Projects\KenHRSolution\KenHRApp.Infrastructure\KenHRApp.Infrastructure.csproj" --startup-assembly "C:\NET Projects\KenHRSolution\KenHRApp.Web\KenHRApp.Web\bin\Debug\net8.0\KenHRApp.Web.dll" --startup-project "C:\NET Projects\KenHRSolution\KenHRApp.Web\KenHRApp.Web\KenHRApp.Web.csproj" --project-dir "C:\NET Projects\KenHRSolution\KenHRApp.Infrastructure\\" --language C# --configuration Debug --working-dir "C:\NET Projects\KenHRSolution" --root-namespace KenHRApp.Infrastructure --nullable
+Using assembly 'KenHRApp.Infrastructure'.
+Using startup assembly 'KenHRApp.Web'.
+Using application base 'C:\NET Projects\KenHRSolution\KenHRApp.Web\KenHRApp.Web\bin\Debug\net8.0'.
+Using working directory 'C:\NET Projects\KenHRSolution\KenHRApp.Web\KenHRApp.Web'.
+Using root namespace 'KenHRApp.Infrastructure'.
+Using project directory 'C:\NET Projects\KenHRSolution\KenHRApp.Infrastructure\'.
+Remaining arguments: .
+Finding DbContext classes...
+Finding IDesignTimeDbContextFactory implementations...
+Finding application service provider in assembly 'KenHRApp.Web'...
+Finding Microsoft.Extensions.Hosting service provider...
+Using environment 'Development'.
+Using application service provider from Microsoft.Extensions.Hosting.
+Found DbContext 'AppDbContext'.
+Finding DbContext classes in the project...
+Found DbContext 'ApplicationDbContext'.
+Using DbContext factory 'AppDbContextFactory'.
+Using context 'AppDbContext'.
+Finding design-time services referenced by assembly 'KenHRApp.Web'...
+Finding design-time services referenced by assembly 'KenHRApp.Infrastructure'...
+No referenced design-time services were found.
+Finding design-time services for provider 'Microsoft.EntityFrameworkCore.SqlServer'...
+Using design-time services from provider 'Microsoft.EntityFrameworkCore.SqlServer'.
+Finding IDesignTimeServices implementations in assembly 'KenHRApp.Web'...
+No design-time services were found.
+The index {'EmployeeNo'} was not created on entity type 'EmergencyContact' as the properties are already covered by the index {'EmployeeNo', 'ContactPerson', 'RelationCode', 'MobileNo'}.
+The index {'EmployeeNo'} was not created on entity type 'EmployeeCertification' as the properties are already covered by the index {'EmployeeNo', 'QualificationCode', 'FromMonthCode', 'FromYear', 'ToMonthCode', 'ToYear'}.
+The index {'EmployeeNo'} was not created on entity type 'EmployeeSkill' as the properties are already covered by the index {'EmployeeNo', 'SkillName'}.
+The index {'EmployeeNo'} was not created on entity type 'EmployeeTransaction' as the properties are already covered by the index {'EmployeeNo', 'ActionCode', 'SectionCode', 'StatusCode', 'LastUpdateOn'}.
+The index {'EmployeeNo'} was not created on entity type 'EmploymentHistory' as the properties are already covered by the index {'EmployeeNo', 'CompanyName', 'Designation', 'FromDate', 'ToDate'}.
+The index {'EmployeeNo'} was not created on entity type 'FamilyMember' as the properties are already covered by the index {'EmployeeNo', 'FirstName', 'LastName', 'RelationCode'}.
+The index {'EmployeeNo'} was not created on entity type 'FamilyVisa' as the properties are already covered by the index {'EmployeeNo', 'FamilyId', 'VisaTypeCode', 'CountryCode', 'IssueDate', 'ExpiryDate'}.
+The index {'EmployeeNo'} was not created on entity type 'LanguageSkill' as the properties are already covered by the index {'EmployeeNo', 'LanguageCode'}.
+The index {'EmployeeNo'} was not created on entity type 'OtherDocument' as the properties are already covered by the index {'EmployeeNo', 'DocumentName', 'DocumentTypeCode'}.
+The index {'EmployeeNo'} was not created on entity type 'Qualification' as the properties are already covered by the index {'EmployeeNo', 'QualificationCode'}.
+The property 'FamilyVisa.FamilyMemberAutoId' was created in shadow state because there are no eligible CLR members with a matching name.
+An operation was scaffolded that may result in the loss of data. Please review the migration for accuracy.
+Writing migration to 'C:\NET Projects\KenHRSolution\KenHRApp.Infrastructure\Migrations\20250818191315_AddOtherEntities.cs'.
+Writing model snapshot to 'C:\NET Projects\KenHRSolution\KenHRApp.Infrastructure\Migrations\AppDbContextModelSnapshot.cs'.
+'AppDbContext' disposed.
+To undo this action, use Remove-Migration.
+PM> 
+
+PM> Update-Database -Context AppDbContext
+Build started...
+Build succeeded.
+Applying migration '20250818191315_AddOtherEntities'.
+Failed executing DbCommand (105ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+ALTER TABLE [kenuser].[Employee] ADD CONSTRAINT [AK_Employee_EmployeeNo] UNIQUE ([EmployeeNo]);
+Microsoft.Data.SqlClient.SqlException (0x80131904): The CREATE UNIQUE INDEX statement terminated because a duplicate key was found for the object name 'kenuser.Employee' and the index name 'AK_Employee_EmployeeNo'. The duplicate key value is (0).
+Could not create constraint or index. See previous errors.
+The statement has been terminated.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlCommand.RunExecuteNonQueryTds(String methodName, Boolean isAsync, Int32 timeout, Boolean asyncWrite)
+   at Microsoft.Data.SqlClient.SqlCommand.InternalExecuteNonQuery(TaskCompletionSource`1 completion, Boolean sendToPipe, Int32 timeout, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String methodName)
+   at Microsoft.Data.SqlClient.SqlCommand.ExecuteNonQuery()
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQuery(RelationalCommandParameterObject parameterObject)
+   at Microsoft.EntityFrameworkCore.Migrations.MigrationCommand.ExecuteNonQuery(IRelationalConnection connection, IReadOnlyDictionary`2 parameterValues)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQuery(IEnumerable`1 migrationCommands, IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.Migrate(String targetMigration)
+   at Microsoft.EntityFrameworkCore.Design.Internal.MigrationsOperations.UpdateDatabase(String targetMigration, String connectionString, String contextType)
+   at Microsoft.EntityFrameworkCore.Design.OperationExecutor.UpdateDatabaseImpl(String targetMigration, String connectionString, String contextType)
+   at Microsoft.EntityFrameworkCore.Design.OperationExecutor.UpdateDatabase.<>c__DisplayClass0_0.<.ctor>b__0()
+   at Microsoft.EntityFrameworkCore.Design.OperationExecutor.OperationBase.Execute(Action action)
+ClientConnectionId:cafacda5-19ee-4114-87df-b099c0157246
+Error Number:1505,State:1,Class:16
+The CREATE UNIQUE INDEX statement terminated because a duplicate key was found for the object name 'kenuser.Employee' and the index name 'AK_Employee_EmployeeNo'. The duplicate key value is (0).
+Could not create constraint or index. See previous errors.
+The statement has been terminated.
+PM> 

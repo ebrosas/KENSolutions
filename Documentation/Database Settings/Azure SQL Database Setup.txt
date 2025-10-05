@@ -1,0 +1,7 @@
+Azure SQL Database Setup:
+
+Server Name: hrsaas-sqlserver
+Location: (Middle East) UAE North
+Server Admin Login: kenadmin
+Password: Ken@0716
+Database Name: KENHRDB

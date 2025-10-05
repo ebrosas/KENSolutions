@@ -1,0 +1,315 @@
+﻿@page "/CoreHR/departmentmaster"
+@using KenHRApp.Domain.Entities
+@using KenHRApp.Application.Common.Interfaces
+@using System.Text
+
+@implements IDisposable
+@* @inject IEmployeeService EmployeeService *@
+@inject IAppCacheService AppCacheService
+@inject ILogger<Employee> Logger
+@inject NavigationManager NavigationManager
+@inject ILookupCacheService LookupCache
+
+<MudText Typo="Typo.h6" Align="Align.Start" Class="pb-1 ps-2" Style="color: #004165;">Department Master</MudText>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="px-4">
+    @if (_showErrorAlert)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
+                  ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
+            @_errorMessage
+        </MudAlert>
+    }
+    <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
+        <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-primary-text" />
+
+        <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
+            <MudPaper Elevation="0" Square="true" Class="w-100">
+                <MudGrid Spacing="5">
+                    <MudItem xs="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="_departmentName" Label="Department Name" HelperText="Enter department search string"
+                                Variant="Variant.Text" HelperTextOnFocus="true" Counter="100" MaxLength="100"
+                                Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="_selectedGroup"
+                                             SearchFunc="SearchDepartmentGroup!"
+                                             Variant="Variant.Text"
+                                             Label="Group Name"
+                                             Margin="Margin.Normal"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for group"
+                                             HelperTextOnFocus="true"
+                                             Clearable="true" Typo="Typo.subtitle2"
+                                             MaxItems="@(_groupList != null ? _groupList.Count : 10)"
+                                             Modal="true" />
+                            @* <MudTextField @bind-Value="_description" Label="Description" HelperText="Enter description search string"
+                                          Variant="Variant.Text" HelperTextOnFocus="true" Counter="100" MaxLength="100"
+                                          Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" /> *@
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="_selectedHead"
+                                             SearchFunc="SearchEmployee!"
+                                             Variant="Variant.Text"
+                                             Label="Department Head"
+                                             Margin="Margin.Normal"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for employee"
+                                             HelperTextOnFocus="true"
+                                             Clearable="true" Typo="Typo.subtitle2"
+                                             MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="_selectedManager"
+                                             SearchFunc="SearchEmployee!"
+                                             Variant="Variant.Text"
+                                             Label="Department Manager"
+                                             Margin="Margin.Normal"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for employee"
+                                             HelperTextOnFocus="true"
+                                             Clearable="true" Typo="Typo.subtitle2"
+                                             MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="5">
+                    <MudItem xs="2">
+                        <MudSwitch @bind-Value="_isActive" Color="Color.Success">Is Active?</MudSwitch>
+                    </MudItem>
+                    <MudItem xs="10">
+                        <MudPaper Class="d-flex gap-2 justify-content-end me-1 mt-0 p-0" Elevation="0">
+                            <div @onmouseover="() => _isSearchHovered = true" @onmouseout="() => _isSearchHovered = false">
+                                <MudButton Variant="@(_isSearchHovered ? Variant.Filled : Variant.Outlined)"
+                                           StartIcon="@Icons.Material.Filled.PersonSearch" Class="px-5"
+                                           Color="Color.Info" Size="Size.Small" OnClick="@(() => BeginSearchDepartmentTask(true))">
+                                    <MudText Typo="Typo.button" HtmlTag="h3">Search</MudText>
+                                </MudButton>
+                            </div>
+                            <div @onmouseover="() => _isResetHovered = true" @onmouseout="() => _isResetHovered = false">
+                                <MudButton Variant="@(_isResetHovered ? Variant.Filled : Variant.Outlined)"
+                                           StartIcon="@Icons.Material.Filled.Refresh" Class="px-5"
+                                           Color="Color.Warning" Size="Size.Small" OnClick="BeginRefreshPageTask">
+                                    <MudText Typo="Typo.button" HtmlTag="h3">Reset</MudText>
+                                </MudButton>
+                            </div>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+            <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
+                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LIST OF DEPARTMENTS</MudText>
+                <MudSpacer />
+                <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add New Department" OnClick="AddNewEmployee" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Dark" Label="Download Master Data" />
+                 </MudMenu>
+             </MudAppBar>
+             <MudPaper Elevation="5" Square="true" Class="w-100">
+                 <MudDataGrid T="DepartmentDTO" Items="@_departmentList" Hover="true" Striped="true" Class="department-master-grid"
+                    Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                    QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                    EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                    EditDialogOptions="new DialogOptions 
+                    { 
+                        MaxWidth = MaxWidth.Small, 
+                        FullWidth = true,
+                        BackdropClick = false,
+                        CloseOnEscapeKey = false
+                    }"
+                    StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
+                    TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                     <ToolBarContent>                        
+                         <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                             <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
+                                           Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"   
+                                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                             </MudTextField>
+                         </MudPaper>
+                        <MudSpacer />
+                        <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                             <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
+                             <MudPaper Class="ms-3" Elevation="0">
+                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new department" />
+                             </MudPaper>                             
+                        </MudPaper>
+                    </ToolBarContent>
+                     <Columns>
+                        <PropertyColumn Property="x => x.DepartmentId" Hidden Editable="false">
+                             <EditTemplate>
+                                 @* Empty to prevent rendering *@
+                             </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.DepartmentCode" Title="Department Code" Class="col-dept-code">
+                             <EditTemplate>
+                                 <MudTextField @bind-Value="context.Item.DepartmentCode" Label="Department Name" HelperText="Maximum input is 20 chars."
+                                               Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="20" MaxLength="20"
+                                                Required RequiredError="Department Code is required"
+                                               Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                             </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.DepartmentName" Title="Department Name" Class="col-dept-name">
+                            <EditTemplate>
+                                <MudTextField @bind-Value="context.Item.DepartmentName" Label="Department Name" HelperText="Maximum input is 120 chars."
+                                           Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="120" MaxLength="120"
+                                            Required RequiredError="Department Name is required"
+                                           Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.GroupCode" Hidden>
+                            <EditTemplate>
+                                @* Empty to prevent rendering *@
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.GroupName" Title="Group Name" Class="col-group-name">
+                             <EditTemplate>
+                                 <MudSelect @bind-Value="context.Item.GroupCode" Variant="Variant.Text" Margin="Margin.Dense" Label="Group Name"
+                                    Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                    HelperText="Filter by employment status" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
+                                     @foreach (var group in _groupList)
+                                    {
+                                        <MudSelectItem Value="group.UDCCode">@group.UDCDesc1</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.SuperintendentEmpNo" Hidden Required="false">
+                             <EditTemplate>
+                                 @* Empty to prevent rendering *@
+                             </EditTemplate>
+                         </PropertyColumn>
+                        <PropertyColumn Property="x => x.SuperintendentName" Title="Department Head" Class="col-superintendent" Required="false">
+                            <EditTemplate>
+                                 <MudAutocomplete @bind-Value="context.Item.SuperintendentName"
+                                                  SearchFunc="SearchEmployee!"
+                                                  Variant="Variant.Text"
+                                                  Label="Department Head"
+                                                  Margin="Margin.Normal"
+                                                  Dense="true"
+                                                  Placeholder="Please Select"
+                                                  HelperText="Type a key to search for employee"
+                                                  HelperTextOnFocus="true"
+                                                  Clearable="true" Typo="Typo.subtitle2"
+                                                  MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
+                                                  Modal="true" />
+                            </EditTemplate>
+                        </PropertyColumn>
+                         <PropertyColumn Property="x => x.ManagerEmpNo" Hidden Required="false">
+                             <EditTemplate>
+                                 @* Empty to prevent rendering *@
+                             </EditTemplate>
+                         </PropertyColumn>
+                        <PropertyColumn Property="x => x.ManagerName" Title="Department Manager" Class="col-manager" Required="false">
+                            <EditTemplate>
+                                 <MudAutocomplete @bind-Value="context.Item.ManagerName"
+                                                  SearchFunc="SearchEmployee!"
+                                                  Variant="Variant.Text"
+                                                  Label="Department Manager"
+                                                  Margin="Margin.Normal"
+                                                  Dense="true"
+                                                  Placeholder="Please Select"
+                                                  HelperText="Type a key to search for employee"
+                                                  HelperTextOnFocus="true"
+                                                  Clearable="true" Typo="Typo.subtitle2"
+                                                  MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
+                                                  Modal="true" />
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.Description" Class="col-description" Required="false">
+                            <EditTemplate>
+                                <MudTextField @bind-Value="context.Item.Description" Label="Description" HelperText="Maximum input is 120 chars."
+                                              Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="120" MaxLength="120" Lines="2"
+                                              Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.ParentDepartmentId" Hidden Editable="false" Required="false">
+                             <EditTemplate>
+                                 @* Empty to prevent rendering *@
+                             </EditTemplate>
+                        </PropertyColumn>
+                         <PropertyColumn Property="x => x.ParentDepartmentName" Title="Parent Department" 
+                             Class="col-parent-dept" Hidden Editable="false" Required="false">
+                             <EditTemplate>
+                                 @* Empty to prevent rendering *@
+                             </EditTemplate>
+                        </PropertyColumn>                        
+                        <PropertyColumn Property="x => x.CreatedAt" Title="Created Date" Class="col-created-date" Editable="false">
+                             <CellTemplate>
+                                 @context.Item.CreatedAt.ToString("dd-MMM-yyyy")
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.UpdatedAt" Title="Updated Date" Class="col-updated-date" Editable="false">
+                            <CellTemplate>
+                                @context.Item.UpdatedAt?.ToString("dd-MMM-yyyy")
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.IsActiveDesc" Title="Is Active?" Class="col-active" Required="false">
+                             <CellTemplate Context="row">
+                                <MudChip T="string" Size=Size.Small Color="@(row.Item.IsActiveDesc == "Yes" ? Color.Success : Color.Error)">
+                                    @row.Item.IsActiveDesc
+                                </MudChip>
+                            </CellTemplate>
+                            <EditTemplate>
+                                <MudSwitch @bind-Value="context.Item.IsActive" Color="Color.Success" UncheckedColor="Color.Error" Label="Is Active?" />
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                            <CellTemplate Context="row">
+                                <MudIconButton Color="Color.Info" title="View and edit employee information" Class="show-btn fa-icon-btn"
+                                    OnClick="@row.Actions.StartEditingItemAsync">
+                                    <ChildContent>
+                                        <i class="fas fa-edit fa-1x"></i>
+                                    </ChildContent>
+                                </MudIconButton>
+                                <MudIconButton Color="Color.Error" title="Delete department record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
+                                    <ChildContent>
+                                        <i class="fas fa-trash-alt fa-1x"></i>
+                                    </ChildContent>
+                                </MudIconButton>
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                    <NoRecordsContent>
+                        <div class="no-data-box">
+                            <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
+                            <span>No data found</span>
+                        </div>
+                    </NoRecordsContent>
+                    <PagerContent>
+                        <MudDataGridPager T="DepartmentDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                    </PagerContent>
+                </MudDataGrid>
+            </MudPaper>
+            <MudScrollToTop TopOffset="100"
+                            Selector="#mainPanel"
+                            VisibleCssClass="visible absolute"
+                            HiddenCssClass="hidden absolute">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+            </MudScrollToTop>
+        </MudStack>
+    </div>
+</MudContainer>
+
+<!-- Full-screen overlay -->
+@if (_isRunning)
+{
+    <div class="fullscreen-overlay">
+        <MudProgressCircular Indeterminate="true" Size="Size.Medium" Color="Color.Info" />
+        <MudText Typo="Typo.h6" Class="mt-2 text-white">@overlayMessage</MudText>
+        </div>
+}
+
+

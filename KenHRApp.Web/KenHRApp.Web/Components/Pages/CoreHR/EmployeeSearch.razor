@@ -1,0 +1,599 @@
+﻿@page "/CoreHR/employeesearch"
+@using KenHRApp.Domain.Entities
+@using KenHRApp.Application.Common.Interfaces
+@using System.Text
+
+@implements IDisposable     
+@inject IEmployeeService EmployeeService
+@inject IAppCacheService AppCacheService
+@inject ILogger<Employee> Logger
+@inject NavigationManager NavigationManager
+@inject ILookupCacheService LookupCache
+
+<MudText Typo="Typo.h6" Align="Align.Start" Class="pb-1 ps-2" Style="color: #004165;">Employee Master</MudText>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="px-4">
+    @if (_showErrorAlert)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
+            ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
+            @_errorMessage
+        </MudAlert>
+    }
+    <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;"> 
+        <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-primary-text" />
+        
+        <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
+            <MudPaper Elevation="0" Square="true" Class="w-100">
+                <MudGrid Spacing="5">
+                    <MudItem xs="2">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="_employeeCode" Label="Employee No." HelperText="Max. input is 20 chars."
+                                            Variant="Variant.Text" HelperTextOnFocus="true" Counter="20" MaxLength="20"
+                                            Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="_firstName" Label="First Name" HelperText="Max. input is 50 chars."
+                                            Variant="Variant.Text" HelperTextOnFocus="true" Counter="50" MaxLength="50"
+                                            Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="_lastName" Label="Last Name" HelperText="Max. input is 50 chars."
+                                            Variant="Variant.Text" HelperTextOnFocus="true" Counter="50" MaxLength="50"
+                                            Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="2">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudDatePicker @ref="_dojPicker" Label="Date of Joining" Editable="true" @bind-Date="_dateOfJoining" Margin="Margin.Dense" Color="Color.Primary"
+                                HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" Clearable="true" AutoClose="true"
+                                Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Text">
+                                <PickerActions Context="dateContext">
+                                    <MudButton Class="mr-auto align-self-start" OnClick="@(() => _dojPicker.ClearAsync())">Clear</MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _dateOfJoining = DateTime.Today))">Today</MudButton>
+                                    <MudButton Color="Color.Primary" OnClick="@(() => _dojPicker.CloseAsync())">OK</MudButton>
+                                </PickerActions>
+                            </MudDatePicker>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="2">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="_selectedManager"
+                                             SearchFunc="SearchReportingManager!"
+                                             Variant="Variant.Text"
+                                             Label="Reporting Manager"
+                                             Margin="Margin.Normal"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for value"
+                                             HelperTextOnFocus="true"
+                                             Clearable="true" Typo="Typo.subtitle2"
+                                             MaxItems="@(_managerList != null ? _managerList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>   
+                <MudGrid Spacing="5">
+                    <MudItem xs="2">
+                        <MudPaper Elevation="0" Class="p-0 w-100">                            
+                            <MudSelect T="UserDefinedCodeDTO" @bind-Value="_selectedEmployeeStatus" Variant="Variant.Text" Margin="Margin.Dense" Label="Employee Status" 
+                                    Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                       HelperText="Filter by employment status" HelperTextOnFocus="true" Clearable="true" Immediate="true" Typo="Typo.subtitle2">
+                                @foreach (var status in _employeeStatusList)
+                                {
+                                    <MudSelectItem Value="status">@status.UDCDesc1</MudSelectItem>
+                                }
+                            </MudSelect>      
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudSelect T="UserDefinedCodeDTO" @bind-Value="_selectedEmploymentType" Variant="Variant.Text" Margin="Margin.Dense" Label="Employement Type"
+                                        Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                       HelperText="Filter by employment type" HelperTextOnFocus="true" Clearable="true" Immediate="true" Typo="Typo.subtitle2">
+                                @foreach (var empType in _employmentTypeList)
+                                {
+                                    <MudSelectItem Value="empType">@empType.UDCDesc1</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="_selectedDepartment"
+                                SearchFunc="SearchDepartment!"
+                                Variant="Variant.Text"
+                                Label="Department"
+                                Margin="Margin.Normal"
+                                Dense="true"
+                                Placeholder="Please Select"
+                                HelperText="Type a key to search for value"
+                                HelperTextOnFocus="true"
+                                Clearable="true" Typo="Typo.subtitle2"
+                                MaxItems="@(_departmentList != null ? _departmentList.Count : 10)"
+                                Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudPaper Class="d-flex gap-2 justify-content-start align-items-baseline ms-2 pt-3" Elevation="0">
+                            <div @onmouseover="() => _isSearchHovered = true" @onmouseout="() => _isSearchHovered = false">
+                                <MudButton Variant="@(_isSearchHovered ? Variant.Filled : Variant.Outlined)" 
+                                    StartIcon="@Icons.Material.Filled.PersonSearch" Class="px-5"
+                                    Color="Color.Info" Size="Size.Medium" OnClick="@(() => BeginSearchEmployeeTask(true))">
+                                    <MudText Typo="Typo.button" HtmlTag="h3">Search</MudText>
+                                    @*  @if (_isRunning)
+                                    {
+                                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                        <MudText Typo="Typo.button" HtmlTag="h3" Class="ms-2">Processing</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText Typo="Typo.button" HtmlTag="h3">Search</MudText>
+                                    } *@
+                                </MudButton>
+                            </div>
+                            <div @onmouseover="() => _isResetHovered = true" @onmouseout="() => _isResetHovered = false">
+                                <MudButton Variant="@(_isResetHovered ? Variant.Filled : Variant.Outlined)"
+                                    StartIcon="@Icons.Material.Filled.Refresh" Class="px-5"
+                                           Color="Color.Warning" Size="Size.Medium" OnClick="BeginRefreshPageTask">
+                                    <MudText Typo="Typo.button" HtmlTag="h3">Reset</MudText>
+                                </MudButton>
+                            </div>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+            <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
+                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LIST OF EMPLOYEES</MudText>
+                <MudSpacer />
+                <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add New Employee" OnClick="AddNewEmployee" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Dark" Label="Download Master Data" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Upload" IconColor="Color.Dark" Label="Upload Employees" />
+                 </MudMenu>
+            </MudAppBar>
+            <MudPaper Elevation="4" Square="true" Class="w-100">
+                <MudDataGrid T="EmployeeMasterDTO" Items="@employeeList" Hover="true" Striped="true" Class="employee-master-grid"
+                    TableLayout="TableLayout.Fixed" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                    <Columns>
+                        <PropertyColumn Property="x => x.EmployeeId" Hidden />
+                        <PropertyColumn Property="x => x.EmployeeNo" Title="Employee No." Class="col-employee-code" />
+                        <PropertyColumn Property="x => x.FirstName" Title="First Name" Class="col-first-name" />
+                        <PropertyColumn Property="x => x.LastName" Title="Last Name" Class="col-last-name" />
+                        <PropertyColumn Property="x => x.Gender" Class="col-gender" />
+                        <PropertyColumn Property="x => x.HireDate" Title="Date of Join" Class="col-joining-date">
+                             <CellTemplate>
+                                 @context.Item.HireDate?.ToString("dd-MMM-yyyy")
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.EmploymentTypeCode" Hidden />
+                        <PropertyColumn Property="x => x.EmploymentType" Title="Employment Type" Class="col-employment-type" />
+                        <PropertyColumn Property="x => x.ReportingManagerCode" Hidden />
+                        <PropertyColumn Property="x => x.ReportingManager" Title="Reporting Manager" Class="col-reporting-manager" />
+                        <PropertyColumn Property="x => x.DepartmentName" Title="Department" Class="col-department" />
+                        <PropertyColumn Property="x => x.EmployeeStatusCode" Hidden />
+                        <PropertyColumn Property="x => x.EmployeeStatus" Title="Employee Status" Class="col-employee-status">
+                             <CellTemplate Context="row">
+                                 <MudChip T="string" Size=Size.Small Color="@(row.Item.EmployeeStatusCode == "STATACTIVE" ? Color.Success
+                                     : (row.Item.EmployeeStatusCode == "STATRESIGNED" || row.Item.EmployeeStatusCode == "STATRETIRED" || row.Item.EmployeeStatusCode == "STATTERMINATED" || row.Item.EmployeeStatusCode == "STATINACTIVE") ? Color.Error
+                                     : (row.Item.EmployeeStatusCode == "STATSUSPENDED" || row.Item.EmployeeStatusCode == "STATHOLD") ? Color.Warning
+                                     : (row.Item.EmployeeStatusCode == "STATNEWJOIN" || row.Item.EmployeeStatusCode == "STATHOLD") ? Color.Primary
+                                     : (row.Item.EmployeeStatusCode == "STATPENDING" || row.Item.EmployeeStatusCode == "STATNOTJOIN") ? Color.Secondary
+                                     : Color.Default)">
+                                     @row.Item.EmployeeStatus
+                                </MudChip>
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                            <CellTemplate>
+                                 <MudIconButton Color="Color.Info" title="View and edit employee information" Class="show-btn fa-icon-btn"
+                                                OnClick="@(()=>GoToEmployeeDetail(context.Item))">
+                                    <ChildContent>
+                                        <i class="fas fa-edit fa-1x"></i>
+                                    </ChildContent>
+                                </MudIconButton>
+                                 <MudIconButton Color="Color.Error" title="Delete employee record" Class="hide-btn fa-icon-btn" OnClick="@context.Actions.StartEditingItemAsync">
+                                    <ChildContent>
+                                        <i class="fas fa-trash-alt fa-lg"></i>
+                                    </ChildContent>
+                                </MudIconButton>
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                    <NoRecordsContent>
+                         <div class="no-data-box">
+                             <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
+                             <span>No data found</span>
+                         </div>
+                    </NoRecordsContent>
+                 </MudDataGrid>
+            </MudPaper>
+            <MudScrollToTop TopOffset="100"
+                            Selector="#mainPanel"
+                            VisibleCssClass="visible absolute"
+                            HiddenCssClass="hidden absolute">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+            </MudScrollToTop>
+        </MudStack>
+    </div>         
+</MudContainer>
+
+ <!-- Full-screen overlay -->
+@if (_isRunning)
+{
+    <div class="fullscreen-overlay">
+        <MudProgressCircular Indeterminate="true" Size="Size.Medium" Color="Color.Info" />
+        <MudText Typo="Typo.h6" Class="mt-2 text-white">@overlayMessage</MudText>
+    </div>
+}
+
+@code {
+
+    #region Fields
+    private MudDatePicker _dojPicker;
+    private IReadOnlyList<EmployeeMasterDTO> employeeList = new List<EmployeeMasterDTO>();
+    private IReadOnlyList<UserDefinedCodeDTO> _employeeStatusList = new List<UserDefinedCodeDTO>();
+    private IReadOnlyList<UserDefinedCodeDTO> _employmentTypeList = new List<UserDefinedCodeDTO>();
+    private IReadOnlyList<DepartmentDTO> _departmentList = new List<DepartmentDTO>();
+    private IReadOnlyList<EmployeeDTO> _managerList = new List<EmployeeDTO>();
+
+    private UserDefinedCodeDTO? _selectedEmployeeStatus = null;
+    private UserDefinedCodeDTO? _selectedEmploymentType = null;
+    private StringBuilder _errorMessage = new StringBuilder();
+
+    private string _selectedDepartment = string.Empty;
+    private string[]? _departmentArray = null;
+    private string? _departmentCode = null;        
+    private string _selectedManager = string.Empty;
+    private string[]? _managerArray = null;
+
+    private int? _employeeCode = null;
+    private string? _firstName = null;
+    private string? _lastName = null;
+    private int? _reportingManager = null;
+    private DateTime? _dateOfJoining = null;        
+    private string? _employeeType = null;        
+    private string overlayMessage = "Please wait...";
+    private string _departmentCacheKey = string.Empty;
+    private string _employeeCacheKey = string.Empty;
+
+    #region Flags
+    private bool _isSearchHovered = false;
+    private bool _isResetHovered = false;
+    private bool _isTaskFinished = false;
+    private bool _isRunning = false;
+    private bool _showErrorAlert = false;
+    #endregion
+
+    private enum UDCKeys
+    {
+        EMPSTATUS,	// Employee Status
+        EMPLOYTYPE,	// Employment Type
+        DEPARTMENT  // Departments
+    }   
+
+    private List<BreadcrumbItem> _breadcrumbItems =
+    [
+        new("Home", href: "/", icon: Icons.Material.Filled.Home),
+        new("Employee Master", href: "/CoreHR/employeesearch", icon: @Icons.Material.Filled.PeopleAlt, disabled: true)
+    ];
+    #endregion
+
+    #region Parameters and Injections
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public bool ForceLoad { get; set; } = false;
+    #endregion
+
+    #region Page Methods
+    public void Dispose()
+    {
+        // Cleanup resources
+        Logger.LogInformation("Employee page disposed");
+    }
+
+    protected override void OnInitialized()
+    {
+        BeginLoadComboboxTask();
+
+        if (LookupCache.IsEmployeeSearch)
+        {
+            LookupCache.IsEmployeeSearch = false;
+            BeginSearchEmployeeTask(ForceLoad);
+        }
+    }
+    #endregion
+
+    #region Asynchronous Tasks
+    private void BeginLoadComboboxTask()
+    {
+        _isTaskFinished = false;
+        _isRunning = true;
+
+        // Set the overlay message
+        overlayMessage = "Initializing form, please wait...";
+
+        _ = LoadComboboxAsync(async () =>
+        {
+            _isTaskFinished = true;
+            _isRunning = false;
+
+            if (_errorMessage.Length > 0)
+                ShowHideError(true);
+
+            // Shows the spinner overlay
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private async Task LoadComboboxAsync(Func<Task> callback)
+    {
+        // Wait for 1 second then gives control back to the runtime
+        await Task.Delay(300);
+
+        // Populate Employee Status dropdown
+        var repoResult = await LookupCache.GetEmployeeStatusAsync();
+        if (repoResult.Success)
+        {
+            _employeeStatusList = repoResult.Value!;
+        }
+        else
+        {
+            // Set the error message
+            _errorMessage.AppendLine(repoResult.Error);
+        }
+
+        // Populate Employment Type dropdown
+        repoResult = await LookupCache.GetEmploymentTypeAsync();
+        if (repoResult.Success)
+        {
+            _employmentTypeList = repoResult.Value!;
+        }
+        else
+        {
+            // Set the error message
+            _errorMessage.AppendLine(repoResult.Error);
+        }
+
+        #region Get Department list
+        var deptResult = await LookupCache.GetDepartmentMasterAsync();
+        if (deptResult.Success)
+        {
+            _departmentList = deptResult.Value!;
+        }
+        else
+        {
+            // Set the error message
+            _errorMessage.AppendLine(deptResult.Error);
+        }
+
+        if (_departmentList != null)
+        {
+            _departmentArray = _departmentList.Select(d => d.DepartmentName).OrderBy(d => d).ToArray();
+
+            // Save departments into cache via Application service
+            _departmentCacheKey = await AppCacheService.StoreDepartmentsAsync(_departmentList.ToList());
+        }
+        #endregion
+
+        #region Get Reporting Manager list
+        var managerResult = await LookupCache.GetReportingManagerAsync();
+        if (managerResult.Success)
+        {
+            _managerList = managerResult.Value!;
+        }
+        else
+        {
+            // Set the error message
+            _errorMessage.AppendLine(managerResult.Error);
+        }
+
+        if (_managerList != null)
+        {
+            _managerArray = _managerList.Select(d => d.EmployeeFullName).OrderBy(d => d).ToArray();
+
+            // Save employees into cache via Application service
+            _employeeCacheKey = await AppCacheService.StoreEmployeesAsync(_managerList.ToList());
+        }
+        #endregion
+
+        if (callback != null)
+        {
+            // Hide the spinner overlay
+            await callback.Invoke();
+        }
+    }
+
+    private void BeginSearchEmployeeTask(bool forceLoad = false)
+    {
+        _isTaskFinished = false;
+        _isRunning = true;
+
+        // Set the overlay message
+        overlayMessage = "Loading employee list, please wait...";
+
+        /*
+        Notes:
+        - The underscore makes the method call asynchronous, non-blocking, and explicit that we don’t care about the result.
+        - By assigning it to _, you’re telling the compiler: "Yes, I know this returns a Task, but I’m intentionally not awaiting it. Run it in the background."
+        - It’s like saying “fire-and-forget”.
+        - In short, The underscore _ is a discard assignment — it suppresses compiler warnings when you deliberately ignore the return value of a method.
+        */
+
+        _ = SearchEmployeeAsync(async () =>
+        {
+            _isTaskFinished = true;
+            _isRunning = false;
+
+            /* Notes:
+            * StateHasChanged → refresh the UI.
+            * InvokeAsync → marshal that call to the right Blazor thread.
+            * await → make sure the re-render finishes in a safe, async-friendly way.
+            */                       
+
+            // Shows the spinner overlay
+            await InvokeAsync(StateHasChanged);
+        }, forceLoad);
+    }
+
+    private async Task SearchEmployeeAsync(Func<Task> callback, bool forceLoad = false)
+    {
+        // Simulate async work
+        // This creates a task that waits asynchronously for 3000 milliseconds (3 seconds).
+        // The method “pauses” here and gives control back to the runtime until the timer completes.
+        // Await makes the method asynchronous — the UI stays responsive during the 3-second delay.
+        await Task.Delay(1000);
+
+        // Reset error messages
+        _errorMessage.Clear();
+
+        // Get the department code
+        _departmentCode = string.Empty;
+        if (!string.IsNullOrEmpty(_selectedDepartment))
+        {
+            DepartmentDTO? departmentDTO = _departmentList.Where(d => d.DepartmentName == _selectedDepartment).FirstOrDefault();
+            if (departmentDTO != null)
+                _departmentCode = departmentDTO.DepartmentCode;
+        }
+
+        _reportingManager = null;
+        if (!string.IsNullOrEmpty(_selectedManager))
+        {
+            EmployeeDTO? selectedManager = _managerList.Where(a => a.EmployeeFullName == _selectedManager).FirstOrDefault();
+            if (selectedManager != null)
+                _reportingManager = selectedManager.EmployeeNo;
+        }
+
+        var result = await LookupCache.SearchEmployeeAsync(_employeeCode, _firstName, _lastName, _reportingManager,
+            _dateOfJoining, _selectedEmployeeStatus?.UDCCode, _selectedEmploymentType?.UDCCode, _departmentCode, forceLoad);
+        if (result.Success)
+        {
+            // Set the flag to indicate that search has been invoked
+            LookupCache.IsEmployeeSearch = true;
+
+            employeeList = result.Value!;
+        }
+        else
+        {
+            // Set the error message
+            _errorMessage.Append(result.Error);
+
+            ShowHideError(true);
+        }
+
+        if (callback != null)
+        {
+            // Hide the spinner overlay
+            await callback.Invoke();
+        }
+    }
+
+    private void BeginRefreshPageTask()
+    {
+        _isTaskFinished = false;
+        _isRunning = true;
+
+        // Set the overlay message
+        overlayMessage = "Refreshing form, please wait...";
+
+        _ = RefreshPageAsync(async () =>
+        {
+            _isTaskFinished = true;
+            _isRunning = false;
+
+            // Shows the spinner overlay
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private async Task RefreshPageAsync(Func<Task> callback)
+    {
+        // Wait for 1 second then gives control back to the runtime
+        await Task.Delay(1000);
+
+        // Reset error messages
+        _errorMessage.Clear();
+
+        // Clear field mappings
+        _employeeCode = null;
+        _firstName = null;
+        _lastName = null;
+        _reportingManager = null;
+        _dateOfJoining = null;
+        _employeeType = null;
+        _departmentCode = null;
+        _selectedEmployeeStatus = null;
+        _selectedEmploymentType = null;
+        _selectedDepartment = string.Empty;
+        employeeList = new List<EmployeeMasterDTO>();
+
+        if (callback != null)
+        {
+            // Hide the spinner overlay
+            await callback.Invoke();
+        }
+    }
+    #endregion
+
+    #region Database Methods
+    private async Task<IEnumerable<string>> SearchDepartment(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _departmentArray!;
+        }
+
+        return _departmentArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchReportingManager(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _managerArray!;
+        }
+
+        return _managerArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }                
+    #endregion
+
+    #region Private Methods
+    private void ShowHideError(bool value)
+    {
+        if (value)
+        {
+            _showErrorAlert = true;
+        }
+        else
+        {
+            _showErrorAlert = false;   
+
+            // Reset error messages
+            _errorMessage.Clear();
+        }
+    }
+
+    private void GoToEmployeeDetail(EmployeeMasterDTO employee)
+    {       
+        NavigationManager.NavigateTo($"/employees?EmployeeId={employee.EmployeeId}&ActionType=View&DepartmentCacheKey={_departmentCacheKey}&EmployeeCacheKey={_employeeCacheKey}");
+    }
+
+    private void AddNewEmployee()
+    {
+        NavigationManager.NavigateTo($"/employees?EmployeeId=0&ActionType=Add&DepartmentCacheKey={_departmentCacheKey}&EmployeeCacheKey={_employeeCacheKey}");
+    }
+    #endregion
+}

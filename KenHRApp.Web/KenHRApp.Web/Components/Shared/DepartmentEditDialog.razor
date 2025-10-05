@@ -1,0 +1,34 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudTextField @bind-Value="Department.DepartmentCode" Label="Department Code" Required="true" />
+            <MudTextField @bind-Value="Department.DepartmentName" Label="Department Name" Required="true" />
+            <MudTextField @bind-Value="Department.Description" Label="Description" />
+        </MudForm>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
+        <MudButton Color="Color.Default" Variant="Variant.Text" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter] 
+    public DepartmentDTO Department { get; set; } = new();
+
+    private MudForm _form = new();
+
+    private async Task Save()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        MudDialog.Close(DialogResult.Ok(Department));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

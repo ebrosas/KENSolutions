@@ -1,0 +1,203 @@
+﻿@inherits LayoutComponentBase
+@inject IAppState State
+@inject ISharedAction Actions
+
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    @* <MudAppBar Elevation="2" Color="@appBarColor" Dense="false"> *@
+    <MudAppBar Elevation="2" Style="background-color: #004165;" Dense="false">
+        <MudIconButton Icon="@Icons.Material.Filled.Apps" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
+        <MudText Typo="Typo.h5" Class="ml-1"></MudText>
+        <MudSpacer />        
+        <MudMenu Dense
+                  Variant="Variant.Text"
+                  Size="Size.Medium"
+                  Color="Color.Inherit"
+                  AriaLabel="Open site configurations"
+                  title="System setup options"
+                  Icon="@Icons.Material.Filled.Settings">
+             <MudMenuItem Href="/"
+                ForceLoad
+                Icon="@Icons.Material.TwoTone.AccountTree"
+                Class="navMenu"
+                Size="Size.Small"
+                Label="Organization" />
+             <MudMenuItem Href="/"
+                ForceLoad
+                Icon="@Icons.Material.TwoTone.SettingsSuggest"
+                Class="navMenu"
+                Label="Portal" />
+             <MudMenuItem Href="/"
+                          ForceLoad
+                          Icon="@Icons.Material.TwoTone.AttachMoney"
+                          Class="navMenu"
+                          Label="Compensation & Benefits" />
+             <MudMenuItem Href="/"
+                          ForceLoad
+                          Icon="@Icons.Material.TwoTone.People"
+                          Class="navMenu"
+                          Label="Recruitment & On-boarding" />
+             <MudMenuItem Href="/"
+                          ForceLoad
+                          Icon="@Icons.Material.TwoTone.CalendarMonth"
+                          Class="navMenu"
+                          Label="Time & Attendance" />
+             <MudMenuItem Href="/"
+                          ForceLoad
+                          Icon="@Icons.Material.TwoTone.AirplaneTicket"
+                          Class="navMenu"
+                          Label="Travel & Expense" />
+             <MudMenuItem Href="/"
+                          ForceLoad
+                          Icon="@Icons.Custom.Brands.Calculator"
+                          Class="navMenu"
+                          Label="Payroll & Compliance" />
+             <MudMenuItem Href="/"
+                          ForceLoad
+                          Icon="@Icons.Material.TwoTone.ManageAccounts"
+                          Class="navMenu"
+                          Label="Performance Management" />
+             <MudMenuItem Href="/"
+                          ForceLoad
+                          Icon="@Icons.Material.TwoTone.PersonAddAlt"
+                          Class="navMenu"
+                          Label="Employee Creation" />
+             <MudMenuItem Href="/"
+                          ForceLoad
+                          Icon="@Icons.Material.Filled.NaturePeople"
+                          Class="navMenu"
+                          Label="Employee Life Cycle" />
+        </MudMenu>
+        <MudIconButton Icon="@Icons.Material.Filled.FavoriteBorder" Color="Color.Inherit" Edge="Edge.End" title="Frequently used links" />
+        <MudIconButton Icon="@Icons.Material.Outlined.NotificationsActive" Color="Color.Inherit" Edge="Edge.End" title="Notifications" />
+        <MudIconButton Icon="@Icons.Material.Filled.SupervisedUserCircle" Color="Color.Inherit" Edge="Edge.End" title="User Profile" />
+        <MudMenu Dense
+                  Variant="Variant.Text"
+                  Size="Size.Medium"
+                  Color="Color.Inherit"
+                  AriaLabel="Open user menu"
+                  Icon="@Icons.Material.TwoTone.MoreVert">
+
+             <MudMenu EndIcon="@Icons.Material.TwoTone.Settings"
+                      Style="min-width: 200px; width: 250px;"
+                      Class="navMenu" 
+                      Label="Settings">
+                 <MudMenuItem Href="/"
+                              ForceLoad
+                              Icon="@Icons.Material.TwoTone.People"
+                              Class="navMenu"
+                              Label="Users" />
+                 <MudMenuItem Href="/"
+                              ForceLoad
+                              Icon="@Icons.Material.TwoTone.Security"
+                              IconColor="Color.Info"
+                              Label="Security" />
+                 <MudMenuItem Href="Account/Logout"
+                              ForceLoad
+                              Icon="@Icons.Material.TwoTone.Logout"
+                              Class="navMenu"
+                              Label="Sign Out" />
+             </MudMenu>
+             @* <MudDivider /> *@
+         </MudMenu>         
+    </MudAppBar>
+     <MudDrawer @bind-Open="@_drawerOpen" Elevation="0" ClipMode="DrawerClipMode.Always" Variant="DrawerVariant.Responsive" Width="260px"
+        Color="Color.Default" Class="custom-drawer">
+                @* Style="overflow-y: scroll; scrollbar-width: none;"> *@   
+         <MudDrawerHeader Dense="true">              
+             <MudButtonGroup Color="Color.Transparent" Variant="Variant.Filled" Class="p-0 m-0">
+                 <MudIconButton Icon="@Icons.Material.Filled.Home" Color="Color.Dark" Size=Size.Small title="Homepage" Href="/home"></MudIconButton>
+                 <MudIconButton Icon="@Icons.Material.Filled.DashboardCustomize" Color="Color.Dark" Size=Size.Small Href="/dashboard" title="Dashboard"></MudIconButton>
+                <MudToggleIconButton Icon="@Icons.Material.Outlined.PushPin" 
+                    Color="@Color.Dark" Size=Size.Small
+                    Toggled="PinDrawer"
+                    ToggledChanged="OnToggledPinDrawerChanged"
+                    ToggledIcon="@Icons.Material.Rounded.PushPin" 
+                    ToggledColor="@Color.Success"
+                    title="Show/hide side menu" />
+                 <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Error" Size=Size.Small OnClick="HideDrawer" title="Close drawer"></MudIconButton>
+             </MudButtonGroup>             
+         </MudDrawerHeader>
+         <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+         <MudContainer MaxWidth="MaxWidth.False" Class="px-2 pt-3">
+            @Body
+        </MudContainer>        
+    </MudMainContent>
+</MudLayout>
+
+@code {
+
+    #region Fields
+    private bool _drawerOpen = false;
+    private Color appBarColor = Color.Primary;
+    #endregion
+
+    #region Properties
+    public bool PinDrawer { get; set; }
+    #endregion
+
+    private void CloseDrawer() => _drawerOpen = false;
+
+    #region Override Methods
+    protected override void OnInitialized()
+    {
+        Actions.ShowHideDrawer = ShowDrawer;
+    }
+    #endregion
+
+    #region Private Methods
+    private void ShowDrawer()
+    {
+        _drawerOpen = true;
+    }
+
+    private void HideDrawer()
+    {
+        _drawerOpen = false;
+    }
+    #endregion
+
+    #region Public Methods
+    public void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+        PinDrawer = !_drawerOpen;
+        
+        if (PinDrawer)
+        {
+            State.ShowAppDrawer = true;
+            Actions.ShowHideDrawer = ShowDrawer;
+        }
+        else
+        {
+            State.ShowAppDrawer = false;
+            Actions.ShowHideDrawer = HideDrawer;
+        }
+    }
+
+    public void OnToggledPinDrawerChanged(bool toggled)
+    {
+        // Because variable is not two-way bound, we need to update it ourselves.
+        PinDrawer = toggled;
+
+        if (PinDrawer)
+        {
+            // _drawerOpen = true;
+            State.ShowAppDrawer = true;
+            Actions.ShowHideDrawer = ShowDrawer;
+        }
+        else
+        {
+            // _drawerOpen = false;
+            State.ShowAppDrawer = false;
+            Actions.ShowHideDrawer = HideDrawer;
+        }
+    }
+    #endregion
+}
