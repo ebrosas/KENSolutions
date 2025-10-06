@@ -29,6 +29,7 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<bool>> DeleteEmployeeAsync(int employeeId, CancellationToken cancellationToken = default);
         Task<Result<int>> SaveDepartmentAsync(DepartmentMaster dto, CancellationToken cancellationToken = default);
         Task<Result<bool>> DeleteDepartmentAsync(int departmentID, CancellationToken cancellationToken = default);
+        Task<Result<int>> AddDepartmentAsync(DepartmentMaster department, CancellationToken cancellationToken = default);
         #endregion
     }
 }

@@ -1683,6 +1683,32 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<bool>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<int>> AddDepartmentAsync(DepartmentMaster department, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {                
+                // Save to database
+                _db.DepartmentMasters.Add(department);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

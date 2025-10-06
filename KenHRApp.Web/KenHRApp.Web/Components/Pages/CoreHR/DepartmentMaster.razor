@@ -143,7 +143,7 @@
                         <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
                              <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
                              <MudPaper Class="ms-3" Elevation="0">
-                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new department" />
+                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new department" OnClick="AddDepartment" />
                              </MudPaper>                             
                         </MudPaper>
                     </ToolBarContent>
@@ -245,7 +245,17 @@
                              <EditTemplate>
                                  @* Empty to prevent rendering *@
                              </EditTemplate>
-                        </PropertyColumn>                        
+                        </PropertyColumn>   
+                         <PropertyColumn Property="x => x.IsActiveDesc" Title="Is Active?" Class="col-active" Required="false">
+                             <CellTemplate Context="row">
+                                 <MudChip T="string" Size=Size.Small Color="@(row.Item.IsActiveDesc == "Yes" ? Color.Success : Color.Error)">
+                                     @row.Item.IsActiveDesc
+                                </MudChip>
+                            </CellTemplate>
+                            <EditTemplate>
+                                <MudSwitch @bind-Value="context.Item.IsActive" Color="Color.Success" UncheckedColor="Color.Error" Label="Is Active?" />
+                            </EditTemplate>
+                        </PropertyColumn>
                         <PropertyColumn Property="x => x.CreatedAt" Title="Created Date" Class="col-created-date" Editable="false">
                              <CellTemplate>
                                  @context.Item.CreatedAt.ToString("dd-MMM-yyyy")
@@ -255,17 +265,7 @@
                             <CellTemplate>
                                 @context.Item.UpdatedAt?.ToString("dd-MMM-yyyy")
                             </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.IsActiveDesc" Title="Is Active?" Class="col-active" Required="false">
-                             <CellTemplate Context="row">
-                                <MudChip T="string" Size=Size.Small Color="@(row.Item.IsActiveDesc == "Yes" ? Color.Success : Color.Error)">
-                                    @row.Item.IsActiveDesc
-                                </MudChip>
-                            </CellTemplate>
-                            <EditTemplate>
-                                <MudSwitch @bind-Value="context.Item.IsActive" Color="Color.Success" UncheckedColor="Color.Error" Label="Is Active?" />
-                            </EditTemplate>
-                        </PropertyColumn>
+                        </PropertyColumn>                        
                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                             <CellTemplate Context="row">
                                 <MudIconButton Color="Color.Info" title="View and edit employee information" Class="show-btn fa-icon-btn"

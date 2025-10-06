@@ -226,23 +226,90 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         private async Task AddDepartment()
         {
-            var parameters = new DialogParameters { ["Department"] = new DepartmentDTO() };
+            var parameters = new DialogParameters 
+            { 
+                ["Department"] = new DepartmentDTO(),
+                [ "GroupList"] = _groupList,
+                ["EmployeeList"] = _employeeList,
+                ["IsClearable"] = true,
+                ["IsDisabled"] = false
+            };
 
             var options = new DialogOptions
             {
-                CloseOnEscapeKey = false,
+                CloseOnEscapeKey = true,
                 BackdropClick = false,
                 FullWidth = true,
-                MaxWidth = MaxWidth.Medium
+                MaxWidth = MaxWidth.Large
             };
 
-            var dialog = await DialogService.ShowAsync<DepartmentEditDialog>("Add Department", parameters, options);
+            var dialog = await DialogService.ShowAsync<DepartmentEditDialog>("Add New Department", parameters, options);
+            
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
                 var newDept = (DepartmentDTO)result.Data!;
-                newDept.DepartmentId = _departmentList.Max(d => d.DepartmentId) + 1;
-                _departmentList.Add(newDept);
+                newDept.DepartmentId = 0;
+
+                #region Check for duplicate entries
+                var duplicateDepartment = _departmentList.FirstOrDefault(g => g.DepartmentCode == newDept.DepartmentCode && g.DepartmentName == newDept.DepartmentName);
+                if (duplicateDepartment != null)
+                {
+                    // Show error
+                    //_errorMessage.AppendLine("The Department Code and Name already exists. Please enter a different Department Code and Name.");
+                    //ShowHideError(true);
+                    
+                    await DialogService.ShowMessageBox("Error", "The Department Code and Name already exists. Please enter a different Department Code and Name.", "OK");
+                    return;
+                }
+                #endregion
+
+                #region Get the selected Group Name
+                if (!string.IsNullOrEmpty(newDept.GroupCode))
+                {
+                    UserDefinedCodeDTO? udc = _groupList.Where(d => d.UDCCode == newDept.GroupCode).FirstOrDefault();
+                    if (udc != null)
+                        newDept.GroupName = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get the selected Department Head
+                if (!string.IsNullOrEmpty(newDept.SuperintendentName))
+                {
+                    EmployeeDTO? headEmp = _employeeList.Where(d => d.EmployeeFullName == newDept.SuperintendentName).FirstOrDefault();
+                    if (headEmp != null)
+                        newDept.SuperintendentEmpNo = headEmp.EmployeeNo;
+                }
+                #endregion
+
+                #region Get the selected Department Manager
+                if (!string.IsNullOrEmpty(newDept.ManagerName))
+                {
+                    EmployeeDTO? managerEmp = _employeeList.Where(d => d.EmployeeFullName == newDept.ManagerName).FirstOrDefault();
+                    if (managerEmp != null)
+                        newDept.ManagerEmpNo = managerEmp.EmployeeNo;
+                }
+                #endregion
+
+                newDept.IsActiveDesc = newDept.IsActive ? "Yes" : "No";
+
+                // Set the Update Date
+                newDept.CreatedAt = DateTime.Now;
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Adding department, please wait...";
+
+                _ = SaveChangeAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                }, newDept);
             }
         }
         #endregion
@@ -601,11 +668,21 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             string errorMsg = string.Empty;
 
             if (department.DepartmentId == 0)
-            {
-                //var addResult = await EmployeeService.AddEmployeeAsync(department, _cts.Token);
-                //isSuccess = addResult.Success;
-                //if (!isSuccess)
-                //    errorMsg = addResult.Error!;
+            {                
+                var addResult = await EmployeeService.AddDepartmentAsync(department, _cts.Token);
+                isSuccess = addResult.Success;
+                if (!isSuccess)
+                    errorMsg = addResult.Error!;
+                else
+                {
+                    // Get the new identity seed
+                    department.DepartmentId = _departmentList.Max(d => d.DepartmentId) + 1;
+
+                    // Add locally to the list so UI updates immediately
+                    _departmentList.Add(department);
+                    
+                    StateHasChanged();
+                }
             }
             else
             {
@@ -617,11 +694,6 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
             if (isSuccess)
             {
-                // Reset flags
-                //_isEditMode = false;
-                //_saveBtnEnabled = false;
-                //_isDisabled = true;
-
                 // Show notification
                 ShowNotification("Department data saved successfully!", SnackBarTypes.Success);
             }

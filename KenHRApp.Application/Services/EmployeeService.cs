@@ -2113,6 +2113,43 @@ namespace KenHRApp.Application.Services
                 return Result<bool>.Failure(ex.Message.ToString());
             }
         }
+
+        public async Task<Result<int>> AddDepartmentAsync(DepartmentDTO dto, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Initialize DepartmentMaster entity
+                DepartmentMaster department = new DepartmentMaster()
+                {
+                    DepartmentCode = dto.DepartmentCode,
+                    DepartmentName = dto.DepartmentName,
+                    GroupCode = dto.GroupCode,
+                    Description = dto.Description,
+                    ParentDepartmentId = dto.ParentDepartmentId,
+                    SuperintendentEmpNo = dto.SuperintendentEmpNo,
+                    ManagerEmpNo = dto.ManagerEmpNo,
+                    IsActive = true,
+                    CreatedAt = DateTime.Now
+                };
+                #endregion
+
+                var result = await _repository.AddDepartmentAsync(department, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to commit data changes to the database. Please try saving again.");
+                }
+
+                return Result<int>.SuccessResult(result.Value);
+
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
         #endregion
     }
 }

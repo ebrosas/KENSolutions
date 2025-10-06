@@ -1,10 +1,90 @@
-﻿<MudDialog>
+﻿@using KenHRApp.Web.Components.Common
+
+<MudDialog>
     <DialogContent>
         <MudForm @ref="_form">
-            <MudTextField @bind-Value="Department.DepartmentCode" Label="Department Code" Required="true" />
-            <MudTextField @bind-Value="Department.DepartmentName" Label="Department Name" Required="true" />
-            <MudTextField @bind-Value="Department.Description" Label="Description" />
-            <MudTextField @bind-Value="Department.GroupName" Label="GroupName" />
+            <MudGrid Spacing="7">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        @* <LabelWithAsterisk TModel="DepartmentDTO" TValue="string" Label="Department Code" For="x => x.DepartmentCode" /> *@
+                        <MudTextField @bind-Value="Department.DepartmentCode" For="@(() => Department.DepartmentCode)"
+                                      HelperText="Max. text input is 20 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                      Counter="20" MaxLength="20" Disabled="false" Label="Department Code"
+                                      Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>  
+                </MudItem>
+                 <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        @* <LabelWithAsterisk TModel="DepartmentDTO" TValue="string" Label="Department Name" For="x => x.DepartmentName" /> *@
+                        <MudTextField @bind-Value="Department.DepartmentName" For="@(() => Department.DepartmentName)"
+                                      HelperText="Max. text input is 120 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                      Counter="120" MaxLength="120" Disabled="@IsDisabled" Label="Department Name"
+                                      Clearable="false" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>  
+                </MudItem>
+            </MudGrid>
+            <MudGrid Spacing="7">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudTextField @bind-Value="Department.Description" Label="Description"
+                                      For="@(() => Department.Description)"
+                                      HelperText="Max. text input is 300 chars."
+                                      Variant="Variant.Text" HelperTextOnFocus="true" Counter="150" MaxLength="150" 
+                                      Clearable="@IsClearable" Disabled="@IsDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudSelect @bind-Value="Department.GroupCode" Variant="Variant.Text" Margin="Margin.Dense" Label="Group Name"
+                                   Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                   HelperText="Filter by employment status" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
+                            @foreach (var group in GroupList)
+                            {
+                                <MudSelectItem Value="group.UDCCode">@group.UDCDesc1</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+            <MudGrid Spacing="7">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudAutocomplete @bind-Value="Department.SuperintendentName"
+                                         SearchFunc="SearchEmployee!"
+                                         Variant="Variant.Text"
+                                         Label="Department Head"
+                                         Margin="Margin.Normal"
+                                         Dense="true"
+                                         Placeholder="Please Select"
+                                         HelperText="Type a key to search for employee"
+                                         HelperTextOnFocus="true"
+                                         Clearable="true" Typo="Typo.subtitle2"
+                                         MaxItems="@(EmployeeList != null ? EmployeeList.Count : 10)"
+                                         Modal="true" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudAutocomplete @bind-Value="Department.ManagerName"
+                                         SearchFunc="SearchEmployee!"
+                                         Variant="Variant.Text"
+                                         Label="Department Manager"
+                                         Margin="Margin.Normal"
+                                         Dense="true"
+                                         Placeholder="Please Select"
+                                         HelperText="Type a key to search for employee"
+                                         HelperTextOnFocus="true"
+                                         Clearable="true" Typo="Typo.subtitle2"
+                                         MaxItems="@(EmployeeList != null ? EmployeeList.Count : 10)"
+                                         Modal="true" />
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+            <MudGrid Spacing="7">
+                <MudItem xs="6">
+                    <MudSwitch @bind-Value="Department.IsActive" Color="Color.Success" UncheckedColor="Color.Default" LabelPlacement="Placement.Start">Is Active?</MudSwitch>
+                </MudItem>
+            </MudGrid>
         </MudForm>
     </DialogContent>
 
@@ -16,20 +96,70 @@
 
 @code {
     
+    #region Fields
+    private MudForm _form = new();
+    private List<UserDefinedCodeDTO> _groupList = new List<UserDefinedCodeDTO>();
+    private IReadOnlyList<EmployeeDTO> _employeeList = new List<EmployeeDTO>();
+    private string[]? _groupArray = null;
+    private string[]? _employeeArray = null;
+    #endregion
+
+    #region Parameters and Injections
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = default!;
 
     [Parameter] 
     public DepartmentDTO Department { get; set; } = new();
 
-    private MudForm _form = new();
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> GroupList { get; set; } = new List<UserDefinedCodeDTO>();
 
-    private async Task Save()
+    [Parameter]
+    public IReadOnlyList<EmployeeDTO> EmployeeList { get; set; } = new List<EmployeeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<DepartmentDTO> DepartmentList { get; set; } = new List<DepartmentDTO>();
+
+    [Parameter]
+    public bool IsClearable { get; set; } = true;
+
+    [Parameter]
+    public bool IsDisabled { get; set; } = true;
+    #endregion
+
+    #region Page Methods
+    protected override void OnInitialized()
+    {
+        if (EmployeeList != null)
+        {
+            _employeeArray = EmployeeList.Select(d => d.EmployeeFullName).OrderBy(d => d).ToArray();
+        }
+    }
+    #endregion
+
+    #region Private Methods
+     private async Task Save()
     {
         await _form.Validate();
-        if (!_form.IsValid) return;
+        if (!_form.IsValid) return;                
+
         MudDialog.Close(DialogResult.Ok(Department));
     }
 
     private void Cancel() => MudDialog.Cancel();
+
+    private async Task<IEnumerable<string>> SearchEmployee(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _employeeArray!;
+        }
+
+        return _employeeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    #endregion
 }

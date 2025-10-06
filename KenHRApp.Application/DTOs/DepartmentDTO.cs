@@ -26,7 +26,11 @@ namespace KenHRApp.Application.DTOs
 
         public string? GroupCode { get; set; } = null;
         public string? GroupName { get; set; } = null;
+
+        [Display(Name = "Description")]
+        [StringLength(150, ErrorMessage = "Description can't be more than 150 characters.")]
         public string? Description { get; set; } = null;
+
         public int? ParentDepartmentId { get; set; }
         public string? ParentDepartmentName { get; set; } = null;
         public int? SuperintendentEmpNo { get; set; }
@@ -34,7 +38,13 @@ namespace KenHRApp.Application.DTOs
         public int? ManagerEmpNo { get; set; }
         public string? ManagerName { get; set; } = null;
         public bool IsActive { get; set; } = true;
+
+        [Display(Name = "Created Date")]
+        [DataType(DataType.Date)]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [Display(Name = "Updated Date")]
+        [DataType(DataType.Date)]
         public DateTime? UpdatedAt { get; set; }
         #endregion
 

@@ -41,6 +41,7 @@ namespace KenHRApp.Application.Interfaces
             string departmentCode = "", string groupCode = "");
         Task<Result<int>> SaveDepartmentAsync(DepartmentDTO department, CancellationToken cancellationToken = default);
         Task<Result<bool>> DeleteDepartmentAsync(int departmentID, CancellationToken cancellationToken = default);
+        Task<Result<int>> AddDepartmentAsync(DepartmentDTO dto, CancellationToken cancellationToken = default);
         #endregion
     }
 }
