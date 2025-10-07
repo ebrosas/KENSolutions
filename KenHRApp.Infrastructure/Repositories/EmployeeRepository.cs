@@ -1737,6 +1737,69 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<bool>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<int>> UpdateEmergencyContactAsync(EmergencyContact dto, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                var contact = await _db.EmergencyContacts.FirstOrDefaultAsync(x => x.AutoId == dto.AutoId, cancellationToken);
+                if (contact == null)
+                    throw new InvalidOperationException("Emergency contact person not found");
+
+                #region Update Employee entity
+                contact.ContactPerson = dto.ContactPerson;
+                contact.RelationCode = dto.RelationCode;
+                contact.MobileNo = dto.MobileNo;
+                contact.LandlineNo = dto.LandlineNo;
+                contact.Address = dto.Address;
+                contact.CountryCode = dto.CountryCode;
+                contact.City = dto.City;
+                #endregion
+
+                // Save to database
+                _db.EmergencyContacts.Update(contact);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> AddEmergencyContactAsync(EmergencyContact contact, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                // Save to database
+                _db.EmergencyContacts.Add(contact);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

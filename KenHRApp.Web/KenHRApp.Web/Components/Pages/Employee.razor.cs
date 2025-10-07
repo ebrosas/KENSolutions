@@ -314,7 +314,7 @@ namespace KenHRApp.Web.Components.Pages
             {
                 if (item == null) return;
 
-                #region Get selected relation
+                #region Get selected relationship
                 if (!string.IsNullOrEmpty(item.RelationCode))
                 {
                     UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCCode == item.RelationCode).FirstOrDefault();
@@ -367,44 +367,28 @@ namespace KenHRApp.Web.Components.Pages
             // Initialize the cancellation token
             _cts = new CancellationTokenSource();
 
-            bool isSuccess = false;
-            string errorMsg = string.Empty;
-
-            //if (contactPerson.AutoId == 0)
-            //{
-            //    var addResult = await EmployeeService.AddDepartmentAsync(contactPerson, _cts.Token);
-            //    isSuccess = addResult.Success;
-            //    if (!isSuccess)
-            //        errorMsg = addResult.Error!;
-            //    else
-            //    {
-            //        // Get the new identity seed
-            //        contactPerson.AutoId = employee.EmergencyContactList.Max(d => d.AutoId) + 1;
-
-            //        // Add locally to the list so UI updates immediately
-            //        employee.EmergencyContactList.Add(contactPerson);
-
-            //        StateHasChanged();
-            //    }
-            //}
-            //else
-            //{
-            //    var saveResult = await EmployeeService.SaveDepartmentAsync(contactPerson, _cts.Token);
-            //    isSuccess = saveResult.Success;
-            //    if (!isSuccess)
-            //        errorMsg = saveResult.Error!;
-            //}
-
-            if (isSuccess)
+            var result = await EmployeeService.SaveEmergencyContactAsync(contactPerson, _cts.Token);
+            if (!result.Success)
             {
-                // Show notification
-                ShowNotification("Emergency contact saved successfully!", NotificationType.Success);
+                // Set the error message
+                _errorMessage.AppendLine(result.Error!);
+                ShowHideError(true);
             }
             else
             {
-                // Set the error message
-                _errorMessage.AppendLine(errorMsg);
-                ShowHideError(true);
+                if (contactPerson.AutoId == 0)
+                {
+                    // Get the new identity seed
+                    contactPerson.AutoId = employee.EmergencyContactList.Max(d => d.AutoId) + 1;
+
+                    // Add locally to the list so UI updates immediately
+                    employee.EmergencyContactList.Add(contactPerson);
+
+                    StateHasChanged();
+                }
+
+                // Show notification
+                ShowNotification("Emergency contact saved successfully!", NotificationType.Success);
             }
 
             if (callback != null)
@@ -1530,6 +1514,24 @@ namespace KenHRApp.Web.Components.Pages
                                 _roleTypeArray = _roleTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
                         }
                         #endregion
+
+                        #region Populate Relationship Type dropdown
+                        try
+                        {
+                            groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.RELATIONTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                        }
+                        catch (Exception ex)
+                        {
+                            _errorMessage.Append($"Error getting Relationship Types group ID: {ex.Message}");
+                        }
+
+                        if (groupID > 0)
+                        {
+                            _relationTypeList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.UDCDesc1).ToList();
+                            if (_relationTypeList != null)
+                                _relationTypeArray = _relationTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                        }
+                        #endregion
                     }
                 }
                 else
@@ -2236,6 +2238,20 @@ namespace KenHRApp.Web.Components.Pages
             }
 
             return _roleTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchRelationship(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _relationTypeArray!;
+            }
+
+            return _relationTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
         #endregion
     }

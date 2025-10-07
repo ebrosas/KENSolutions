@@ -2171,6 +2171,65 @@ namespace KenHRApp.Application.Services
                 return Result<bool>.Failure(ex.Message.ToString());
             }
         }
+
+        public async Task<Result<int>> SaveEmergencyContactAsync(EmergencyContactDTO dto, CancellationToken cancellationToken = default)
+        {
+            int saveResult = 0;
+
+            try
+            {
+                #region Initialize EmergencyContact entity
+                EmergencyContact contactEntity = new EmergencyContact()
+                {
+                    AutoId = dto.AutoId,
+                    ContactPerson = dto.ContactPerson,
+                    RelationCode = dto.RelationCode,
+                    MobileNo = dto.MobileNo,
+                    LandlineNo = dto.LandlineNo,
+                    Address = dto.Address,
+                    CountryCode = dto.CountryCode,
+                    City = dto.City
+                };
+                #endregion
+
+                if (contactEntity.AutoId == 0)
+                {
+                    var addResult = await _repository.AddEmergencyContactAsync(contactEntity, cancellationToken);
+                    if (addResult.Success)
+                    {
+                        saveResult = addResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(addResult.Error))
+                            throw new Exception(addResult.Error);
+                        else
+                            throw new Exception("Unable to add new emergency contact to the database. Please try saving again.");
+                    }
+                }
+                else
+                {
+                    var updateResult = await _repository.UpdateEmergencyContactAsync(contactEntity, cancellationToken);
+                    if (updateResult.Success)
+                    {
+                        saveResult = updateResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(updateResult.Error))
+                            throw new Exception(updateResult.Error);
+                        else
+                            throw new Exception("Unable to update the selected emergency contact. Please try saving again.");
+                    }
+                }
+
+                return Result<int>.SuccessResult(saveResult);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
         #endregion
     }
 }
