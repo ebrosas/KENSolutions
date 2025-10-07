@@ -492,11 +492,11 @@ h1:focus {
 
 /* Format table header */
 .emergency-contact-grid .mud-table-head {
-    background-color: #CFD8DC; /* Table header background color */
+    background-color: #BBDEFB; /* Table header background color */
     font-weight: bold;
     text-align: center !important;
-    font-size: 14px !important;
-    text-decoration: underline;
+    font-size: 18px !important;
+    text-decoration: solid;
     height: 20px;
     line-height: 20px;
 }
@@ -507,7 +507,7 @@ h1:focus {
     white-space: nowrap;
     text-overflow: ellipsis;
     text-align: left;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 /* Grid Column widths */

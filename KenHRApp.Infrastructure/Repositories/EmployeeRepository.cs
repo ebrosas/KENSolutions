@@ -1709,6 +1709,34 @@ namespace KenHRApp.Infrastructure.Repositories
                     return Result<int>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<bool>> DeleteEmergencyContactAsync(int autoID, CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var contactPerson = await _db.EmergencyContacts.FindAsync(autoID);
+                if (contactPerson == null)
+                    throw new Exception("Could not perform deletion because the selectec contact person is not found in the database.");
+
+                _db.EmergencyContacts.Remove(contactPerson);
+
+                int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
+                if (rowsDeleted > 0)
+                    isSuccess = true;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

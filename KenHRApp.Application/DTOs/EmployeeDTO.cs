@@ -326,7 +326,7 @@ namespace KenHRApp.Application.DTOs
         #endregion
 
         #region Reference Navigations
-        public IEnumerable<EmergencyContactDTO> EmergencyContactList { get; set; } = new List<EmergencyContactDTO>();
+        public List<EmergencyContactDTO> EmergencyContactList { get; set; } = new List<EmergencyContactDTO>();
         public IdentityProofDTO EmpIdentityProof { get; set; } = new IdentityProofDTO();   
         public List<QualificationDTO> QualificationList { get; set; } = new List<QualificationDTO>();
         public List<EmployeeSkillDTO> EmployeeSkillList { get; set; } = new List<EmployeeSkillDTO>();

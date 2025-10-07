@@ -30,6 +30,7 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<int>> SaveDepartmentAsync(DepartmentMaster dto, CancellationToken cancellationToken = default);
         Task<Result<bool>> DeleteDepartmentAsync(int departmentID, CancellationToken cancellationToken = default);
         Task<Result<int>> AddDepartmentAsync(DepartmentMaster department, CancellationToken cancellationToken = default);
+        Task<Result<bool>> DeleteEmergencyContactAsync(int autoID, CancellationToken cancellationToken = default);
         #endregion
     }
 }

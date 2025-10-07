@@ -2150,6 +2150,27 @@ namespace KenHRApp.Application.Services
                 return Result<int>.Failure(ex.Message.ToString());
             }
         }
+
+        public async Task<Result<bool>> DeleteEmergencyContactAsync(int autoID, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _repository.DeleteEmergencyContactAsync(autoID, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to delete the selected contact person due to unknown error. Please refresh the page then try to delete again.");
+                }
+
+                return Result<bool>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString());
+            }
+        }
         #endregion
     }
 }

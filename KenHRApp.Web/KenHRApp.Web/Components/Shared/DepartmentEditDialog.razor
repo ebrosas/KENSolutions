@@ -82,7 +82,9 @@
             </MudGrid>
             <MudGrid Spacing="7">
                 <MudItem xs="6">
-                    <MudSwitch @bind-Value="Department.IsActive" Color="Color.Success" UncheckedColor="Color.Default" LabelPlacement="Placement.Start">Is Active?</MudSwitch>
+                    <MudPaper Elevation="0" Class="p-0 w-100 d-flex justify-content-start">
+                        <MudSwitch @bind-Value="Department.IsActive" Color="Color.Success" UncheckedColor="Color.Default" LabelPlacement="Placement.Start">Is Active?</MudSwitch>
+                    </MudPaper>
                 </MudItem>
             </MudGrid>
         </MudForm>

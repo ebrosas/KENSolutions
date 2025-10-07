@@ -14,9 +14,15 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 {
     public partial class DepartmentMaster
     {
+        #region Parameters and Injections
         [Inject] private IDialogService DialogService { get; set; } = default!;
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         [Inject] private IEmployeeService EmployeeService { get; set; } = default!;
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public bool ForceLoad { get; set; } = false;
+        #endregion
 
         #region Fields
         private MudDatePicker _dojPicker;
@@ -76,12 +82,6 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             new("Home", href: "/", icon: Icons.Material.Filled.Home),
             new("Department Master", href: null, icon: @Icons.Material.Filled.AccountBalance, disabled: true)
         ];
-        #endregion
-
-        #region Parameters and Injections
-        [Parameter]
-        [SupplyParameterFromQuery]
-        public bool ForceLoad { get; set; } = false;
         #endregion
 
         #region Page Methods
