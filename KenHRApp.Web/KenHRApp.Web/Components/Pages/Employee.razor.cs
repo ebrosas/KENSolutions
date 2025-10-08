@@ -181,6 +181,14 @@ namespace KenHRApp.Web.Components.Pages
             Error
         }
 
+        private enum MessageBoxTypes
+        {
+            Info,
+            Confirm,
+            Warning,
+            Error
+        }
+
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/", icon: Icons.Material.Filled.Home),
@@ -189,9 +197,12 @@ namespace KenHRApp.Web.Components.Pages
         ];
         #endregion
 
-        #region Button Icons
+        #region Dialog Box Button Icons
         private readonly string _iconDelete = "fas fa-trash-alt";
         private readonly string _iconCancel = "fas fa-window-close";
+        private readonly string _iconError = "fas fa-times-circle";
+        private readonly string _iconInfo = "fas fa-info-circle";
+        private readonly string _iconWarning = "fas fa-exclamation-circle";
         #endregion
 
         #region Grid Fields
@@ -506,6 +517,37 @@ namespace KenHRApp.Web.Components.Pages
             {
                 // Hide the spinner overlay
                 await callback.Invoke();
+            }
+        }
+
+        private async Task AddEmergencyContact()
+        {
+            try
+            {
+                var parameters = new DialogParameters
+                {
+                    ["Department"] = new DepartmentDTO(),
+                    //["GroupList"] = _groupList,
+                    //["EmployeeList"] = _employeeList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Large
+                };
+
+                var dialog = await DialogService.ShowAsync<DepartmentEditDialog>("Add New Contact Person", parameters, options);
+
+                var result = await dialog.Result;
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
             }
         }
         #endregion
@@ -1040,6 +1082,42 @@ namespace KenHRApp.Web.Components.Pages
         #endregion
 
         #region Private Methods
+        private async Task ShowErrorMessage(MessageBoxTypes msgboxType, string title, string content)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", title},
+                { "DialogIcon", msgboxType == MessageBoxTypes.Error ? _iconError
+                        : msgboxType == MessageBoxTypes.Warning ? _iconWarning
+                        : _iconInfo  },
+                { "ContentText", content },
+                {
+                    "Color", msgboxType == MessageBoxTypes.Error ? Color.Error
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
+                },
+                {
+                    "DialogIconColor", msgboxType == MessageBoxTypes.Error ? Color.Error
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
+                }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.Center,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<InfoDialog>(title, parameters, options);
+            var result = await dialog.Result;
+        }
+
         private void ShowNotification(string message, NotificationType type)
         {
             Snackbar.Clear();

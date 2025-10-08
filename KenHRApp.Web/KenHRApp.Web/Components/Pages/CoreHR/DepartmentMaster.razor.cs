@@ -215,7 +215,8 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 { "DialogIcon", _iconDelete },
                 { "ContentText", $"Are you sure you want to delete the department '{department.DepartmentName}'?" },
                 { "ConfirmText", "Delete" },
-                { "Color", Color.Error }
+                { "Color", Color.Error },
+                { "DialogIconColor", Color.Error }
             };
 
             var options = new DialogOptions 
@@ -556,7 +557,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                         : _iconInfo  },
                 { "ContentText", content },
                 { 
-                    "Color", msgboxType == MessageBoxTypes.Error ? Color.Error 
+                    "Color", msgboxType == MessageBoxTypes.Error ? Color.Error
                         : msgboxType == MessageBoxTypes.Info ? Color.Info
                         : msgboxType == MessageBoxTypes.Warning ? Color.Warning
                         : Color.Default
