@@ -50,6 +50,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         #region Dialog Box Button Icons
         private readonly string _iconDelete = "fas fa-trash-alt";
         private readonly string _iconCancel = "fas fa-window-close";
+        private readonly string _iconError = "fas fa-times-circle";
+        private readonly string _iconInfo = "fas fa-info-circle";
+        private readonly string _iconWarning = "fas fa-exclamation-circle";
         #endregion
 
         #region Flags
@@ -76,6 +79,14 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             Warning,
             Error
         }
+
+        private enum MessageBoxTypes
+        {
+            Info,
+            Confirm,
+            Warning,
+            Error
+        }   
 
         private List<BreadcrumbItem> _breadcrumbItems =
         [
@@ -252,14 +263,12 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 newDept.DepartmentId = 0;
 
                 #region Check for duplicate entries
-                var duplicateDepartment = _departmentList.FirstOrDefault(g => g.DepartmentCode == newDept.DepartmentCode && g.DepartmentName == newDept.DepartmentName);
+                var duplicateDepartment = _departmentList.FirstOrDefault(g => g.DepartmentCode.Trim().ToUpper() == newDept.DepartmentCode.Trim().ToUpper() 
+                    && g.DepartmentName.Trim().ToUpper() == newDept.DepartmentName.Trim().ToUpper());
                 if (duplicateDepartment != null)
                 {
                     // Show error
-                    //_errorMessage.AppendLine("The Department Code and Name already exists. Please enter a different Department Code and Name.");
-                    //ShowHideError(true);
-                    
-                    await DialogService.ShowMessageBox("Error", "The Department Code and Name already exists. Please enter a different Department Code and Name.", "OK");
+                    await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The Department Code and Name already exists. Please enter a different Department Code and Name.");  
                     return;
                 }
                 #endregion
@@ -536,6 +545,42 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 await callback.Invoke();
             }
         }
+
+        private async Task ShowErrorMessage(MessageBoxTypes msgboxType, string title, string content)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", title},
+                { "DialogIcon", msgboxType == MessageBoxTypes.Error ? _iconError
+                        : msgboxType == MessageBoxTypes.Warning ? _iconWarning
+                        : _iconInfo  },
+                { "ContentText", content },
+                { 
+                    "Color", msgboxType == MessageBoxTypes.Error ? Color.Error 
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
+                },
+                {
+                    "DialogIconColor", msgboxType == MessageBoxTypes.Error ? Color.Error
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
+                }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.Center,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<InfoDialog>(title, parameters, options);
+            var result = await dialog.Result;
+        }
         #endregion
 
         #region Private Methods
@@ -566,16 +611,6 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 // Reset error messages
                 _errorMessage.Clear();
             }
-        }
-
-        private void GoToEmployeeDetail(EmployeeMasterDTO employee)
-        {
-            //NavigationManager.NavigateTo($"/employees?EmployeeId={employee.EmployeeId}&ActionType=View&DepartmentCacheKey={_departmentCacheKey}&EmployeeCacheKey={_employeeCacheKey}");
-        }
-
-        private void AddNewEmployee()
-        {
-            //NavigationManager.NavigateTo($"/employees?EmployeeId=0&ActionType=Add&DepartmentCacheKey={_departmentCacheKey}&EmployeeCacheKey={_employeeCacheKey}");
         }
 
         private void ShowNotification(string message, SnackBarTypes type)

@@ -1014,10 +1014,10 @@
                             </TitleContent>
                             <ChildContent>
                                 <MudPaper Elevation="4" Square="true" Class="w-100">                            
-                                    <MudDataGrid T="EmergencyContactDTO" Items="@employee.EmergencyContactList" Hover="true" Striped="true" Class="emergency-contact-grid"
+                                    <MudDataGrid T="EmergencyContactDTO" Items="@employee.EmergencyContactList" Hover="true" Striped="true" Class="emergency-contact-grid" 
                                         Filterable="@_emergencyFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                                         QuickFilter="@_emergencyQuickFilter" Hideable="true" PageSize="5"
-                                        EditTrigger="DataGridEditTrigger.Manual" ReadOnly="@(!_isEditMode)" EditMode="DataGridEditMode.Form"
+                                        EditTrigger="DataGridEditTrigger.Manual" ReadOnly="@(!_allowGridEdit)" EditMode="DataGridEditMode.Form"
                                         EditDialogOptions="new DialogOptions 
                                         { 
                                             MaxWidth = MaxWidth.Small, 
@@ -1099,12 +1099,12 @@
                                             </PropertyColumn>
                                             <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                                                 <CellTemplate Context="row">
-                                                    <MudIconButton Color="Color.Info" title="Edit record" Class="show-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
+                                                     <MudIconButton Color="Color.Info" Disabled="@(!_allowGridEdit)" title="Edit record" Class="show-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
                                                         <ChildContent>
-                                                            ,<i class="fas fa-edit fa-1x"></i>
+                                                            <i class="fas fa-edit fa-1x"></i>
                                                         </ChildContent>
                                                     </MudIconButton>
-                                                    <MudIconButton Color="Color.Error" title="Delete selected emergency contact" Class="fa-icon-btn" OnClick="() => ConfirmDeleteEmergency(row.Item)">
+                                                     <MudIconButton Color="Color.Error" Disabled="@(!_allowGridEdit)" title="Delete selected emergency contact" Class="fa-icon-btn" OnClick="() => ConfirmDeleteEmergency(row.Item)">
                                                         <ChildContent>
                                                             <i class="fas fa-trash-alt fa-1x"></i>
                                                         </ChildContent>

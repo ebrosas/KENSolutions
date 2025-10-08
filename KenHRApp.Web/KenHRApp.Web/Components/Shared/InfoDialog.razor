@@ -1,0 +1,40 @@
+﻿<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@DialogIcon" Class="mr-1 mb-n1" Size="Size.Medium" Color="@DialogIconColor" />
+            @DialogTitle
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText Typo="Typo.subtitle2">@ContentText</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="@Color" Variant="Variant.Filled" Size="Size.Small" OnClick="HandleOkay">
+            @OkayText
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public string DialogTitle { get; set; } = "Error";
+
+    [Parameter]
+    public string DialogIcon { get; set; } = "fas fa-times-circle";
+
+    [Parameter]
+    public Color DialogIconColor { get; set; } = Color.Error;
+
+    [Parameter] 
+    public string ContentText { get; set; } = "An unhandled error occured.";
+
+    [Parameter] 
+    public string OkayText { get; set; } = "Okay";
+
+    [Parameter]
+    public Color Color { get; set; }
+
+    private void HandleOkay() => MudDialog.Close(DialogResult.Ok(true));
+}

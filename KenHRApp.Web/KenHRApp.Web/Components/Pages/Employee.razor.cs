@@ -62,6 +62,7 @@ namespace KenHRApp.Web.Components.Pages
         private CancellationTokenSource? _cts;
 
         #region System Flags
+        private static bool _forceLoad = false;
         private bool _isRunning = false;
         private bool _isDisabled = false;
         private bool _isEditMode = false;
@@ -70,7 +71,7 @@ namespace KenHRApp.Web.Components.Pages
         private bool _saveBtnEnabled = false;
         private bool _showErrorAlert = false;
         private bool _hasValidationError = false;
-        private static bool _forceLoad = false;
+        private bool _allowGridEdit = false;
         #endregion
 
         #region User Defined Codes
@@ -524,6 +525,7 @@ namespace KenHRApp.Web.Components.Pages
             {
                 // Reset the flags
                 _isEditMode = false;
+                _allowGridEdit = false;
                 _isDisabled = true;
                 _isRunning = false;
 
@@ -887,6 +889,7 @@ namespace KenHRApp.Web.Components.Pages
             {
                 // Reset flags
                 _isEditMode = false;
+                _allowGridEdit = false;
                 _saveBtnEnabled = false;
                 _isDisabled = true;
 
@@ -1123,9 +1126,11 @@ namespace KenHRApp.Web.Components.Pages
                 // do your async work
                 await Task.Delay(1000);
 
+                // Set the flags
                 _isEditMode = true;
+                _allowGridEdit = true;
                 _saveBtnEnabled = true;
-                _isDisabled = false;
+                _isDisabled = false;                
 
                 // Hide error message if any
                 ShowHideError(false);
@@ -1951,7 +1956,8 @@ namespace KenHRApp.Web.Components.Pages
 
             // Set flags
             _isEditMode = true;
-            _isDisabled = false;
+            _allowGridEdit = true;
+            _isDisabled = false;            
 
             if (callback != null)
             {
