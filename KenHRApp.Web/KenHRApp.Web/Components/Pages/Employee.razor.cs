@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace KenHRApp.Web.Components.Pages
 {

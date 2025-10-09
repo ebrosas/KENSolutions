@@ -1,20 +1,4 @@
 ﻿@page "/employees"
-@using KenHRApp.Domain.Entities
-@using KenHRApp.Application.Common.Interfaces
-@using System.Text
-@using System.ComponentModel.DataAnnotations
-@using KenHRApp.Web.Components.Common
-@using KenHRApp.Web.Components.Shared
-
-@* @implements IDisposable     // Implements System.IDisposable so that the Dispose method can be called 
-@inject ILogger<Employee> Logger
-
-@inject IEmployeeService EmployeeService
-@inject IAppCacheService AppCacheService
-@inject ISnackbar Snackbar
-@inject ILookupCacheService LookupCache
-@inject NavigationManager Navigation
-@inject IDialogService DialogService *@
 
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
     <EditForm EditContext="@_editContext"

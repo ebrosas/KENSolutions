@@ -119,10 +119,10 @@
         <MudNavLink Href="/users" Icon="fas fa-print" Class="navMenu navlink-icon-sm">Training Attendance</MudNavLink>
     </MudNavGroup>
     <MudNavGroup Title="Recruitment" Icon="far fa-handshake" Class="navlink-icon-sm">
-        <MudNavLink Href="/security" Icon="fas fa-hand-holding-medical" Class="navMenu navlink-icon-sm">Employee Engagement</MudNavLink>
-        <MudNavLink Href="/users" Icon="@Icons.Material.TwoTone.People" Class="navMenu navlink-icon-sm">Employee Separation</MudNavLink>
-        <MudNavLink Href="/users" Icon="@Icons.Material.TwoTone.People" Class="navMenu navlink-icon-sm">Contract Renewal</MudNavLink>
-        <MudNavLink Href="/users" Icon="@Icons.Material.TwoTone.People" Class="navMenu navlink-icon-sm">Probationary Assessment</MudNavLink>
+        <MudNavLink Icon="fas fa-handshake" Class="navMenu navlink-icon-sm" OnClick="ShowRecruitment">Manage Requitment</MudNavLink>
+        <MudNavLink Href="/users" Icon="fas fa-door-open" Class="navMenu navlink-icon-sm">Employee Separation</MudNavLink>
+        <MudNavLink Href="/users" Icon="fas fa-file-signature" Class="navMenu navlink-icon-sm">Contract Renewal</MudNavLink>
+        <MudNavLink Href="/users" Icon="fas fa-chart-line" Class="navMenu navlink-icon-sm">Probationary Assessment</MudNavLink>
     </MudNavGroup>
     <MudNavGroup Title="Travel & Expense" Icon="fas fa-luggage-cart" Class="navMenu navlink-icon-sm">
         <MudNavLink Href="/security" Icon="fas fa-plane-departure" Class="navMenu navlink-icon-sm">Travel Request</MudNavLink>
@@ -207,6 +207,12 @@
     private void ShowDepartmentMaster()
     {
         NavigationManager.NavigateTo("/CoreHR/departmentmaster");
+        Actions.InvokeShowHideDrawer();
+    }
+
+    private void ShowRecruitment()
+    {
+        NavigationManager.NavigateTo("/Recruitment/recruitmenthome");
         Actions.InvokeShowHideDrawer();
     }
     #endregion

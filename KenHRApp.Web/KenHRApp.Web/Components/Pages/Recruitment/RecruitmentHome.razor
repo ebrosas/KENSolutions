@@ -1,0 +1,53 @@
+﻿@page "/Recruitment/recruitmenthome"
+
+<MudText Typo="Typo.h6" Align="Align.Start" Class="pb-1 ps-2" Style="color: #004165;">Recruitment Management</MudText>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="px-4">
+    <EditForm EditContext="@_editContext"
+        OnValidSubmit="HandleValidSubmit" 
+        OnInvalidSubmit="HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        @if (_hasValidationError && _validationMessages.Any())
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
+                <ul style="margin:0; padding-left:20px;">
+                    @foreach (var msg in _validationMessages)
+                    {
+                        <li>
+                            <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
+                            </li>
+                    }
+                </ul>
+            </MudAlert>
+        }
+
+        @if (_showErrorAlert)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
+                      ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
+                @_errorMessage
+            </MudAlert>
+        }
+        <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
+            <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="4" Class="mud-primary-text" />
+
+            <MudPaper Elevation="5" Square="true" Class="w-100 mt-2">
+                <MudStepper NonLinear ShowResetButton Ripple="true">
+                     <MudStep Title="Planning & Budgeting">Manage budget attributes, defined job position, and create job posting </MudStep>
+                     <MudStep Title="Talent Acquisition">Manage recruitment requisition and assign recruiter </MudStep>
+                     <MudStep Title="Sourcing">Manage talent sources and prospective candidates </MudStep>
+                     <MudStep Title="On-Boarding">Manage new employee on-boarding process</MudStep>
+                 </MudStepper>
+             </MudPaper>
+
+             <MudScrollToTop TopOffset="100"
+                             Selector="#mainPanel"
+                             VisibleCssClass="visible absolute"
+                             HiddenCssClass="hidden absolute">
+                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+             </MudScrollToTop>
+        </div>        
+    </EditForm>
+    
+</MudContainer>
