@@ -527,9 +527,9 @@ namespace KenHRApp.Web.Components.Pages
             {
                 var parameters = new DialogParameters
                 {
-                    ["Department"] = new DepartmentDTO(),
-                    //["GroupList"] = _groupList,
-                    //["EmployeeList"] = _employeeList,
+                    ["EmergencyContact"] = new EmergencyContactDTO(),
+                    ["RelationTypeList"] = _relationTypeList,
+                    ["CountryList"] = _countryList,
                     ["IsClearable"] = true,
                     ["IsDisabled"] = false
                 };
@@ -542,9 +542,45 @@ namespace KenHRApp.Web.Components.Pages
                     MaxWidth = MaxWidth.Large
                 };
 
-                var dialog = await DialogService.ShowAsync<DepartmentEditDialog>("Add New Contact Person", parameters, options);
+                // Show the dialog box
+                var dialog = await DialogService.ShowAsync<EmergencyContactDialog>("Add New Contact Person", parameters, options);
 
                 var result = await dialog.Result;
+                if (result != null && !result.Canceled)
+                {
+                    var newContact = (EmergencyContactDTO)result.Data!;
+                    newContact.AutoId = 0;
+
+                    #region Get the selected relationship type
+                    if (!string.IsNullOrEmpty(newContact.Relation))
+                    {
+                        UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCDesc1 == newContact.Relation).FirstOrDefault();
+                        if (udc != null)
+                            newContact.RelationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get the selected country
+                    if (!string.IsNullOrEmpty(newContact.CountryDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCDesc1 == newContact.CountryDesc).FirstOrDefault();
+                        if (udc != null)
+                            newContact.CountryCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Check for duplicate entries
+                    var duplicateContact = employee.EmergencyContactList.FirstOrDefault(e => e.ContactPerson.Trim().ToUpper() == newContact.ContactPerson.Trim().ToUpper()
+                        && e.RelationCode.Trim().ToUpper() == newContact.RelationCode.Trim().ToUpper()
+                        && e.MobileNo.Trim() == newContact.MobileNo.Trim());
+                    if (duplicateContact != null)
+                    {
+                        // Show error
+                        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified contact person and relationship already exists. Please enter a different contact name and details.");
+                        return;
+                    }
+                    #endregion
+                }
             }
             catch (Exception ex)
             {

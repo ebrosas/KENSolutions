@@ -1,0 +1,176 @@
+﻿@using KenHRApp.Web.Components.Common
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudGrid Spacing="7">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudTextField @bind-Value="EmergencyContact.ContactPerson" For="@(() => EmergencyContact.ContactPerson)"
+                                      HelperText="Max. text input is 200 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                      Counter="200" MaxLength="200" Disabled="false" Label="Contact Person"
+                                      Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>  
+                </MudItem>
+                 <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudAutocomplete @bind-Value="EmergencyContact.Relation"
+                                         SearchFunc="SearchRelationship!"
+                                         Variant="Variant.Text"
+                                         Label="Relationship"
+                                         Margin="Margin.Normal"
+                                         Dense="true"
+                                         Placeholder="Please Select"
+                                         HelperText="Type a key to search for relationship"
+                                         HelperTextOnFocus="true"
+                                         Clearable="true" Typo="Typo.subtitle2"
+                                         MaxItems="@(RelationTypeList != null ? RelationTypeList.Count : 10)"
+                                         Modal="true" />
+                    </MudPaper>  
+                </MudItem>
+            </MudGrid>
+            <MudGrid Spacing="7">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudTextField @bind-Value="EmergencyContact.MobileNo" Label="Mobile No."
+                                      For="@(() => EmergencyContact.MobileNo)"
+                                      HelperText="Max. text input is 20 chars."
+                                      Variant="Variant.Text" HelperTextOnFocus="true" Counter="20" MaxLength="20" 
+                                      Clearable="@IsClearable" Disabled="@IsDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudTextField @bind-Value="EmergencyContact.LandlineNo" Label="Landline No."
+                                      For="@(() => EmergencyContact.LandlineNo)"
+                                      HelperText="Max. text input is 20 chars."
+                                      Variant="Variant.Text" HelperTextOnFocus="true" Counter="20" MaxLength="20"
+                                      Clearable="@IsClearable" Disabled="@IsDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+            <MudGrid Spacing="7">
+                <MudItem xs="12">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudTextField @bind-Value="EmergencyContact.Address" For="@(() => EmergencyContact.Address)"
+                                      HelperText="Max. text input is 300 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                      Counter="300" MaxLength="300" Disabled="false" Label="Address" Lines="3"
+                                      Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+            <MudGrid Spacing="7">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudAutocomplete @bind-Value="EmergencyContact.CountryDesc"
+                                         SearchFunc="SearchCountry!"
+                                         Variant="Variant.Text"
+                                         Label="Country"
+                                         Margin="Margin.Normal"
+                                         Dense="true"
+                                         Placeholder="Please Select"
+                                         HelperText="Type a key to search for country"
+                                         HelperTextOnFocus="true"
+                                         Clearable="true" Typo="Typo.subtitle2"
+                                         MaxItems="@(CountryList != null ? CountryList.Count : 10)"
+                                         Modal="true" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudTextField @bind-Value="EmergencyContact.City" Label="City"
+                                      For="@(() => EmergencyContact.City)"
+                                      HelperText="Max. text input is 100 chars."
+                                      Variant="Variant.Text" HelperTextOnFocus="true" Counter="100" MaxLength="100"
+                                      Clearable="@IsClearable" Disabled="@IsDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
+        <MudButton Color="Color.Default" Variant="Variant.Text" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Fields
+    private MudForm _form = new();
+    private string[]? _relationTypeArray = null;
+    private string[]? _countryArray = null;
+    #endregion
+
+    #region Parameters and Injections
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public EmergencyContactDTO EmergencyContact { get; set; } = new();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> RelationTypeList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> CountryList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public bool IsClearable { get; set; } = true;
+
+    [Parameter]
+    public bool IsDisabled { get; set; } = true;
+    #endregion
+
+    #region Page Methods
+    protected override void OnInitialized()
+    {
+        if (RelationTypeList != null)
+            _relationTypeArray = RelationTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (CountryList != null)
+            _countryArray = CountryList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+    }
+    #endregion
+
+    #region Private Methods
+    private async Task Save()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        MudDialog.Close(DialogResult.Ok(EmergencyContact));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+        
+    private async Task<IEnumerable<string>> SearchRelationship(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _relationTypeArray!;
+        }
+
+        return _relationTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchCountry(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _countryArray!;
+        }
+
+        return _countryArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    #endregion
+}
+}
