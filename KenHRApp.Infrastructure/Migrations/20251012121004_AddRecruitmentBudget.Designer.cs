@@ -4,6 +4,7 @@ using KenHRApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KenHRApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251012121004_AddRecruitmentBudget")]
+    partial class AddRecruitmentBudget
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,7 +38,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2025, 10, 12, 12, 14, 35, 926, DateTimeKind.Utc).AddTicks(6273));
+                        .HasDefaultValue(new DateTime(2025, 10, 12, 12, 10, 2, 832, DateTimeKind.Utc).AddTicks(5074));
 
                     b.Property<string>("DepartmentCode")
                         .IsRequired()
@@ -1101,7 +1104,7 @@ namespace KenHRApp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BudgetId"));
 
-                    b.Property<int?>("ActiveCount")
+                    b.Property<int>("ActiveCount")
                         .HasColumnType("int");
 
                     b.Property<int>("BudgetHeadCount")
@@ -1110,25 +1113,25 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2025, 10, 12, 15, 14, 35, 926, DateTimeKind.Local).AddTicks(9672));
+                        .HasDefaultValue(new DateTime(2025, 10, 12, 15, 10, 2, 833, DateTimeKind.Local).AddTicks(4636));
 
                     b.Property<string>("DepartmentCode")
                         .IsRequired()
                         .HasColumnType("varchar(20)");
 
-                    b.Property<int?>("ExitCount")
+                    b.Property<int>("ExitCount")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("LastUpdateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<int?>("NetGapCount")
+                    b.Property<int>("NetGapCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("varchar(300)");
 
-                    b.Property<int?>("RequisitionCount")
+                    b.Property<int>("RequisitionCount")
                         .HasColumnType("int");
 
                     b.HasKey("BudgetId")

@@ -31,6 +31,7 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<UserDefinedCodeGroup> UserDefinedCodeGroups => Set<UserDefinedCodeGroup>();
         public DbSet<UserDefinedCode> UserDefinedCodes => Set<UserDefinedCode>();
         public DbSet<DepartmentMaster> DepartmentMasters => Set<DepartmentMaster>();
+        public DbSet<RecruitmentBudget> RecruitmentBudgets => Set<RecruitmentBudget>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -238,6 +239,20 @@ namespace KenHRApp.Infrastructure.Data
                       .IsUnique()
                       .HasFilter(null);
                 });
+
+            modelBuilder.Entity<RecruitmentBudget>(
+               entity =>
+               {
+                   entity.ToTable("RecruitmentBudget");
+                   entity.HasKey(d => d.BudgetId)
+                       .HasName("PK_RecruitmentBudget_BudgetId");
+                   entity.Property(r => r.CreatedDate)
+                       .HasDefaultValue(DateTime.Now);
+                   entity.HasIndex(e => new { e.DepartmentCode, e.BudgetHeadCount })
+                     .HasDatabaseName("IX_RecruitmentBudget_CompoKeys")
+                     .IsUnique()
+                     .HasFilter(null);
+               });
             #endregion
 
             #region Set Employee navigation                         

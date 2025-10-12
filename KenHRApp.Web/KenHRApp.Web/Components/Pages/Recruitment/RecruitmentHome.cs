@@ -18,18 +18,20 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         #endregion
 
-        #region Fields        
+        #region Private Fields        
         private EmployeeDTO _employee = new();
         private StringBuilder _errorMessage = new StringBuilder();
         private EditContext? _editContext;
         private List<string> _validationMessages = new();
         private string overlayMessage = "Please wait...";
         private CancellationTokenSource? _cts;
+        private string _searchString = string.Empty;
 
         #region Flags
         private bool _showErrorAlert = false;
         private bool _hasValidationError = false;
         private bool _isRunning = false;
+        private bool _enableFilter = false;
         #endregion
 
         #region Enums
@@ -52,6 +54,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         #endregion
 
         #region Collections
+        private List<RecruitmentBudgetDTO> _budgetList = new List<RecruitmentBudgetDTO>();
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/", icon: Icons.Material.Filled.Home),
@@ -73,6 +76,32 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         {
             // Reset error display when navigating to page
             _hasValidationError = false;
+        }
+        #endregion
+
+        #region Grid Events 
+        private Func<RecruitmentBudgetDTO, bool> _quickFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(_searchString))
+                return true;
+            
+            if (!string.IsNullOrEmpty(x.DepartmentName) && x.DepartmentName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.Remarks) && x.Remarks.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
+        };
+
+        private void StartedEditingItem(RecruitmentBudgetDTO item)
+        {
+
+        }
+
+        private void CommittedItemChanges(RecruitmentBudgetDTO item)
+        {
+
         }
         #endregion
 
@@ -168,6 +197,11 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     Snackbar.Add(message, Severity.Normal);
                     break;
             }
+        }
+
+        private async Task AddBudget()
+        {
+
         }
         #endregion
 

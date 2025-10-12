@@ -16,7 +16,7 @@
                     {
                         <li>
                             <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
-                            </li>
+                        </li>
                     }
                 </ul>
             </MudAlert>
@@ -34,7 +34,126 @@
 
             <MudPaper Elevation="5" Square="true" Class="w-100 mt-2">
                 <MudStepper NonLinear ShowResetButton Ripple="true">
-                     <MudStep Title="Planning & Budgeting">Manage budget attributes, defined job position, and create job posting </MudStep>
+                     <MudStep Title="Planning & Budgeting">
+                        <MudText Typo="Typo.subtitle1"><strong>Manage budget attributes, defined job position, and create job posting </strong></MudText>
+                        <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
+                             <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
+                                 <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">RECRUITMENT BUDGETS:</MudText>
+                                 <MudSpacer />
+                                 <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
+                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add New Department" />
+                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
+                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Dark" Label="Download Master Data" />
+                                 </MudMenu>
+                             </MudAppBar>
+                             <MudPaper Elevation="5" Square="true" Class="w-100">
+                                 <MudDataGrid T="RecruitmentBudgetDTO" Items="@_budgetList" Hover="true" Striped="true" Class="department-master-grid"
+                                    Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                                    QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                                    EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                                    EditDialogOptions="new DialogOptions 
+                                    { 
+                                        MaxWidth = MaxWidth.Small, 
+                                        FullWidth = true,
+                                        BackdropClick = false,
+                                        CloseOnEscapeKey = false
+                                    }"
+                                    StartedEditingItem="@StartedEditingItem" CommittedItemChanges="@CommittedItemChanges"
+                                    TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                                     <ToolBarContent>                        
+                                         <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                                             <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
+                                                           Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"   
+                                                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                                             </MudTextField>
+                                         </MudPaper>
+                                        <MudSpacer />
+                                        <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                             <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
+                                             <MudPaper Class="ms-3" Elevation="0">
+                                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new department" OnClick="AddBudget" />
+                                             </MudPaper>                             
+                                        </MudPaper>
+                                    </ToolBarContent>
+                                     <Columns>
+                                         <PropertyColumn Property="x => x.BudgetId" Hidden Editable="false">
+                                             <EditTemplate Context="row">
+                                                 @* Empty to prevent rendering *@
+                                             </EditTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.DepartmentCode" Hidden Required="false">
+                                             <EditTemplate Context="row">
+                                                 @* Empty to prevent rendering *@
+                                             </EditTemplate>
+                                         </PropertyColumn>
+                                         <PropertyColumn Property="x => x.DepartmentName" Title="Department" Class="col-dept-code">
+                                             <EditTemplate Context="row">
+                                                 <MudTextField @bind-Value="row.Item.DepartmentName" Label="Department Name" HelperText="Maximum input is 120 chars."
+                                                        Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="120" MaxLength="120"
+                                                        Required RequiredError="Department Name is required"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                             </EditTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.BudgetHeadCount" Title="Head Count Budget" Class="col-dept-name">
+                                             <EditTemplate Context="row">
+                                                 <MudNumericField @bind-Value="row.Item.BudgetHeadCount" Label="Head Count Budget" Variant="Variant.Outlined"
+                                                    HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                    Required RequiredError="Head Count Budget is required"
+                                                    Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                            </EditTemplate>
+                                        </PropertyColumn>
+                                         <PropertyColumn Property="x => x.ActiveCount" Title="Active Employees" Class="col-dept-name">
+                                             <EditTemplate Context="row">
+                                                 <MudNumericField @bind-Value="row.Item.ActiveCount" Label="Active Employees" Variant="Variant.Outlined"
+                                                    Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                             </EditTemplate>
+                                         </PropertyColumn>
+                                        <PropertyColumn Property="x => x.Remarks" Class="col-description" Required="false">
+                                             <EditTemplate Context="row">
+                                                 <MudTextField @bind-Value="row.Item.Remarks" Label="Description" HelperText="Maximum input is 120 chars."
+                                                              Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="120" MaxLength="120" Lines="2"
+                                                              Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                            </EditTemplate>
+                                        </PropertyColumn>
+                                         <PropertyColumn Property="x => x.CreatedDate" Title="Created Date" Class="col-created-date" Editable="false">
+                                             <CellTemplate Context="row">
+                                                 @row.Item.CreatedDate?.ToString("dd-MMM-yyyy")
+                                            </CellTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.LastUpdateDate" Title="Last Updated Date" Class="col-updated-date" Editable="false">
+                                            <CellTemplate Context="row">
+                                                @row.Item.LastUpdateDate?.ToString("dd-MMM-yyyy")
+                                            </CellTemplate>
+                                        </PropertyColumn>                        
+                                        <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                                            <CellTemplate Context="row">
+                                                <MudIconButton Color="Color.Info" title="View and edit employee information" Class="show-btn fa-icon-btn"
+                                                    OnClick="@row.Actions.StartEditingItemAsync">
+                                                    <ChildContent>
+                                                        <i class="fas fa-edit fa-1x"></i>
+                                                    </ChildContent>
+                                                </MudIconButton>
+                                                <MudIconButton Color="Color.Error" title="Delete department record" Class="fa-icon-btn" >
+                                                    <ChildContent>
+                                                        <i class="fas fa-trash-alt fa-1x"></i>
+                                                    </ChildContent>
+                                                </MudIconButton>
+                                            </CellTemplate>
+                                        </TemplateColumn>
+                                    </Columns>
+                                    <NoRecordsContent>
+                                        <div class="no-data-box">
+                                            <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
+                                            <span>No data found</span>
+                                        </div>
+                                    </NoRecordsContent>
+                                    <PagerContent>
+                                        <MudDataGridPager T="DepartmentDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                                    </PagerContent>
+                                </MudDataGrid>
+                            </MudPaper>
+                        </MudStack>
+                     </MudStep>
                      <MudStep Title="Talent Acquisition">Manage recruitment requisition and assign recruiter </MudStep>
                      <MudStep Title="Sourcing">Manage talent sources and prospective candidates </MudStep>
                      <MudStep Title="On-Boarding">Manage new employee on-boarding process</MudStep>
