@@ -20,6 +20,11 @@ namespace KenHRApp.Application.DTOs
         [StringLength(120, ErrorMessage = "Department Name can't be more than 120 characters.")]
         public string DepartmentName { get; set; } = null!;
 
+        [Required(ErrorMessage = "Budget Description is required")]
+        [Display(Name = "Budget Description")]
+        [StringLength(200, ErrorMessage = "Budget Description can't be more than 200 characters.")]
+        public string BudgetDescription { get; set; } = null!;
+
         [Required(ErrorMessage = "Head Count Budget is required")]
         [Display(Name = "Head Count Budget")]
         public int BudgetHeadCount { get; set; }
@@ -37,7 +42,10 @@ namespace KenHRApp.Application.DTOs
         public int NetGapCount { get; set; }
 
         [Display(Name = "Net Indent")]
-        public int NewIndent { get; set; }
+        public int NewIndentCount { get; set; }
+
+        [Display(Name = "On-hold")]
+        public bool OnHold { get; set; }
 
         [StringLength(120, ErrorMessage = "Remarks can't be more than 120 characters.")]
         public string? Remarks { get; set; } = null;
@@ -49,6 +57,14 @@ namespace KenHRApp.Application.DTOs
         [Display(Name = "Last Updated Date")]
         [DataType(DataType.Date)]
         public DateTime? LastUpdateDate { get; set; } = null;
+        #endregion
+
+        #region Extended Properties
+        public string OnHoldDesc
+        {
+            get { return OnHold ? "Yes" : "No"; }
+            set { }
+        }
         #endregion
     }
 }

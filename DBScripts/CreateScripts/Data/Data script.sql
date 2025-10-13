@@ -76,6 +76,8 @@
 	SELECT * from [kenuser].[DepartmentMaster] a
 	ORDER BY a.DepartmentName
 
+	SELECT * FROM kenuser.RecruitmentBudget a
+
 	
 
 /*	Data updates:

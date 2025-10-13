@@ -1021,15 +1021,18 @@
                                              </MudPaper>
                                             <MudSpacer />
                                             <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                                <!--
                                                 <MudSwitch @bind-Value="_emergencyFilter" 
                                                     Disabled="@(!_allowGridEdit)"
                                                     ThumbIcon="@(_emergencyFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" 
                                                     ThumbIconColor="@(_emergencyFilter==true ? Color.Success : Color.Error)">
                                                     Custom Filter
                                                 </MudSwitch>
+                                                -->
+                                                <MudSwitch @bind-Value="_emergencyFilter" Disabled="@(!_allowGridEdit)" Color="Color.Success" UncheckedColor="Color.Default">Custom Filter</MudSwitch>
                                                  <MudPaper Class="ms-3" Elevation="0">
                                                     <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small"
-                                                            Disabled="@(!_allowGridEdit)"
+                                                        Disabled="@(!_allowGridEdit)"
                                                         title="Add new contact person" OnClick="AddEmergencyContact" />
                                                  </MudPaper>                             
                                             </MudPaper>

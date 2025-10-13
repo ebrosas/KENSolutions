@@ -18,7 +18,10 @@ namespace KenHRApp.Domain.Entities
         public string DepartmentCode { get; set; } = null!;
 
         [NotMapped]
-        public string? DepartmentName { get; set; } = null;
+        public string DepartmentName { get; set; } = null!;
+
+        [Column(TypeName = "varchar(200)")]
+        public string BudgetDescription { get; set; } = null!;
 
         [Required(ErrorMessage = "Head Count Budget is required")]
         public int BudgetHeadCount { get; set; }
@@ -27,6 +30,8 @@ namespace KenHRApp.Domain.Entities
         public int? ExitCount { get; set; }
         public int? RequisitionCount { get; set; }
         public int? NetGapCount { get; set; }
+        public int? NewIndentCount { get; set; }
+        public bool? OnHold { get; set; }
 
         [Column(TypeName = "varchar(300)")]
         public string? Remarks { get; set; } = null;

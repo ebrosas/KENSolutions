@@ -15,12 +15,24 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
     public partial class RecruitmentHome
     {
         #region Parameters and Injections
-        [Inject] private ISnackbar Snackbar { get; set; } = default!;
+        [Inject] 
+        private IDialogService DialogService { get; set; } = default!;
+        
+        [Inject] 
+        private ISnackbar Snackbar { get; set; } = default!;
+        
+        [Inject] 
+        private IRecruitmentService RecruitmentService { get; set; } = default!;
+
+        [Inject] 
+        private ILookupCacheService LookupCache { get; set; } = default!;
         #endregion
 
         #region Private Fields        
-        private EmployeeDTO _employee = new();
+        private RecruitmentBudgetDTO _recruitmentBudget = new();
+        //private EmployeeDTO employee = new();
         private StringBuilder _errorMessage = new StringBuilder();
+        private EditForm _editForm;
         private EditContext? _editContext;
         private List<string> _validationMessages = new();
         private string overlayMessage = "Please wait...";
@@ -53,13 +65,16 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         }
         #endregion
 
-        #region Collections
-        private List<RecruitmentBudgetDTO> _budgetList = new List<RecruitmentBudgetDTO>();
+        #region Collections        
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/", icon: Icons.Material.Filled.Home),
             new("Recruitment Management", href: null, disabled: true, @Icons.Material.Outlined.People)
         ];
+
+        private List<RecruitmentBudgetDTO> _budgetList = new List<RecruitmentBudgetDTO>();
+        private IReadOnlyList<DepartmentDTO> _departmentList = new List<DepartmentDTO>();
+        private string[]? _departmentArray = null;
         #endregion
 
         #endregion
@@ -68,8 +83,9 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         protected override void OnInitialized()
         {
             // Initialize the EditContext 
-            _editContext = new EditContext(_employee);
-            
+            _editContext = new EditContext(_recruitmentBudget);
+
+            BeginSearchBudget();
         }
 
         protected override void OnParametersSet()
@@ -88,6 +104,9 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             if (!string.IsNullOrEmpty(x.DepartmentName) && x.DepartmentName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
+            if (!string.IsNullOrEmpty(x.BudgetDescription) && x.BudgetDescription.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
             if (!string.IsNullOrEmpty(x.Remarks) && x.Remarks.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
@@ -96,7 +115,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
 
         private void StartedEditingItem(RecruitmentBudgetDTO item)
         {
-
+            BeginLoadComboboxTask();
         }
 
         private void CommittedItemChanges(RecruitmentBudgetDTO item)
@@ -145,7 +164,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             }
         }
         #endregion
-
+                
         #region Private Methods
         private void ShowHideError(bool value)
         {
@@ -203,9 +222,72 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         {
 
         }
+
+        private async Task<IEnumerable<string>> SearchDepartment(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _departmentArray!;
+            }
+
+            return _departmentArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private void BeginLoadComboboxTask()
+        {
+            _isRunning = true;
+
+            // Set the overlay message
+            overlayMessage = "Initializing form, please wait...";
+
+            _ = LoadComboboxAsync(async () =>
+            {
+                _isRunning = false;
+
+                if (_errorMessage.Length > 0)
+                    ShowHideError(true);
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);                                
+            });
+        }
         #endregion
 
         #region Database Methods
+        private async Task LoadComboboxAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(300);
+
+            #region Get Department list
+            var deptResult = await LookupCache.GetDepartmentMasterAsync();
+            if (deptResult.Success)
+            {
+                _departmentList = deptResult.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(deptResult.Error);
+            }
+
+            if (_departmentList != null)
+            {
+                _departmentArray = _departmentList.Select(d => d.DepartmentName).OrderBy(d => d).ToArray();
+            }
+            #endregion
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
         private async Task SaveChangeAsync(Func<Task> callback)
         {
             // Wait for 1 second then gives control back to the runtime
@@ -213,6 +295,61 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
 
             // Reset error messages
             _errorMessage.Clear();
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private void BeginSearchBudget(bool forceLoad = false)
+        {
+            _isRunning = true;
+
+            // Set the overlay message
+            overlayMessage = "Loading budget list, please wait...";
+
+            _ = SearchBudgetAsync(async () =>
+            {                
+                _isRunning = false;
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            }, forceLoad);
+        }
+
+        private async Task SearchBudgetAsync(Func<Task> callback, bool forceLoad = false)
+        {
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            string departmentCode = string.Empty;
+            bool? onHold = null;
+
+            #region Get the department code            
+            //if (!string.IsNullOrEmpty(_selectedDepartment))
+            //{
+            //    DepartmentDTO? departmentDTO = _departmentList.Where(d => d.DepartmentName == _selectedDepartment).FirstOrDefault();
+            //    if (departmentDTO != null)
+            //        _departmentCode = departmentDTO.DepartmentCode;
+            //}
+            #endregion
+
+            var repoResult = await RecruitmentService.GetRecruitmentBudgetAsync(departmentCode, onHold);
+            if (repoResult.Success)
+            {
+                _budgetList = repoResult.Value!;
+            }
+            else
+            {
+                // Show error message
+                _errorMessage.AppendLine(repoResult.Error);
+
+                ShowHideError(true);
+            }
 
             if (callback != null)
             {
