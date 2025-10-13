@@ -45,10 +45,10 @@
                              <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
                                  <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">RECRUITMENT BUDGETS:</MudText>
                                  <MudSpacer />
-                                 <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
-                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add New Department" />
-                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
-                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Dark" Label="Download Master Data" />
+                                 <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Filled.Menu">
+                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Primary" Label="Add New Budget" />
+                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Primary" Label="Export Grid Data to Excel" />
+                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Primary" Label="Download Master Data" />
                                  </MudMenu>
                              </MudAppBar>
                              <MudPaper Elevation="5" Square="true" Class="w-100">
@@ -64,7 +64,7 @@
                                             BackdropClick = false,
                                             CloseOnEscapeKey = false
                                         }"
-                                        StartedEditingItem="@StartedEditingItem" CommittedItemChanges="@CommittedItemChanges"
+                                        StartedEditingItem="@StartedEditingItem" CommittedItemChanges="@CommittedItemChanges" 
                                         TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
                                          <ToolBarContent>                        
                                              <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
@@ -79,7 +79,8 @@
                                                  <MudSwitch @bind-Value="_enableFilter" Color="Color.Success" UncheckedColor="Color.Default"
                                                     Label="Enable Custom Filter" LabelPlacement="Placement.Start" />
                                                  <MudPaper Class="ms-3" Elevation="0">
-                                                     <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new department" OnClick="AddBudget" />
+                                                     <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new department"
+                                                             OnClick="AddBudgetAsync" />
                                                  </MudPaper>                             
                                             </MudPaper>
                                         </ToolBarContent>
@@ -99,11 +100,11 @@
                                                      <MudAutocomplete @bind-Value="row.Item.DepartmentName"
                                                             SearchFunc="SearchDepartment!"
                                                             Variant="Variant.Text"
-                                                            Label="Department Head"
+                                                            Label="Department"
                                                             Margin="Margin.Normal"
                                                             Dense="true"
                                                             Placeholder="Please Select"
-                                                            HelperText="Type a key to search for employee"
+                                                            HelperText="Type a key to search for department"
                                                             HelperTextOnFocus="true"
                                                             Clearable="true" Typo="Typo.subtitle2"
                                                             MaxItems="@(_departmentList != null ? _departmentList.Count : 10)"
@@ -168,7 +169,7 @@
                                                     </MudChip>
                                                 </CellTemplate>
                                                 <EditTemplate Context="row">
-                                                    <MudSwitch @bind-Value="row.Item.OnHold" Color="Color.Success" UncheckedColor="Color.Error" Label="On-hold?" />
+                                                    <MudSwitch @bind-Value="row.Item.OnHold" Color="Color.Error" UncheckedColor="Color.Default" Label="On-hold?" />
                                                 </EditTemplate>
                                             </PropertyColumn>
                                              <PropertyColumn Property="x => x.CreatedDate" Title="Created Date" Class="col-created-date" Editable="false">
@@ -189,7 +190,8 @@
                                                             <i class="fas fa-edit fa-1x"></i>
                                                         </ChildContent>
                                                     </MudIconButton>
-                                                    <MudIconButton Color="Color.Error" title="Delete department record" Class="fa-icon-btn" >
+                                                    <MudIconButton Color="Color.Error" title="Delete budget record" Class="fa-icon-btn"
+                                                                   OnClick="() => ConfirmDeleteBudget(row.Item)">
                                                         <ChildContent>
                                                             <i class="fas fa-trash-alt fa-1x"></i>
                                                         </ChildContent>

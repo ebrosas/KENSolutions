@@ -12,6 +12,9 @@ namespace KenHRApp.Infrastructure.Repositories
     {
         #region Public Methods
         Task<Result<List<RecruitmentBudget>?>> GetRecruitmentBudgetAsync(string? departmentCode, bool? onHold);
+        Task<Result<int>> UpdateRecruitmentBudgetAsync(RecruitmentBudget dto, CancellationToken cancellationToken = default);
+        Task<Result<int>> AddRecruitmentBudgetAsync(RecruitmentBudget dto, CancellationToken cancellationToken = default);
+        Task<Result<bool>> DeleteRecruitmentBudgetAsync(int budgetID, CancellationToken cancellationToken = default);
         #endregion
     }
 }

@@ -29,8 +29,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         #endregion
 
         #region Private Fields        
-        private RecruitmentBudgetDTO _recruitmentBudget = new();
-        //private EmployeeDTO employee = new();
+        private RecruitmentBudgetDTO _recruitmentBudget = new();        
         private StringBuilder _errorMessage = new StringBuilder();
         private EditForm _editForm;
         private EditContext? _editContext;
@@ -63,6 +62,14 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             Warning,
             Error
         }
+        #endregion
+
+        #region Dialog Box Button Icons
+        private readonly string _iconDelete = "fas fa-trash-alt";
+        private readonly string _iconCancel = "fas fa-window-close";
+        private readonly string _iconError = "fas fa-times-circle";
+        private readonly string _iconInfo = "fas fa-info-circle";
+        private readonly string _iconWarning = "fas fa-exclamation-circle";
         #endregion
 
         #region Collections        
@@ -120,7 +127,69 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
 
         private void CommittedItemChanges(RecruitmentBudgetDTO item)
         {
+            try
+            {
+                if (item == null) return;
 
+                #region Get selected department
+                if (!string.IsNullOrEmpty(item.DepartmentName))
+                {
+                    DepartmentDTO? department = _departmentList.Where(d => d.DepartmentName == item.DepartmentName).FirstOrDefault();
+                    if (department != null)
+                        item.DepartmentCode = department.DepartmentCode;
+                }
+                #endregion
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Saving changes, please wait...";
+
+                _ = SaveRecruitmentBudgetAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+                }, item);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Save cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task ConfirmDeleteBudget(RecruitmentBudgetDTO budget)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to delete the recruitment budget for '{budget.DepartmentName}'?" },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,    // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Confirmation", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                BeginDeleteRecruitmentBudget(budget);
+            }
         }
         #endregion
 
@@ -164,7 +233,115 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             }
         }
         #endregion
-                
+
+        #region Async Methods
+        private void BeginDeleteRecruitmentBudget(RecruitmentBudgetDTO budget)
+        {
+            try
+            {
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Deleting budget record, please wait...";
+
+                _ = DeleteRecruitmentBudgetAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    // Remove locally from the list so UI updates immediately
+                    _budgetList.Remove(budget);
+
+                    StateHasChanged();
+
+                }, budget);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Delete cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private void BeginSearchBudget(bool forceLoad = false)
+        {
+            _isRunning = true;
+
+            // Set the overlay message
+            overlayMessage = "Loading budget list, please wait...";
+
+            _ = SearchBudgetAsync(async () =>
+            {
+                _isRunning = false;
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            }, forceLoad);
+        }
+
+        private async Task AddBudgetAsync()
+        {
+            try
+            {
+                var parameters = new DialogParameters
+                {
+                    ["EmergencyContact"] = new RecruitmentBudgetDTO(),
+                    ["DepartmentList"] = _departmentList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Large
+                };
+
+                // Show the dialog box
+                var dialog = await DialogService.ShowAsync<EmergencyContactDialog>("Add New Budget", parameters, options);
+
+                var result = await dialog.Result;
+                if (result != null && !result.Canceled)
+                {
+                    var newBudget = (RecruitmentBudgetDTO)result.Data!;
+                    newBudget.BudgetId = 0;
+
+                    #region Get the selected department
+                    if (!string.IsNullOrEmpty(newBudget.DepartmentName))
+                    {
+                        DepartmentDTO? department = _departmentList.Where(d => d.DepartmentName == newBudget.DepartmentName).FirstOrDefault();
+                        if (department != null)
+                            newBudget.DepartmentCode = department.DepartmentCode;
+                    }
+                    #endregion
+
+                    #region Check for duplicate entries
+                    var duplicateBudget = _budgetList.FirstOrDefault(e => e.DepartmentCode.Trim().ToUpper() == newBudget.DepartmentCode.Trim().ToUpper()
+                        && e.BudgetHeadCount == newBudget.BudgetHeadCount);
+                    if (duplicateBudget != null)
+                    {
+                        // Show error
+                        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified department and head count budget already exists. Please enter a different value on these fields then try to save again.");
+                        return;
+                    }
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+        #endregion
+
         #region Private Methods
         private void ShowHideError(bool value)
         {
@@ -216,11 +393,42 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     Snackbar.Add(message, Severity.Normal);
                     break;
             }
-        }
+        }                
 
-        private async Task AddBudget()
+        private async Task ShowErrorMessage(MessageBoxTypes msgboxType, string title, string content)
         {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", title},
+                { "DialogIcon", msgboxType == MessageBoxTypes.Error ? _iconError
+                        : msgboxType == MessageBoxTypes.Warning ? _iconWarning
+                        : _iconInfo  },
+                { "ContentText", content },
+                {
+                    "Color", msgboxType == MessageBoxTypes.Error ? Color.Error
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
+                },
+                {
+                    "DialogIconColor", msgboxType == MessageBoxTypes.Error ? Color.Error
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
+                }
+            };
 
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.Center,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<InfoDialog>(title, parameters, options);
+            var result = await dialog.Result;
         }
 
         private async Task<IEnumerable<string>> SearchDepartment(string value, CancellationToken token)
@@ -303,21 +511,47 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             }
         }
 
-        private void BeginSearchBudget(bool forceLoad = false)
+        private async Task SaveRecruitmentBudgetAsync(Func<Task> callback, RecruitmentBudgetDTO budget)
         {
-            _isRunning = true;
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
 
-            // Set the overlay message
-            overlayMessage = "Loading budget list, please wait...";
+            // Reset error messages
+            _errorMessage.Clear();
 
-            _ = SearchBudgetAsync(async () =>
-            {                
-                _isRunning = false;
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
 
-                // Shows the spinner overlay
-                await InvokeAsync(StateHasChanged);
-            }, forceLoad);
-        }
+            var result = await RecruitmentService.SaveRecruitmentBudgetAsync(budget, _cts.Token);
+            if (!result.Success)
+            {
+                // Set the error message
+                _errorMessage.AppendLine(result.Error!);
+                ShowHideError(true);
+            }
+            else
+            {
+                if (budget.BudgetId == 0)
+                {
+                    // Get the new identity seed
+                    budget.BudgetId = _budgetList.Max(d => d.BudgetId) + 1;
+
+                    // Add locally to the list so UI updates immediately
+                    _budgetList.Add(budget);
+
+                    StateHasChanged();
+                }
+
+                // Show notification
+                ShowNotification("Budget saved successfully!", NotificationType.Success);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }                
 
         private async Task SearchBudgetAsync(Func<Task> callback, bool forceLoad = false)
         {
@@ -349,6 +583,54 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 _errorMessage.AppendLine(repoResult.Error);
 
                 ShowHideError(true);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task DeleteRecruitmentBudgetAsync(Func<Task> callback, RecruitmentBudgetDTO budget)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            if (budget.BudgetId == 0)
+            {
+                errorMsg = "Budget record is not found.";
+            }
+            else
+            {
+                var deleteResult = await RecruitmentService.DeleteRecruitmentBudgetAsync(budget.BudgetId, _cts.Token);
+                isSuccess = deleteResult.Success;
+                if (!isSuccess)
+                    errorMsg = deleteResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Show notification
+                ShowNotification("The selected budget has been deleted successfully!", NotificationType.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(errorMsg);
+                    ShowHideError(true);
+                }
             }
 
             if (callback != null)

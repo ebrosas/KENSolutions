@@ -12,6 +12,8 @@ namespace KenHRApp.Application.Interfaces
     {
         #region Public Methods
         Task<Result<List<RecruitmentBudgetDTO>>> GetRecruitmentBudgetAsync(string? departmentCode, bool? onHold);
+        Task<Result<int>> SaveRecruitmentBudgetAsync(RecruitmentBudgetDTO dto, CancellationToken cancellationToken = default);
+        Task<Result<bool>> DeleteRecruitmentBudgetAsync(int budgetID, CancellationToken cancellationToken = default);
         #endregion
     }
 }

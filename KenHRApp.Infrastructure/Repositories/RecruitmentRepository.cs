@@ -75,6 +75,101 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<List<RecruitmentBudget>?>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<int>> UpdateRecruitmentBudgetAsync(RecruitmentBudget dto, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                var budget = await _db.RecruitmentBudgets.FirstOrDefaultAsync(x => x.BudgetId == dto.BudgetId, cancellationToken);
+                if (budget == null)
+                    throw new InvalidOperationException("Recruitment budget not found");
+
+                #region Update RecruitmentBudget entity
+                budget.DepartmentCode = dto.DepartmentCode;
+                budget.BudgetDescription = dto.BudgetDescription;
+                budget.BudgetHeadCount = dto.BudgetHeadCount;
+                budget.ActiveCount = dto.ActiveCount;
+                budget.ExitCount = dto.ExitCount;
+                budget.RequisitionCount = dto.RequisitionCount;
+                budget.NetGapCount = dto.NetGapCount;
+                budget.NewIndentCount = dto.NewIndentCount;
+                budget.OnHold = dto.OnHold;
+                budget.Remarks = dto.Remarks;
+                budget.LastUpdateDate = dto.LastUpdateDate;
+                #endregion
+
+                // Save to database
+                _db.RecruitmentBudgets.Update(budget);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> AddRecruitmentBudgetAsync(RecruitmentBudget dto, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                // Save to database
+                _db.RecruitmentBudgets.Add(dto);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<bool>> DeleteRecruitmentBudgetAsync(int budgetID, CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var budget = await _db.RecruitmentBudgets.FindAsync(budgetID);
+                if (budget == null)
+                    throw new Exception("Could not delete budget because record not found in the database.");
+
+                _db.RecruitmentBudgets.Remove(budget);
+
+                int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
+                if (rowsDeleted > 0)
+                    isSuccess = true;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }
