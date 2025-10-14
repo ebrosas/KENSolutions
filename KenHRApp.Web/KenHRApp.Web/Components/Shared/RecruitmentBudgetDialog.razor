@@ -1,0 +1,197 @@
+﻿@using KenHRApp.Web.Components.Common
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@DialogIcon" Class="mr-1 mb-n1" Size="Size.Medium" Color="@DialogIconColor" />
+            @DialogTitle
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudGrid Spacing="7">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudAutocomplete @bind-Value="RecruitmentBudget.DepartmentName"
+                            SearchFunc="SearchDepartment!"
+                            Variant="Variant.Text"
+                            Label="Department Name"
+                            Margin="Margin.Normal"
+                            Dense="true"
+                            Placeholder="Please Select"
+                            HelperText="Type a key to search for department"
+                            HelperTextOnFocus="true"
+                            Clearable="true" Typo="Typo.subtitle2"
+                            MaxItems="@(DepartmentList != null ? DepartmentList.Count : 10)"
+                            Required RequiredError="Department Name is required"
+                            Modal="true" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudTextField @bind-Value="RecruitmentBudget.BudgetDescription" Label="Budget Description"
+                                      For="@(() => RecruitmentBudget.BudgetDescription)"
+                                      HelperText="Max. text input is 120 chars."
+                                      Variant="Variant.Text" HelperTextOnFocus="true" Counter="120" MaxLength="120"
+                                      Clearable="@IsClearable" Disabled="@IsDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+            <MudGrid Spacing="7">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudNumericField @bind-Value="RecruitmentBudget.BudgetHeadCount" Label="Head Count Budget"
+                            For="@(() => RecruitmentBudget.BudgetHeadCount)"
+                                          Variant="Variant.Text"
+                            HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                            Required RequiredError="Head Count Budget is required"
+                            Clearable="false" Disabled="@IsDisabled"
+                            Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudNumericField @bind-Value="RecruitmentBudget.ActiveCount" Label="Active Employees"
+                            For="@(() => RecruitmentBudget.ActiveCount)"
+                                          Variant="Variant.Text"
+                            HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                            Clearable="false" Disabled="@IsDisabled"
+                            Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+            <MudGrid Spacing="7">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudNumericField @bind-Value="RecruitmentBudget.ExitCount" Label="Exit Employees"
+                            For="@(() => RecruitmentBudget.ExitCount)"
+                                          Variant="Variant.Text"
+                            HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                            Clearable="false" Disabled="@IsDisabled"
+                            Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>
+                </MudItem>
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudNumericField @bind-Value="RecruitmentBudget.RequisitionCount" Label="Active Requisitions"
+                                          For="@(() => RecruitmentBudget.RequisitionCount)"
+                                          Variant="Variant.Text"
+                                          Clearable="false" Disabled="true"
+                                          Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                     </MudPaper>
+                 </MudItem>
+            </MudGrid>
+            <MudGrid Spacing="7">               
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudNumericField @bind-Value="RecruitmentBudget.NetGapCount" Label="Net Gap"
+                                          For="@(() => RecruitmentBudget.NetGapCount)"
+                                          Variant="Variant.Text"
+                                          Clearable="false" Disabled="true"
+                                          Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>
+                </MudItem>
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudNumericField @bind-Value="RecruitmentBudget.NewIndentCount" Label="New Indent"
+                                          For="@(() => RecruitmentBudget.NewIndentCount)"
+                                          Variant="Variant.Text"
+                                          HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                          Clearable="false" Disabled="@IsDisabled"
+                                          Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                     </MudPaper>
+                 </MudItem>
+            </MudGrid>
+             <MudGrid Spacing="7">
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudTextField @bind-Value="RecruitmentBudget.Remarks" For="@(() => RecruitmentBudget.Remarks)" Label="Remarks"
+                                       HelperText="Max. text input is 300 chars." Variant="Variant.Outlined" HelperTextOnFocus="true"
+                                       Counter="300" MaxLength="300" Disabled="false" Lines="3"
+                                       Clearable="false" Immediate="@IsDisabled" 
+                                       Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                     </MudPaper>
+                 </MudItem>
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100 d-flex justify-content-start">
+                         <MudSwitch @bind-Value="RecruitmentBudget.OnHold" Color="Color.Error" UncheckedColor="Color.Default" LabelPlacement="Placement.Start">On-hold?</MudSwitch>
+                     </MudPaper>
+                 </MudItem>
+             </MudGrid>
+        </MudForm>
+    </DialogContent>
+
+    <DialogActions>
+         <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
+         <MudButton Color="Color.Default" Variant="Variant.Text" Size="Size.Medium" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Fields
+    private MudForm _form = new();
+    private string[]? _departmentArray = null;
+    private string[]? _countryArray = null;
+    #endregion
+
+    #region Parameters and Injections
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public string DialogTitle { get; set; } = "Confirmation";
+
+    [Parameter]
+    public string DialogIcon { get; set; } = "fas fa-trash-alt";
+
+    [Parameter]
+    public Color DialogIconColor { get; set; } = Color.Error;
+
+    [Parameter]
+    public RecruitmentBudgetDTO RecruitmentBudget { get; set; } = new();
+
+    [Parameter]
+    public IReadOnlyList<DepartmentDTO> DepartmentList { get; set; } = new List<DepartmentDTO>();
+
+    [Parameter]
+    public bool IsClearable { get; set; } = true;
+
+    [Parameter]
+    public bool IsDisabled { get; set; } = true;
+    #endregion
+
+    #region Page Methods
+    protected override void OnInitialized()
+    {
+        if (DepartmentList != null)
+            _departmentArray = DepartmentList.Select(d => d.DepartmentName).OrderBy(d => d).ToArray();
+    }
+    #endregion
+
+    #region Private Methods
+    private async Task Save()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        MudDialog.Close(DialogResult.Ok(RecruitmentBudget));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task<IEnumerable<string>> SearchDepartment(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _departmentArray!;
+        }
+
+        return _departmentArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    #endregion
+}
+}

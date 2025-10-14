@@ -86,7 +86,7 @@ h1:focus {
 /* Format table header */
 .budget-grid .mud-table-head {
     background-color: #BBDEFB;
-    font-weight: bolder;
+    font-weight: bold !important;
     text-align: center !important;
     font-size: 14px !important;
     text-decoration: underline;

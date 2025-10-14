@@ -70,6 +70,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private readonly string _iconError = "fas fa-times-circle";
         private readonly string _iconInfo = "fas fa-info-circle";
         private readonly string _iconWarning = "fas fa-exclamation-circle";
+        private readonly string _iconAdd = "fas fa-plus-circle";
         #endregion
 
         #region Collections        
@@ -92,7 +93,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             // Initialize the EditContext 
             _editContext = new EditContext(_recruitmentBudget);
 
-            BeginSearchBudget();
+            BeginLoadComboboxTask();            
         }
 
         protected override void OnParametersSet()
@@ -122,7 +123,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
 
         private void StartedEditingItem(RecruitmentBudgetDTO item)
         {
-            BeginLoadComboboxTask();
+            //BeginLoadComboboxTask();
         }
 
         private void CommittedItemChanges(RecruitmentBudgetDTO item)
@@ -146,7 +147,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 // Set the overlay message
                 overlayMessage = "Saving changes, please wait...";
 
-                _ = SaveRecruitmentBudgetAsync(async () =>
+                _ = SaveChangeAsync(async () =>
                 {
                     _isRunning = false;
 
@@ -215,13 +216,13 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 // Set the overlay message
                 overlayMessage = "Saving changes, please wait...";
 
-                _ = SaveChangeAsync(async () =>
-                {
-                    _isRunning = false;
+                //_ = SaveChangeAsync(async () =>
+                //{
+                //    _isRunning = false;
 
-                    // Shows the spinner overlay
-                    await InvokeAsync(StateHasChanged);
-                });
+                //    // Shows the spinner overlay
+                //    await InvokeAsync(StateHasChanged);
+                //});
             }
             catch (OperationCanceledException)
             {
@@ -291,7 +292,10 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             {
                 var parameters = new DialogParameters
                 {
-                    ["EmergencyContact"] = new RecruitmentBudgetDTO(),
+                    ["DialogTitle"] = "Add New Budget",
+                    ["DialogIcon"] = _iconAdd,
+                    ["DialogIconColor"] = Color.Info,
+                    ["RecruitmentBudget"] = new RecruitmentBudgetDTO() { OnHold = false },
                     ["DepartmentList"] = _departmentList,
                     ["IsClearable"] = true,
                     ["IsDisabled"] = false
@@ -302,11 +306,12 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     CloseOnEscapeKey = true,
                     BackdropClick = false,
                     FullWidth = true,
-                    MaxWidth = MaxWidth.Large
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
                 };
 
                 // Show the dialog box
-                var dialog = await DialogService.ShowAsync<EmergencyContactDialog>("Add New Budget", parameters, options);
+                var dialog = await DialogService.ShowAsync<RecruitmentBudgetDialog>("Add New Budget", parameters, options);
 
                 var result = await dialog.Result;
                 if (result != null && !result.Canceled)
@@ -333,6 +338,24 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                         return;
                     }
                     #endregion
+
+                    // Set the Update Date
+                    newBudget.CreatedDate = DateTime.Now;
+
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Adding budget, please wait...";
+
+                    _ = SaveChangeAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+
+                    }, newBudget);
                 }
             }
             catch (Exception ex)
@@ -459,6 +482,8 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 if (_errorMessage.Length > 0)
                     ShowHideError(true);
 
+                BeginSearchBudget();
+
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);                                
             });
@@ -496,22 +521,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             }
         }
 
-        private async Task SaveChangeAsync(Func<Task> callback)
-        {
-            // Wait for 1 second then gives control back to the runtime
-            await Task.Delay(500);
-
-            // Reset error messages
-            _errorMessage.Clear();
-
-            if (callback != null)
-            {
-                // Hide the spinner overlay
-                await callback.Invoke();
-            }
-        }
-
-        private async Task SaveRecruitmentBudgetAsync(Func<Task> callback, RecruitmentBudgetDTO budget)
+        private async Task SaveChangeAsync(Func<Task> callback, RecruitmentBudgetDTO budget)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(500);

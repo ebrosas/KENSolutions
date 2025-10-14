@@ -43,9 +43,9 @@
                         </MudText>
                         <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
                              <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
-                                 <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">RECRUITMENT BUDGETS:</MudText>
+                                 <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">RECRUITMENT BUDGETS</MudText>
                                  <MudSpacer />
-                                 <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Filled.Menu">
+                                 <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
                                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Primary" Label="Add New Budget" />
                                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Primary" Label="Export Grid Data to Excel" />
                                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Primary" Label="Download Master Data" />
@@ -79,8 +79,7 @@
                                                  <MudSwitch @bind-Value="_enableFilter" Color="Color.Success" UncheckedColor="Color.Default"
                                                     Label="Enable Custom Filter" LabelPlacement="Placement.Start" />
                                                  <MudPaper Class="ms-3" Elevation="0">
-                                                     <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new department"
-                                                             OnClick="AddBudgetAsync" />
+                                                     <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new department" OnClick="AddBudgetAsync" />
                                                  </MudPaper>                             
                                             </MudPaper>
                                         </ToolBarContent>
@@ -95,8 +94,13 @@
                                                      @* Empty to prevent rendering *@
                                                  </EditTemplate>
                                              </PropertyColumn>
-                                             <PropertyColumn Property="x => x.DepartmentName" Title="Department" Class="col-dept-name">
-                                                 <EditTemplate Context="row">
+                                             <PropertyColumn Property="x => x.DepartmentName" Title="Department" Class="col-dept-name" Editable="false">
+                                                 <CellTemplate Context="row">
+                                                     <MudChip T="string" Size=Size.Small Color="Color.Default" Label="true" Class="fw-bold">
+                                                         @row.Item.DepartmentName
+                                                </MudChip>
+                                                </CellTemplate>
+                                                @* <EditTemplate Context="row">
                                                      <MudAutocomplete @bind-Value="row.Item.DepartmentName"
                                                             SearchFunc="SearchDepartment!"
                                                             Variant="Variant.Text"
@@ -109,7 +113,7 @@
                                                             Clearable="true" Typo="Typo.subtitle2"
                                                             MaxItems="@(_departmentList != null ? _departmentList.Count : 10)"
                                                             Modal="true" />
-                                                 </EditTemplate>
+                                                </EditTemplate> *@
                                             </PropertyColumn>
                                              <PropertyColumn Property="x => x.BudgetDescription" Title="Budget Description" Class="col-description">
                                                  <EditTemplate Context="row">
@@ -134,12 +138,12 @@
                                                         Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                                 </EditTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.RequisitionCount" Title="Active Requisitions" Class="col-requisition-count">
-                                                 <EditTemplate Context="row">
+                                             <PropertyColumn Property="x => x.RequisitionCount" Title="Active Requisitions" Class="col-requisition-count" Editable="false">
+                                                 @* <EditTemplate Context="row">
                                                      <MudNumericField @bind-Value="row.Item.RequisitionCount" Label="Active Requisitions" Variant="Variant.Outlined"
                                                                       HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
                                                                       Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                 </EditTemplate>
+                                                 </EditTemplate> *@
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.ExitCount" Title="Exit Employees" Class="col-exit-count">
                                                  <EditTemplate Context="row">
@@ -148,12 +152,12 @@
                                                                       Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                                  </EditTemplate>
                                              </PropertyColumn>
-                                             <PropertyColumn Property="x => x.NetGapCount" Title="Net Gap" Class="col-gap-count">
-                                                 <EditTemplate Context="row">
+                                             <PropertyColumn Property="x => x.NetGapCount" Title="Net Gap" Class="col-gap-count" Editable="false">
+                                                 @* <EditTemplate Context="row">
                                                      <MudNumericField @bind-Value="row.Item.NetGapCount" Label="Net Gap" Variant="Variant.Outlined"
                                                                       HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
                                                                       Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                 </EditTemplate>
+                                                 </EditTemplate> *@
                                              </PropertyColumn>
                                              <PropertyColumn Property="x => x.NewIndentCount" Title="New Indent" Class="col-indent-count">
                                                  <EditTemplate Context="row">
