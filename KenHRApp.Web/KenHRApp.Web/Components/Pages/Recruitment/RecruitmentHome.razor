@@ -117,15 +117,18 @@
                                             </PropertyColumn>
                                              <PropertyColumn Property="x => x.BudgetDescription" Title="Budget Description" Class="col-description">
                                                  <EditTemplate Context="row">
-                                                     <MudTextField @bind-Value="row.Item.BudgetDescription" Label="Budget Description" HelperText="Maximum input is 200 chars."
-                                                                   Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="200" MaxLength="200"
-                                                                                    Required RequiredError="Department Name is required"
-                                                                   Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                    <MudTextField @bind-Value="row.Item.BudgetDescription" For="@(() => row.Item.BudgetDescription)"
+                                                        Label="Budget Description" 
+                                                        HelperText="Maximum input is 200 chars."
+                                                        Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="200" MaxLength="200"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                                  </EditTemplate>
                                              </PropertyColumn>
                                             <PropertyColumn Property="x => x.BudgetHeadCount" Title="Head Count Budget" Class="col-head-count">
                                                  <EditTemplate Context="row">
-                                                     <MudNumericField @bind-Value="row.Item.BudgetHeadCount" Label="Head Count Budget" Variant="Variant.Outlined"
+                                                     <MudNumericField @bind-Value="row.Item.BudgetHeadCount" Label="Head Count Budget"
+                                                        For="@(() => row.Item.BudgetHeadCount)"
+                                                        Variant="Variant.Outlined"
                                                         HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
                                                         Required RequiredError="Head Count Budget is required"
                                                         Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
@@ -133,7 +136,9 @@
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.ActiveCount" Title="Active Employees" Class="col-active-count">
                                                  <EditTemplate Context="row">
-                                                     <MudNumericField @bind-Value="row.Item.ActiveCount" Label="Active Employees" Variant="Variant.Outlined"
+                                                     <MudNumericField @bind-Value="row.Item.ActiveCount" Label="Active Employees"
+                                                                      For="@(() => row.Item.ActiveCount)"
+                                                        Variant="Variant.Outlined"
                                                         HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
                                                         Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                                 </EditTemplate>
@@ -147,9 +152,11 @@
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.ExitCount" Title="Exit Employees" Class="col-exit-count">
                                                  <EditTemplate Context="row">
-                                                     <MudNumericField @bind-Value="row.Item.ExitCount" Label="Exit Employees" Variant="Variant.Outlined"
-                                                                      HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
-                                                                      Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                     <MudNumericField @bind-Value="row.Item.ExitCount" Label="Exit Employees"
+                                                        For="@(() => row.Item.ExitCount)"
+                                                        Variant="Variant.Outlined"
+                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                                  </EditTemplate>
                                              </PropertyColumn>
                                              <PropertyColumn Property="x => x.NetGapCount" Title="Net Gap" Class="col-gap-count" Editable="false">
@@ -161,7 +168,9 @@
                                              </PropertyColumn>
                                              <PropertyColumn Property="x => x.NewIndentCount" Title="New Indent" Class="col-indent-count">
                                                  <EditTemplate Context="row">
-                                                     <MudNumericField @bind-Value="row.Item.NewIndentCount" Label="New Indent" Variant="Variant.Outlined"
+                                                     <MudNumericField @bind-Value="row.Item.NewIndentCount" Label="New Indent"
+                                                        For="@(() => row.Item.NewIndentCount)"
+                                                        Variant="Variant.Outlined"
                                                         HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
                                                         Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                                  </EditTemplate>

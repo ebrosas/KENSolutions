@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KenHRApp.Application.Common.Validations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -30,6 +31,7 @@ namespace KenHRApp.Application.DTOs
         public int BudgetHeadCount { get; set; }
 
         [Display(Name = "Active Employees")]
+        [ActiveCountValidation("BudgetHeadCount")] // ✅ custom validation
         public int ActiveCount { get; set; }
 
         [Display(Name = "Exit Employees")]
@@ -64,6 +66,13 @@ namespace KenHRApp.Application.DTOs
         {
             get { return OnHold ? "Yes" : "No"; }
             set { }
+        }
+        #endregion
+
+        #region Public Methods
+        public void RecalculateNetGap()
+        {
+            NetGapCount = BudgetHeadCount - ((ActiveCount + RequisitionCount) - ExitCount);
         }
         #endregion
     }

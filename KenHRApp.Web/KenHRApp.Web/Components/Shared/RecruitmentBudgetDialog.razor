@@ -74,10 +74,10 @@
                  <MudItem xs="6">
                      <MudPaper Elevation="0" Class="p-0 w-100">
                          <MudNumericField @bind-Value="RecruitmentBudget.RequisitionCount" Label="Active Requisitions"
-                                          For="@(() => RecruitmentBudget.RequisitionCount)"
-                                          Variant="Variant.Text"
-                                          Clearable="false" Disabled="true"
-                                          Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                            For="@(() => RecruitmentBudget.RequisitionCount)"
+                            Variant="Variant.Text" Clearable="false"
+                            Disabled="true" HelperText="(Note: This field is non-editable, which displays the total count of active recruitment requests.)"
+                            Margin="Margin.Dense" Typo="Typo.subtitle2" />
                      </MudPaper>
                  </MudItem>
             </MudGrid>
@@ -85,10 +85,11 @@
                 <MudItem xs="6">
                     <MudPaper Elevation="0" Class="p-0 w-100">
                          <MudNumericField @bind-Value="RecruitmentBudget.NetGapCount" Label="Net Gap"
-                                          For="@(() => RecruitmentBudget.NetGapCount)"
-                                          Variant="Variant.Text"
-                                          Clearable="false" Disabled="true"
-                                          Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                            For="@(() => RecruitmentBudget.NetGapCount)"
+                            Variant="Variant.Text"
+                            Clearable="false" Disabled="true"
+                            HelperText="(Note: This field is non-editable, which displays the difference between head count and active employees.)"
+                            Margin="Margin.Dense" Typo="Typo.subtitle2" />
                     </MudPaper>
                 </MudItem>
                  <MudItem xs="6">
@@ -121,13 +122,13 @@
         </MudForm>
     </DialogContent>
 
-    <DialogActions>
-         <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
+    <DialogActions>         
          <MudButton Color="Color.Default" Variant="Variant.Text" Size="Size.Medium" OnClick="Cancel">Cancel</MudButton>
+         <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
     </DialogActions>
 </MudDialog>
 
-@code {
+ @code {
     #region Fields
     private MudForm _form = new();
     private string[]? _departmentArray = null;
@@ -192,6 +193,13 @@
 
         return _departmentArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
+
+    private async Task<int> CalculateNetGap()
+    {
+        await Task.Delay(1);
+
+        int netGap = (RecruitmentBudget.BudgetHeadCount - ((RecruitmentBudget.ActiveCount + RecruitmentBudget.RequisitionCount) - RecruitmentBudget.ExitCount));
+        return netGap;
+    }
     #endregion
-}
 }
