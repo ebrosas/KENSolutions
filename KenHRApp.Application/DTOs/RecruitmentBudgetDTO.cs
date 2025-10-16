@@ -35,6 +35,7 @@ namespace KenHRApp.Application.DTOs
         public int ActiveCount { get; set; }
 
         [Display(Name = "Exit Employees")]
+        [ExitEmployeeValidation("ActiveCount")] // ✅ custom validation
         public int ExitCount { get; set; }
 
         [Display(Name = "Active Requisition")]
@@ -44,6 +45,7 @@ namespace KenHRApp.Application.DTOs
         public int NetGapCount { get; set; }
 
         [Display(Name = "Net Indent")]
+        [NewIndentValidation("NetGapCount")] // ✅ custom validation
         public int NewIndentCount { get; set; }
 
         [Display(Name = "On-hold")]

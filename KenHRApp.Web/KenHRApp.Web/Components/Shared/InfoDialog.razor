@@ -25,13 +25,16 @@
     public string DialogIcon { get; set; } = "fas fa-times-circle";
 
     [Parameter]
-    public Color DialogIconColor { get; set; } = Color.Error;
+    public Color DialogIconColor { get; set; } = Color.Error;        
 
     [Parameter] 
     public string ContentText { get; set; } = "An unhandled error occured.";
 
     [Parameter] 
     public string OkayText { get; set; } = "Okay";
+
+    [Parameter]
+    public Color OkBtnColor { get; set; } = Color.Error;
 
     [Parameter]
     public Color Color { get; set; }

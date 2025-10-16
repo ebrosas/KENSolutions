@@ -40,7 +40,13 @@
             <MudGrid Spacing="7">
                 <MudItem xs="6">
                     <MudPaper Elevation="0" Class="p-0 w-100">
-                        <MudNumericField @bind-Value="RecruitmentBudget.BudgetHeadCount" Label="Head Count Budget"
+                        <MudNumericField Label="Head Count Budget"
+                            Value="RecruitmentBudget.BudgetHeadCount"
+                            ValueChanged="@(async (int v) => {
+                                    RecruitmentBudget.BudgetHeadCount = v;
+                                    RecruitmentBudget.RecalculateNetGap();
+                                    await InvokeAsync(StateHasChanged);
+                                })"
                             For="@(() => RecruitmentBudget.BudgetHeadCount)"
                                           Variant="Variant.Text"
                             HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
@@ -51,19 +57,32 @@
                 </MudItem>
                 <MudItem xs="6">
                     <MudPaper Elevation="0" Class="p-0 w-100">
-                         <MudNumericField @bind-Value="RecruitmentBudget.ActiveCount" Label="Active Employees"
+                         <MudNumericField Label="Active Employees"
+                            Value="RecruitmentBudget.ActiveCount"
+                            ValueChanged="@(async (int v) => {
+                                 RecruitmentBudget.ActiveCount = v;
+                                 RecruitmentBudget.RecalculateNetGap();
+                                 await InvokeAsync(StateHasChanged);
+                             })"
                             For="@(() => RecruitmentBudget.ActiveCount)"
-                                          Variant="Variant.Text"
+                            Variant="Variant.Text"
                             HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
                             Clearable="false" Disabled="@IsDisabled"
-                            Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                            Immediate="true" Margin="Margin.Dense" 
+                            Typo="Typo.subtitle2" />
                     </MudPaper>
                 </MudItem>
             </MudGrid>
             <MudGrid Spacing="7">
                 <MudItem xs="6">
                     <MudPaper Elevation="0" Class="p-0 w-100">
-                         <MudNumericField @bind-Value="RecruitmentBudget.ExitCount" Label="Exit Employees"
+                         <MudNumericField Label="Exit Employees"
+                            Value="RecruitmentBudget.ExitCount"
+                            ValueChanged="@(async (int v) => {
+                                 RecruitmentBudget.ExitCount = v;
+                                 RecruitmentBudget.RecalculateNetGap();
+                                 await InvokeAsync(StateHasChanged);
+                             })"
                             For="@(() => RecruitmentBudget.ExitCount)"
                                           Variant="Variant.Text"
                             HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
@@ -87,7 +106,7 @@
                          <MudNumericField @bind-Value="RecruitmentBudget.NetGapCount" Label="Net Gap"
                             For="@(() => RecruitmentBudget.NetGapCount)"
                             Variant="Variant.Text"
-                            Clearable="false" Disabled="true"
+                            Clearable="false" Disabled="true" ReadOnly="true"
                             HelperText="(Note: This field is non-editable, which displays the difference between head count and active employees.)"
                             Margin="Margin.Dense" Typo="Typo.subtitle2" />
                     </MudPaper>

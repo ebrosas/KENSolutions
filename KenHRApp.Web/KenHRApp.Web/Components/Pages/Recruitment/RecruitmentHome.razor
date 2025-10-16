@@ -197,17 +197,18 @@
                                             </PropertyColumn>                        
                                             <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                                                 <CellTemplate Context="row">
-                                                    <MudIconButton Color="Color.Info" title="View and edit employee information" Class="show-btn fa-icon-btn"
+                                                    <MudIconButton Color="Color.Info" title="Edit budget information" 
+                                                        Icon="@Icons.Material.Rounded.Edit"
                                                         OnClick="@row.Actions.StartEditingItemAsync">
-                                                        <ChildContent>
-                                                            <i class="fas fa-edit fa-1x"></i>
-                                                        </ChildContent>
                                                     </MudIconButton>
-                                                    <MudIconButton Color="Color.Error" title="Delete budget record" Class="fa-icon-btn"
-                                                                   OnClick="() => ConfirmDeleteBudget(row.Item)">
-                                                        <ChildContent>
-                                                            <i class="fas fa-trash-alt fa-1x"></i>
-                                                        </ChildContent>
+                                                    <MudIconButton Color="Color.Success" title="Create requisition" 
+                                                        Icon="@Icons.Material.Filled.AddCircle"
+                                                        Disabled="@(row.Item.NewIndentCount == 0)"
+                                                        OnClick="@row.Actions.StartEditingItemAsync">
+                                                    </MudIconButton>
+                                                    <MudIconButton Color="Color.Error" title="Delete budget"                                                        
+                                                        Icon="@Icons.Material.Rounded.Delete"
+                                                        OnClick="() => ConfirmDeleteBudget(row.Item)">
                                                     </MudIconButton>
                                                 </CellTemplate>
                                             </TemplateColumn>

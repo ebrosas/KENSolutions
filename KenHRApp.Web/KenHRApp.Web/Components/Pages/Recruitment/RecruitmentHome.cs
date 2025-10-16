@@ -438,6 +438,12 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                         : msgboxType == MessageBoxTypes.Info ? Color.Info
                         : msgboxType == MessageBoxTypes.Warning ? Color.Warning
                         : Color.Default
+                },
+                {
+                    "OkBtnColor", msgboxType == MessageBoxTypes.Error ? Color.Error
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
                 }
             };
 
