@@ -46,9 +46,9 @@
                                  <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">RECRUITMENT BUDGETS</MudText>
                                  <MudSpacer />
                                  <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
-                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Primary" Label="Add New Budget" />
-                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Primary" Label="Export Grid Data to Excel" />
-                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Primary" Label="Download Master Data" />
+                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Info" Label="Add New Budget" OnClick="AddBudgetAsync" />
+                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Info" Label="Export Grid Data to Excel" />
+                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Info" Label="Download Master Data" />
                                  </MudMenu>
                              </MudAppBar>
                              <MudPaper Elevation="5" Square="true" Class="w-100">
@@ -79,7 +79,7 @@
                                                  <MudSwitch @bind-Value="_enableFilter" Color="Color.Success" UncheckedColor="Color.Default"
                                                     Label="Enable Custom Filter" LabelPlacement="Placement.Start" />
                                                  <MudPaper Class="ms-3" Elevation="0">
-                                                     <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new department" OnClick="AddBudgetAsync" />
+                                                     <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new recruitment budget" OnClick="AddBudgetAsync" />
                                                  </MudPaper>                             
                                             </MudPaper>
                                         </ToolBarContent>
@@ -197,7 +197,7 @@
                                             </PropertyColumn>                        
                                             <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                                                 <CellTemplate Context="row">
-                                                    <MudIconButton Color="Color.Info" title="Edit budget information" 
+                                                    <MudIconButton Color="Color.Info" title="Edit budget details" 
                                                         Icon="@Icons.Material.Rounded.Edit"
                                                         OnClick="@row.Actions.StartEditingItemAsync">
                                                     </MudIconButton>
@@ -206,8 +206,8 @@
                                                         Disabled="@(row.Item.NewIndentCount == 0)"
                                                         OnClick="@row.Actions.StartEditingItemAsync">
                                                     </MudIconButton>
-                                                    <MudIconButton Color="Color.Error" title="Delete budget"                                                        
-                                                        Icon="@Icons.Material.Rounded.Delete"
+                                                    <MudIconButton Color="Color.Error" title="Delete budget record"
+                                                                   Icon="@Icons.Material.Rounded.DeleteForever"
                                                         OnClick="() => ConfirmDeleteBudget(row.Item)">
                                                     </MudIconButton>
                                                 </CellTemplate>
