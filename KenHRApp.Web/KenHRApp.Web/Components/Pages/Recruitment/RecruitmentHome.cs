@@ -9,23 +9,18 @@ using System.Text;
 using System.ComponentModel.DataAnnotations;
 using KenHRApp.Application.Services;
 using KenHRApp.Domain.Entities;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace KenHRApp.Web.Components.Pages.Recruitment
 {
     public partial class RecruitmentHome
     {
         #region Parameters and Injections
-        [Inject] 
-        private IDialogService DialogService { get; set; } = default!;
-        
-        [Inject] 
-        private ISnackbar Snackbar { get; set; } = default!;
-        
-        [Inject] 
-        private IRecruitmentService RecruitmentService { get; set; } = default!;
-
-        [Inject] 
-        private ILookupCacheService LookupCache { get; set; } = default!;
+        [Inject] private IDialogService DialogService { get; set; } = default!;
+        [Inject] private ISnackbar Snackbar { get; set; } = default!;
+        [Inject] private IRecruitmentService RecruitmentService { get; set; } = default!;
+        [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
+        [Inject] private NavigationManager Navigation { get; set; } = default!;
         #endregion
 
         #region Private Fields        
@@ -493,6 +488,11 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);                                
             });
+        }
+
+        private void GoToRecruitmentRequest(RecruitmentBudgetDTO recruitment)
+        {
+            Navigation.NavigateTo($"/Recruitment/recruitmentrequest?RequisitionId={recruitment.BudgetId}");
         }
         #endregion
 

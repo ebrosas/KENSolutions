@@ -1,0 +1,47 @@
+﻿@page "/Recruitment/recruitmentrequest"
+<link href="css/recruitment.css" rel="stylesheet" />
+
+<MudText Typo="Typo.h6" Align="Align.Start" Class="pb-1 ps-2" Style="color: #004165;">Recruitment Request</MudText>
+<MudContainer MaxWidth="MaxWidth.False" Class="px-4">
+    <EditForm EditContext="@_editContext"
+        OnValidSubmit="HandleValidSubmit" 
+        OnInvalidSubmit="HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        @if (_hasValidationError && _validationMessages.Any())
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
+                <ul style="margin:0; padding-left:20px;">
+                    @foreach (var msg in _validationMessages)
+                    {
+                        <li>
+                            <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
+                            </li>
+                    }
+                </ul>
+            </MudAlert>
+        }
+        @if (_showErrorAlert)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
+                      ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
+                @_errorMessage
+            </MudAlert>
+        }
+        <div id="mainPanel" class="ma-0 full-height mt-0 pt-0" style="overflow-y: scroll; scrollbar-width: none;">
+            <MudText Typo="Typo.h5" Align="Align.Start" Class="pb-3 ps-3" Style="color: #004165;">@_recruitmentRequest.JobTitle</MudText>
+            <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="4" Class="mud-primary-text" />
+
+            <MudScrollToTop TopOffset="100"
+                            Selector="#mainPanel"
+                            VisibleCssClass="visible absolute"
+                            HiddenCssClass="hidden absolute">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+            </MudScrollToTop>
+        </div>
+    </EditForm>
+</MudContainer>
+
+@code {
+
+}

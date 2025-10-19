@@ -3,7 +3,7 @@
 	SELECT * FROM [dbo].[__EFMigrationsHistory]
 
 	SELECT * FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
-	ORDER BY a.UDCGroupId
+	ORDER BY a.UDCGDesc1
 
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
@@ -17,7 +17,7 @@
 	--Get Employment Type
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
-	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'EMPLOYTYPE')
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'QUALIFACTIONMODE')
 
 	--Get Countries
 	SELECT a.* 
@@ -37,7 +37,7 @@
 	--General
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
-	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'RELATIONTYPE')
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'JOBTITLE')
 
 	SELECT a.EmployeeId, a.EmployeeNo, 
 		a.EmploymentTypeCode, a.RoleCode, a.JobTitleCode, a.FirstAttendanceModeCode, a.SecondAttendanceModeCode, a.ThirdAttendanceModeCode,
