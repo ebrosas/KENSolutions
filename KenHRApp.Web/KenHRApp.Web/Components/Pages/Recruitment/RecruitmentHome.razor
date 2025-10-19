@@ -57,14 +57,8 @@
                                         Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                                         QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
                                         EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
-                                        EditDialogOptions="new DialogOptions 
-                                        { 
-                                            MaxWidth = MaxWidth.Small, 
-                                            FullWidth = true,
-                                            BackdropClick = false,
-                                            CloseOnEscapeKey = false
-                                        }"
-                                        StartedEditingItem="@StartedEditingItem" CommittedItemChanges="@CommittedItemChanges" 
+                                        StartedEditingItem="@StartedEditingItem"
+                                        CommittedItemChanges="@CommittedItemChanges"
                                         TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
                                          <ToolBarContent>                        
                                              <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
@@ -199,7 +193,7 @@
                                                 <CellTemplate Context="row">
                                                     <MudIconButton Color="Color.Info" title="Edit budget details" 
                                                         Icon="@Icons.Material.Rounded.Edit"
-                                                        OnClick="@row.Actions.StartEditingItemAsync">
+                                                        OnClick="@(() => EditBudgetAsync(row.Item))">
                                                     </MudIconButton>
                                                     <MudIconButton Color="Color.Success" title="Create requisition" 
                                                         Icon="@Icons.Material.Filled.AddCircle"

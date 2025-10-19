@@ -158,14 +158,14 @@
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = default!;
 
-    [Parameter]
-    public string DialogTitle { get; set; } = "Confirmation";
+    // [Parameter]
+    // public string DialogTitle { get; set; } = "Confirmation";
 
-    [Parameter]
-    public string DialogIcon { get; set; } = "fas fa-trash-alt";
+    // [Parameter]
+    // public string DialogIcon { get; set; } = "fas fa-trash-alt";
 
-    [Parameter]
-    public Color DialogIconColor { get; set; } = Color.Error;
+    // [Parameter]
+    // public Color DialogIconColor { get; set; } = Color.Error;
 
     [Parameter]
     public RecruitmentBudgetDTO RecruitmentBudget { get; set; } = new();
@@ -178,6 +178,14 @@
 
     [Parameter]
     public bool IsDisabled { get; set; } = true;
+
+    [Parameter] 
+    public bool IsEditMode { get; set; }
+
+    // Optional UI helpers
+    protected string DialogTitle => IsEditMode ? "Edit Recruitment Budget" : "Add New Recruitment Budget";
+    protected string DialogIcon => IsEditMode ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add;
+    protected Color DialogIconColor => IsEditMode ? Color.Info : Color.Success;
     #endregion
 
     #region Page Methods

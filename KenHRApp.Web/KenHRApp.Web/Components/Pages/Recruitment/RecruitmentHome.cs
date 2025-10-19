@@ -10,6 +10,8 @@ using System.ComponentModel.DataAnnotations;
 using KenHRApp.Application.Services;
 using KenHRApp.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using static MudBlazor.CategoryTypes;
+using Humanizer;
 
 namespace KenHRApp.Web.Components.Pages.Recruitment
 {
@@ -116,9 +118,16 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             return false;
         };
 
-        private void StartedEditingItem(RecruitmentBudgetDTO item)
+        //private async Task OnStartedEditingItem(MudDataGridRowEditEventArgs<RecruitmentBudgetDTO> e)
+        //{
+        //    var item = e.Item;
+        //    await EditBudgetAsync(item);
+        //    e.Cancel = true; // Prevent the DataGrid's internal edit form from appearing
+        //}
+
+        private async Task StartedEditingItem(RecruitmentBudgetDTO item)
         {
-            //BeginLoadComboboxTask();
+            await EditBudgetAsync(item);
         }
 
         private void CommittedItemChanges(RecruitmentBudgetDTO item)
@@ -287,13 +296,14 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             {
                 var parameters = new DialogParameters
                 {
-                    ["DialogTitle"] = "Add New Budget",
-                    ["DialogIcon"] = _iconAdd,
-                    ["DialogIconColor"] = Color.Info,
+                    //["DialogTitle"] = "Add New Budget",
+                    //["DialogIcon"] = _iconAdd,
+                    //["DialogIconColor"] = Color.Info,
                     ["RecruitmentBudget"] = new RecruitmentBudgetDTO() { OnHold = false },
                     ["DepartmentList"] = _departmentList,
                     ["IsClearable"] = true,
-                    ["IsDisabled"] = false
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = false
                 };
 
                 var options = new DialogOptions
@@ -306,9 +316,9 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 };
 
                 // Show the dialog box
-                var dialog = await DialogService.ShowAsync<RecruitmentBudgetDialog>("Add New Budget", parameters, options);
-
+                var dialog = await DialogService.ShowAsync<RecruitmentBudgetDialog>("Add Recruitment Budget", parameters, options);
                 var result = await dialog.Result;
+
                 if (result != null && !result.Canceled)
                 {
                     var newBudget = (RecruitmentBudgetDTO)result.Data!;
@@ -357,6 +367,94 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             {
                 await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
             }
+        }
+
+        private async Task EditBudgetAsync(RecruitmentBudgetDTO budget)
+        {
+            try
+            {
+                // Clone the object so the dialog can edit without affecting the grid until Save
+                var editableCopy = new RecruitmentBudgetDTO
+                {
+                    BudgetId = budget.BudgetId,
+                    DepartmentCode = budget.DepartmentCode,
+                    DepartmentName = budget.DepartmentName,
+                    BudgetDescription = budget.BudgetDescription,
+                    BudgetHeadCount = budget.BudgetHeadCount,
+                    ActiveCount = budget.ActiveCount,
+                    ExitCount = budget.ExitCount,
+                    RequisitionCount = budget.RequisitionCount,
+                    NetGapCount = budget.NetGapCount,
+                    NewIndentCount = budget.NewIndentCount,
+                    OnHold = budget.OnHold,
+                    Remarks = budget.Remarks,
+                    CreatedDate = budget.CreatedDate,
+                    LastUpdateDate = budget.LastUpdateDate
+                };
+
+                var parameters = new DialogParameters
+                {
+                    ["RecruitmentBudget"] = editableCopy,
+                    ["DepartmentList"] = _departmentList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = true
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                var dialog = await DialogService.ShowAsync<RecruitmentBudgetDialog>("Edit Recruitment Budget", parameters, options);
+                var result = await dialog.Result;
+
+                if (result != null && !result.Canceled)
+                {
+                    var updated = (RecruitmentBudgetDTO)result.Data!;
+
+                    #region Get selected department
+                    if (!string.IsNullOrEmpty(updated.DepartmentName))
+                    {
+                        DepartmentDTO? department = _departmentList.Where(d => d.DepartmentName == updated.DepartmentName).FirstOrDefault();
+                        if (department != null)
+                            updated.DepartmentCode = department.DepartmentCode;
+                    }
+                    #endregion
+
+                    // Update in-memory grid item
+                    var index = _budgetList.FindIndex(x => x.BudgetId == updated.BudgetId);
+                    if (index >= 0)
+                    {
+                        _budgetList[index] = updated;
+                        await InvokeAsync(StateHasChanged);
+                    }
+
+                    #region Persist changes to DB
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Saving budget changes, please wait...";
+
+                    _ = SaveChangeAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, updated);
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }            
         }
         #endregion
 
@@ -526,7 +624,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 await callback.Invoke();
             }
         }
-
+               
         private async Task SaveChangeAsync(Func<Task> callback, RecruitmentBudgetDTO budget)
         {
             // Wait for 1 second then gives control back to the runtime
@@ -559,7 +657,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 }
 
                 // Show notification
-                ShowNotification("Budget saved successfully!", NotificationType.Success);
+                ShowNotification("Recruitment budget saved successfully!", NotificationType.Success);
             }
 
             if (callback != null)

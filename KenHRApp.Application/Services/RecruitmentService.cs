@@ -88,7 +88,9 @@ namespace KenHRApp.Application.Services
                     NetGapCount = dto.NetGapCount,
                     NewIndentCount = dto.NewIndentCount,
                     OnHold = dto.OnHold,
-                    Remarks = dto.Remarks
+                    Remarks = dto.Remarks,
+                    CreatedDate = dto.CreatedDate,
+                    LastUpdateDate = dto.LastUpdateDate
                 };
                 #endregion
 
