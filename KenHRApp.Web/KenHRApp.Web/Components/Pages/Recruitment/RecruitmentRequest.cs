@@ -73,7 +73,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         [
             new("Home", href: "/", icon: Icons.Material.Filled.Home),
             new("Recruitment Management", href: "/Recruitment/recruitmenthome", icon: @Icons.Material.Outlined.People),
-            new("Recruitment Request", href: null, disabled: true, @Icons.Material.Filled.EditNote)
+            new("Recruitment Request", href: null, disabled: true, @Icons.Material.Outlined.EditCalendar)
         ];
         #endregion
         #endregion
