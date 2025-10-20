@@ -9,7 +9,7 @@
 @inject NavigationManager NavigationManager
 @inject ILookupCacheService LookupCache
 
-<MudText Typo="Typo.h6" Align="Align.Start" Class="pb-1 ps-2" Style="color: #004165;">Department Master</MudText>
+<MudText Typo="Typo.subtitle1" Align="Align.Center" Class="pb-1 ps-2 fw-bolder" Style="color: #004165;">Department Master</MudText>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
     @if (_showErrorAlert)
@@ -20,7 +20,8 @@
         </MudAlert>
     }
     <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
-        <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-primary-text" />
+        <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
+                        CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
 
         <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
             <MudPaper Elevation="0" Square="true" Class="w-100">

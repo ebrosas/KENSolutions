@@ -1,7 +1,7 @@
 ﻿@page "/Recruitment/recruitmentrequest"
 <link href="css/recruitment.css" rel="stylesheet" />
 
-<MudText Typo="Typo.h6" Align="Align.Start" Class="pb-1 ps-2" Style="color: #004165;">Recruitment Request</MudText>
+<MudText Typo="Typo.subtitle1" Align="Align.Center" Class="pb-1 ps-2 fw-bolder" Style="color: #004165;">Recruitment Request</MudText>
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
     <EditForm EditContext="@_editContext"
         OnValidSubmit="HandleValidSubmit" 
@@ -29,15 +29,243 @@
             </MudAlert>
         }
         <div id="mainPanel" class="ma-0 full-height mt-0 pt-0" style="overflow-y: scroll; scrollbar-width: none;">
-            <MudText Typo="Typo.h5" Align="Align.Start" Class="pb-3 ps-3" Style="color: #004165;">@_recruitmentRequest.JobTitle</MudText>
-            <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="4" Class="mud-primary-text" />
-
-            <MudScrollToTop TopOffset="100"
-                            Selector="#mainPanel"
-                            VisibleCssClass="visible absolute"
-                            HiddenCssClass="hidden absolute">
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
-            </MudScrollToTop>
+            <MudBreadcrumbs Style="font-size: 12px;" Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="4" Class="mud-primary-text" />
+            <MudText Typo="Typo.subtitle1" Align="Align.Start" Class="mt-3 ps-3" Style="color: #004165;">Add / Edit Position Description for <strong>@_recruitmentRequest.JobTitle</strong></MudText>
+            <MudExpansionPanels Elevation="0" MultiExpansion="true">
+                <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters Expanded>
+                    <TitleContent>
+                        <div class="d-flex">
+                            <MudIcon Icon="fas fa-briefcase" Style="color: #004165;" class="mr-3" Size=Size.Small></MudIcon>
+                            <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Position Properties</strong></MudText>
+                        </div>
+                    </TitleContent>
+                    <ChildContent>
+                        <MudGrid Spacing="0">
+                            <MudItem xs="4" sm="4" Class="px-4">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_recruitmentRequest.EmploymentType"
+                                                     SearchFunc="SearchEmploymentType!"
+                                                     Variant="Variant.Text"
+                                                     Label="Employment Type"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for employment type"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_employmentTypeList != null ? _employmentTypeList.Count : 10)"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="4" sm="4" Class="px-4">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_recruitmentRequest.QualificationMode"
+                                                     SearchFunc="SearchQualficationMode!"
+                                                     Variant="Variant.Text"
+                                                     Label="Qualification Mode"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for qualification mode"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="4" sm="4" Class="px-4">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_recruitmentRequest.PositionType"
+                                                     SearchFunc="SearchQualficationMode!"
+                                                     Variant="Variant.Text"
+                                                     Label="Position Type"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for qualification mode"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Spacing="0">
+                            <MudItem xs="4" sm="4" Class="px-4">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_recruitmentRequest.InterviewProcess"
+                                                     SearchFunc="SearchQualficationMode!"
+                                                     Variant="Variant.Text"
+                                                     Label="Interview Process"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for qualification mode"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="2" sm="2" Class="px-4">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudPaper Elevation="0">
+                                        <MudText Typo="Typo.caption" Align="Align.Start" Style="color: #004165;">Pre-Assessment</MudText>
+                                        <MudPaper Elevation="0" Class="p-0 w-100 d-flex justify-content-start">
+                                            <MudSwitch @bind-Value="_recruitmentRequest.IsPreAssessment"  Color="Color.Success" UncheckedColor="Color.Default" LabelPlacement="Placement.Start">Yes/No</MudSwitch>
+                                        </MudPaper>                                        
+                                    </MudPaper>
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+                    </ChildContent>
+                </MudExpansionPanel>         
+                <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters Expanded>
+                    <TitleContent>
+                        <div class="d-flex">
+                            <MudIcon Icon="fas fa-search" Style="color: #004165;" class="mr-3" Size=Size.Small></MudIcon>
+                            <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Choose Attributes for Planning</strong></MudText>                            
+                        </div>
+                        <div class="mt-1 ps-5">
+                            <MudText Typo="Typo.caption" Style="color: #004165;">Note: Those attributes on which template configuration is done will be mandatory for creating the job description or requisition.</MudText>
+                        </div>                        
+                    </TitleContent>
+                    <ChildContent>
+                        <MudGrid Spacing="0">
+                            <MudItem xs="3" Class="px-4">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudTextField @bind-Value="_recruitmentRequest.Company"
+                                            For="@(() => _recruitmentRequest.Company)" Label="Company"
+                                            Counter="150" MaxLength="150"
+                                            HelperText="Max. text input is 50 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                            Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true"
+                                            Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="3" Class="px-4">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_recruitmentRequest.DepartmentName"
+                                                     SearchFunc="SearchQualficationMode!"
+                                                     Variant="Variant.Text"
+                                                     Label="Department"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for department"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="3" Class="px-4">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_recruitmentRequest.Country"
+                                                     SearchFunc="SearchQualficationMode!"
+                                                     Variant="Variant.Text"
+                                                     Label="Country"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for country"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="3" Class="px-4">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_recruitmentRequest.Education"
+                                                     SearchFunc="SearchQualficationMode!"
+                                                     Variant="Variant.Text"
+                                                     Label="Education"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for education"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Spacing="0">
+                            <MudItem xs="3" Class="px-4">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_recruitmentRequest.EmployeeClass"
+                                                     SearchFunc="SearchQualficationMode!"
+                                                     Variant="Variant.Text"
+                                                     Label="Employee Class"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for department"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="3" Class="px-4">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_recruitmentRequest.Ethnicity"
+                                                     SearchFunc="SearchQualficationMode!"
+                                                     Variant="Variant.Text"
+                                                     Label="Ethnicity"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for department"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="3" Class="px-4">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_recruitmentRequest.JobTitle"
+                                                     SearchFunc="SearchQualficationMode!"
+                                                     Variant="Variant.Text"
+                                                     Label="Job Title"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for country"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="3" Class="px-4">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_recruitmentRequest.PayGradeDesc"
+                                                     SearchFunc="SearchQualficationMode!"
+                                                     Variant="Variant.Text"
+                                                     Label="Pay Grade"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for education"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+                    </ChildContent>
+                </MudExpansionPanel>
+                <MudScrollToTop TopOffset="100"
+                                Selector="#mainPanel"
+                                VisibleCssClass="visible absolute"
+                                HiddenCssClass="hidden absolute">
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+                </MudScrollToTop>
+            </MudExpansionPanels>
         </div>
     </EditForm>
 </MudContainer>

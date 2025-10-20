@@ -21,7 +21,7 @@
         }
         <MudPaper class="paper-header w-100 px-4" Elevation="0">
             <MudText Typo="Typo.h5" Align="Align.Start" Class="pb-3 ps-3" Style="color: #004165;">@employee.EmployeeFullName</MudText>
-                <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="4" Class="mud-primary-text" />
+            <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="4" Class="mud-primary-text" />
             <MudPaper>
                 @if (ActionType == ActionTypes.Edit.ToString() ||
                     ActionType == ActionTypes.View.ToString())

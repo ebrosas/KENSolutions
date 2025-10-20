@@ -23,7 +23,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         #endregion
 
         #region Fields
-        private RecruitmentRequestDTO _recruitmentRequest = new();  
+        private RecruitmentRequestDTO _recruitmentRequest = new();
         private EditContext? _editContext;
         private List<string> _validationMessages = new();
         private CancellationTokenSource? _cts;
@@ -76,6 +76,14 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             new("Recruitment Request", href: null, disabled: true, @Icons.Material.Outlined.EditCalendar)
         ];
         #endregion
+
+        #region Collection Arrays
+        private List<UserDefinedCodeDTO> _employmentTypeList = new List<UserDefinedCodeDTO>();
+        private string[]? _employmentTypeArray = null;
+        private List<UserDefinedCodeDTO> _qualificationModeList = new List<UserDefinedCodeDTO>();
+        private string[]? _qualificationModeArray = null;
+        #endregion
+
         #endregion
 
         #region Page Events
@@ -187,7 +195,37 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 // Reset error messages
                 _errorMessage.Clear();
             }
-        }                
+        }
+        #endregion
+
+        #region Drop-down Boxes Search Methods
+        private async Task<IEnumerable<string>> SearchEmploymentType(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _employmentTypeArray!;
+            }
+
+            return _employmentTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchQualficationMode(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _qualificationModeArray!;
+            }
+
+            return _qualificationModeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
         #endregion
     }
 }

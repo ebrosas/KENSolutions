@@ -37,7 +37,7 @@
 	--General
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
-	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'JOBTITLE')
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'QUALIFACTIONTYPE')
 
 	SELECT a.EmployeeId, a.EmployeeNo, 
 		a.EmploymentTypeCode, a.RoleCode, a.JobTitleCode, a.FirstAttendanceModeCode, a.SecondAttendanceModeCode, a.ThirdAttendanceModeCode,
@@ -45,6 +45,9 @@
 		a.* 
 	FROM kenuser.Employee a
 	WHERE a.EmployeeNo = 10003633
+
+	SELECT * FROM kenuser.UserDefinedCode a
+	ORDER BY a.UDCDesc1
 
 	SELECT a.PlaceOfIssue, * 
 	FROM [kenuser].[IdentityProof] a WITH (NOLOCK)

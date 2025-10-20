@@ -1556,15 +1556,15 @@ h1:focus {
 
 /* Breadcrumb container */
 .mud-breadcrumbs {
-    padding: 10px 15px;
+    padding: 10px;
     background: #f8f9fb; /* light background */
-    border-radius: 8px;
+    border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 /* Breadcrumb items */
 .mud-breadcrumb-item {
-    font-size: 15px;
+    font-size: 10px;
     font-weight: 500;
     color: #555;
     transition: color 0.2s ease-in-out;
