@@ -90,6 +90,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
 
         #region Collection Arrays
         string[] workExperienceLabels = new string[] { "0", "10", "20", "30", "40", "50" };
+        string[] ageRangeLabels = new string[] { "18", "32", "47", "61", "75" };
 
         private List<UserDefinedCodeDTO> _employmentTypeList = new List<UserDefinedCodeDTO>();
         private string[]? _employmentTypeArray = null;

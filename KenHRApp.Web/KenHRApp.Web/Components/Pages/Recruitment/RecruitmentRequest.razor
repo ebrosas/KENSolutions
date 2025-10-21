@@ -297,10 +297,10 @@
                                                     </MudPaper>
                                                     <MudSpacer />
                                                     <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
-                                                        <MudSwitch @bind-Value="_enableFilter" Color="Color.Success" UncheckedColor="Color.Default"
+                                                        <MudSwitch @bind-Value="_enableFilter" Color="Color.Secondary" UncheckedColor="Color.Default" Style="font-size: 14px;"
                                                                    Label="Enable Custom Filter" LabelPlacement="Placement.Start" />
                                                         <MudPaper Class="ms-3" Elevation="0">
-                                                            <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new recruitment budget" OnClick="AddQualificationAsync" />
+                                                            <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new qualification" OnClick="AddQualificationAsync" />
                                                         </MudPaper>
                                                     </MudPaper>
                                                 </ToolBarContent>
@@ -357,19 +357,41 @@
                                          <MudPaper Elevation="0" Class="p-0 w-100">
                                              <MudSlider @bind-Value="_recruitmentRequest.TotalWorkExperience" Min="0" Max="50"
                                                 TickMarks="true" Step="10" TickMarkLabels="@workExperienceLabels"
-                                                Color="Color.Info" Size="Size.Medium">
-                                                 Total Work Experience: @_recruitmentRequest.TotalWorkExperience.ToString()
+                                                        Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
+                                                 Total Work Experience (years): @_recruitmentRequest.TotalWorkExperience.ToString()
                                                 </MudSlider>
                                          </MudPaper>
                                      </MudItem>
                                         <MudItem xs="6" Class="px-4">
                                             <MudPaper Elevation="0" Class="p-0 w-100">
                                                 <MudSlider @bind-Value="_recruitmentRequest.TotalRelevantExperience" Min="0" Max="25" Color="Color.Info" Size="Size.Medium" ValueLabel="true">
-                                                    Relevant Experience: @_recruitmentRequest.TotalRelevantExperience.ToString()
+                                                Relevant Experience (years: @_recruitmentRequest.TotalRelevantExperience.ToString()
                                                 </MudSlider>
                                             </MudPaper>
                                         </MudItem>
                                  </MudGrid>
+                                <MudGrid Spacing="0">
+                                    <MudItem xs="6" Class="px-4">
+                                        <MudPaper Elevation="0" Class="p-0 w-100">
+                                            <MudSlider @bind-Value="_recruitmentRequest.AgeRange" Min="18" Max="75"
+                                                       TickMarks="true" Step="10" TickMarkLabels="@ageRangeLabels"
+                                                       Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
+                                                Age Range (years): @_recruitmentRequest.AgeRange.ToString()
+                                            </MudSlider>
+                                        </MudPaper>
+                                    </MudItem>
+                                    <MudItem xs="6" Class="px-0">
+                                        <MudPaper Elevation="0" Class="p-0 w-100">
+                                            <div class="mt-1 ps-3">
+                                                <MudText Typo="Typo.subtitle2" Color="Color.Default">Gender</MudText>
+                                            </div>
+                                            <MudRadioGroup @bind-Value="_recruitmentRequest.GenderCode">
+                                                <MudRadio Value="@("Male")" Color="Color.Success" Size="Size.Medium">Male</MudRadio>
+                                                <MudRadio Value="@("Female")" Color="Color.Secondary" Size="Size.Medium">Female</MudRadio>
+                                            </MudRadioGroup>
+                                        </MudPaper>
+                                    </MudItem>
+                                </MudGrid>
                             </MudPaper>
                         </MudStack>
                     </ChildContent>

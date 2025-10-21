@@ -107,6 +107,10 @@ namespace KenHRApp.Application.DTOs
         [Display(Name = "Max. Age")]
         public int MaxAge { get; set; }
 
+        [Required(ErrorMessage = "Age Range is required")]
+        [Display(Name = "Age Range (years)")]
+        public int AgeRange { get; set; }
+
         public string GenderCode { get; set; } = null!;
 
         [Required(ErrorMessage = "Gender is required")]
