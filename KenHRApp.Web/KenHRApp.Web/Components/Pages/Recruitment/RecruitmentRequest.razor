@@ -1,5 +1,5 @@
 ﻿@page "/Recruitment/recruitmentrequest"
-<link href="css/recruitment.css" rel="stylesheet" />
+<link href="~/css/recruitment.css" rel="stylesheet" />
 
 <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="pb-1 ps-2 fw-bolder" Style="color: #004165;">Recruitment Request</MudText>
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
@@ -257,6 +257,121 @@
                                 </MudPaper>
                             </MudItem>
                         </MudGrid>
+                    </ChildContent>
+                </MudExpansionPanel>
+                <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters Expanded>
+                    <TitleContent>
+                        <div class="d-flex">
+                            <MudIcon Icon="fas fa-file-alt" Style="color: #004165;" class="mr-3" Size=Size.Small></MudIcon>
+                            <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Position Description</strong></MudText>
+                        </div>
+                    </TitleContent>
+                    <ChildContent>
+                        <MudStack Row="true" StretchItems="StretchItems.All" AlignItems="AlignItems.Stretch" Spacing="2" Wrap="Wrap.NoWrap" Class="mb-3">
+                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                <MudGrid Spacing="0">
+                                    <MudItem xs="12" Class="px-0">
+                                        <MudPaper Elevation="0" Class="p-0 w-100">
+                                            <MudTextField @bind-Value="_recruitmentRequest.JobTitle"
+                                                          For="@(() => _recruitmentRequest.JobTitle)" Label="Job Title"
+                                                          HelperText="This is field is read-only" Variant="Variant.Filled" HelperTextOnFocus="true"
+                                                          Clearable="false" ReadOnly="true" Immediate="true"
+                                                          Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                        </MudPaper>
+                                    </MudItem>
+                                </MudGrid>
+                                 <MudGrid Spacing="0">
+                                    <MudItem xs="12" Class="px-0">
+                                        <div class="qualification-grid">
+                                            <MudDataGrid T="JobQualificationDTO" Items="@_recruitmentRequest.QualificationList" Hover="true" Striped="true"
+                                                Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                                                Hideable="true" PageSize="5"
+                                                EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                                                TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                                                <ToolBarContent>
+                                                    <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                                                        <MudTextField @bind-Value="_searchStringQualification" Placeholder="Enter search string" Adornment="Adornment.Start"
+                                                                      Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"
+                                                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                                                        </MudTextField>
+                                                    </MudPaper>
+                                                    <MudSpacer />
+                                                    <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                                        <MudSwitch @bind-Value="_enableFilter" Color="Color.Success" UncheckedColor="Color.Default"
+                                                                   Label="Enable Custom Filter" LabelPlacement="Placement.Start" />
+                                                        <MudPaper Class="ms-3" Elevation="0">
+                                                            <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new recruitment budget" OnClick="AddQualificationAsync" />
+                                                        </MudPaper>
+                                                    </MudPaper>
+                                                </ToolBarContent>
+                                                <Columns>
+                                                    <PropertyColumn Property="x => x.AutoId" Hidden Editable="false">
+                                                         <EditTemplate Context="row">
+                                                             @* Empty to prevent rendering *@
+                                                         </EditTemplate>
+                                                     </PropertyColumn>
+                                                     <PropertyColumn Property="x => x.Qualification" Title="Qualification" Class="col-qualification" />
+                                                     <PropertyColumn Property="x => x.Stream" Title="Stream" Class="col-stream" />
+                                                     <PropertyColumn Property="x => x.Specialization" Title="Specialization" Class="col-specialization" />
+                                                     <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                                                         <CellTemplate Context="row">
+                                                             <MudIconButton Color="Color.Info" title="Edit budget details"
+                                                                            Icon="@Icons.Material.Rounded.Edit"
+                                                                            OnClick="@(() => EditQualificationAsync(row.Item))">
+                                                             </MudIconButton>
+                                                             <MudIconButton Color="Color.Error" title="Delete budget record"
+                                                                            Icon="@Icons.Material.Rounded.DeleteForever"
+                                                                            OnClick="() => DeleteQualification(row.Item)">
+                                                             </MudIconButton>
+                                                         </CellTemplate>
+                                                     </TemplateColumn>
+                                                 </Columns>
+                                                 <NoRecordsContent>
+                                                     <div class="no-data-box">
+                                                         <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
+                                                         <span>No data found</span>
+                                                     </div>
+                                                 </NoRecordsContent>
+                                                 <PagerContent>
+                                                     <MudDataGridPager T="JobQualificationDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                                                 </PagerContent>
+                                             </MudDataGrid>
+                                         </div>
+                                    </MudItem>
+                                </MudGrid>
+                            </MudPaper>
+                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                <MudGrid Spacing="0">
+                                    <MudItem xs="12" Class="px-0">
+                                         <MudPaper Elevation="0" Class="p-0 w-100">
+                                             <MudTextField @bind-Value="_recruitmentRequest.PositionDescription" Label="Position Description"
+                                                           For="@(() => _recruitmentRequest.PositionDescription)"
+                                                           HelperText="Type the full job description here"
+                                                           Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="1000" MaxLength="1000" Lines="5"
+                                                           Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                         </MudPaper>
+                                     </MudItem>
+                                 </MudGrid>
+                                <MudGrid Spacing="0">
+                                    <MudItem xs="6" Class="px-4">
+                                         <MudPaper Elevation="0" Class="p-0 w-100">
+                                             <MudSlider @bind-Value="_recruitmentRequest.TotalWorkExperience" Min="0" Max="50"
+                                                TickMarks="true" Step="10" TickMarkLabels="@workExperienceLabels"
+                                                Color="Color.Info" Size="Size.Medium">
+                                                 Total Work Experience: @_recruitmentRequest.TotalWorkExperience.ToString()
+                                                </MudSlider>
+                                         </MudPaper>
+                                     </MudItem>
+                                        <MudItem xs="6" Class="px-4">
+                                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                                <MudSlider @bind-Value="_recruitmentRequest.TotalRelevantExperience" Min="0" Max="25" Color="Color.Info" Size="Size.Medium" ValueLabel="true">
+                                                    Relevant Experience: @_recruitmentRequest.TotalRelevantExperience.ToString()
+                                                </MudSlider>
+                                            </MudPaper>
+                                        </MudItem>
+                                 </MudGrid>
+                            </MudPaper>
+                        </MudStack>
                     </ChildContent>
                 </MudExpansionPanel>
                 <MudScrollToTop TopOffset="100"

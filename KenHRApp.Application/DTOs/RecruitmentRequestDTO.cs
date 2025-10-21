@@ -114,8 +114,11 @@ namespace KenHRApp.Application.DTOs
         public string Gender { get; set; } = null!;
 
         public string? VideoDescriptionURL { get; set; } = null;
+        #endregion
 
+        #region Reference Navigations
         public List<RecruitmentLanguageSkillDTO> LanguageSkillList { get; set; } = new List<RecruitmentLanguageSkillDTO>();
+        public List<JobQualificationDTO> QualificationList { get; set; } = new List<JobQualificationDTO>();
         #endregion
     }
 }

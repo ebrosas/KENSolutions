@@ -1564,7 +1564,7 @@ h1:focus {
 
 /* Breadcrumb items */
 .mud-breadcrumb-item {
-    font-size: 10px;
+    font-size: 15px;
     font-weight: 500;
     color: #555;
     transition: color 0.2s ease-in-out;
