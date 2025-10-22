@@ -1,7 +1,6 @@
 ﻿@page "/Recruitment/recruitmentrequest"
-<link href="~/css/recruitment.css" rel="stylesheet" />
 
-<MudText Typo="Typo.subtitle1" Align="Align.Center" Class="pb-1 ps-2 fw-bolder" Style="color: #004165;">Recruitment Request</MudText>
+<MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Recruitment Request</MudText>
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
     <EditForm EditContext="@_editContext"
         OnValidSubmit="HandleValidSubmit" 
@@ -30,7 +29,9 @@
         }
         <div id="mainPanel" class="ma-0 full-height mt-0 pt-0" style="overflow-y: scroll; scrollbar-width: none;">
             <MudBreadcrumbs Style="font-size: 12px;" Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="4" Class="mud-primary-text" />
-            <MudText Typo="Typo.subtitle1" Align="Align.Start" Class="mt-3 ps-3" Style="color: #004165;">Add / Edit Position Description for <strong>@_recruitmentRequest.JobTitle</strong></MudText>
+            <MudText Typo="Typo.subtitle1" Align="Align.Start" Class="mt-4 ps-3 fw-bold" Color="Color.Primary">
+                Add / Edit Position Description for <strong>@DepartmentName</strong>
+            </MudText>
             <MudExpansionPanels Elevation="0" MultiExpansion="true">
                 <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters Expanded>
                     <TitleContent>
@@ -385,10 +386,24 @@
                                             <div class="mt-1 ps-3">
                                                 <MudText Typo="Typo.subtitle2" Color="Color.Default">Gender</MudText>
                                             </div>
-                                            <MudRadioGroup @bind-Value="_recruitmentRequest.GenderCode">
-                                                <MudRadio Value="@("Male")" Color="Color.Success" Size="Size.Medium">Male</MudRadio>
-                                                <MudRadio Value="@("Female")" Color="Color.Secondary" Size="Size.Medium">Female</MudRadio>
-                                            </MudRadioGroup>
+                                            <MudChipSet @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection" CheckMark="false" Variant="Variant.Text" Color="Color.Info">
+                                                <MudChip T="string">
+                                                    <AvatarContent>
+                                                        <MudAvatar Color="Color.Success" Variant="Variant.Filled" Rounded="true" title="Male">
+                                                            <MudIcon Color="Color.Dark" Icon="fas fa-male" Size="Size.Small" />
+                                                        </MudAvatar>
+                                                    </AvatarContent>
+                                                    <ChildContent>Male</ChildContent>
+                                                </MudChip>
+                                                <MudChip T="string">
+                                                    <AvatarContent>
+                                                        <MudAvatar Color="Color.Secondary" Variant="Variant.Filled" Rounded="true" title="Male">
+                                                            <MudIcon Color="Color.Dark" Icon="fas fa-female" Size="Size.Small" />
+                                                        </MudAvatar>
+                                                    </AvatarContent>
+                                                    <ChildContent>Female</ChildContent>
+                                                </MudChip>
+                                            </MudChipSet>
                                         </MudPaper>
                                     </MudItem>
                                 </MudGrid>

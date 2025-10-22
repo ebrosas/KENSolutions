@@ -20,6 +20,10 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IDialogService DialogService { get; set; } = default!;
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string DepartmentName { get; set; } = string.Empty;
         #endregion
 
         #region Fields
@@ -30,6 +34,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private string overlayMessage = "Please wait...";
         private StringBuilder _errorMessage = new StringBuilder();
         private string _searchStringQualification = string.Empty;
+        private IReadOnlyCollection<string> _selected;
 
         #region System Flags
         private static bool _forceLoad = false;

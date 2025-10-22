@@ -1,9 +1,6 @@
 ﻿@page "/Recruitment/recruitmenthome"
 
-<link href="css/recruitment.css" rel="stylesheet" />
-
-<MudText Typo="Typo.subtitle1" Align="Align.Center" Class="pb-1 ps-2 fw-bolder" Style="color: #004165;">Recruitment Management</MudText>
-
+<MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-0 ps-4 fw-bolder" Style="color: #004165;">Recruitment Management</MudText>
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
     <EditForm EditContext="@_editContext" @ref="_editForm"
         OnValidSubmit="HandleValidSubmit" 
@@ -88,9 +85,9 @@
                                                      @* Empty to prevent rendering *@
                                                  </EditTemplate>
                                              </PropertyColumn>
-                                             <PropertyColumn Property="x => x.DepartmentName" Title="Department" Class="col-dept-name" Editable="false">
+                                             <PropertyColumn Property="x => x.DepartmentName" Title="Department" Class="col-dept-name" Editable="false" StickyLeft="true">
                                                  <CellTemplate Context="row">
-                                                     <MudChip T="string" Size=Size.Small Color="Color.Default" Label="true" Class="fw-bold">
+                                                     <MudChip T="string" Size=Size.Small Color="Color.Secondary" Label="true" Class="fw-bold" Style="font-size: 14px;">
                                                          @row.Item.DepartmentName
                                                 </MudChip>
                                                 </CellTemplate>
@@ -171,7 +168,7 @@
                                              </PropertyColumn>
                                              <PropertyColumn Property="x => x.OnHoldDesc" Title="On-hold?" Class="col-onhold" Required="false">
                                                  <CellTemplate Context="row">
-                                                     <MudChip T="string" Size=Size.Small Color="@(row.Item.OnHoldDesc == "Yes" ? Color.Success : Color.Error)">
+                                                     <MudChip T="string" Size=Size.Small Color="@(row.Item.OnHoldDesc == "Yes" ? Color.Error : Color.Success)">
                                                          @row.Item.OnHoldDesc
                                                     </MudChip>
                                                 </CellTemplate>
@@ -195,8 +192,8 @@
                                                         Icon="@Icons.Material.Rounded.Edit"
                                                         OnClick="@(() => EditBudgetAsync(row.Item))">
                                                     </MudIconButton>
-                                                    <MudIconButton Color="Color.Success" title="Create requisition" 
-                                                        Icon="@Icons.Material.Filled.AddCircle"
+                                                    <MudIconButton Color="Color.Tertiary" title="Create requisition"
+                                                        Icon="@Icons.Material.Rounded.CreateNewFolder"
                                                         Disabled="@(row.Item.NewIndentCount == 0)"
                                                         OnClick="@(()=>GoToRecruitmentRequest(row.Item))">
                                                     </MudIconButton>

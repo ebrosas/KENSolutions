@@ -590,7 +590,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
 
         private void GoToRecruitmentRequest(RecruitmentBudgetDTO recruitment)
         {
-            Navigation.NavigateTo($"/Recruitment/recruitmentrequest?RequisitionId={recruitment.BudgetId}");
+            Navigation.NavigateTo($"/Recruitment/recruitmentrequest?RequisitionId={recruitment.BudgetId}&DepartmentName={recruitment.DepartmentName}");
         }
         #endregion
 
