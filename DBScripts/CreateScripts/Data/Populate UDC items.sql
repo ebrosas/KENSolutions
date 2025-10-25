@@ -1877,6 +1877,110 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@Amount						= NULL
 
 	*/
+
+	/*	Populate Position Types
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'POSITIONTYPE'
+
+		SELECT	@UDCCode					= 'POSTYPNEW',
+				@UDCDesc1					= 'New',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'POSTYPREPLACE',
+				@UDCDesc1					= 'Replacement',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'POSTYPTEMP',
+				@UDCDesc1					= 'Temporary',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 3,
+				@IsActive					= 1,
+				@Amount						= NULL 
+		
+	*/
+
+	/*	Populate Interview Process
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'INTERVIEWWF'
+
+		SELECT	@UDCCode					= 'INTPRCSEQUEMCE',
+				@UDCDesc1					= 'Sequential',
+				@UDCDesc2					= 'Sequential Interview Workflow',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'INTPRCPARALLEL',
+				@UDCDesc1					= 'Parallel',
+				@UDCDesc2					= 'Parallel Interview Workflow',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'INTPRCSEQPAR',
+				@UDCDesc1					= 'Sequential and Parallel',
+				@UDCDesc2					= 'Sequential and Parallel Interview Workflow',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 3,
+				@IsActive					= 1,
+				@Amount						= NULL 
+		
+	*/
+
+	/*	Populate Ethnicity Types
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'ETHNICTYPE'
+
+		SELECT	@UDCCode					= 'ETHCOMMOM',
+				@UDCDesc1					= 'Common',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ETHEXPAT',
+				@UDCDesc1					= 'Expat',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ETHLOCAL',
+				@UDCDesc1					= 'Local',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 3,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ETHNATIONAL',
+				@UDCDesc1					= 'Nationals',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 4,
+				@IsActive					= 1,
+				@Amount						= NULL 
+		
+	*/
 	
 
 	IF @actionType = 0

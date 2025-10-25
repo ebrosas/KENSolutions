@@ -1,4 +1,4 @@
-DECLARE	@actionType					TINYINT = 0,		--(Notes: 0 = Check records; 1 = Insert new record)
+DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert new record)
 		@isCommitTrans				BIT = 1,
 		@UDCGCode					VARCHAR(20) = '',
 		@UDCGDesc1					VARCHAR(150) = '',
@@ -188,6 +188,24 @@ DECLARE	@actionType					TINYINT = 0,		--(Notes: 0 = Check records; 1 = Insert ne
 	--Add Department Groups
 	--SELECT	@UDCGCode					= 'DEPTGROUP',
 	--		@UDCGDesc1					= 'Department Groups',
+	--		@UDCGDesc2					= NULL,
+	--		@UDCGSpecialHandlingCode	= NULL
+
+	--Add Position Types
+	--SELECT	@UDCGCode					= 'POSITIONTYPE',
+	--		@UDCGDesc1					= 'Position Types',
+	--		@UDCGDesc2					= NULL,
+	--		@UDCGSpecialHandlingCode	= NULL
+
+	--Add Position Types
+	--SELECT	@UDCGCode					= 'INTERVIEWWF',
+	--		@UDCGDesc1					= 'Interview Process',
+	--		@UDCGDesc2					= NULL,
+	--		@UDCGSpecialHandlingCode	= NULL
+
+	--Add Ethnicity Types
+	--SELECT	@UDCGCode					= 'ETHNICTYPE',
+	--		@UDCGDesc1					= 'Ethnicity Types',
 	--		@UDCGDesc2					= NULL,
 	--		@UDCGSpecialHandlingCode	= NULL
 

@@ -409,7 +409,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 }
             }
 
-                if (callback != null)
+            if (callback != null)
             {
                 // Hide the spinner overlay
                 await callback.Invoke();

@@ -15,7 +15,7 @@
                     {
                         <li>
                             <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
-                            </li>
+                        </li>
                     }
                 </ul>
             </MudAlert>
@@ -61,7 +61,7 @@
                             <MudItem xs="4" sm="4" Class="px-4">
                                 <MudPaper Elevation="0" Class="p-0 w-100">
                                     <MudAutocomplete @bind-Value="_recruitmentRequest.QualificationMode"
-                                                     SearchFunc="SearchQualficationMode!"
+                                                     SearchFunc="SearchQualificationMode!"
                                                      Variant="Variant.Text"
                                                      Label="Qualification Mode"
                                                      Margin="Margin.Normal"
@@ -77,16 +77,16 @@
                             <MudItem xs="4" sm="4" Class="px-4">
                                 <MudPaper Elevation="0" Class="p-0 w-100">
                                     <MudAutocomplete @bind-Value="_recruitmentRequest.PositionType"
-                                                     SearchFunc="SearchQualficationMode!"
+                                                     SearchFunc="SearchPositionType!"
                                                      Variant="Variant.Text"
                                                      Label="Position Type"
                                                      Margin="Margin.Normal"
                                                      Dense="true"
                                                      Placeholder="Please Select"
-                                                     HelperText="Type a key to search for qualification mode"
+                                                     HelperText="Type a key to search for position"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
-                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     MaxItems="@(_positionTypeList != null ? _positionTypeList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
                             </MudItem>
@@ -95,16 +95,16 @@
                             <MudItem xs="4" sm="4" Class="px-4">
                                 <MudPaper Elevation="0" Class="p-0 w-100">
                                     <MudAutocomplete @bind-Value="_recruitmentRequest.InterviewProcess"
-                                                     SearchFunc="SearchQualficationMode!"
+                                                     SearchFunc="SearchInterviewProcess!"
                                                      Variant="Variant.Text"
                                                      Label="Interview Process"
                                                      Margin="Margin.Normal"
                                                      Dense="true"
                                                      Placeholder="Please Select"
-                                                     HelperText="Type a key to search for qualification mode"
+                                                     HelperText="Type a key to search for interview process"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
-                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     MaxItems="@(_interviewProcessList != null ? _interviewProcessList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
                             </MudItem>
@@ -146,7 +146,7 @@
                             <MudItem xs="3" Class="px-4">
                                 <MudPaper Elevation="0" Class="p-0 w-100">
                                     <MudAutocomplete @bind-Value="_recruitmentRequest.DepartmentName"
-                                                     SearchFunc="SearchQualficationMode!"
+                                                     SearchFunc="SearchDepartment!"
                                                      Variant="Variant.Text"
                                                      Label="Department"
                                                      Margin="Margin.Normal"
@@ -155,14 +155,14 @@
                                                      HelperText="Type a key to search for department"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
-                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     MaxItems="@(_departmentList != null ? _departmentList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
                             </MudItem>
                             <MudItem xs="3" Class="px-4">
                                 <MudPaper Elevation="0" Class="p-0 w-100">
                                     <MudAutocomplete @bind-Value="_recruitmentRequest.Country"
-                                                     SearchFunc="SearchQualficationMode!"
+                                                     SearchFunc="SearchCountry!"
                                                      Variant="Variant.Text"
                                                      Label="Country"
                                                      Margin="Margin.Normal"
@@ -171,14 +171,14 @@
                                                      HelperText="Type a key to search for country"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
-                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     MaxItems="@(_countryList != null ? _countryList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
                             </MudItem>
                             <MudItem xs="3" Class="px-4">
                                 <MudPaper Elevation="0" Class="p-0 w-100">
                                     <MudAutocomplete @bind-Value="_recruitmentRequest.Education"
-                                                     SearchFunc="SearchQualficationMode!"
+                                                     SearchFunc="SearchEducationLevel!"
                                                      Variant="Variant.Text"
                                                      Label="Education"
                                                      Margin="Margin.Normal"
@@ -187,7 +187,7 @@
                                                      HelperText="Type a key to search for education"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
-                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     MaxItems="@(_educationLevelList != null ? _educationLevelList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
                             </MudItem>
@@ -196,64 +196,64 @@
                             <MudItem xs="3" Class="px-4">
                                 <MudPaper Elevation="0" Class="p-0 w-100">
                                     <MudAutocomplete @bind-Value="_recruitmentRequest.EmployeeClass"
-                                                     SearchFunc="SearchQualficationMode!"
+                                                     SearchFunc="SearchEmployeeClass!"
                                                      Variant="Variant.Text"
                                                      Label="Employee Class"
                                                      Margin="Margin.Normal"
                                                      Dense="true"
                                                      Placeholder="Please Select"
-                                                     HelperText="Type a key to search for department"
+                                                     HelperText="Type a key to search for employee class"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
-                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     MaxItems="@(_employeeClassList != null ? _employeeClassList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
                             </MudItem>
                             <MudItem xs="3" Class="px-4">
                                 <MudPaper Elevation="0" Class="p-0 w-100">
                                     <MudAutocomplete @bind-Value="_recruitmentRequest.Ethnicity"
-                                                     SearchFunc="SearchQualficationMode!"
+                                                     SearchFunc="SearchEthnicity!"
                                                      Variant="Variant.Text"
                                                      Label="Ethnicity"
                                                      Margin="Margin.Normal"
                                                      Dense="true"
                                                      Placeholder="Please Select"
-                                                     HelperText="Type a key to search for department"
+                                                     HelperText="Type a key to search for ethnicity"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
-                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     MaxItems="@(_ethnicityTypeList != null ? _ethnicityTypeList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
                             </MudItem>
                             <MudItem xs="3" Class="px-4">
                                 <MudPaper Elevation="0" Class="p-0 w-100">
                                     <MudAutocomplete @bind-Value="_recruitmentRequest.JobTitle"
-                                                     SearchFunc="SearchQualficationMode!"
+                                                     SearchFunc="SearchJobTitle!"
                                                      Variant="Variant.Text"
                                                      Label="Job Title"
                                                      Margin="Margin.Normal"
                                                      Dense="true"
                                                      Placeholder="Please Select"
-                                                     HelperText="Type a key to search for country"
+                                                     HelperText="Type a key to search for job title"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
-                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     MaxItems="@(_jobTitleList != null ? _jobTitleList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
                             </MudItem>
                             <MudItem xs="3" Class="px-4">
                                 <MudPaper Elevation="0" Class="p-0 w-100">
                                     <MudAutocomplete @bind-Value="_recruitmentRequest.PayGradeDesc"
-                                                     SearchFunc="SearchQualficationMode!"
+                                                     SearchFunc="SearchPayGrade!"
                                                      Variant="Variant.Text"
                                                      Label="Pay Grade"
                                                      Margin="Margin.Normal"
                                                      Dense="true"
                                                      Placeholder="Please Select"
-                                                     HelperText="Type a key to search for education"
+                                                     HelperText="Type a key to search for pay grade"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
-                                                     MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                     MaxItems="@(_payGradeList != null ? _payGradeList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
                             </MudItem>
@@ -268,7 +268,7 @@
                         </div>
                     </TitleContent>
                     <ChildContent>
-                        <MudStack Row="true" StretchItems="StretchItems.All" AlignItems="AlignItems.Stretch" Spacing="2" Wrap="Wrap.NoWrap" Class="mb-3">
+                        <MudStack Row="true" StretchItems="StretchItems.All" AlignItems="AlignItems.Stretch" Spacing="3" Wrap="Wrap.NoWrap" Class="mb-3">
                             <MudPaper Elevation="0" Class="p-0 w-100">
                                 <MudGrid Spacing="0">
                                     <MudItem xs="12" Class="px-0">
@@ -366,7 +366,7 @@
                                         <MudItem xs="6" Class="px-4">
                                             <MudPaper Elevation="0" Class="p-0 w-100">
                                                 <MudSlider @bind-Value="_recruitmentRequest.TotalRelevantExperience" Min="0" Max="25" Color="Color.Info" Size="Size.Medium" ValueLabel="true">
-                                                Relevant Experience (years: @_recruitmentRequest.TotalRelevantExperience.ToString()
+                                                Relevant Experience (years): @_recruitmentRequest.TotalRelevantExperience.ToString()
                                                 </MudSlider>
                                             </MudPaper>
                                         </MudItem>
@@ -375,7 +375,6 @@
                                     <MudItem xs="6" Class="px-4">
                                         <MudPaper Elevation="0" Class="p-0 w-100">
                                             <MudSlider @bind-Value="_recruitmentRequest.AgeRange" Min="18" Max="75"
-                                                       TickMarks="true" Step="10" TickMarkLabels="@ageRangeLabels"
                                                        Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
                                                 Age Range (years): @_recruitmentRequest.AgeRange.ToString()
                                             </MudSlider>
@@ -384,24 +383,193 @@
                                     <MudItem xs="6" Class="px-0">
                                         <MudPaper Elevation="0" Class="p-0 w-100">
                                             <div class="mt-1 ps-3">
-                                                <MudText Typo="Typo.subtitle2" Color="Color.Default">Gender</MudText>
+                                                @if (_selected is { Count: > 0 })
+                                                {
+                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Gender: You selected @string.Join(", ", _selected.OrderBy(x => x))</MudText>
+                                                }
+                                                else
+                                                {
+                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Gender: Nothing selected</MudText>
+                                                }
+                                                
                                             </div>
-                                            <MudChipSet @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection" CheckMark="false" Variant="Variant.Text" Color="Color.Info">
-                                                <MudChip T="string">
+                                            <MudChipSet @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Info">
+                                                <MudChip T="string" Value="@("Male")">
                                                     <AvatarContent>
                                                         <MudAvatar Color="Color.Success" Variant="Variant.Filled" Rounded="true" title="Male">
                                                             <MudIcon Color="Color.Dark" Icon="fas fa-male" Size="Size.Small" />
                                                         </MudAvatar>
                                                     </AvatarContent>
-                                                    <ChildContent>Male</ChildContent>
                                                 </MudChip>
-                                                <MudChip T="string">
+                                                <MudChip T="string" Value="@("Female")">
                                                     <AvatarContent>
                                                         <MudAvatar Color="Color.Secondary" Variant="Variant.Filled" Rounded="true" title="Male">
                                                             <MudIcon Color="Color.Dark" Icon="fas fa-female" Size="Size.Small" />
                                                         </MudAvatar>
                                                     </AvatarContent>
-                                                    <ChildContent>Female</ChildContent>
+                                                </MudChip>
+                                            </MudChipSet>
+                                            @* <MudChipSet @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Info">
+                                                <MudChip T="string" Icon="fas fa-male" IconColor="Color.Success" Value="@("Male")" />
+                                                <MudChip T="string" Icon="fas fa-female" IconColor="Color.Secondary" Value="@("Female")" />
+                                            </MudChipSet> *@
+                                        </MudPaper>
+                                    </MudItem>
+                                </MudGrid>
+                            </MudPaper>
+                        </MudStack>
+                    </ChildContent>
+                </MudExpansionPanel>
+                <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters Expanded>
+                    <TitleContent>
+                        <div class="d-flex">
+                            <MudIcon Icon="fas fa-money-check-alt" Style="color: #004165;" class="mr-3" Size=Size.Small></MudIcon>
+                            <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Compensation Benefits</strong></MudText>
+                        </div>
+                    </TitleContent>
+                    <ChildContent>
+                        <MudStack Row="true" StretchItems="StretchItems.All" AlignItems="AlignItems.Stretch" Spacing="3" Wrap="Wrap.NoWrap" Class="mb-3">
+                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                <MudGrid Spacing="0">
+                                    <MudItem xs="12" Class="px-0">
+                                        <MudPaper Elevation="0" Class="p-0 w-100">
+                                            <MudTextField @bind-Value="_recruitmentRequest.Responsibilities" Label="Duties and Responsibilities"
+                                                          For="@(() => _recruitmentRequest.Responsibilities)"
+                                                          HelperText="Type the duty and responsibility definitions here"
+                                                          Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="5000" MaxLength="5000" Lines="8"
+                                                          Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                        </MudPaper>
+                                    </MudItem>
+                                </MudGrid>
+                                <MudGrid Spacing="0">
+                                    <MudItem xs="12" Class="px-0">
+                                        <MudPaper Elevation="0" Class="p-0 w-100">
+                                            <MudTextField @bind-Value="_recruitmentRequest.GeneralRemarks" Label="General Remarks"
+                                                          For="@(() => _recruitmentRequest.GeneralRemarks)"
+                                                          HelperText="Note: This field is optional only"
+                                                          Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="5000" MaxLength="5000" Lines="8"
+                                                          Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                        </MudPaper>
+                                    </MudItem>
+                                </MudGrid>                                                           
+                            </MudPaper>
+                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                <MudGrid Spacing="0">
+                                    <MudItem xs="12" Class="px-0">
+                                        <MudPaper Elevation="0" Class="p-0 w-100">
+                                            <MudTextField @bind-Value="_recruitmentRequest.Competencies" Label="Competencies"
+                                                          For="@(() => _recruitmentRequest.Competencies)"
+                                                          HelperText="Type the full competency definitions here"
+                                                          Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="5000" MaxLength="5000" Lines="8"
+                                                          Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                        </MudPaper>
+                                    </MudItem>
+                                </MudGrid>
+                                <MudGrid Spacing="0">
+                                    <MudItem xs="6" Class="px-4">
+                                        <MudSlider @bind-Value="_recruitmentRequest.YearlySalaryRange" Min="@_recruitmentRequest.YearlySalaryRangeMin" Max="_recruitmentRequest.YearlySalaryRangeMax"
+                                                   Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
+                                            Yearly Salary Range (@_recruitmentRequest.YearlySalaryRangeCurrency): @_recruitmentRequest.YearlySalaryRange.ToString()
+                                        </MudSlider>
+                                    </MudItem>
+                                    <MudItem xs="6" Class="px-4">
+                                        <MudSlider @bind-Value="_recruitmentRequest.MonthlySalaryRange" Min="@_recruitmentRequest.MonthlySalaryRangeMin" Max="_recruitmentRequest.MonthlySalaryRangeMax"
+                                                   Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
+                                            Monthly Salary Range (@_recruitmentRequest.MonthlySalaryRangeCurrency): @_recruitmentRequest.MonthlySalaryRange.ToString()
+                                        </MudSlider>
+                                    </MudItem>
+                                </MudGrid>
+                                <MudGrid Spacing="0">
+                                    <MudItem xs="6" Class="px-4">
+                                        <MudSlider @bind-Value="_recruitmentRequest.DailySalaryRange" Min="@_recruitmentRequest.DailySalaryRangeMin" Max="_recruitmentRequest.DailySalaryRangeMax"
+                                                   Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
+                                            Daily Salary Range (@_recruitmentRequest.DailySalaryRangeCurrency): @_recruitmentRequest.DailySalaryRange.ToString()
+                                        </MudSlider>
+                                    </MudItem>
+                                    <MudItem xs="6" Class="px-4">
+                                        <MudSlider @bind-Value="_recruitmentRequest.HourlySalaryRange" Min="@_recruitmentRequest.HourlySalaryRangeMin" Max="_recruitmentRequest.HourlySalaryRangeMax"
+                                                   Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
+                                            Hourly Salary Range (@_recruitmentRequest.HourlySalaryRangeCurrency): @_recruitmentRequest.HourlySalaryRange.ToString()
+                                        </MudSlider>
+                                    </MudItem>
+                                </MudGrid>
+                                <MudGrid Spacing="0">
+                                    <MudItem xs="10" Class="px-0">
+                                        <MudPaper Elevation="0" Class="p-0 w-100">
+                                            <div class="mt-1 ps-3">
+                                                @if (_selected is { Count: > 0 })
+                                                {
+                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Assets / Prerequisites: @string.Join(", ", _selected.OrderBy(x => x))</MudText>
+                                                }
+                                                else
+                                                {
+                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Assets / Prerequisites:</MudText>
+                                                }
+
+                                            </div>
+                                            <MudChipSet @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Info">
+                                                <MudChip T="string" Value="@("Desktop")">
+                                                    <AvatarContent>
+                                                        <MudAvatar Color="Color.Default" Variant="Variant.Filled" Rounded="true" title="Desktop">
+                                                            <MudIcon Color="Color.Dark" Icon="fas fa-desktop" Size="Size.Small" />
+                                                        </MudAvatar>
+                                                    </AvatarContent>
+                                                </MudChip>
+                                                <MudChip T="string" Value="@("Laptop")">
+                                                    <AvatarContent>
+                                                        <MudAvatar Color="Color.Default" Variant="Variant.Filled" Rounded="true" title="Laptop">
+                                                            <MudIcon Color="Color.Dark" Icon="fas fa-laptop" Size="Size.Small" />
+                                                        </MudAvatar>
+                                                    </AvatarContent>
+                                                </MudChip>
+                                                <MudChip T="string" Value="@("Tablet")">
+                                                    <AvatarContent>
+                                                        <MudAvatar Color="Color.Default" Variant="Variant.Filled" Rounded="true" title="Tablet">
+                                                            <MudIcon Color="Color.Dark" Icon="fas fa-tablet-alt" Size="Size.Small" />
+                                                        </MudAvatar>
+                                                    </AvatarContent>
+                                                </MudChip>
+                                                <MudChip T="string" Value="@("Accomodation")">
+                                                    <AvatarContent>
+                                                        <MudAvatar Color="Color.Default" Variant="Variant.Filled" Rounded="true" title="Accomodation">
+                                                            <MudIcon Color="Color.Dark" Icon="fas fa-house-user" Size="Size.Small" />
+                                                        </MudAvatar>
+                                                    </AvatarContent>
+                                                </MudChip>
+                                                <MudChip T="string" Value="@("Car")">
+                                                    <AvatarContent>
+                                                        <MudAvatar Color="Color.Default" Variant="Variant.Filled" Rounded="true" title="Car">
+                                                            <MudIcon Color="Color.Dark" Icon="fas fa-car" Size="Size.Small" />
+                                                        </MudAvatar>
+                                                    </AvatarContent>
+                                                </MudChip>
+                                                <MudChip T="string" Value="@("Mobile")">
+                                                    <AvatarContent>
+                                                        <MudAvatar Color="Color.Default" Variant="Variant.Filled" Rounded="true" title="Mobile">
+                                                            <MudIcon Color="Color.Dark" Icon="fas fa-mobile-alt" Size="Size.Small" />
+                                                        </MudAvatar>
+                                                    </AvatarContent>
+                                                </MudChip>
+                                                <MudChip T="string" Value="@("Uniform")">
+                                                    <AvatarContent>
+                                                        <MudAvatar Color="Color.Default" Variant="Variant.Filled" Rounded="true" title="Uniform">
+                                                            <MudIcon Color="Color.Dark" Icon="fas fa-tshirt" Size="Size.Small" />
+                                                        </MudAvatar>
+                                                    </AvatarContent>
+                                                </MudChip>
+                                                <MudChip T="string" Value="@("Simcard")">
+                                                    <AvatarContent>
+                                                        <MudAvatar Color="Color.Default" Variant="Variant.Filled" Rounded="true" title="Simcard">
+                                                            <MudIcon Color="Color.Dark" Icon="fas fa-microchip" Size="Size.Small" />
+                                                        </MudAvatar>
+                                                    </AvatarContent>
+                                                </MudChip>
+                                                <MudChip T="string" Value="@("Data Card")">
+                                                    <AvatarContent>
+                                                        <MudAvatar Color="Color.Default" Variant="Variant.Filled" Rounded="true" title="Data Card">
+                                                            <MudIcon Color="Color.Dark" Icon="fas fa-id-card" Size="Size.Small" />
+                                                        </MudAvatar>
+                                                    </AvatarContent>
                                                 </MudChip>
                                             </MudChipSet>
                                         </MudPaper>
@@ -410,7 +578,7 @@
                             </MudPaper>
                         </MudStack>
                     </ChildContent>
-                </MudExpansionPanel>
+                </MudExpansionPanel>  
                 <MudScrollToTop TopOffset="100"
                                 Selector="#mainPanel"
                                 VisibleCssClass="visible absolute"
@@ -422,6 +590,11 @@
     </EditForm>
 </MudContainer>
 
-@code {
-
+<!-- Full-screen overlay -->
+@if (_isRunning)
+{
+    <div class="fullscreen-overlay">
+        <MudProgressCircular Indeterminate="true" Size="Size.Medium" Color="Color.Info" />
+        <MudText Typo="Typo.h6" Class="mt-2 text-white">@overlayMessage</MudText>
+        </div>
 }

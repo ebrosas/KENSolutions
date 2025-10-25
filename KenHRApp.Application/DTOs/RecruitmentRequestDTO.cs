@@ -120,6 +120,48 @@ namespace KenHRApp.Application.DTOs
         public string? VideoDescriptionURL { get; set; } = null;
         #endregion
 
+        #region Compensation and Benefits
+        [Display(Name = "Yearly Salary Range")]
+        public int YearlySalaryRange { get; set; }
+        public int YearlySalaryRangeMin { get; set; } = 0;
+        public int YearlySalaryRangeMax { get; set; } = 100;
+        public string? YearlySalaryRangeCurrency { get; set; } = "BHD";
+
+        [Display(Name = "Monthly Salary Range")]
+        public int MonthlySalaryRange { get; set; }
+        public int MonthlySalaryRangeMin { get; set; } = 0;
+        public int MonthlySalaryRangeMax { get; set; } = 100;
+        public string? MonthlySalaryRangeCurrency { get; set; } = "BHD";
+
+        [Display(Name = "Daily Salary Range")]
+        public int DailySalaryRange { get; set; }
+        public int DailySalaryRangeMin { get; set; } = 0;
+        public int DailySalaryRangeMax { get; set; } = 100;
+        public string? DailySalaryRangeCurrency { get; set; } = "BHD";
+
+        [Display(Name = "Hourly Salary Range")]
+        public int HourlySalaryRange { get; set; }
+        public int HourlySalaryRangeMin { get; set; } = 0;
+        public int HourlySalaryRangeMax { get; set; } = 100;
+        public string? HourlySalaryRangeCurrency { get; set; } = "BHD";
+
+        public List<string>? AssetsList { get; set; } = null;
+
+        [Required(ErrorMessage = "Duties and Responsibilities is required")]
+        [Display(Name = "Duties and Responsibilities")]
+        [StringLength(5000, ErrorMessage = "Duties and Responsibilities length can't be more than 5000 characters.")]
+        public string Responsibilities { get; set; } = null!;
+
+        [Required(ErrorMessage = "Competencies is required")]
+        [Display(Name = "Competencies")]
+        [StringLength(5000, ErrorMessage = "Competencies length can't be more than 5000 characters.")]
+        public string Competencies { get; set; } = null!;
+
+        [Display(Name = "General Remarks")]
+        [StringLength(5000, ErrorMessage = "General Remarks length can't be more than 5000 characters.")]
+        public string? GeneralRemarks { get; set; } = null;
+        #endregion
+
         #region Reference Navigations
         public List<RecruitmentLanguageSkillDTO> LanguageSkillList { get; set; } = new List<RecruitmentLanguageSkillDTO>();
         public List<JobQualificationDTO> QualificationList { get; set; } = new List<JobQualificationDTO>();

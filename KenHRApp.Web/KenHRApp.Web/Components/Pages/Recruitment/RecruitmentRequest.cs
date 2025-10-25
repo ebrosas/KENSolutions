@@ -15,6 +15,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
     {
         #region Parameters and Injections
         [Inject] private IRecruitmentService RecruitmentService { get; set; } = default!;
+        [Inject] private IEmployeeService EmployeeService { get; set; } = default!;
         [Inject] private IAppCacheService AppCacheService { get; set; } = default!;
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
@@ -47,8 +48,23 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private bool _showErrorAlert = false;
         private bool _hasValidationError = false;
         private bool _allowGridEdit = false;
-        private bool _enableFilter = false;  
+        private bool _enableFilter = false;
         #endregion
+
+        private enum UDCKeys
+        {
+            EMPLOYTYPE,             // Employment Type
+            QUALIFACTIONMODE,       // Qualification Modes
+            POSITIONTYPE,           // Position Types
+            INTERVIEWWF,            // Interview Process
+            DEPARTMENT,             // Departments
+            COUNTRY,                // Countries
+            EDUCLEVEL,              // Education Levels
+            EMPCLASS,               // Employee Class
+            JOBTITLE,               // Job Titles
+            PAYGRADE,               // Pay Grades
+            ETHNICTYPE              // Ethnicity Types
+        }
 
         #region Dialog Box Button Icons
         private readonly string _iconDelete = "fas fa-trash-alt";
@@ -101,6 +117,24 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private string[]? _employmentTypeArray = null;
         private List<UserDefinedCodeDTO> _qualificationModeList = new List<UserDefinedCodeDTO>();
         private string[]? _qualificationModeArray = null;
+        private List<UserDefinedCodeDTO> _positionTypeList = new List<UserDefinedCodeDTO>();
+        private string[]? _positionTypeArray = null;
+        private List<UserDefinedCodeDTO> _interviewProcessList = new List<UserDefinedCodeDTO>();
+        private string[]? _interviewProcessArray = null;
+        private List<UserDefinedCodeDTO> _departmentList = new List<UserDefinedCodeDTO>();
+        private string[]? _departmentArray = null;
+        private List<UserDefinedCodeDTO> _countryList = new List<UserDefinedCodeDTO>();
+        private string[]? _countryArray = null;
+        private List<UserDefinedCodeDTO> _educationLevelList = new List<UserDefinedCodeDTO>();
+        private string[]? _educationLevelArray = null;
+        private List<UserDefinedCodeDTO> _employeeClassList = new List<UserDefinedCodeDTO>();
+        private string[]? _employeeClassArray = null;
+        private List<UserDefinedCodeDTO> _jobTitleList = new List<UserDefinedCodeDTO>();
+        private string[]? _jobTitleArray = null;
+        private List<UserDefinedCodeDTO> _payGradeList = new List<UserDefinedCodeDTO>();
+        private string[]? _payGradeArray = null;
+        private List<UserDefinedCodeDTO> _ethnicityTypeList = new List<UserDefinedCodeDTO>();
+        private string[]? _ethnicityTypeArray = null;
         #endregion
 
         #endregion
@@ -111,7 +145,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             // Initialize the EditContext 
             _editContext = new EditContext(_recruitmentRequest);
 
-            //BeginLoadComboboxTask();
+            BeginLoadComboboxTask();
         }
 
         protected override void OnParametersSet()
@@ -191,6 +225,240 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         #endregion
 
         #region Async Methods
+        private async Task LoadComboboxAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(300);
+
+            #region Get all UDC group codes
+            List<UserDefinedCodeGroupDTO>? udcGroupList = new();
+            int groupID = 0;
+
+            var resultUDC = await EmployeeService.GetUserDefinedCodeGroupAsync();
+            if (resultUDC.Success)
+            {
+                udcGroupList = resultUDC!.Value;
+            }
+            else
+                _errorMessage.Append(resultUDC.Error);
+            #endregion
+
+            // Get UDC dataset
+            var result = await EmployeeService.GetUserDefinedCodeAllAsync();
+            if (result.Success)
+            {
+                var udcData = result.Value;
+                if (udcData!.Any() && udcGroupList!.Any())
+                {
+                    #region Get Employment Types
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.EMPLOYTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Employement Type group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _employmentTypeList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_employmentTypeList != null)
+                            _employmentTypeArray = _employmentTypeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Qualification Modes
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.QUALIFACTIONMODE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Qualification Mode group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _qualificationModeList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_qualificationModeList != null)
+                            _qualificationModeArray = _qualificationModeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Position Types
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.POSITIONTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Position Type group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _positionTypeList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_positionTypeList != null)
+                            _positionTypeArray = _positionTypeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Interview Processes
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.INTERVIEWWF.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Interview Process group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _interviewProcessList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_interviewProcessList != null)
+                            _interviewProcessArray = _interviewProcessList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Departments
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.DEPARTMENT.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Departments group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _departmentList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_departmentList != null)
+                            _departmentArray = _departmentList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Countries
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.COUNTRY.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Countries group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _countryList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_countryList != null)
+                            _countryArray = _countryList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Education Levels
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.EDUCLEVEL.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Education Levels group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _educationLevelList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_educationLevelList != null)
+                            _educationLevelArray = _educationLevelList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Employee Classes
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.EMPCLASS.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Employee Classes group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _employeeClassList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_employeeClassList != null)
+                            _employeeClassArray = _employeeClassList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Job Titles
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.JOBTITLE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Job Titles group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _jobTitleList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_jobTitleList != null)
+                            _jobTitleArray = _jobTitleList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Pay Grades
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.PAYGRADE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Pay Grades group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _payGradeList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_payGradeList != null)
+                            _payGradeArray = _payGradeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Ethnicity Types
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ETHNICTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Ethnicity Types group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _ethnicityTypeList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_ethnicityTypeList != null)
+                            _ethnicityTypeArray = _ethnicityTypeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+                }
+            }
+            else
+                _errorMessage.Append(result.Error);
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
         private async Task AddQualificationAsync()
         {
             try
@@ -379,6 +647,25 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         #endregion
 
         #region Private Methods
+        private void BeginLoadComboboxTask()
+        {
+            _isRunning = true;
+
+            // Set the overlay message
+            overlayMessage = "Initializing form, please wait...";
+
+            _ = LoadComboboxAsync(async () =>
+            {
+                _isRunning = false;
+
+                if (_errorMessage.Length > 0)
+                    ShowHideError(true);
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            });
+        }
+
         private void ShowNotification(string message, NotificationType type)
         {
             Snackbar.Clear();
@@ -491,7 +778,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             return _employmentTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        private async Task<IEnumerable<string>> SearchQualficationMode(string value, CancellationToken token)
+        private async Task<IEnumerable<string>> SearchQualificationMode(string value, CancellationToken token)
         {
             // In real life use an asynchronous function for fetching data from an api.
             await Task.Delay(5, token);
@@ -503,6 +790,132 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             }
 
             return _qualificationModeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchPositionType(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _positionTypeArray!;
+            }
+
+            return _positionTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchInterviewProcess(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _interviewProcessArray!;
+            }
+
+            return _interviewProcessArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchDepartment(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _departmentArray!;
+            }
+
+            return _departmentArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchCountry(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _countryArray!;
+            }
+
+            return _countryArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchEducationLevel(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _educationLevelArray!;
+            }
+
+            return _educationLevelArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchEmployeeClass(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _employeeClassArray!;
+            }
+
+            return _employeeClassArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchJobTitle(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _jobTitleArray!;
+            }
+
+            return _jobTitleArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchPayGrade(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _payGradeArray!;
+            }
+
+            return _payGradeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchEthnicity(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _ethnicityTypeArray!;
+            }
+
+            return _ethnicityTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
         #endregion
     }
