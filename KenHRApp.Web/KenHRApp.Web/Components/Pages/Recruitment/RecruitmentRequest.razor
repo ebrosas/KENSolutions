@@ -285,7 +285,8 @@
                                     <MudItem xs="12" Class="px-0">
                                         <div class="qualification-grid">
                                             <MudDataGrid T="JobQualificationDTO" Items="@_recruitmentRequest.QualificationList" Hover="true" Striped="true"
-                                                Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                                                Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" 
+                                                FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                                                 Hideable="true" PageSize="5"
                                                 EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
                                                 TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
@@ -462,29 +463,50 @@
                                     </MudItem>
                                 </MudGrid>
                                 <MudGrid Spacing="0">
+                                    <MudPaper Elevation="0" Class="p-0 d-flex justify-content-start">
+                                        <MudText Typo="Typo.subtitle2" Color="Color.Default">Select Salary Range:</MudText>
+                                    </MudPaper>
+                                    <MudPaper Elevation="0" Class="p-0 d-flex justify-content-start">
+                                        <MudRadioGroup @bind-Value="_recruitmentRequest.SalaryRangeType">
+                                            <MudRadio Value="@("Yearly")" Color="Color.Info">Yearly</MudRadio>
+                                            <MudRadio Value="@("Monthly")" Color="Color.Info">Monthly</MudRadio>
+                                            <MudRadio Value="@("Daily")" Color="Color.Info">Daily</MudRadio>
+                                            <MudRadio Value="@("Hourly")" Color="Color.Info">Hourly</MudRadio>
+                                        </MudRadioGroup>
+                                    </MudPaper>
+                                </MudGrid>
+                                <MudGrid Spacing="0">
                                     <MudItem xs="6" Class="px-4">
-                                        <MudSlider @bind-Value="_recruitmentRequest.YearlySalaryRange" Min="@_recruitmentRequest.YearlySalaryRangeMin" Max="_recruitmentRequest.YearlySalaryRangeMax"
-                                                   Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
+                                        <MudSlider @bind-Value="_recruitmentRequest.YearlySalaryRange"  
+                                            Disabled="@(_recruitmentRequest.SalaryRangeType == "Yearly" ? false: true)"
+                                            Min="@_recruitmentRequest.YearlySalaryRangeMin" Max="_recruitmentRequest.YearlySalaryRangeMax"
+                                            Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
                                             Yearly Salary Range (@_recruitmentRequest.YearlySalaryRangeCurrency): @_recruitmentRequest.YearlySalaryRange.ToString()
                                         </MudSlider>
                                     </MudItem>
                                     <MudItem xs="6" Class="px-4">
-                                        <MudSlider @bind-Value="_recruitmentRequest.MonthlySalaryRange" Min="@_recruitmentRequest.MonthlySalaryRangeMin" Max="_recruitmentRequest.MonthlySalaryRangeMax"
-                                                   Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
+                                        <MudSlider @bind-Value="_recruitmentRequest.MonthlySalaryRange" 
+                                            Disabled="@(_recruitmentRequest.SalaryRangeType == "Monthly" ? false: true)"
+                                            Min="@_recruitmentRequest.MonthlySalaryRangeMin" Max="_recruitmentRequest.MonthlySalaryRangeMax"
+                                            Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
                                             Monthly Salary Range (@_recruitmentRequest.MonthlySalaryRangeCurrency): @_recruitmentRequest.MonthlySalaryRange.ToString()
                                         </MudSlider>
                                     </MudItem>
                                 </MudGrid>
                                 <MudGrid Spacing="0">
                                     <MudItem xs="6" Class="px-4">
-                                        <MudSlider @bind-Value="_recruitmentRequest.DailySalaryRange" Min="@_recruitmentRequest.DailySalaryRangeMin" Max="_recruitmentRequest.DailySalaryRangeMax"
-                                                   Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
+                                        <MudSlider @bind-Value="_recruitmentRequest.DailySalaryRange" 
+                                            Disabled="@(_recruitmentRequest.SalaryRangeType == "Daily" ? false: true)"
+                                            Min="@_recruitmentRequest.DailySalaryRangeMin" Max="_recruitmentRequest.DailySalaryRangeMax"
+                                                Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
                                             Daily Salary Range (@_recruitmentRequest.DailySalaryRangeCurrency): @_recruitmentRequest.DailySalaryRange.ToString()
                                         </MudSlider>
                                     </MudItem>
                                     <MudItem xs="6" Class="px-4">
-                                        <MudSlider @bind-Value="_recruitmentRequest.HourlySalaryRange" Min="@_recruitmentRequest.HourlySalaryRangeMin" Max="_recruitmentRequest.HourlySalaryRangeMax"
-                                                   Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
+                                        <MudSlider @bind-Value="_recruitmentRequest.HourlySalaryRange" 
+                                            Disabled="@(_recruitmentRequest.SalaryRangeType == "Hourly" ? false: true)"
+                                            Min="@_recruitmentRequest.HourlySalaryRangeMin" Max="_recruitmentRequest.HourlySalaryRangeMax"
+                                            Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
                                             Hourly Salary Range (@_recruitmentRequest.HourlySalaryRangeCurrency): @_recruitmentRequest.HourlySalaryRange.ToString()
                                         </MudSlider>
                                     </MudItem>
@@ -503,7 +525,7 @@
                                                 }
 
                                             </div>
-                                            <MudChipSet @bind-SelectedValues="_recruitmentRequest.AssetList" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Info">
+                                            <MudChipSet @bind-SelectedValues="_recruitmentRequest.AssetList" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Secondary">
                                                 <MudChip T="string" Value="@("Desktop")">
                                                     <AvatarContent>
                                                         <MudAvatar Color="Color.Default" Variant="Variant.Filled" Rounded="true" title="Desktop">

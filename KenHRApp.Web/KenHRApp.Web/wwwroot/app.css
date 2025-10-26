@@ -1518,35 +1518,35 @@ h1:focus {
 
 /* Grid Column widths */
 .qualification-grid .col-qualification {
-    width: 300px !important;
+    width: 250px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 100px;
+    min-width: 70px;
 }
 
 .qualification-grid .col-stream {
-    width: 200px !important;
+    width: 150px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 80px;
+    min-width: 60px;
 }
 
 .qualification-grid .col-specialization {
-    width: 200px !important;
+    width: 150px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 80px;
+    min-width: 60px;
 }
 
 .qualification-grid .col-remarks {
-    width: 200px !important;
+    width: 180px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 80px;
+    min-width: 60px;
 }
 
 .qualification-grid .flex-column {

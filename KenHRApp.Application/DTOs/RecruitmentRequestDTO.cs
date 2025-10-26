@@ -115,6 +115,7 @@ namespace KenHRApp.Application.DTOs
         public IReadOnlyCollection<string>? AssetList { get; set; } = null;
 
         public string? VideoDescriptionURL { get; set; } = null;
+        public string SalaryRangeType { get; set; } = "Monthly";
         #endregion
 
         #region Compensation and Benefits

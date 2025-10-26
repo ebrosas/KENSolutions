@@ -197,7 +197,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	--		@UDCGDesc2					= NULL,
 	--		@UDCGSpecialHandlingCode	= NULL
 
-	--Add Position Types
+	--Add Interview Process Types
 	--SELECT	@UDCGCode					= 'INTERVIEWWF',
 	--		@UDCGDesc1					= 'Interview Process',
 	--		@UDCGDesc2					= NULL,

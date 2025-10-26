@@ -35,6 +35,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private string overlayMessage = "Please wait...";
         private StringBuilder _errorMessage = new StringBuilder();
         private string _searchStringQualification = string.Empty;
+        public string SelectedOption { get; set; }
 
         #region System Flags
         private static bool _forceLoad = false;
