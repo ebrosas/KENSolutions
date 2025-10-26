@@ -298,7 +298,7 @@
                                                     </MudPaper>
                                                     <MudSpacer />
                                                     <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
-                                                        <MudSwitch @bind-Value="_enableFilter" Color="Color.Secondary" UncheckedColor="Color.Default" Style="font-size: 14px;"
+                                                        <MudSwitch @bind-Value="_enableFilter" Color="Color.Success" UncheckedColor="Color.Default" Style="font-size: 14px;"
                                                                    Label="Enable Custom Filter" LabelPlacement="Placement.Start" />
                                                         <MudPaper Class="ms-3" Elevation="0">
                                                             <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new qualification" OnClick="AddQualificationAsync" />
@@ -314,13 +314,14 @@
                                                      <PropertyColumn Property="x => x.Qualification" Title="Qualification" Class="col-qualification" />
                                                      <PropertyColumn Property="x => x.Stream" Title="Stream" Class="col-stream" />
                                                      <PropertyColumn Property="x => x.Specialization" Title="Specialization" Class="col-specialization" />
+                                                     <PropertyColumn Property="x => x.Remarks" Title="Remarks" Class="col-remarks" />
                                                      <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                                                          <CellTemplate Context="row">
-                                                             <MudIconButton Color="Color.Info" title="Edit budget details"
+                                                             <MudIconButton Color="Color.Info" title="Edit qualification"
                                                                             Icon="@Icons.Material.Rounded.Edit"
                                                                             OnClick="@(() => EditQualificationAsync(row.Item))">
                                                              </MudIconButton>
-                                                             <MudIconButton Color="Color.Error" title="Delete budget record"
+                                                             <MudIconButton Color="Color.Error" title="Delete qualification"
                                                                             Icon="@Icons.Material.Rounded.DeleteForever"
                                                                             OnClick="() => DeleteQualification(row.Item)">
                                                              </MudIconButton>
@@ -357,8 +358,7 @@
                                     <MudItem xs="6" Class="px-4">
                                          <MudPaper Elevation="0" Class="p-0 w-100">
                                              <MudSlider @bind-Value="_recruitmentRequest.TotalWorkExperience" Min="0" Max="50"
-                                                TickMarks="true" Step="10" TickMarkLabels="@workExperienceLabels"
-                                                        Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
+                                                Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
                                                  Total Work Experience (years): @_recruitmentRequest.TotalWorkExperience.ToString()
                                                 </MudSlider>
                                          </MudPaper>
@@ -383,17 +383,17 @@
                                     <MudItem xs="6" Class="px-0">
                                         <MudPaper Elevation="0" Class="p-0 w-100">
                                             <div class="mt-1 ps-3">
-                                                @if (_selected is { Count: > 0 })
+                                                @if (_recruitmentRequest.GenderList is { Count: > 0 })
                                                 {
-                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Gender: You selected @string.Join(", ", _selected.OrderBy(x => x))</MudText>
+                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Gender: @string.Join(", ", _recruitmentRequest.GenderList.OrderBy(x => x))</MudText>
                                                 }
                                                 else
                                                 {
-                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Gender: Nothing selected</MudText>
+                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Gender:</MudText>
                                                 }
                                                 
                                             </div>
-                                            <MudChipSet @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Info">
+                                            <MudChipSet @bind-SelectedValues="_recruitmentRequest.GenderList" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Info">
                                                 <MudChip T="string" Value="@("Male")">
                                                     <AvatarContent>
                                                         <MudAvatar Color="Color.Success" Variant="Variant.Filled" Rounded="true" title="Male">
@@ -409,10 +409,6 @@
                                                     </AvatarContent>
                                                 </MudChip>
                                             </MudChipSet>
-                                            @* <MudChipSet @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Info">
-                                                <MudChip T="string" Icon="fas fa-male" IconColor="Color.Success" Value="@("Male")" />
-                                                <MudChip T="string" Icon="fas fa-female" IconColor="Color.Secondary" Value="@("Female")" />
-                                            </MudChipSet> *@
                                         </MudPaper>
                                     </MudItem>
                                 </MudGrid>
@@ -497,9 +493,9 @@
                                     <MudItem xs="10" Class="px-0">
                                         <MudPaper Elevation="0" Class="p-0 w-100">
                                             <div class="mt-1 ps-3">
-                                                @if (_selected is { Count: > 0 })
+                                                @if (_recruitmentRequest.AssetList is { Count: > 0 })
                                                 {
-                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Assets / Prerequisites: @string.Join(", ", _selected.OrderBy(x => x))</MudText>
+                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Assets / Prerequisites: @string.Join(", ", _recruitmentRequest.AssetList.OrderBy(x => x))</MudText>
                                                 }
                                                 else
                                                 {
@@ -507,7 +503,7 @@
                                                 }
 
                                             </div>
-                                            <MudChipSet @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Info">
+                                            <MudChipSet @bind-SelectedValues="_recruitmentRequest.AssetList" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Info">
                                                 <MudChip T="string" Value="@("Desktop")">
                                                     <AvatarContent>
                                                         <MudAvatar Color="Color.Default" Variant="Variant.Filled" Rounded="true" title="Desktop">

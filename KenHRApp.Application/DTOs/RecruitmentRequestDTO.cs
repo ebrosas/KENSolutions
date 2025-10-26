@@ -111,11 +111,8 @@ namespace KenHRApp.Application.DTOs
         [Display(Name = "Age Range (years)")]
         public int AgeRange { get; set; }
 
-        public string GenderCode { get; set; } = null!;
-
-        [Required(ErrorMessage = "Gender is required")]
-        [Display(Name = "Gender")]
-        public string Gender { get; set; } = null!;
+        public IReadOnlyCollection<string>? GenderList { get; set; } = null;
+        public IReadOnlyCollection<string>? AssetList { get; set; } = null;
 
         public string? VideoDescriptionURL { get; set; } = null;
         #endregion

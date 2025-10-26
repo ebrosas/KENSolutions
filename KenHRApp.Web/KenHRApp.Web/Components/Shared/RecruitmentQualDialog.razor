@@ -1,0 +1,193 @@
+﻿@using KenHRApp.Web.Components.Common
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@DialogIcon" Class="mr-1 mb-n1" Size="Size.Medium" Color="@DialogIconColor" />
+            @DialogTitle
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudGrid Spacing="7">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudAutocomplete @bind-Value="RecruitmentQualification.Qualification"
+                                         SearchFunc="SearchQualificationType!"
+                                         Variant="Variant.Outlined"
+                                         Label="Qualificiation"
+                                         Margin="Margin.Normal"
+                                         Dense="true"
+                                         Placeholder="Please Select"
+                                         HelperText="Type a key to search for department"
+                                         HelperTextOnFocus="true"
+                                         Clearable="true" Typo="Typo.subtitle2"
+                                         MaxItems="@(QualificationTypeList != null ? QualificationTypeList.Count : 10)"
+                                         Required RequiredError="Qualification is required"
+                                         Disabled="@IsDisabled"
+                                        Modal="true" />
+                     </MudPaper>
+                 </MudItem>
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudAutocomplete @bind-Value="RecruitmentQualification.Stream"
+                                SearchFunc="SearchStreamType!"
+                                          Variant="Variant.Outlined"
+                                Label="Stream"
+                                Margin="Margin.Normal"
+                                Dense="true"
+                                Placeholder="Please Select"
+                                HelperText="Type a key to search for department"
+                                HelperTextOnFocus="true"
+                                Clearable="true" Typo="Typo.subtitle2"
+                                MaxItems="@(StreamTypeList != null ? StreamTypeList.Count : 10)"
+                                Required RequiredError="Stream is required"
+                                Disabled="@IsDisabled"
+                                Modal="true" />
+                     </MudPaper>
+                 </MudItem>
+             </MudGrid>
+             <MudGrid Spacing="7">
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudAutocomplete @bind-Value="RecruitmentQualification.Specialization"
+                                SearchFunc="SearchSpecialization!"
+                                          Variant="Variant.Outlined"
+                                Label="Specialization"
+                                Margin="Margin.Normal"
+                                Dense="true"
+                                Placeholder="Please Select"
+                                HelperText="Type a key to search for department"
+                                HelperTextOnFocus="true"
+                                Clearable="true" Typo="Typo.subtitle2"
+                                MaxItems="@(SpecializationList != null ? SpecializationList.Count : 10)"
+                                Disabled="@IsDisabled"
+                                Modal="true" />
+                     </MudPaper>
+                 </MudItem>
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudTextField @bind-Value="RecruitmentQualification.Remarks" For="@(() => RecruitmentQualification.Remarks)" Label="Remarks"
+                                       HelperText="Max. text input is 300 chars." Variant="Variant.Outlined" HelperTextOnFocus="true"
+                                       Counter="500" MaxLength="500" Disabled="@IsDisabled" Lines="2"
+                                       Clearable="false" Immediate="true"
+                                       Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                     </MudPaper>
+                 </MudItem>
+             </MudGrid>
+         </MudForm>
+     </DialogContent>
+
+     <DialogActions>
+         <MudButton Color="Color.Default" Variant="Variant.Text" Size="Size.Medium" OnClick="Cancel">Cancel</MudButton>
+         <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
+     </DialogActions>
+ </MudDialog>
+
+ @code {
+    #region Fields
+    private MudForm _form = new();
+    private string[]? _qualificationArray = null;
+    private string[]? _streamArray = null;
+    private string[]? _specializationArray = null;
+    #endregion
+
+    #region Parameters and Injections
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public JobQualificationDTO RecruitmentQualification { get; set; } = new();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> QualificationTypeList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> StreamTypeList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> SpecializationList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public bool IsClearable { get; set; } = true;
+
+    [Parameter]
+    public bool IsDisabled { get; set; } = true;
+
+    [Parameter]
+    public bool IsEditMode { get; set; }
+
+    // Optional UI helpers
+    protected string DialogTitle => IsEditMode ? "Edit Qualification" : "Add New Qualification";
+    protected string DialogIcon => IsEditMode ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add;
+    protected Color DialogIconColor => IsEditMode ? Color.Info : Color.Success;
+    #endregion
+
+    #region Page Methods
+    protected override void OnInitialized()
+    {
+        if (QualificationTypeList != null)
+            _qualificationArray = QualificationTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (StreamTypeList != null)
+            _streamArray = StreamTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (SpecializationList != null)
+            _specializationArray = SpecializationList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+    }
+    #endregion
+
+    #region Private Methods
+    private async Task Save()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        MudDialog.Close(DialogResult.Ok(RecruitmentQualification));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task<IEnumerable<string>> SearchQualificationType(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _qualificationArray!;
+        }
+
+        return _qualificationArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchStreamType(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _streamArray!;
+        }
+
+        return _streamArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchSpecialization(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _specializationArray!;
+        }
+
+        return _specializationArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    #endregion
+}

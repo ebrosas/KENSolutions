@@ -1522,6 +1522,7 @@ h1:focus {
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 100px;
 }
 
 .qualification-grid .col-stream {
@@ -1529,9 +1530,18 @@ h1:focus {
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 80px;
 }
 
 .qualification-grid .col-specialization {
+    width: 200px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 80px;
+}
+
+.qualification-grid .col-remarks {
     width: 200px !important;
     text-align: left;
     overflow: hidden;

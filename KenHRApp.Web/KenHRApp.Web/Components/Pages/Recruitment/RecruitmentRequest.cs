@@ -35,7 +35,6 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private string overlayMessage = "Please wait...";
         private StringBuilder _errorMessage = new StringBuilder();
         private string _searchStringQualification = string.Empty;
-        private IReadOnlyCollection<string> _selected;
 
         #region System Flags
         private static bool _forceLoad = false;
@@ -55,6 +54,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         {
             EMPLOYTYPE,             // Employment Type
             QUALIFACTIONMODE,       // Qualification Modes
+            QUALIFACTIONTYPE,       // Qualification Types
             POSITIONTYPE,           // Position Types
             INTERVIEWWF,            // Interview Process
             DEPARTMENT,             // Departments
@@ -63,7 +63,9 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             EMPCLASS,               // Employee Class
             JOBTITLE,               // Job Titles
             PAYGRADE,               // Pay Grades
-            ETHNICTYPE              // Ethnicity Types
+            ETHNICTYPE,             // Ethnicity Types
+            STREAMTYPE,             // Stream Types
+            SPECIALIZATION          // Specialization Types
         }
 
         #region Dialog Box Button Icons
@@ -135,6 +137,9 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private string[]? _payGradeArray = null;
         private List<UserDefinedCodeDTO> _ethnicityTypeList = new List<UserDefinedCodeDTO>();
         private string[]? _ethnicityTypeArray = null;
+        private List<UserDefinedCodeDTO> _qualificationTypeList = new List<UserDefinedCodeDTO>();
+        private List<UserDefinedCodeDTO> _streamTypeList = new List<UserDefinedCodeDTO>();
+        private List<UserDefinedCodeDTO> _specializationList = new List<UserDefinedCodeDTO>();        
         #endregion
 
         #endregion
@@ -283,6 +288,54 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                         _qualificationModeList = udcData!.Where(a => a.GroupID == groupID).ToList();
                         if (_qualificationModeList != null)
                             _qualificationModeArray = _qualificationModeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Qualification Types
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.QUALIFACTIONTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Qualification Types group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _qualificationTypeList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                    }
+                    #endregion
+
+                    #region Get Stream Types
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.STREAMTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Stream Types group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _streamTypeList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                    }
+                    #endregion
+
+                    #region Get Specialization Types
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.SPECIALIZATION.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Specialization Types group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _specializationList = udcData!.Where(a => a.GroupID == groupID).ToList();
                     }
                     #endregion
 
@@ -465,8 +518,10 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             {
                 var parameters = new DialogParameters
                 {
-                    ["RecruitmentBudget"] = new RecruitmentBudgetDTO() { OnHold = false },
-                    //["DepartmentList"] = _departmentList,
+                    ["RecruitmentQualification"] = new JobQualificationDTO(),
+                    ["QualificationTypeList"] = _qualificationTypeList,
+                    ["StreamTypeList"] = _streamTypeList,
+                    ["SpecializationList"] = _specializationList,
                     ["IsClearable"] = true,
                     ["IsDisabled"] = false,
                     ["IsEditMode"] = false
@@ -482,52 +537,69 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 };
 
                 // Show the dialog box
-                var dialog = await DialogService.ShowAsync<RecruitmentBudgetDialog>("Add Recruitment Budget", parameters, options);
+                var dialog = await DialogService.ShowAsync<RecruitmentQualDialog>("Add Qualification", parameters, options);
                 var result = await dialog.Result;
 
-                //if (result != null && !result.Canceled)
-                //{
-                //    var newBudget = (RecruitmentBudgetDTO)result.Data!;
-                //    newBudget.BudgetId = 0;
+                if (result != null && !result.Canceled)
+                {
+                    UserDefinedCodeDTO? udc = null;
+                    var newQualification = (JobQualificationDTO)result.Data!;
+                    newQualification.AutoId = 0;
 
-                //    #region Get the selected department
-                //    if (!string.IsNullOrEmpty(newBudget.DepartmentName))
-                //    {
-                //        DepartmentDTO? department = _departmentList.Where(d => d.DepartmentName == newBudget.DepartmentName).FirstOrDefault();
-                //        if (department != null)
-                //            newBudget.DepartmentCode = department.DepartmentCode;
-                //    }
-                //    #endregion
+                    #region Get the selected Qualification
+                    if (!string.IsNullOrEmpty(newQualification.Qualification))
+                    {
+                        udc = _qualificationTypeList.Where(d => d.UDCDesc1 == newQualification.Qualification).FirstOrDefault();
+                        if (udc != null)
+                            newQualification.QualificationCode = udc.UDCCode;
+                    }
+                    #endregion
 
-                //    #region Check for duplicate entries
-                //    var duplicateBudget = _budgetList.FirstOrDefault(e => e.DepartmentCode.Trim().ToUpper() == newBudget.DepartmentCode.Trim().ToUpper()
-                //        && e.BudgetHeadCount == newBudget.BudgetHeadCount);
-                //    if (duplicateBudget != null)
-                //    {
-                //        // Show error
-                //        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified department and head count budget already exists. Please enter a different value on these fields then try to save again.");
-                //        return;
-                //    }
-                //    #endregion
+                    #region Get the selected Stream
+                    if (!string.IsNullOrEmpty(newQualification.Stream))
+                    {
+                        udc = _streamTypeList.Where(d => d.UDCDesc1 == newQualification.Stream).FirstOrDefault();
+                        if (udc != null)
+                            newQualification.StreamCode = udc.UDCCode;
+                    }
+                    #endregion
 
-                //    // Set the Update Date
-                //    newBudget.CreatedDate = DateTime.Now;
+                    #region Get the selected Specialization
+                    if (!string.IsNullOrEmpty(newQualification.Specialization))
+                    {
+                        udc = _specializationList.Where(d => d.UDCDesc1 == newQualification.Specialization).FirstOrDefault();
+                        if (udc != null)
+                            newQualification.SpecializationCode = udc.UDCCode;
+                    }
+                    #endregion
 
-                //    // Set flag to display the loading panel
-                //    _isRunning = true;
+                    #region Check for duplicate entries
+                    var duplicateRecord = _recruitmentRequest.QualificationList.FirstOrDefault(e => e.QualificationCode.Trim().ToUpper() == newQualification.QualificationCode.Trim().ToUpper() 
+                        && e.StreamCode.Trim() == newQualification.StreamCode.Trim()
+                        && (!string.IsNullOrEmpty(newQualification.SpecializationCode) && e.SpecializationCode!.Trim() == newQualification.SpecializationCode!.Trim()));
+                    if (duplicateRecord != null)
+                    {
+                        // Show error
+                        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified qualification already exists. Please enter a different value for Qualification, Stream, and Specialization fields then try saving again.");
+                        return;
+                    }
+                    #endregion
 
-                //    // Set the overlay message
-                //    overlayMessage = "Adding budget, please wait...";
+                    // Set flag to display the loading panel
+                    _isRunning = true;
 
-                //    _ = SaveChangeAsync(async () =>
-                //    {
-                //        _isRunning = false;
+                    // Set the overlay message
+                    overlayMessage = "Adding qualification, please wait...";
 
-                //        // Shows the spinner overlay
-                //        await InvokeAsync(StateHasChanged);
+                    _ = SaveChangeAsync(async () =>
+                    {
+                        _isRunning = false;
 
-                //    }, newBudget);
-                //}
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+
+                    }, newQualification);
+                }
             }
             catch (Exception ex)
             {
@@ -549,13 +621,16 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     StreamCode = qualification.StreamCode,
                     Stream = qualification.Stream,
                     SpecializationCode = qualification.SpecializationCode,
-                    Specialization = qualification.Specialization
+                    Specialization = qualification.Specialization,
+                    Remarks = qualification.Remarks 
                 };
 
                 var parameters = new DialogParameters
                 {
-                    ["RecruitmentBudget"] = editableCopy,
-                    //["DepartmentList"] = _departmentList,
+                    ["RecruitmentQualification"] = editableCopy,
+                    ["QualificationTypeList"] = _qualificationTypeList,
+                    ["StreamTypeList"] = _streamTypeList,
+                    ["SpecializationList"] = _specializationList,
                     ["IsClearable"] = true,
                     ["IsDisabled"] = false,
                     ["IsEditMode"] = true
@@ -570,44 +645,63 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     CloseButton = false
                 };
 
-                var dialog = await DialogService.ShowAsync<RecruitmentBudgetDialog>("Edit Recruitment Budget", parameters, options);
+                var dialog = await DialogService.ShowAsync<RecruitmentQualDialog>("Edit Qualification", parameters, options);
                 var result = await dialog.Result;
 
                 if (result != null && !result.Canceled)
                 {
-                    var updated = (RecruitmentBudgetDTO)result.Data!;
+                    UserDefinedCodeDTO? udc = null;
+                    var updated = (JobQualificationDTO)result.Data!;
 
-                    #region Get selected department
-                    //if (!string.IsNullOrEmpty(updated.DepartmentName))
-                    //{
-                    //    DepartmentDTO? department = _departmentList.Where(d => d.DepartmentName == updated.DepartmentName).FirstOrDefault();
-                    //    if (department != null)
-                    //        updated.DepartmentCode = department.DepartmentCode;
-                    //}
-                    //#endregion
+                    #region Get the selected Qualification
+                    if (!string.IsNullOrEmpty(updated.Qualification))
+                    {
+                        udc = _qualificationTypeList.Where(d => d.UDCDesc1 == updated.Qualification).FirstOrDefault();
+                        if (udc != null)
+                            updated.QualificationCode = udc.UDCCode;
+                    }
+                    #endregion
 
-                    //// Update in-memory grid item
-                    //var index = _qualificationList.FindIndex(x => x.BudgetId == updated.BudgetId);
-                    //if (index >= 0)
-                    //{
-                    //    _qualificationList[index] = updated;
-                    //    await InvokeAsync(StateHasChanged);
-                    //}
+                    #region Get the selected Stream
+                    if (!string.IsNullOrEmpty(updated.Stream))
+                    {
+                        udc = _streamTypeList.Where(d => d.UDCDesc1 == updated.Stream).FirstOrDefault();
+                        if (udc != null)
+                            updated.StreamCode = udc.UDCCode;
+                    }
+                    #endregion
 
-                    //#region Persist changes to DB
-                    //// Set flag to display the loading panel
-                    //_isRunning = true;
+                    #region Get the selected Specialization
+                    if (!string.IsNullOrEmpty(updated.Specialization))
+                    {
+                        udc = _specializationList.Where(d => d.UDCDesc1 == updated.Specialization).FirstOrDefault();
+                        if (udc != null)
+                            updated.SpecializationCode = udc.UDCCode;
+                    }
+                    #endregion
 
-                    //// Set the overlay message
-                    //overlayMessage = "Saving qualification changes, please wait...";
+                    // Update in-memory grid item
+                    var index = _recruitmentRequest.QualificationList.FindIndex(x => x.AutoId == updated.AutoId);
+                    if (index >= 0)
+                    {
+                        _recruitmentRequest.QualificationList[index] = updated;
+                        await InvokeAsync(StateHasChanged);
+                    }
 
-                    //_ = SaveChangeAsync(async () =>
-                    //{
-                    //    _isRunning = false;
+                    #region Persist changes to DB
+                    // Set flag to display the loading panel
+                    _isRunning = true;
 
-                    //    // Shows the spinner overlay
-                    //    await InvokeAsync(StateHasChanged);
-                    //}, updated);
+                    // Set the overlay message
+                    overlayMessage = "Saving qualification, please wait...";
+
+                    _ = SaveChangeAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, updated);
                     #endregion
                 }
             }
@@ -642,6 +736,38 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             if (result != null && !result.Canceled)
             {
                 //BeginDeleteRecruitmentBudget(budget);
+            }
+        }
+
+        private async Task SaveChangeAsync(Func<Task> callback, JobQualificationDTO qualification)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(300);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            if (qualification.AutoId == 0)
+            {
+                // Get the new identity seed
+                if (_recruitmentRequest.QualificationList.Any())
+                    qualification.AutoId = _recruitmentRequest.QualificationList.Max(d => d.AutoId) + 1;
+                else
+                    qualification.AutoId = 1;
+
+                // Add locally to the list so UI updates immediately
+                _recruitmentRequest.QualificationList.Add(qualification);
+
+                StateHasChanged();
+            }
+
+            // Show notification
+            ShowNotification("Qualification has been saved successfully.", NotificationType.Success);
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
             }
         }
         #endregion
