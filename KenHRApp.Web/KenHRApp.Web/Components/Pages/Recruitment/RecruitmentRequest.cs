@@ -34,8 +34,10 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private CancellationTokenSource? _cts;
         private string overlayMessage = "Please wait...";
         private StringBuilder _errorMessage = new StringBuilder();
-        private string _searchStringQualification = string.Empty;
-        public string SelectedOption { get; set; }
+        private string _searchStringQualification = string.Empty;        
+        private readonly List<string> _skillChips = new();
+        private int _numberOfColors = Enum.GetValues(typeof(Color)).Length;
+        private int _skillChipCounter = 0;
 
         #region System Flags
         private static bool _forceLoad = false;
@@ -940,6 +942,9 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     break;
             }
         }
+
+        private void OnChipClosed(MudChip<string> chip) => _skillChips.Remove(chip.Value);
+        private void AddChip() => _skillChips.Add($"Chip {++_skillChipCounter}");
         #endregion
 
         #region Drop-down Boxes Search Methods
