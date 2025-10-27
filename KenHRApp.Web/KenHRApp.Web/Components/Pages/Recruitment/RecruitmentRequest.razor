@@ -386,11 +386,11 @@
                                             <div class="mt-1 ps-3">
                                                 @if (_recruitmentRequest.GenderList is { Count: > 0 })
                                                 {
-                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Gender: @string.Join(", ", _recruitmentRequest.GenderList.OrderBy(x => x))</MudText>
+                                                    <MudText Typo="Typo.subtitle2" Class="fw-bold" Style="color: #004165;">Gender: @string.Join(", ", _recruitmentRequest.GenderList.OrderBy(x => x))</MudText>
                                                 }
                                                 else
                                                 {
-                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Gender:</MudText>
+                                                    <MudText Typo="Typo.subtitle2" Class="fw-bold" Style="color: #004165;">Gender:</MudText>
                                                 }
                                                 
                                             </div>
@@ -463,11 +463,11 @@
                                     </MudItem>
                                 </MudGrid>
                                 <MudGrid Spacing="0">
-                                    <MudPaper Elevation="0" Class="p-0 d-flex justify-content-start">
-                                        <MudText Typo="Typo.subtitle2" Color="Color.Default">Select Salary Range:</MudText>
-                                    </MudPaper>
-                                    <MudPaper Elevation="0" Class="p-0 d-flex justify-content-start">
-                                        <MudRadioGroup @bind-Value="_recruitmentRequest.SalaryRangeType">
+                                    <MudPaper Elevation="0" Class="p-0 w-100">
+                                        <div class="mt-1 ps-3">
+                                            <MudText Typo="Typo.subtitle2" Class="fw-bold" Style="color: #004165;">Select Salary Range:</MudText>
+                                        </div>
+                                        <MudRadioGroup @bind-Value="SalaryRangeType">
                                             <MudRadio Value="@("Yearly")" Color="Color.Info">Yearly</MudRadio>
                                             <MudRadio Value="@("Monthly")" Color="Color.Info">Monthly</MudRadio>
                                             <MudRadio Value="@("Daily")" Color="Color.Info">Daily</MudRadio>
@@ -481,7 +481,7 @@
                                             Disabled="@(_recruitmentRequest.SalaryRangeType == "Yearly" ? false: true)"
                                             Min="@_recruitmentRequest.YearlySalaryRangeMin" Max="_recruitmentRequest.YearlySalaryRangeMax"
                                             Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
-                                            Yearly Salary Range (@_recruitmentRequest.YearlySalaryRangeCurrency): @_recruitmentRequest.YearlySalaryRange.ToString()
+                                            Yearly Salary Range (@_recruitmentRequest.YearlySalaryRangeMin to @_recruitmentRequest.YearlySalaryRangeMax @_recruitmentRequest.YearlySalaryRangeCurrency): @_recruitmentRequest.YearlySalaryRange.ToString()
                                         </MudSlider>
                                     </MudItem>
                                     <MudItem xs="6" Class="px-4">
@@ -517,15 +517,15 @@
                                             <div class="mt-1 ps-3">
                                                 @if (_recruitmentRequest.AssetList is { Count: > 0 })
                                                 {
-                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Assets / Prerequisites: @string.Join(", ", _recruitmentRequest.AssetList.OrderBy(x => x))</MudText>
+                                                    <MudText Typo="Typo.subtitle2" Class="fw-bold" Style="color: #004165;">Assets / Prerequisites: @string.Join(", ", _recruitmentRequest.AssetList.OrderBy(x => x))</MudText>
                                                 }
                                                 else
                                                 {
-                                                    <MudText Typo="Typo.subtitle2" Color="Color.Default">Assets / Prerequisites:</MudText>
+                                                    <MudText Typo="Typo.subtitle2" Class="fw-bold" Style="color: #004165;">Assets / Prerequisites:</MudText>
                                                 }
 
                                             </div>
-                                            <MudChipSet @bind-SelectedValues="_recruitmentRequest.AssetList" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Secondary">
+                                            <MudChipSet @bind-SelectedValues="_recruitmentRequest.AssetList" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Info">
                                                 <MudChip T="string" Value="@("Desktop")">
                                                     <AvatarContent>
                                                         <MudAvatar Color="Color.Default" Variant="Variant.Filled" Rounded="true" title="Desktop">

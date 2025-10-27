@@ -115,26 +115,27 @@ namespace KenHRApp.Application.DTOs
         public IReadOnlyCollection<string>? AssetList { get; set; } = null;
 
         public string? VideoDescriptionURL { get; set; } = null;
-        public string SalaryRangeType { get; set; } = "Monthly";
         #endregion
 
         #region Compensation and Benefits
+        public string? SalaryRangeType { get; set; } = null;
+
         [Display(Name = "Yearly Salary Range")]
         public int YearlySalaryRange { get; set; }
         public int YearlySalaryRangeMin { get; set; } = 0;
-        public int YearlySalaryRangeMax { get; set; } = 100;
+        public int YearlySalaryRangeMax { get; set; } = 100000;
         public string? YearlySalaryRangeCurrency { get; set; } = "BHD";
 
         [Display(Name = "Monthly Salary Range")]
         public int MonthlySalaryRange { get; set; }
         public int MonthlySalaryRangeMin { get; set; } = 0;
-        public int MonthlySalaryRangeMax { get; set; } = 100;
+        public int MonthlySalaryRangeMax { get; set; } = 10000;
         public string? MonthlySalaryRangeCurrency { get; set; } = "BHD";
 
         [Display(Name = "Daily Salary Range")]
         public int DailySalaryRange { get; set; }
         public int DailySalaryRangeMin { get; set; } = 0;
-        public int DailySalaryRangeMax { get; set; } = 100;
+        public int DailySalaryRangeMax { get; set; } = 1000;
         public string? DailySalaryRangeCurrency { get; set; } = "BHD";
 
         [Display(Name = "Hourly Salary Range")]

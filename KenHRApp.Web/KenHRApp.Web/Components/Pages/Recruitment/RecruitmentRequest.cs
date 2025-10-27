@@ -124,7 +124,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private string[]? _positionTypeArray = null;
         private List<UserDefinedCodeDTO> _interviewProcessList = new List<UserDefinedCodeDTO>();
         private string[]? _interviewProcessArray = null;
-        private List<UserDefinedCodeDTO> _departmentList = new List<UserDefinedCodeDTO>();
+        private IReadOnlyList<DepartmentDTO> _departmentList = new List<DepartmentDTO>();
         private string[]? _departmentArray = null;
         private List<UserDefinedCodeDTO> _countryList = new List<UserDefinedCodeDTO>();
         private string[]? _countryArray = null;
@@ -140,9 +140,23 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private string[]? _ethnicityTypeArray = null;
         private List<UserDefinedCodeDTO> _qualificationTypeList = new List<UserDefinedCodeDTO>();
         private List<UserDefinedCodeDTO> _streamTypeList = new List<UserDefinedCodeDTO>();
-        private List<UserDefinedCodeDTO> _specializationList = new List<UserDefinedCodeDTO>();        
+        private List<UserDefinedCodeDTO> _specializationList = new List<UserDefinedCodeDTO>();
         #endregion
 
+        #endregion
+
+        #region Properties
+        private string SalaryRangeType
+        {
+            get => _recruitmentRequest.SalaryRangeType;
+            set
+            {
+                if (_recruitmentRequest.SalaryRangeType == value) return;
+                _recruitmentRequest.SalaryRangeType = value;
+                UpdateSliderStates(value);
+                StateHasChanged();
+            }
+        }
         #endregion
 
         #region Page Events
@@ -150,6 +164,10 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         {
             // Initialize the EditContext 
             _editContext = new EditContext(_recruitmentRequest);
+
+            // initialize DTO and slider state
+            _recruitmentRequest.SalaryRangeType ??= "Monthly";
+            UpdateSliderStates(_recruitmentRequest.SalaryRangeType);
 
             BeginLoadComboboxTask();
         }
@@ -377,21 +395,19 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     #endregion
 
                     #region Get Departments
-                    try
+                    var deptResult = await LookupCache.GetDepartmentMasterAsync();
+                    if (deptResult.Success)
                     {
-                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.DEPARTMENT.ToString()).FirstOrDefault()!.UDCGroupId;
+                        _departmentList = deptResult.Value!;
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        _errorMessage.Append($"Error getting Departments group ID: {ex.Message}");
+                        // Set the error message
+                        _errorMessage.AppendLine(deptResult.Error);
                     }
 
-                    if (groupID > 0)
-                    {
-                        _departmentList = udcData!.Where(a => a.GroupID == groupID).ToList();
-                        if (_departmentList != null)
-                            _departmentArray = _departmentList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
-                    }
+                    if (_departmentList != null && _departmentList.Count > 0)
+                        _departmentArray = _departmentList.Select(d => d.DepartmentName).OrderBy(d => d).ToArray();
                     #endregion
 
                     #region Get Countries
@@ -887,6 +903,42 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
 
             var dialog = await DialogService.ShowAsync<InfoDialog>(title, parameters, options);
             var result = await dialog.Result;
+        }
+
+        private void OnSalaryRangeTypeChanged(string value)
+        {
+            _recruitmentRequest.SalaryRangeType = value;
+            UpdateSliderStates(value);
+        }
+
+        private void UpdateSliderStates(string type)
+        {
+            switch(type)
+            {
+                case "Yearly":
+                    _recruitmentRequest.MonthlySalaryRange = 0;
+                    _recruitmentRequest.DailySalaryRange = 0;
+                    _recruitmentRequest.HourlySalaryRange = 0;
+                    break;
+
+                case "Monthly":
+                    _recruitmentRequest.YearlySalaryRange = 0;
+                    _recruitmentRequest.DailySalaryRange = 0;
+                    _recruitmentRequest.HourlySalaryRange = 0;
+                    break;
+
+                case "Daily":
+                    _recruitmentRequest.YearlySalaryRange = 0;
+                    _recruitmentRequest.MonthlySalaryRange = 0;                    
+                    _recruitmentRequest.HourlySalaryRange = 0;
+                    break;
+
+                case "Hourly":
+                    _recruitmentRequest.YearlySalaryRange = 0;
+                    _recruitmentRequest.MonthlySalaryRange = 0;
+                    _recruitmentRequest.DailySalaryRange = 0;
+                    break;
+            }
         }
         #endregion
 

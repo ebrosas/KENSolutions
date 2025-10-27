@@ -9,7 +9,7 @@
     </TitleContent>
     <DialogContent>
         <MudForm @ref="_form">
-            <MudGrid Spacing="7">
+            <MudGrid Spacing="4">
                 <MudItem xs="6">
                     <MudPaper Elevation="0" Class="p-0 w-100">
                         <MudAutocomplete @bind-Value="RecruitmentQualification.Qualification"
@@ -47,7 +47,7 @@
                      </MudPaper>
                  </MudItem>
              </MudGrid>
-             <MudGrid Spacing="7">
+             <MudGrid Spacing="4">
                  <MudItem xs="6">
                      <MudPaper Elevation="0" Class="p-0 w-100">
                          <MudAutocomplete @bind-Value="RecruitmentQualification.Specialization"
@@ -66,10 +66,10 @@
                      </MudPaper>
                  </MudItem>
                  <MudItem xs="6">
-                     <MudPaper Elevation="0" Class="p-0 w-100">
+                     <MudPaper Elevation="0" Class="p-0 w-100 pt-2">
                          <MudTextField @bind-Value="RecruitmentQualification.Remarks" For="@(() => RecruitmentQualification.Remarks)" Label="Remarks"
                                        HelperText="Max. text input is 300 chars." Variant="Variant.Outlined" HelperTextOnFocus="true"
-                                       Counter="500" MaxLength="500" Disabled="@IsDisabled" Lines="2"
+                                       Counter="500" MaxLength="500" Disabled="@IsDisabled" Lines="4"
                                        Clearable="false" Immediate="true"
                                        Margin="Margin.Dense" Typo="Typo.subtitle2" />
                      </MudPaper>
