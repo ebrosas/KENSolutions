@@ -353,34 +353,33 @@
                                 <MudGrid Spacing="0" Class="mt-3">
                                     <MudItem xs="9" Class="px-0">
                                         <MudPaper Elevation="0" Class="p-0 w-100">
-                                            <MudTextField @bind-Value="_recruitmentRequest.PositionDescription" Label="Skills"
-                                                           For="@(() => _recruitmentRequest.PositionDescription)"
-                                                           HelperText="Type a skill then click Add button"
+                                            <MudTextField @bind-Value="_skillName" Label="Skills"
+                                                           HelperText="Type a skill then click the Add button"
                                                            Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="100" MaxLength="100" Lines="1"
                                                            Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                         </MudPaper>
                                     </MudItem>
                                     <MudItem xs="3" Class="px-0">
                                         <MudPaper Elevation="0" Class="p-0 w-100 mt-2 ps-3">
-                                             <MudButtonGroup Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
+                                             <MudButtonGroup Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
                                                  <MudButton StartIcon="@Icons.Material.Rounded.AddBox" IconColor="Color.Success" OnClick="AddChip">Add</MudButton>
-                                                 <MudButton StartIcon="@Icons.Material.Rounded.Refresh" IconColor="Color.Warning">Reset</MudButton>
+                                                 <MudButton StartIcon="@Icons.Material.Rounded.Refresh" IconColor="Color.Warning" OnClick="ClearChips">Reset</MudButton>
                                             </MudButtonGroup>
                                         </MudPaper>
                                     </MudItem>
                                 </MudGrid>
-                                <MudGrid Spacing="0" Class="mt-2">
+                                <MudGrid Spacing="0" Class="mt-0">
                                     <MudStack Justify="@Justify.Center" Class="mud-width-full">
                                         <MudChipSet T="string"
                                                     AllClosable="@true"
-                                                    CheckMark="@true"
+                                                    CheckMark="@true" Size="Size.Medium"
                                                     SelectionMode="@SelectionMode.MultiSelection"
                                                     OnClose="@OnChipClosed">
                                             @for (var i = 0; i < _skillChips.Count; i++)
                                             {
                                                 var localIndex = i;
-                                                <MudChip Value="@_skillChips[localIndex]"
-                                                         Color="@((Color)(localIndex % _numberOfColors))" />
+                                                <MudChip Value="@_skillChips[localIndex]" 
+                                                         Color="Color.Tertiary" />
                                             }
                                         </MudChipSet>
                                     </MudStack>

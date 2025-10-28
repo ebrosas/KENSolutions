@@ -38,6 +38,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private readonly List<string> _skillChips = new();
         private int _numberOfColors = Enum.GetValues(typeof(Color)).Length;
         private int _skillChipCounter = 0;
+        private string _skillName = string.Empty;  
 
         #region System Flags
         private static bool _forceLoad = false;
@@ -944,7 +945,31 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         }
 
         private void OnChipClosed(MudChip<string> chip) => _skillChips.Remove(chip.Value);
-        private void AddChip() => _skillChips.Add($"Chip {++_skillChipCounter}");
+        private void AddChip() 
+        {
+            if (string.IsNullOrEmpty(_skillName))
+            {
+                //await ShowErrorMessage(MessageBoxTypes.Error, "Error", "Please specify the skill to add in the list.");
+                ShowNotification("Please specify the skill to be added in the list.", NotificationType.Information);
+                return;
+            }
+
+            if (_skillChips.Contains(_skillName))
+            {
+                ShowNotification("Error: The specified skill already exist.", NotificationType.Error);
+                //await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified skill already exist.");
+                return;
+            }
+
+            _skillChips.Add(_skillName);
+            _skillName = string.Empty;
+        }
+
+        private void ClearChips()
+        {
+            _skillChips.Clear();
+            _skillName = string.Empty;
+        }
         #endregion
 
         #region Drop-down Boxes Search Methods
