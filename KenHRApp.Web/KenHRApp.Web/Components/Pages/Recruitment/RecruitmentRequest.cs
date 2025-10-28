@@ -755,7 +755,8 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                //BeginDeleteRecruitmentBudget(budget);
+                // Remove locally from the list so UI updates immediately
+                _recruitmentRequest.QualificationList.Remove(qualification);
             }
         }
 
@@ -950,14 +951,17 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             if (string.IsNullOrEmpty(_skillName))
             {
                 //await ShowErrorMessage(MessageBoxTypes.Error, "Error", "Please specify the skill to add in the list.");
-                ShowNotification("Please specify the skill to be added in the list.", NotificationType.Information);
+                ShowNotification("Please specify the skill to be added in the list.", NotificationType.Warning);
                 return;
             }
 
-            if (_skillChips.Contains(_skillName))
+            // Case-insensitive duplicate validation
+            bool exists = _skillChips.Any(s =>
+                string.Equals(s.Trim(), _skillName, StringComparison.OrdinalIgnoreCase));
+
+            if (exists)
             {
-                ShowNotification("Error: The specified skill already exist.", NotificationType.Error);
-                //await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified skill already exist.");
+                ShowNotification("Validation Error: The specified skill already exist.", NotificationType.Error);
                 return;
             }
 
