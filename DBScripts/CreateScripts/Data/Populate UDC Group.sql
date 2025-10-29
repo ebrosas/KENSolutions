@@ -209,6 +209,12 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	--		@UDCGDesc2					= NULL,
 	--		@UDCGSpecialHandlingCode	= NULL
 
+	--Add Customer List
+	--SELECT	@UDCGCode					= 'CUSTOMERLIST',
+	--		@UDCGDesc1					= 'Customer List',
+	--		@UDCGDesc2					= NULL,
+	--		@UDCGSpecialHandlingCode	= NULL
+
 	IF @actionType = 0
 	BEGIN
 

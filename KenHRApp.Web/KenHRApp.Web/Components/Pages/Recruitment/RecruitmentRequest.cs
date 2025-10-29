@@ -69,7 +69,8 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             PAYGRADE,               // Pay Grades
             ETHNICTYPE,             // Ethnicity Types
             STREAMTYPE,             // Stream Types
-            SPECIALIZATION          // Specialization Types
+            SPECIALIZATION,         // Specialization Types
+            CUSTOMERLIST            // Customer List
         }
 
         #region Dialog Box Button Icons
@@ -141,6 +142,8 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private string[]? _payGradeArray = null;
         private List<UserDefinedCodeDTO> _ethnicityTypeList = new List<UserDefinedCodeDTO>();
         private string[]? _ethnicityTypeArray = null;
+        private List<UserDefinedCodeDTO> _customerList = new List<UserDefinedCodeDTO>();
+        private string[]? _customerArray = null;
         private List<UserDefinedCodeDTO> _qualificationTypeList = new List<UserDefinedCodeDTO>();
         private List<UserDefinedCodeDTO> _streamTypeList = new List<UserDefinedCodeDTO>();
         private List<UserDefinedCodeDTO> _specializationList = new List<UserDefinedCodeDTO>();
@@ -518,6 +521,24 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                         _ethnicityTypeList = udcData!.Where(a => a.GroupID == groupID).ToList();
                         if (_ethnicityTypeList != null)
                             _ethnicityTypeArray = _ethnicityTypeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Customer List
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.CUSTOMERLIST.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Customers group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _customerList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_customerList != null)
+                            _customerArray = _customerList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
                     }
                     #endregion
                 }
@@ -1129,6 +1150,20 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             }
 
             return _ethnicityTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchCustomer(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _customerArray!;
+            }
+
+            return _customerArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
         #endregion
     }

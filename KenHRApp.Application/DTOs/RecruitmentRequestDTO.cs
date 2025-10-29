@@ -41,9 +41,10 @@ namespace KenHRApp.Application.DTOs
 
         #region Attributes for Planning Properties
         [Required(ErrorMessage = "Company is required")]
-        [Display(Name = "Company")]
-        [StringLength(150, ErrorMessage = "Company length can't be more than 150 characters.")]
+        [Display(Name = "Company")]        
         public string Company { get; set; } = null!;
+
+        public string CompanyCode { get; set; } = null!;
 
         public string DepartmentCode { get; set; } = null!;
 

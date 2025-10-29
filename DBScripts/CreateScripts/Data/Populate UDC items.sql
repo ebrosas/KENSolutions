@@ -1981,6 +1981,46 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@Amount						= NULL 
 		
 	*/
+
+	/*	Populate Customer List
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'CUSTOMERLIST'
+
+		SELECT	@UDCCode					= 'CUSTGARMCO',
+				@UDCDesc1					= 'GARMCO',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Bahrain',
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'CUSTBAPCO',
+				@UDCDesc1					= 'BAPCO',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Bahrain',
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'CUSTALBA',
+				@UDCDesc1					= 'Alba',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Bahrain',
+				@SequenceNo					= 3,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'CUSTMOW',
+				@UDCDesc1					= 'Ministry of Works',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Bahrain',
+				@SequenceNo					= 4,
+				@IsActive					= 1,
+				@Amount						= NULL 
+		
+	*/
 	
 
 	IF @actionType = 0

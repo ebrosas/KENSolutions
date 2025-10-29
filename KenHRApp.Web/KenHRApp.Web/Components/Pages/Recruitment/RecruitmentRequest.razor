@@ -27,8 +27,22 @@
                 @_errorMessage
             </MudAlert>
         }
-        <div id="mainPanel" class="ma-0 full-height mt-0 pt-0" style="overflow-y: scroll; scrollbar-width: none;">
+        <MudPaper class="paper-header w-100 px-4" Elevation="0">
             <MudBreadcrumbs Style="font-size: 12px;" Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="4" Class="mud-primary-text" />
+            <MudPaper Elevation="0">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" ButtonType="ButtonType.Submit"
+                    Size="Size.Small" Color="Color.Info">
+                    Create Requisition
+                </MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh"
+                           Size="Size.Small" Color="Color.Default">
+                    Refresh
+                </MudButton>
+            </MudPaper>
+        </MudPaper>
+        <MudDivider DividerType="DividerType.Inset" />
+
+        <div id="mainPanel" class="ma-0 full-height mt-0 pt-0" style="overflow-y: scroll; scrollbar-width: none;">
             <MudText Typo="Typo.subtitle1" Align="Align.Start" Class="mt-4 ps-3 fw-bold" Color="Color.Primary">
                 Add / Edit Position Description for <strong>@DepartmentName</strong>
             </MudText>
@@ -135,12 +149,18 @@
                         <MudGrid Spacing="0">
                             <MudItem xs="3" Class="px-4">
                                 <MudPaper Elevation="0" Class="p-0 w-100">
-                                    <MudTextField @bind-Value="_recruitmentRequest.Company"
-                                            For="@(() => _recruitmentRequest.Company)" Label="Company"
-                                            Counter="150" MaxLength="150"
-                                            HelperText="Max. text input is 50 chars." Variant="Variant.Text" HelperTextOnFocus="true"
-                                            Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true"
-                                            Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                    <MudAutocomplete @bind-Value="_recruitmentRequest.Company"
+                                                     SearchFunc="SearchCustomer!"
+                                                     Variant="Variant.Text"
+                                                     Label="Company"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for company"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_customerList != null ? _customerList.Count : 10)"
+                                                     Modal="true" />
                                 </MudPaper>
                             </MudItem>
                             <MudItem xs="3" Class="px-4">
@@ -227,18 +247,24 @@
                             </MudItem>
                             <MudItem xs="3" Class="px-4">
                                 <MudPaper Elevation="0" Class="p-0 w-100">
-                                    <MudAutocomplete @bind-Value="_recruitmentRequest.JobTitle"
-                                                     SearchFunc="SearchJobTitle!"
-                                                     Variant="Variant.Text"
-                                                     Label="Job Title"
-                                                     Margin="Margin.Normal"
-                                                     Dense="true"
-                                                     Placeholder="Please Select"
-                                                     HelperText="Type a key to search for job title"
-                                                     HelperTextOnFocus="true"
-                                                     Clearable="true" Typo="Typo.subtitle2"
-                                                     MaxItems="@(_jobTitleList != null ? _jobTitleList.Count : 10)"
-                                                     Modal="true" />
+                                    <MudSelect T="string"
+                                            @bind-Value="_recruitmentRequest.JobTitle" 
+                                            For="@(() => _recruitmentRequest.JobTitle)"
+                                            Label="Job Title" 
+                                            Variant="Variant.Text" 
+                                            Margin="Margin.Dense" 
+                                            Placeholder="Please Select" 
+                                            AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" 
+                                            AdornmentColor="Color.Default"
+                                            HelperText="Select job title" 
+                                            HelperTextOnFocus="true" 
+                                            Immediate="true" 
+                                            Typo="Typo.subtitle2">
+                                            @foreach (var job in _jobTitleList)
+                                            {
+                                                <MudSelectItem Value="job.UDCDesc1">@job.UDCDesc1</MudSelectItem>
+                                            }
+                                        </MudSelect>                                                                               
                                 </MudPaper>
                             </MudItem>
                             <MudItem xs="3" Class="px-4">
@@ -379,7 +405,7 @@
                                             {
                                                 var localIndex = i;
                                                 <MudChip Value="@_skillChips[localIndex]" 
-                                                         Color="Color.Primary" />
+                                                         Color="Color.Tertiary" />
                                             }
                                         </MudChipSet>
                                     </MudStack>
