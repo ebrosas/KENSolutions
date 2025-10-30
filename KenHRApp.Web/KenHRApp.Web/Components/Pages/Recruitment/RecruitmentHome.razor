@@ -195,7 +195,7 @@
                                                     <MudIconButton Color="Color.Tertiary" title="Create requisition"
                                                         Icon="@Icons.Material.Rounded.CreateNewFolder"
                                                         Disabled="@(row.Item.NewIndentCount == 0)"
-                                                        OnClick="@(()=>GoToRecruitmentRequest(row.Item))">
+                                                        OnClick="@(()=>AddRequisition(row.Item))">
                                                     </MudIconButton>
                                                     <MudIconButton Color="Color.Error" title="Delete budget record"
                                                                    Icon="@Icons.Material.Rounded.DeleteForever"

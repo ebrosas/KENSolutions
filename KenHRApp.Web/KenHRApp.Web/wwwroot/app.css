@@ -1518,7 +1518,7 @@ h1:focus {
 
 /* Grid Column widths */
 .qualification-grid .col-qualification {
-    width: 180px !important;
+    width: 200px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1526,7 +1526,7 @@ h1:focus {
 }
 
 .qualification-grid .col-stream {
-    width: 130px !important;
+    width: 150px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1534,7 +1534,7 @@ h1:focus {
 }
 
 .qualification-grid .col-specialization {
-    width: 130px !important;
+    width: 150px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1542,7 +1542,7 @@ h1:focus {
 }
 
 .qualification-grid .col-remarks {
-    width: 130px !important;
+    width: 150px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;

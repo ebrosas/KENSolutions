@@ -220,7 +220,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 // Set the overlay message
                 overlayMessage = "Saving changes, please wait...";
 
-                //_ = SaveChangeAsync(async () =>
+                //_ = SaveQualificationAsync(async () =>
                 //{
                 //    _isRunning = false;
 
@@ -588,9 +588,9 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             });
         }
 
-        private void GoToRecruitmentRequest(RecruitmentBudgetDTO recruitment)
+        private void AddRequisition(RecruitmentBudgetDTO recruitment)
         {
-            Navigation.NavigateTo($"/Recruitment/recruitmentrequest?RequisitionId={recruitment.BudgetId}&DepartmentName={recruitment.DepartmentName}");
+            Navigation.NavigateTo($"/Recruitment/recruitmentrequest?RequisitionId={recruitment.BudgetId}&DepartmentName={recruitment.DepartmentName}&ActionType=Add");
         }
         #endregion
 

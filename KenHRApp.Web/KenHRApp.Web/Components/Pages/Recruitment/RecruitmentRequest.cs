@@ -25,6 +25,10 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         [Parameter]
         [SupplyParameterFromQuery]
         public string DepartmentName { get; set; } = string.Empty;
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string ActionType { get; set; } = ActionTypes.View.ToString();
         #endregion
 
         #region Fields
@@ -82,7 +86,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private readonly string _iconAdd = "fas fa-plus-circle";
         #endregion
 
-        #region Enums and Collections
+        #region Enums 
         private enum ActionTypes
         {
             View,
@@ -171,6 +175,17 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             // Initialize the EditContext 
             _editContext = new EditContext(_recruitmentRequest);
 
+            if (ActionType == ActionTypes.Edit.ToString() ||
+                ActionType == ActionTypes.View.ToString())
+            {
+                _isDisabled = true;
+            }
+            else if (ActionType == ActionTypes.Add.ToString())
+            {
+                _isDisabled = false;
+                _saveBtnEnabled = true;
+            }
+
             // initialize DTO and slider state
             _recruitmentRequest.SalaryRangeType ??= "Monthly";
             UpdateSliderStates(_recruitmentRequest.SalaryRangeType);
@@ -200,7 +215,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 // Set the overlay message
                 overlayMessage = "Saving changes, please wait...";
 
-                //_ = SaveChangeAsync(async () =>
+                //_ = SaveQualificationAsync(async () =>
                 //{
                 //    _isRunning = false;
 
@@ -632,7 +647,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     // Set the overlay message
                     overlayMessage = "Adding qualification, please wait...";
 
-                    _ = SaveChangeAsync(async () =>
+                    _ = SaveQualificationAsync(async () =>
                     {
                         _isRunning = false;
 
@@ -736,7 +751,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     // Set the overlay message
                     overlayMessage = "Saving qualification, please wait...";
 
-                    _ = SaveChangeAsync(async () =>
+                    _ = SaveQualificationAsync(async () =>
                     {
                         _isRunning = false;
 
@@ -781,7 +796,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             }
         }
 
-        private async Task SaveChangeAsync(Func<Task> callback, JobQualificationDTO qualification)
+        private async Task SaveQualificationAsync(Func<Task> callback, JobQualificationDTO qualification)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(300);
@@ -805,6 +820,165 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
 
             // Show notification
             ShowNotification("Qualification has been saved successfully.", NotificationType.Success);
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task SaveRequisitionAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            bool isNewRequition = _recruitmentRequest.RequisitionId == 0;
+
+            #region Get the combobox selected values
+            UserDefinedCodeDTO? udc = null;
+
+            if (!string.IsNullOrEmpty(_recruitmentRequest.DepartmentName))
+            {
+                DepartmentDTO? selectedDepartment = _departmentList.Where(a => a.DepartmentName == _recruitmentRequest.DepartmentName).FirstOrDefault();
+                if (selectedDepartment != null)
+                    _recruitmentRequest.DepartmentCode = selectedDepartment.DepartmentCode;
+            }
+
+            if (!string.IsNullOrEmpty(_recruitmentRequest.EmploymentType))
+            {
+                udc = _employmentTypeList.Where(a => a.UDCDesc1 == _recruitmentRequest.EmploymentType).FirstOrDefault();
+                if (udc != null)
+                    _recruitmentRequest.EmploymentTypeCode = udc.UDCCode;
+            }
+
+            if (!string.IsNullOrEmpty(_recruitmentRequest.QualificationMode))
+            {
+                udc = _qualificationModeList.Where(a => a.UDCDesc1 == _recruitmentRequest.QualificationMode).FirstOrDefault();
+                if (udc != null)
+                    _recruitmentRequest.QualificationModeCode = udc.UDCCode;
+            }
+
+            if (!string.IsNullOrEmpty(_recruitmentRequest.PositionType))
+            {
+                udc = _positionTypeList.Where(a => a.UDCDesc1 == _recruitmentRequest.PositionType).FirstOrDefault();
+                if (udc != null)
+                    _recruitmentRequest.PositionTypeCode = udc.UDCCode;
+            }
+
+            if (!string.IsNullOrEmpty(_recruitmentRequest.InterviewProcess))
+            {
+                udc = _interviewProcessList.Where(a => a.UDCDesc1 == _recruitmentRequest.InterviewProcess).FirstOrDefault();
+                if (udc != null)
+                    _recruitmentRequest.InterviewProcessCode = udc.UDCCode;
+            }
+
+            if (!string.IsNullOrEmpty(_recruitmentRequest.Company))
+            {
+                udc = _customerList.Where(a => a.UDCDesc1 == _recruitmentRequest.Company).FirstOrDefault();
+                if (udc != null)
+                    _recruitmentRequest.CompanyCode = udc.UDCCode;
+            }
+
+            if (!string.IsNullOrEmpty(_recruitmentRequest.Country))
+            {
+                udc = _countryList.Where(a => a.UDCDesc1 == _recruitmentRequest.Country).FirstOrDefault();
+                if (udc != null)
+                    _recruitmentRequest.CountryCode = udc.UDCCode;
+            }
+
+            if (!string.IsNullOrEmpty(_recruitmentRequest.Education))
+            {
+                udc = _educationLevelList.Where(a => a.UDCDesc1 == _recruitmentRequest.Education).FirstOrDefault();
+                if (udc != null)
+                    _recruitmentRequest.EducationCode = udc.UDCCode;
+            }
+
+            if (!string.IsNullOrEmpty(_recruitmentRequest.EmploymentType))
+            {
+                udc = _employmentTypeList.Where(a => a.UDCDesc1 == _recruitmentRequest.EmploymentType).FirstOrDefault();
+                if (udc != null)
+                    _recruitmentRequest.EmploymentTypeCode = udc.UDCCode;
+            }
+
+            if (!string.IsNullOrEmpty(_recruitmentRequest.EmployeeClass))
+            {
+                udc = _employeeClassList.Where(a => a.UDCDesc1 == _recruitmentRequest.EmployeeClass).FirstOrDefault();
+                if (udc != null)
+                    _recruitmentRequest.EmployeeClassCode = udc.UDCCode;
+            }
+
+            if (!string.IsNullOrEmpty(_recruitmentRequest.Ethnicity))
+            {
+                udc = _ethnicityTypeList.Where(a => a.UDCDesc1 == _recruitmentRequest.Ethnicity).FirstOrDefault();
+                if (udc != null)
+                    _recruitmentRequest.EthnicityCode = udc.UDCCode;
+            }
+
+            if (!string.IsNullOrEmpty(_recruitmentRequest.JobTitle))
+            {
+                udc = _jobTitleList.Where(a => a.UDCDesc1 == _recruitmentRequest.JobTitle).FirstOrDefault();
+                if (udc != null)
+                    _recruitmentRequest.JobTitleCode = udc.UDCCode;
+            }
+
+            if (!string.IsNullOrEmpty(_recruitmentRequest.PayGradeDesc))
+            {
+                udc = _payGradeList.Where(a => a.UDCDesc1 == _recruitmentRequest.PayGradeDesc).FirstOrDefault();
+                if (udc != null)
+                    _recruitmentRequest.PayGradeCode = udc.UDCCode;
+            }
+            #endregion
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            //if (isNewRequition)
+            //{
+            //    var addResult = await EmployeeService.AddEmployeeAsync(_recruitmentRequest, _cts.Token);
+            //    isSuccess = addResult.Success;
+            //    if (!isSuccess)
+            //        errorMsg = addResult.Error!;
+            //    else
+            //    {
+            //        // Set flag to enable reload of _recruitmentRequests when navigating back to the Employe Search page
+            //        _forceLoad = true;
+            //    }
+            //}
+            //else
+            //{
+            //    var saveResult = await EmployeeService.SaveEmployeeAsync(_recruitmentRequest, _cts.Token);
+            //    isSuccess = saveResult.Success;
+            //    if (!isSuccess)
+            //        errorMsg = saveResult.Error!;
+            //}
+
+            if (isSuccess)
+            {
+                // Reset flags
+                _isEditMode = false;
+                _allowGridEdit = false;
+                _saveBtnEnabled = false;
+                _isDisabled = true;
+
+                // Show notification
+                if (isNewRequition)
+                    ShowNotification("Recruitment requisition has been created successfully!", NotificationType.Success);
+                else
+                    ShowNotification("Changes has been saved successfully!", NotificationType.Success);
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(errorMsg);
+                ShowHideError(true);
+            }
 
             if (callback != null)
             {

@@ -69,6 +69,7 @@
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
                                                      MaxItems="@(_employmentTypeList != null ? _employmentTypeList.Count : 10)"
+                                                     Disabled="@_isDisabled"
                                                      Modal="true" />
                                 </MudPaper>
                             </MudItem>
@@ -84,6 +85,7 @@
                                                      HelperText="Type a key to search for qualification mode"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
+                                                     Disabled="@_isDisabled"
                                                      MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
@@ -100,6 +102,7 @@
                                                      HelperText="Type a key to search for position"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
+                                                     Disabled="@_isDisabled"
                                                      MaxItems="@(_positionTypeList != null ? _positionTypeList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
@@ -118,6 +121,7 @@
                                                      HelperText="Type a key to search for interview process"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
+                                                     Disabled="@_isDisabled"
                                                      MaxItems="@(_interviewProcessList != null ? _interviewProcessList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
@@ -127,7 +131,9 @@
                                     <MudPaper Elevation="0">
                                         <MudText Typo="Typo.caption" Align="Align.Start" Style="color: #004165;">Pre-Assessment</MudText>
                                         <MudPaper Elevation="0" Class="p-0 w-100 d-flex justify-content-start">
-                                            <MudSwitch @bind-Value="_recruitmentRequest.IsPreAssessment"  Color="Color.Success" UncheckedColor="Color.Default" LabelPlacement="Placement.Start">Yes/No</MudSwitch>
+                                            <MudSwitch @bind-Value="_recruitmentRequest.IsPreAssessment"  Color="Color.Success" UncheckedColor="Color.Default" 
+                                                Disabled="@_isDisabled"
+                                                LabelPlacement="Placement.Start">Yes/No</MudSwitch>
                                         </MudPaper>                                        
                                     </MudPaper>
                                 </MudPaper>
@@ -159,6 +165,7 @@
                                                      HelperText="Type a key to search for company"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
+                                                     Disabled="@_isDisabled"
                                                      MaxItems="@(_customerList != null ? _customerList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
@@ -175,6 +182,7 @@
                                                      HelperText="Type a key to search for department"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
+                                                     Disabled="@_isDisabled"
                                                      MaxItems="@(_departmentList != null ? _departmentList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
@@ -191,6 +199,7 @@
                                                      HelperText="Type a key to search for country"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
+                                                     Disabled="@_isDisabled"
                                                      MaxItems="@(_countryList != null ? _countryList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
@@ -207,6 +216,7 @@
                                                      HelperText="Type a key to search for education"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
+                                                     Disabled="@_isDisabled"
                                                      MaxItems="@(_educationLevelList != null ? _educationLevelList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
@@ -225,6 +235,7 @@
                                                      HelperText="Type a key to search for employee class"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
+                                                     Disabled="@_isDisabled"
                                                      MaxItems="@(_employeeClassList != null ? _employeeClassList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
@@ -241,6 +252,7 @@
                                                      HelperText="Type a key to search for ethnicity"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
+                                                     Disabled="@_isDisabled"
                                                      MaxItems="@(_ethnicityTypeList != null ? _ethnicityTypeList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
@@ -259,6 +271,7 @@
                                             HelperText="Select job title" 
                                             HelperTextOnFocus="true" 
                                             Immediate="true" 
+                                            Disabled="@_isDisabled"
                                             Typo="Typo.subtitle2">
                                             @foreach (var job in _jobTitleList)
                                             {
@@ -279,6 +292,7 @@
                                                      HelperText="Type a key to search for pay grade"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
+                                                     Disabled="@_isDisabled"
                                                      MaxItems="@(_payGradeList != null ? _payGradeList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
@@ -303,6 +317,7 @@
                                                           For="@(() => _recruitmentRequest.JobTitle)" Label="Job Title"
                                                           HelperText="This is field is read-only" Variant="Variant.Filled" HelperTextOnFocus="true"
                                                           Clearable="false" ReadOnly="true" Immediate="true"
+                                                          Disabled="@_isDisabled"
                                                           Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                         </MudPaper>
                                     </MudItem>
@@ -419,14 +434,15 @@
                                                            For="@(() => _recruitmentRequest.PositionDescription)"
                                                            HelperText="Type the full job description here"
                                                            Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="1000" MaxLength="1000" Lines="5"
-                                                           Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                           Clearable="@_isClearable" Disabled="@_isDisabled" 
+                                                           Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                          </MudPaper>
                                      </MudItem>
                                  </MudGrid>
                                 <MudGrid Spacing="0">
                                     <MudItem xs="6" Class="px-4">
                                          <MudPaper Elevation="0" Class="p-0 w-100">
-                                             <MudSlider @bind-Value="_recruitmentRequest.TotalWorkExperience" Min="0" Max="50"
+                                            <MudSlider @bind-Value="_recruitmentRequest.TotalWorkExperience" Min="0" Max="50" Disabled="@_isDisabled"
                                                 Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
                                                  Total Work Experience (years): @_recruitmentRequest.TotalWorkExperience.ToString()
                                                 </MudSlider>
@@ -434,7 +450,8 @@
                                      </MudItem>
                                         <MudItem xs="6" Class="px-4">
                                             <MudPaper Elevation="0" Class="p-0 w-100">
-                                                <MudSlider @bind-Value="_recruitmentRequest.TotalRelevantExperience" Min="0" Max="25" Color="Color.Info" Size="Size.Medium" ValueLabel="true">
+                                                <MudSlider @bind-Value="_recruitmentRequest.TotalRelevantExperience" Min="0" Max="25" Disabled="@_isDisabled"
+                                                    Color="Color.Info" Size="Size.Medium" ValueLabel="true">
                                                 Relevant Experience (years): @_recruitmentRequest.TotalRelevantExperience.ToString()
                                                 </MudSlider>
                                             </MudPaper>
@@ -443,7 +460,7 @@
                                 <MudGrid Spacing="0">
                                     <MudItem xs="6" Class="px-4">
                                         <MudPaper Elevation="0" Class="p-0 w-100">
-                                            <MudSlider @bind-Value="_recruitmentRequest.AgeRange" Min="18" Max="75"
+                                            <MudSlider @bind-Value="_recruitmentRequest.AgeRange" Min="18" Max="75" Disabled="@_isDisabled"
                                                        Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
                                                 Age Range (years): @_recruitmentRequest.AgeRange.ToString()
                                             </MudSlider>
@@ -463,14 +480,14 @@
                                                 
                                             </div>
                                             <MudChipSet @bind-SelectedValues="_recruitmentRequest.GenderList" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Info">
-                                                <MudChip T="string" Value="@("Male")">
+                                                <MudChip T="string" Value="@("Male")" Disabled="@_isDisabled">
                                                     <AvatarContent>
                                                         <MudAvatar Color="Color.Success" Variant="Variant.Filled" Rounded="true" title="Male">
                                                             <MudIcon Color="Color.Dark" Icon="fas fa-male" Size="Size.Small" />
                                                         </MudAvatar>
                                                     </AvatarContent>
                                                 </MudChip>
-                                                <MudChip T="string" Value="@("Female")">
+                                                <MudChip T="string" Value="@("Female")" Disabled="@_isDisabled">
                                                     <AvatarContent>
                                                         <MudAvatar Color="Color.Secondary" Variant="Variant.Filled" Rounded="true" title="Male">
                                                             <MudIcon Color="Color.Dark" Icon="fas fa-female" Size="Size.Small" />
@@ -502,7 +519,8 @@
                                                           For="@(() => _recruitmentRequest.Responsibilities)"
                                                           HelperText="Type the duty and responsibility definitions here"
                                                           Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="5000" MaxLength="5000" Lines="8"
-                                                          Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                          Clearable="@_isClearable" Disabled="@_isDisabled" 
+                                                          Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                         </MudPaper>
                                     </MudItem>
                                 </MudGrid>
@@ -535,7 +553,7 @@
                                         <div class="mt-1 ps-3">
                                             <MudText Typo="Typo.subtitle2" Class="fw-bold" Style="color: #004165;">Select Salary Range:</MudText>
                                         </div>
-                                        <MudRadioGroup T="string" @bind-Value="SalaryRangeType">
+                                        <MudRadioGroup T="string" @bind-Value="SalaryRangeType" Disabled="@_isDisabled">
                                             <MudRadio Value="@("Yearly")" Color="Color.Info">Yearly</MudRadio>
                                             <MudRadio Value="@("Monthly")" Color="Color.Info">Monthly</MudRadio>
                                             <MudRadio Value="@("Daily")" Color="Color.Info">Daily</MudRadio>
@@ -543,7 +561,7 @@
                                         </MudRadioGroup>
                                     </MudPaper>
                                 </MudGrid>
-                                <MudGrid Spacing="0">
+                                <MudGrid Spacing="0">                                    
                                     <MudItem xs="6" Class="px-4">
                                         <MudSlider @bind-Value="_recruitmentRequest.YearlySalaryRange"  
                                             Disabled="@(_recruitmentRequest.SalaryRangeType == "Yearly" ? false: true)"
@@ -597,7 +615,8 @@
                                                 }
 
                                             </div>
-                                            <MudChipSet @bind-SelectedValues="_recruitmentRequest.AssetList" SelectionMode="SelectionMode.MultiSelection" CheckMark="true" Variant="Variant.Text" Color="Color.Info">
+                                            <MudChipSet @bind-SelectedValues="_recruitmentRequest.AssetList" SelectionMode="SelectionMode.MultiSelection" Disabled="@_isDisabled"
+                                                        CheckMark="true" Variant="Variant.Text" Color="Color.Info">
                                                 <MudChip T="string" Value="@("Desktop")">
                                                     <AvatarContent>
                                                         <MudAvatar Color="Color.Default" Variant="Variant.Filled" Rounded="true" title="Desktop">
