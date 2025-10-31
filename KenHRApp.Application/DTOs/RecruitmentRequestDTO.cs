@@ -95,25 +95,26 @@ namespace KenHRApp.Application.DTOs
         [Required(ErrorMessage = "Total Work Experience is required")]
         [Display(Name = "Total Work Experience")]
         public int TotalWorkExperience { get; set; }
+        public int MinWorkExperience { get; set; }
+        public int MaxWorkExperience { get; set; }
 
         [Required(ErrorMessage = "Relevant Experience is required")]
         [Display(Name = "Relevant Experience")]
         public int TotalRelevantExperience { get; set; }
-
-        [Required(ErrorMessage = "Min. Age is required")]
-        [Display(Name = "Min. Age")]
-        public int MinAge { get; set; }
-
-        [Required(ErrorMessage = "Max. Age is required")]
-        [Display(Name = "Max. Age")]
-        public int MaxAge { get; set; }
+        public int MinRelevantExperience { get; set; }
+        public int MaxRelevantExperience { get; set; }
 
         [Required(ErrorMessage = "Age Range is required")]
         [Display(Name = "Age Range (years)")]
         public int AgeRange { get; set; }
+        public int MinAge { get; set; }
+        public int MaxAge { get; set; }
 
         public IReadOnlyCollection<string>? GenderList { get; set; } = null;
+        public string? RequiredGender { get; set; } = null;
+
         public IReadOnlyCollection<string>? AssetList { get; set; } = null;
+        public string? RequiredAsset { get; set; } = null;
 
         public string? VideoDescriptionURL { get; set; } = null;
         #endregion
@@ -145,7 +146,6 @@ namespace KenHRApp.Application.DTOs
         public int HourlySalaryRangeMax { get; set; } = 100;
         public string? HourlySalaryRangeCurrency { get; set; } = "BHD";
 
-        public List<string>? AssetsList { get; set; } = null;
 
         [Required(ErrorMessage = "Duties and Responsibilities is required")]
         [Display(Name = "Duties and Responsibilities")]

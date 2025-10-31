@@ -23,6 +23,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         [Inject] private IRecruitmentService RecruitmentService { get; set; } = default!;
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
+        [Inject] private IAppState AppState { get; set; } = default!;
         #endregion
 
         #region Private Fields        
@@ -590,7 +591,28 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
 
         private void AddRequisition(RecruitmentBudgetDTO recruitment)
         {
-            Navigation.NavigateTo($"/Recruitment/recruitmentrequest?RequisitionId={recruitment.BudgetId}&DepartmentName={recruitment.DepartmentName}&ActionType=Add");
+            var deptName = Uri.EscapeDataString(recruitment.DepartmentName);
+
+            // Initialize DTO object to be passed to  the requisition form
+            // Pass via NavigationManager and a shared state service 
+            AppState.RecruitmentRequest = new RecruitmentRequestDTO
+            {
+                MinWorkExperience = 0,
+                MaxWorkExperience = 50,
+                MinRelevantExperience = 0,
+                MaxRelevantExperience = 50,
+                MinAge = 18,
+                MaxAge = 75,
+                DepartmentCode = recruitment.DepartmentCode,
+                DepartmentName = recruitment.DepartmentName,
+                SalaryRangeType = "Monthly",
+                YearlySalaryRangeMin = 0,
+                YearlySalaryRangeMax = 100000,
+                YearlySalaryRangeCurrency = "BHD"
+            };
+
+            // Open the requisition form
+            Navigation.NavigateTo($"/Recruitment/recruitmentrequest?RequisitionId={recruitment.BudgetId}&DepartmentName={deptName}&ActionType=Add");
         }
         #endregion
 

@@ -34,7 +34,7 @@
                     Size="Size.Small" Color="Color.Info">
                     Create Requisition
                 </MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh"
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" ButtonType="ButtonType.Reset"
                            Size="Size.Small" Color="Color.Default">
                     Refresh
                 </MudButton>
@@ -182,7 +182,7 @@
                                                      HelperText="Type a key to search for department"
                                                      HelperTextOnFocus="true"
                                                      Clearable="true" Typo="Typo.subtitle2"
-                                                     Disabled="@_isDisabled"
+                                                     Disabled="true"
                                                      MaxItems="@(_departmentList != null ? _departmentList.Count : 10)"
                                                      Modal="true" />
                                 </MudPaper>
@@ -441,29 +441,46 @@
                                  </MudGrid>
                                 <MudGrid Spacing="0">
                                     <MudItem xs="6" Class="px-4">
-                                         <MudPaper Elevation="0" Class="p-0 w-100">
-                                            <MudSlider @bind-Value="_recruitmentRequest.TotalWorkExperience" Min="0" Max="50" Disabled="@_isDisabled"
-                                                Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
-                                                 Total Work Experience (years): @_recruitmentRequest.TotalWorkExperience.ToString()
+                                        <MudPaper Elevation="0" Class="p-0 w-100 d-flex flex-column">
+                                            <MudSlider @bind-Value="_recruitmentRequest.TotalWorkExperience" 
+                                                Min="_recruitmentRequest.MinWorkExperience" Max="_recruitmentRequest.MaxWorkExperience" Disabled="@_isDisabled"
+                                                    ValueLabelFormat="FormatExperienceLabel"
+                                                    Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
+                                                     Total Work Experience: @_recruitmentRequest.TotalWorkExperience.ToString()
                                                 </MudSlider>
+                                                <div class="d-flex justify-space-between mt-1 px-1">
+                                                    <span>@($"{_recruitmentRequest.MinWorkExperience} yrs")</span>
+                                                    <span>@($"{_recruitmentRequest.MaxWorkExperience} yrs")</span>
+                                                </div>
                                          </MudPaper>
-                                     </MudItem>
+                                        </MudItem>
                                         <MudItem xs="6" Class="px-4">
-                                            <MudPaper Elevation="0" Class="p-0 w-100">
-                                                <MudSlider @bind-Value="_recruitmentRequest.TotalRelevantExperience" Min="0" Max="25" Disabled="@_isDisabled"
+                                            <MudPaper Elevation="0" Class="p-0 w-100 d-flex flex-column">
+                                                <MudSlider @bind-Value="_recruitmentRequest.TotalRelevantExperience" 
+                                                    Min="_recruitmentRequest.MinRelevantExperience" Max="_recruitmentRequest.MaxRelevantExperience" 
+                                                    Disabled="@_isDisabled"
                                                     Color="Color.Info" Size="Size.Medium" ValueLabel="true">
-                                                Relevant Experience (years): @_recruitmentRequest.TotalRelevantExperience.ToString()
+                                                    Relevant Experience: @_recruitmentRequest.TotalRelevantExperience.ToString()
                                                 </MudSlider>
+                                                <div class="d-flex justify-space-between mt-1 px-1">
+                                                    <span>@($"{_recruitmentRequest.MinRelevantExperience} yrs")</span>
+                                                    <span>@($"{_recruitmentRequest.MaxRelevantExperience} yrs")</span>
+                                                </div>
                                             </MudPaper>
                                         </MudItem>
                                  </MudGrid>
                                 <MudGrid Spacing="0">
                                     <MudItem xs="6" Class="px-4">
-                                        <MudPaper Elevation="0" Class="p-0 w-100">
-                                            <MudSlider @bind-Value="_recruitmentRequest.AgeRange" Min="18" Max="75" Disabled="@_isDisabled"
-                                                       Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
-                                                Age Range (years): @_recruitmentRequest.AgeRange.ToString()
+                                        <MudPaper Elevation="0" Class="p-0 w-100 d-flex flex-column">
+                                            <MudSlider @bind-Value="_recruitmentRequest.AgeRange" Disabled="@_isDisabled"
+                                                Min="_recruitmentRequest.MinAge" Max="_recruitmentRequest.MaxAge" 
+                                                Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
+                                                Age Range: @_recruitmentRequest.AgeRange.ToString()
                                             </MudSlider>
+                                            <div class="d-flex justify-space-between mt-1 px-1">
+                                                <span>@($"{_recruitmentRequest.MinAge} yrs")</span>
+                                                <span>@($"{_recruitmentRequest.MaxAge} yrs")</span>
+                                            </div>
                                         </MudPaper>
                                     </MudItem>
                                     <MudItem xs="6" Class="px-0">
@@ -563,42 +580,62 @@
                                 </MudGrid>
                                 <MudGrid Spacing="0">                                    
                                     <MudItem xs="6" Class="px-4">
-                                        <MudSlider @bind-Value="_recruitmentRequest.YearlySalaryRange"  
-                                            Disabled="@(_recruitmentRequest.SalaryRangeType == "Yearly" ? false: true)"
-                                            Min="@_recruitmentRequest.YearlySalaryRangeMin" Max="_recruitmentRequest.YearlySalaryRangeMax"
-                                            Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
-                                            Yearly Salary Range (@_recruitmentRequest.YearlySalaryRangeMin.ToString("N0") - @_recruitmentRequest.YearlySalaryRangeMax.ToString("N0") @_recruitmentRequest.YearlySalaryRangeCurrency): 
-                                                @_recruitmentRequest.YearlySalaryRange.ToString("N0")
-                                        </MudSlider>
+                                        <MudPaper Elevation="0" Class="p-0 w-100 d-flex flex-column">
+                                            <MudSlider @bind-Value="_recruitmentRequest.YearlySalaryRange"  
+                                                Disabled="@(_recruitmentRequest.SalaryRangeType == "Yearly" ? false: true)"
+                                                Min="@_recruitmentRequest.YearlySalaryRangeMin" Max="_recruitmentRequest.YearlySalaryRangeMax"
+                                                Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
+                                                Yearly Salary Range: @_recruitmentRequest.YearlySalaryRange.ToString("N0")
+                                            </MudSlider>
+                                            <div class="d-flex justify-space-between mt-1 px-1">
+                                                <span>@($"{_recruitmentRequest.YearlySalaryRangeMin.ToString("N0")} {_recruitmentRequest.YearlySalaryRangeCurrency}")</span>
+                                                <span>@($"{_recruitmentRequest.YearlySalaryRangeMax.ToString("N0")} {_recruitmentRequest.YearlySalaryRangeCurrency}")</span>
+                                            </div>
+                                        </MudPaper>
                                     </MudItem>
                                     <MudItem xs="6" Class="px-4">
-                                        <MudSlider @bind-Value="_recruitmentRequest.MonthlySalaryRange" 
-                                            Disabled="@(_recruitmentRequest.SalaryRangeType == "Monthly" ? false: true)"
-                                            Min="@_recruitmentRequest.MonthlySalaryRangeMin" Max="_recruitmentRequest.MonthlySalaryRangeMax"
-                                            Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
-                                            Monthly Salary Range (@_recruitmentRequest.MonthlySalaryRangeMin.ToString("N0") - @_recruitmentRequest.MonthlySalaryRangeMax.ToString("N0") @_recruitmentRequest.MonthlySalaryRangeCurrency): 
-                                                @_recruitmentRequest.MonthlySalaryRange.ToString("N0")
-                                        </MudSlider>
+                                        <MudPaper Elevation="0" Class="p-0 w-100 d-flex flex-column">
+                                            <MudSlider @bind-Value="_recruitmentRequest.MonthlySalaryRange" 
+                                                Disabled="@(_recruitmentRequest.SalaryRangeType == "Monthly" ? false: true)"
+                                                Min="@_recruitmentRequest.MonthlySalaryRangeMin" Max="_recruitmentRequest.MonthlySalaryRangeMax"
+                                                Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
+                                                Monthly Salary Range: @_recruitmentRequest.MonthlySalaryRange.ToString("N0")
+                                            </MudSlider>
+                                            <div class="d-flex justify-space-between mt-1 px-1">
+                                                <span>@($"{_recruitmentRequest.MonthlySalaryRangeMin.ToString("N0")} {_recruitmentRequest.MonthlySalaryRangeCurrency}")</span>
+                                                <span>@($"{_recruitmentRequest.MonthlySalaryRangeMax.ToString("N0")} {_recruitmentRequest.MonthlySalaryRangeCurrency}")</span>
+                                            </div>
+                                        </MudPaper>
                                     </MudItem>
                                 </MudGrid>
                                 <MudGrid Spacing="0">
                                     <MudItem xs="6" Class="px-4">
-                                        <MudSlider @bind-Value="_recruitmentRequest.DailySalaryRange" 
-                                            Disabled="@(_recruitmentRequest.SalaryRangeType == "Daily" ? false: true)"
-                                            Min="@_recruitmentRequest.DailySalaryRangeMin" Max="_recruitmentRequest.DailySalaryRangeMax"
+                                        <MudPaper Elevation="0" Class="p-0 w-100 d-flex flex-column">
+                                            <MudSlider @bind-Value="_recruitmentRequest.DailySalaryRange" 
+                                                Disabled="@(_recruitmentRequest.SalaryRangeType == "Daily" ? false: true)"
+                                                Min="@_recruitmentRequest.DailySalaryRangeMin" Max="_recruitmentRequest.DailySalaryRangeMax"
                                                 Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
-                                            Daily Salary Range (@_recruitmentRequest.DailySalaryRangeMin.ToString("N0") - @_recruitmentRequest.DailySalaryRangeMax.ToString("N0") @_recruitmentRequest.DailySalaryRangeCurrency): 
-                                                @_recruitmentRequest.DailySalaryRange.ToString("N0")
-                                        </MudSlider>
+                                                Daily Salary Range: @_recruitmentRequest.DailySalaryRange.ToString("N0")
+                                            </MudSlider>
+                                            <div class="d-flex justify-space-between mt-1 px-1">
+                                                <span>@($"{_recruitmentRequest.DailySalaryRangeMin.ToString("N0")} {_recruitmentRequest.DailySalaryRangeCurrency}")</span>
+                                                <span>@($"{_recruitmentRequest.DailySalaryRangeMax.ToString("N0")} {_recruitmentRequest.DailySalaryRangeCurrency}")</span>
+                                            </div>
+                                        </MudPaper>
                                     </MudItem>
                                     <MudItem xs="6" Class="px-4">
-                                        <MudSlider @bind-Value="_recruitmentRequest.HourlySalaryRange" 
-                                            Disabled="@(_recruitmentRequest.SalaryRangeType == "Hourly" ? false: true)"
-                                            Min="@_recruitmentRequest.HourlySalaryRangeMin" Max="_recruitmentRequest.HourlySalaryRangeMax"
-                                            Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
-                                            Hourly Salary Range (@_recruitmentRequest.HourlySalaryRangeMin.ToString("N0") - @_recruitmentRequest.HourlySalaryRangeMax.ToString("N0") @_recruitmentRequest.HourlySalaryRangeCurrency): 
-                                                @_recruitmentRequest.HourlySalaryRange.ToString("N0")
-                                        </MudSlider>
+                                        <MudPaper Elevation="0" Class="p-0 w-100 d-flex flex-column">
+                                            <MudSlider @bind-Value="_recruitmentRequest.HourlySalaryRange" 
+                                                Disabled="@(_recruitmentRequest.SalaryRangeType == "Hourly" ? false: true)"
+                                                Min="@_recruitmentRequest.HourlySalaryRangeMin" Max="_recruitmentRequest.HourlySalaryRangeMax"
+                                                Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
+                                                Hourly Salary Range: @_recruitmentRequest.HourlySalaryRange.ToString("N0")
+                                            </MudSlider>
+                                            <div class="d-flex justify-space-between mt-1 px-1">
+                                                <span>@($"{_recruitmentRequest.HourlySalaryRangeMin.ToString("N0")} {_recruitmentRequest.HourlySalaryRangeCurrency}")</span>
+                                                <span>@($"{_recruitmentRequest.HourlySalaryRangeMax.ToString("N0")} {_recruitmentRequest.HourlySalaryRangeCurrency}")</span>
+                                            </div>
+                                        </MudPaper>
                                     </MudItem>
                                 </MudGrid>
                                 <MudGrid Spacing="0">

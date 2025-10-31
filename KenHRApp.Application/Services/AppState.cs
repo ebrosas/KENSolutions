@@ -1,4 +1,5 @@
-﻿using KenHRApp.Application.Interfaces;
+﻿using KenHRApp.Application.DTOs;
+using KenHRApp.Application.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace KenHRApp.Application.Services
     {
         #region Properties
         public bool ShowAppDrawer { get; set; } = false;
+        public RecruitmentRequestDTO? RecruitmentRequest { get; set; }
         #endregion
     }
 }

@@ -21,6 +21,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IDialogService DialogService { get; set; } = default!;
+        [Inject] private IAppState AppState { get; set; } = default!;
 
         [Parameter]
         [SupplyParameterFromQuery]
@@ -186,9 +187,25 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 _saveBtnEnabled = true;
             }
 
-            // initialize DTO and slider state
-            _recruitmentRequest.SalaryRangeType ??= "Monthly";
-            UpdateSliderStates(_recruitmentRequest.SalaryRangeType);
+            if (AppState.RecruitmentRequest != null)
+            {
+                _recruitmentRequest.DepartmentCode = AppState.RecruitmentRequest.DepartmentCode;
+                _recruitmentRequest.DepartmentName = AppState.RecruitmentRequest.DepartmentName;    
+                _recruitmentRequest.MinAge = AppState.RecruitmentRequest.MinAge;
+                _recruitmentRequest.MaxAge = AppState.RecruitmentRequest.MaxAge;
+                _recruitmentRequest.MinRelevantExperience = AppState.RecruitmentRequest.MinRelevantExperience;
+                _recruitmentRequest.MaxRelevantExperience = AppState.RecruitmentRequest.MaxRelevantExperience;
+                _recruitmentRequest.MinWorkExperience = AppState.RecruitmentRequest.MinWorkExperience;
+                _recruitmentRequest.MaxWorkExperience = AppState.RecruitmentRequest.MaxWorkExperience;
+                _recruitmentRequest.SalaryRangeType = AppState.RecruitmentRequest.SalaryRangeType;
+                _recruitmentRequest.YearlySalaryRangeMin = AppState.RecruitmentRequest.YearlySalaryRangeMin;
+                _recruitmentRequest.YearlySalaryRangeMax = AppState.RecruitmentRequest.YearlySalaryRangeMax;
+                _recruitmentRequest.YearlySalaryRangeCurrency = AppState.RecruitmentRequest.YearlySalaryRangeCurrency;
+            }
+
+            // Initialize slider state
+            //_recruitmentRequest.SalaryRangeType ??= "Monthly";
+            UpdateSliderStates(_recruitmentRequest.SalaryRangeType!);
 
             BeginLoadComboboxTask();
         }
@@ -215,13 +232,13 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 // Set the overlay message
                 overlayMessage = "Saving changes, please wait...";
 
-                //_ = SaveQualificationAsync(async () =>
-                //{
-                //    _isRunning = false;
+                _ = SaveRequisitionAsync(async () =>
+                {
+                    _isRunning = false;
 
-                //    // Shows the spinner overlay
-                //    await InvokeAsync(StateHasChanged);
-                //});
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+                });
             }
             catch (OperationCanceledException)
             {
@@ -933,6 +950,34 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             }
             #endregion
 
+            #region Initialize Gender List
+            if (_recruitmentRequest.GenderList!.Any())
+            {
+                StringBuilder sbGender = new StringBuilder(); 
+                foreach (string item in _recruitmentRequest.GenderList!)
+                {
+                    if (sbGender.Length == 0)
+                        sbGender.Append(item);
+                    else
+                        sbGender.Append($";{item}");
+                }
+            }
+            #endregion
+
+            #region Initialize Assets List
+            if (_recruitmentRequest.AssetList!.Any())
+            {
+                StringBuilder sbAsset = new StringBuilder();
+                foreach (string item in _recruitmentRequest.AssetList!)
+                {
+                    if (sbAsset.Length == 0)
+                        sbAsset.Append(item);
+                    else
+                        sbAsset.Append($";{item}");
+                }
+            }
+            #endregion
+
             // Initialize the cancellation token
             _cts = new CancellationTokenSource();
 
@@ -1169,6 +1214,8 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             _skillChips.Clear();
             _skillName = string.Empty;
         }
+
+        private string FormatExperienceLabel(double value) => $"{value} yrs";
         #endregion
 
         #region Drop-down Boxes Search Methods

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KenHRApp.Application.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,5 +10,6 @@ namespace KenHRApp.Application.Interfaces
     public interface IAppState
     {
         bool ShowAppDrawer { get; set; }
+        RecruitmentRequestDTO? RecruitmentRequest { get; set; }
     }
 }

@@ -1,0 +1,16 @@
+
+Recruitment Request page:
+
+Fields:
+
+TotalWorkExperience:
+Min: 0
+Max: 50
+
+TotalRelevantExperience:
+Min: 0
+Max: 50
+
+AgeRange:
+Min: 18
+Max: 75
