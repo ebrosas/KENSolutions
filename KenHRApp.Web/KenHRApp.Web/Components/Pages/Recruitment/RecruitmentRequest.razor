@@ -446,7 +446,7 @@
                                                 Min="_recruitmentRequest.MinWorkExperience" Max="_recruitmentRequest.MaxWorkExperience" Disabled="@_isDisabled"
                                                     ValueLabelFormat="FormatExperienceLabel"
                                                     Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
-                                                     Total Work Experience: @_recruitmentRequest.TotalWorkExperience.ToString()
+                                                Total Work Experience: @(_recruitmentRequest.TotalWorkExperience > _recruitmentRequest.MinWorkExperience ? $"{_recruitmentRequest.MinWorkExperience} - {_recruitmentRequest.TotalWorkExperience.ToString("N0")} yrs." : $"{_recruitmentRequest.MinWorkExperience} yrs.")
                                                 </MudSlider>
                                                 <div class="d-flex justify-space-between mt-1 px-1">
                                                     <span>@($"{_recruitmentRequest.MinWorkExperience} yrs")</span>
@@ -460,7 +460,7 @@
                                                     Min="_recruitmentRequest.MinRelevantExperience" Max="_recruitmentRequest.MaxRelevantExperience" 
                                                     Disabled="@_isDisabled"
                                                     Color="Color.Info" Size="Size.Medium" ValueLabel="true">
-                                                    Relevant Experience: @_recruitmentRequest.TotalRelevantExperience.ToString()
+                                                Relevant Experience: @(_recruitmentRequest.TotalRelevantExperience > _recruitmentRequest.MinRelevantExperience ? $"{_recruitmentRequest.MinRelevantExperience} - {_recruitmentRequest.TotalRelevantExperience.ToString("N0")} yrs." : $"{_recruitmentRequest.MinRelevantExperience} yrs.")
                                                 </MudSlider>
                                                 <div class="d-flex justify-space-between mt-1 px-1">
                                                     <span>@($"{_recruitmentRequest.MinRelevantExperience} yrs")</span>
@@ -475,7 +475,7 @@
                                             <MudSlider @bind-Value="_recruitmentRequest.AgeRange" Disabled="@_isDisabled"
                                                 Min="_recruitmentRequest.MinAge" Max="_recruitmentRequest.MaxAge" 
                                                 Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
-                                                Age Range: @_recruitmentRequest.AgeRange.ToString()
+                                                Age Range: @(_recruitmentRequest.AgeRange > _recruitmentRequest.MinAge ? $"{_recruitmentRequest.MinAge} - {_recruitmentRequest.AgeRange.ToString("N0")} yrs." : $"{_recruitmentRequest.MinAge} yrs.")
                                             </MudSlider>
                                             <div class="d-flex justify-space-between mt-1 px-1">
                                                 <span>@($"{_recruitmentRequest.MinAge} yrs")</span>
@@ -585,7 +585,7 @@
                                                 Disabled="@(_recruitmentRequest.SalaryRangeType == "Yearly" ? false: true)"
                                                 Min="@_recruitmentRequest.YearlySalaryRangeMin" Max="_recruitmentRequest.YearlySalaryRangeMax"
                                                 Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
-                                                Yearly Salary Range: @_recruitmentRequest.YearlySalaryRange.ToString("N0")
+                                                Yearly Salary Range: @(_recruitmentRequest.YearlySalaryRange > _recruitmentRequest.YearlySalaryRangeMin ? $"{_recruitmentRequest.YearlySalaryRangeMin.ToString("N0")} - {_recruitmentRequest.YearlySalaryRange.ToString("N0")} {_recruitmentRequest.YearlySalaryRangeCurrency}" : $"{_recruitmentRequest.YearlySalaryRangeMin.ToString("N0")} {_recruitmentRequest.YearlySalaryRangeCurrency}")
                                             </MudSlider>
                                             <div class="d-flex justify-space-between mt-1 px-1">
                                                 <span>@($"{_recruitmentRequest.YearlySalaryRangeMin.ToString("N0")} {_recruitmentRequest.YearlySalaryRangeCurrency}")</span>
@@ -599,7 +599,7 @@
                                                 Disabled="@(_recruitmentRequest.SalaryRangeType == "Monthly" ? false: true)"
                                                 Min="@_recruitmentRequest.MonthlySalaryRangeMin" Max="_recruitmentRequest.MonthlySalaryRangeMax"
                                                 Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
-                                                Monthly Salary Range: @_recruitmentRequest.MonthlySalaryRange.ToString("N0")
+                                                Monthly Salary Range: @(_recruitmentRequest.MonthlySalaryRange > _recruitmentRequest.MonthlySalaryRangeMin ? $"{_recruitmentRequest.MonthlySalaryRangeMin.ToString("N0")} - {_recruitmentRequest.MonthlySalaryRange.ToString("N0")} {_recruitmentRequest.MonthlySalaryRangeCurrency}" : $"{_recruitmentRequest.MonthlySalaryRangeMin.ToString("N0")} {_recruitmentRequest.MonthlySalaryRangeCurrency}")
                                             </MudSlider>
                                             <div class="d-flex justify-space-between mt-1 px-1">
                                                 <span>@($"{_recruitmentRequest.MonthlySalaryRangeMin.ToString("N0")} {_recruitmentRequest.MonthlySalaryRangeCurrency}")</span>
@@ -615,7 +615,7 @@
                                                 Disabled="@(_recruitmentRequest.SalaryRangeType == "Daily" ? false: true)"
                                                 Min="@_recruitmentRequest.DailySalaryRangeMin" Max="_recruitmentRequest.DailySalaryRangeMax"
                                                 Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
-                                                Daily Salary Range: @_recruitmentRequest.DailySalaryRange.ToString("N0")
+                                                Daily Salary Range: @(_recruitmentRequest.DailySalaryRange > _recruitmentRequest.DailySalaryRangeMin ? $"{_recruitmentRequest.DailySalaryRangeMin.ToString("N0")} - {_recruitmentRequest.DailySalaryRange.ToString("N0")} {_recruitmentRequest.DailySalaryRangeCurrency}" : $"{_recruitmentRequest.DailySalaryRangeMin.ToString("N0")} {_recruitmentRequest.DailySalaryRangeCurrency}")
                                             </MudSlider>
                                             <div class="d-flex justify-space-between mt-1 px-1">
                                                 <span>@($"{_recruitmentRequest.DailySalaryRangeMin.ToString("N0")} {_recruitmentRequest.DailySalaryRangeCurrency}")</span>
@@ -629,7 +629,7 @@
                                                 Disabled="@(_recruitmentRequest.SalaryRangeType == "Hourly" ? false: true)"
                                                 Min="@_recruitmentRequest.HourlySalaryRangeMin" Max="_recruitmentRequest.HourlySalaryRangeMax"
                                                 Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
-                                                Hourly Salary Range: @_recruitmentRequest.HourlySalaryRange.ToString("N0")
+                                                Hourly Salary Range: @(_recruitmentRequest.HourlySalaryRange > _recruitmentRequest.HourlySalaryRangeMin ? $"{_recruitmentRequest.HourlySalaryRangeMin.ToString("N0")} - {_recruitmentRequest.HourlySalaryRange.ToString("N0")} {_recruitmentRequest.HourlySalaryRangeCurrency}" : $"{_recruitmentRequest.HourlySalaryRangeMin.ToString("N0")} {_recruitmentRequest.HourlySalaryRangeCurrency}")
                                             </MudSlider>
                                             <div class="d-flex justify-space-between mt-1 px-1">
                                                 <span>@($"{_recruitmentRequest.HourlySalaryRangeMin.ToString("N0")} {_recruitmentRequest.HourlySalaryRangeCurrency}")</span>
