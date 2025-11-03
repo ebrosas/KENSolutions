@@ -37,7 +37,7 @@
 	--General
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
-	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'STREAMTYPE')
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'CURRENCYTYPE')
 
 	SELECT a.EmployeeId, a.EmployeeNo, 
 		a.EmploymentTypeCode, a.RoleCode, a.JobTitleCode, a.FirstAttendanceModeCode, a.SecondAttendanceModeCode, a.ThirdAttendanceModeCode,
@@ -76,7 +76,7 @@
 
 	SELECT * FROM kenuser.Qualification a WITH (NOLOCK)
 
-	SELECT * from [kenuser].[DepartmentMaster] a
+	SELECT * FROM [kenuser].[DepartmentMaster] a
 	ORDER BY a.DepartmentName
 
 	SELECT * FROM kenuser.RecruitmentBudget a

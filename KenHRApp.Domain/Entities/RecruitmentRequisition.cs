@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace KenHRApp.Domain.Entities
 {
-    public class RecruitmentRequest
+    public class RecruitmentRequisition
     {
         #region Position Properties
         public int RequisitionId { get; set; }
@@ -149,6 +149,30 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "varchar(5000)")]
         public string? GeneralRemarks { get; set; } = null;
+        #endregion
+
+        #region General Properties
+        public int? CreatedByNo { get; set; }
+
+        [Column(TypeName = "varchar(50)")]
+        public string? CreatedByUserID { get; set; } = null;
+
+        [Column(TypeName = "varchar(100)")]
+        public string? CreatedByName { get; set; } = null;
+
+        [Column(TypeName = "datetime")]
+        public DateTime? CreatedDate { get; set; } = null;
+
+        public int? LastUpdatedByNo { get; set; }
+
+        [Column(TypeName = "varchar(50)")]
+        public string? LastUpdatedUserID { get; set; } = null;
+
+        [Column(TypeName = "varchar(100)")]
+        public string? LastUpdatedName { get; set; } = null;
+
+        [Column(TypeName = "datetime")]
+        public DateTime? LastUpdateDate { get; set; } = null;
         #endregion
 
         #region Reference Navigations

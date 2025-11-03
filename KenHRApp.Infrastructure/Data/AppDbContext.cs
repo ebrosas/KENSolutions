@@ -32,6 +32,8 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<UserDefinedCode> UserDefinedCodes => Set<UserDefinedCode>();
         public DbSet<DepartmentMaster> DepartmentMasters => Set<DepartmentMaster>();
         public DbSet<RecruitmentBudget> RecruitmentBudgets => Set<RecruitmentBudget>();
+        public DbSet<JobQualification> JobQualifications => Set<JobQualification>();
+        public DbSet<RecruitmentRequisition> RecruitmentRequests => Set<RecruitmentRequisition>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -252,6 +254,38 @@ namespace KenHRApp.Infrastructure.Data
                      .HasDatabaseName("IX_RecruitmentBudget_CompoKeys")
                      .IsUnique()
                      .HasFilter(null);
+               });
+
+            modelBuilder.Entity<JobQualification>(
+            entity =>
+            {
+                entity.ToTable("JobQualification");
+                entity.HasKey(c => c.AutoId)
+                    .HasName("PK_JobQualification_AutoId");
+
+                entity.HasIndex(e => new { e.RequisitionId, e.QualificationCode, e.StreamCode })
+                     .HasDatabaseName("IX_JobQualification_CompoKeys")
+                     .IsUnique();
+            });
+
+            modelBuilder.Entity<RecruitmentRequisition>(
+               entity =>
+               {
+                   entity.ToTable("RecruitmentRequest");
+                   entity.HasKey(d => d.RequisitionId)
+                       .HasName("PK_RecruitmentRequest_RequisitionId");
+                   entity.Property(r => r.CreatedDate)
+                       .HasDefaultValue(DateTime.Now);
+                   entity.HasIndex(e => new { e.EmploymentTypeCode, e.PositionTypeCode, e.CompanyCode, e.DepartmentCode, e.EmployeeClass, e.JobTitleCode, e.PayGradeCode })
+                     .HasDatabaseName("IX_RecruitmentRequisition_CompoKeys")
+                     .IsUnique()
+                     .HasFilter(null);
+                   entity.HasMany(e => e.QualificationList)
+                        .WithOne(e => e.RecruitmentRequest)
+                        .HasPrincipalKey(e => e.RequisitionId)     // Map to RequisitionId primary key of RecruitmentRequisition principal
+                        .HasForeignKey(c => c.RequisitionId)
+                        .IsRequired()
+                        .OnDelete(DeleteBehavior.Cascade);
                });
             #endregion
 

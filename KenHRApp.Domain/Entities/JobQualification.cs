@@ -27,7 +27,7 @@ namespace KenHRApp.Domain.Entities
         #region Reference Navigation to Recruitment Request
         [Comment("Foreign key that references primary key: RecruitmentRequest.RequisitionId")]
         public int RequisitionId { get; set; }
-        public RecruitmentRequest RecruitmentRequest { get; set; } = null!;
+        public RecruitmentRequisition RecruitmentRequest { get; set; } = null!;
         #endregion
     }
 }
