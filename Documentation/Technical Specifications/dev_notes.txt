@@ -14,3 +14,19 @@ Max: 50
 AgeRange:
 Min: 18
 Max: 75
+
+Yearly Salary Range:
+Min: 0
+Max: 100000
+
+Monthly Salary Range:
+Min: 0
+Max: 10000
+
+Daily Salary Range:
+Min: 0
+Max: 1000
+
+Hourly Salary Range:
+Min: 0
+Max: 100

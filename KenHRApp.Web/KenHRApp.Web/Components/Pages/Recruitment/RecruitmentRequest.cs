@@ -189,6 +189,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
 
             if (AppState.RecruitmentRequest != null)
             {
+                #region Initialize recruitment request based on the AppState
                 _recruitmentRequest.DepartmentCode = AppState.RecruitmentRequest.DepartmentCode;
                 _recruitmentRequest.DepartmentName = AppState.RecruitmentRequest.DepartmentName;    
                 _recruitmentRequest.MinAge = AppState.RecruitmentRequest.MinAge;
@@ -201,6 +202,16 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 _recruitmentRequest.YearlySalaryRangeMin = AppState.RecruitmentRequest.YearlySalaryRangeMin;
                 _recruitmentRequest.YearlySalaryRangeMax = AppState.RecruitmentRequest.YearlySalaryRangeMax;
                 _recruitmentRequest.YearlySalaryRangeCurrency = AppState.RecruitmentRequest.YearlySalaryRangeCurrency;
+                _recruitmentRequest.MonthlySalaryRangeMin = AppState.RecruitmentRequest.MonthlySalaryRangeMin;
+                _recruitmentRequest.MonthlySalaryRangeMax = AppState.RecruitmentRequest.MonthlySalaryRangeMax;
+                _recruitmentRequest.MonthlySalaryRangeCurrency = AppState.RecruitmentRequest.MonthlySalaryRangeCurrency;
+                _recruitmentRequest.DailySalaryRangeMin = AppState.RecruitmentRequest.DailySalaryRangeMin;
+                _recruitmentRequest.DailySalaryRangeMax = AppState.RecruitmentRequest.DailySalaryRangeMax;
+                _recruitmentRequest.DailySalaryRangeCurrency = AppState.RecruitmentRequest.DailySalaryRangeCurrency;
+                _recruitmentRequest.HourlySalaryRangeMin = AppState.RecruitmentRequest.HourlySalaryRangeMin;
+                _recruitmentRequest.HourlySalaryRangeMax = AppState.RecruitmentRequest.HourlySalaryRangeMax;
+                _recruitmentRequest.HourlySalaryRangeCurrency = AppState.RecruitmentRequest.HourlySalaryRangeCurrency;
+                #endregion
             }
 
             // Initialize slider state

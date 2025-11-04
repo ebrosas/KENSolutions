@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -124,27 +125,27 @@ namespace KenHRApp.Application.DTOs
 
         [Display(Name = "Yearly Salary Range")]
         public int YearlySalaryRange { get; set; }
-        public int YearlySalaryRangeMin { get; set; } = 0;
-        public int YearlySalaryRangeMax { get; set; } = 100000;
-        public string? YearlySalaryRangeCurrency { get; set; } = "BHD";
+        public int YearlySalaryRangeMin { get; set; } 
+        public int YearlySalaryRangeMax { get; set; } 
+        public string? YearlySalaryRangeCurrency { get; set; } 
 
         [Display(Name = "Monthly Salary Range")]
         public int MonthlySalaryRange { get; set; }
-        public int MonthlySalaryRangeMin { get; set; } = 0;
-        public int MonthlySalaryRangeMax { get; set; } = 10000;
-        public string? MonthlySalaryRangeCurrency { get; set; } = "BHD";
+        public int MonthlySalaryRangeMin { get; set; }
+        public int MonthlySalaryRangeMax { get; set; }
+        public string? MonthlySalaryRangeCurrency { get; set; }
 
         [Display(Name = "Daily Salary Range")]
         public int DailySalaryRange { get; set; }
-        public int DailySalaryRangeMin { get; set; } = 0;
-        public int DailySalaryRangeMax { get; set; } = 1000;
-        public string? DailySalaryRangeCurrency { get; set; } = "BHD";
+        public int DailySalaryRangeMin { get; set; } 
+        public int DailySalaryRangeMax { get; set; } 
+        public string? DailySalaryRangeCurrency { get; set; } 
 
         [Display(Name = "Hourly Salary Range")]
         public int HourlySalaryRange { get; set; }
-        public int HourlySalaryRangeMin { get; set; } = 0;
-        public int HourlySalaryRangeMax { get; set; } = 100;
-        public string? HourlySalaryRangeCurrency { get; set; } = "BHD";
+        public int HourlySalaryRangeMin { get; set; } 
+        public int HourlySalaryRangeMax { get; set; } 
+        public string? HourlySalaryRangeCurrency { get; set; } 
 
 
         [Required(ErrorMessage = "Duties and Responsibilities is required")]
@@ -160,6 +161,40 @@ namespace KenHRApp.Application.DTOs
         [Display(Name = "General Remarks")]
         [StringLength(5000, ErrorMessage = "General Remarks length can't be more than 5000 characters.")]
         public string? GeneralRemarks { get; set; } = null;
+        #endregion
+
+        #region General Properties        
+        public int? CreatedByNo { get; set; }
+        public string? CreatedByUserID { get; set; } = null;
+        public string? CreatedByName { get; set; } = null;
+
+        [Display(Name = "Created Date")]
+        public DateTime? CreatedDate { get; set; } = null;
+
+        public int? LastUpdatedByNo { get; set; }
+        public string? LastUpdatedUserID { get; set; } = null;
+        public string? LastUpdatedName { get; set; } = null;
+
+        [Display(Name = "Last Updated Date")]
+        public DateTime? LastUpdateDate { get; set; } = null;
+        #endregion
+
+        #region Extended Properties
+        public string CreatedByFullName 
+        {
+            get 
+            {
+                return $"{CreatedByNo} - {CreatedByName}";
+            } 
+        }
+
+        public string UpdatedByFullName
+        {
+            get
+            {
+                return $"{LastUpdatedByNo} - {LastUpdatedName}";
+            }
+        }
         #endregion
 
         #region Reference Navigations

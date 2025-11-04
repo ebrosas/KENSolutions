@@ -419,8 +419,8 @@
                                             @for (var i = 0; i < _skillChips.Count; i++)
                                             {
                                                 var localIndex = i;
-                                                <MudChip Value="@_skillChips[localIndex]" 
-                                                         Color="Color.Tertiary" />
+                                                <MudChip Value="@_skillChips[localIndex]" Variant="Variant.Filled"
+                                                         Color="@((Color)(localIndex % _numberOfColors))" />
                                             }
                                         </MudChipSet>
                                     </MudStack>

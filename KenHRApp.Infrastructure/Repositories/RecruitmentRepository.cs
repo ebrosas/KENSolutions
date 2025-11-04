@@ -170,6 +170,168 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<bool>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<int>> AddRecruitmentRequestAsync(RecruitmentRequisition recruitment, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                // Save to database
+                _db.RecruitmentRequests.Add(recruitment);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> UpdateRecruitmentRequestAsync(RecruitmentRequisition dto, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                var recruitment = await _db.RecruitmentRequests.FirstOrDefaultAsync(x => x.RequisitionId == dto.RequisitionId, cancellationToken);
+                if (recruitment == null)
+                    throw new InvalidOperationException("Recruitment requisition record not found");
+
+                #region Update Recruitment Requisition entity
+
+                #region Position Properties       
+                recruitment.EmploymentTypeCode = dto.EmploymentTypeCode;
+                recruitment.QualificationModeCode = dto.QualificationModeCode;
+                recruitment.PositionTypeCode = dto.PositionTypeCode;
+                recruitment.InterviewProcessCode = dto.InterviewProcessCode;
+                recruitment.IsPreAssessment = dto.IsPreAssessment;
+                recruitment.CompanyCode = dto.CompanyCode;
+                recruitment.DepartmentCode = dto.DepartmentCode;
+                recruitment.CountryCode = dto.CountryCode;
+                recruitment.EducationCode = dto.EducationCode;
+                recruitment.EmployeeClassCode = dto.EmployeeClassCode;
+                recruitment.EthnicityCode = dto.EthnicityCode;
+                recruitment.JobTitleCode = dto.JobTitleCode;
+                recruitment.PayGradeCode = dto.PayGradeCode;
+                #endregion
+
+                #region Position Description
+                recruitment.PositionDescription = dto.PositionDescription;
+                recruitment.TotalWorkExperience = dto.TotalWorkExperience;
+                recruitment.MinWorkExperience = dto.MinWorkExperience;
+                recruitment.MaxWorkExperience = dto.MaxWorkExperience;
+                recruitment.TotalRelevantExperience = dto.TotalRelevantExperience;
+                recruitment.MinRelevantExperience = dto.MinRelevantExperience;
+                recruitment.MaxRelevantExperience = dto.MaxRelevantExperience;
+                recruitment.AgeRange = dto.AgeRange;
+                recruitment.MinAge = dto.MinAge;
+                recruitment.MaxAge = dto.MaxAge;
+                recruitment.RequiredGender = dto.RequiredGender;
+                recruitment.RequiredAsset = dto.RequiredAsset;
+                recruitment.VideoDescriptionURL = dto.VideoDescriptionURL;
+                #endregion
+
+                #region Compensation and Benefits
+                recruitment.SalaryRangeType = dto.SalaryRangeType;
+                recruitment.YearlySalaryRange = dto.YearlySalaryRange;
+                recruitment.YearlySalaryRangeMin = dto.YearlySalaryRangeMin;
+                recruitment.YearlySalaryRangeMax = dto.YearlySalaryRangeMax;
+                recruitment.YearlySalaryRangeCurrency = dto.YearlySalaryRangeCurrency;
+                recruitment.MonthlySalaryRange = dto.MonthlySalaryRange;
+                recruitment.MonthlySalaryRangeMin = dto.MonthlySalaryRangeMin;
+                recruitment.MonthlySalaryRangeMax = dto.MonthlySalaryRangeMax;
+                recruitment.MonthlySalaryRangeCurrency = dto.MonthlySalaryRangeCurrency;
+                recruitment.DailySalaryRange = dto.DailySalaryRange;
+                recruitment.DailySalaryRangeMin = dto.DailySalaryRangeMin;
+                recruitment.DailySalaryRangeMax = dto.DailySalaryRangeMax;
+                recruitment.DailySalaryRangeCurrency = dto.DailySalaryRangeCurrency;
+                recruitment.HourlySalaryRange = dto.HourlySalaryRange;
+                recruitment.HourlySalaryRangeMin = dto.HourlySalaryRangeMin;
+                recruitment.HourlySalaryRangeMax = dto.HourlySalaryRangeMax;
+                recruitment.HourlySalaryRangeCurrency = dto.HourlySalaryRangeCurrency;
+                recruitment.Responsibilities = dto.Responsibilities;
+                recruitment.Competencies = dto.Competencies;
+                recruitment.GeneralRemarks = dto.GeneralRemarks;
+                #endregion
+
+                #region General
+                recruitment.LastUpdatedByNo = dto.LastUpdatedByNo;
+                recruitment.LastUpdatedUserID = dto.LastUpdatedUserID;
+                recruitment.LastUpdatedName = dto.LastUpdatedName;
+                recruitment.LastUpdateDate = dto.LastUpdateDate;
+                #endregion
+
+                #endregion
+
+                #region Update Job Qualifications entity
+                if (dto.QualificationList != null && dto.QualificationList.Any())
+                {
+                    #region Delete entity items that don't exist in the DTO
+                    var qualificationsNotInDTO = _db.JobQualifications.AsEnumerable()
+                                    .ExceptBy(dto.QualificationList.Select(d => d.AutoId), e => e.AutoId)
+                                    .ToList();
+                    if (qualificationsNotInDTO.Any())
+                    {
+                        _db.JobQualifications.RemoveRange(qualificationsNotInDTO);
+                        await _db.SaveChangesAsync();
+                    }
+                    #endregion
+
+                    foreach (var qualification in dto.QualificationList)
+                    {
+                        var existingQualification = await _db.JobQualifications
+                            .FirstOrDefaultAsync(jc => jc.RequisitionId == dto.RequisitionId && jc.AutoId == qualification.AutoId, cancellationToken);
+
+                        if (existingQualification != null)
+                        {
+                            // Update existing qualification
+                            existingQualification.QualificationCode = qualification.QualificationCode;
+                            existingQualification.StreamCode = qualification.StreamCode;
+                            existingQualification.SpecializationCode = qualification.SpecializationCode;
+                            existingQualification.Remarks = qualification.Remarks;
+                        }
+                        else
+                        {
+                            // Add new qualification
+                            var newQualification = new JobQualification
+                            {
+                                RequisitionId = dto.RequisitionId,
+                                QualificationCode = qualification.QualificationCode,
+                                StreamCode = qualification.StreamCode,
+                                Remarks = qualification.Remarks,
+                            };
+                            await _db.JobQualifications.AddAsync(newQualification, cancellationToken);
+                        }
+                    }
+                }
+                #endregion
+
+                // Save to database
+                _db.RecruitmentRequests.Update(recruitment);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

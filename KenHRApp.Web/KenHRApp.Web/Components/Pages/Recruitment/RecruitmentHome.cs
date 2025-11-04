@@ -608,7 +608,16 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 SalaryRangeType = "Monthly",
                 YearlySalaryRangeMin = 0,
                 YearlySalaryRangeMax = 100000,
-                YearlySalaryRangeCurrency = "BHD"
+                YearlySalaryRangeCurrency = "BHD",
+                MonthlySalaryRangeMin = 0,
+                MonthlySalaryRangeMax = 10000,
+                MonthlySalaryRangeCurrency = "BHD",
+                DailySalaryRangeMin = 0,
+                DailySalaryRangeMax = 1000,
+                DailySalaryRangeCurrency = "BHD",
+                HourlySalaryRangeMin = 0,
+                HourlySalaryRangeMax = 100,
+                HourlySalaryRangeCurrency = "BHD"
             };
 
             // Open the requisition form
