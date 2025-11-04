@@ -972,6 +972,8 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     else
                         sbGender.Append($";{item}");
                 }
+
+                _recruitmentRequest.RequiredGender = sbGender.ToString();   
             }
             #endregion
 
@@ -986,6 +988,8 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     else
                         sbAsset.Append($";{item}");
                 }
+
+                _recruitmentRequest.RequiredAsset = sbAsset.ToString();
             }
             #endregion
 
@@ -995,25 +999,25 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             bool isSuccess = false;
             string errorMsg = string.Empty;
 
-            //if (isNewRequition)
-            //{
-            //    var addResult = await EmployeeService.AddEmployeeAsync(_recruitmentRequest, _cts.Token);
-            //    isSuccess = addResult.Success;
-            //    if (!isSuccess)
-            //        errorMsg = addResult.Error!;
-            //    else
-            //    {
-            //        // Set flag to enable reload of _recruitmentRequests when navigating back to the Employe Search page
-            //        _forceLoad = true;
-            //    }
-            //}
-            //else
-            //{
-            //    var saveResult = await EmployeeService.SaveEmployeeAsync(_recruitmentRequest, _cts.Token);
-            //    isSuccess = saveResult.Success;
-            //    if (!isSuccess)
-            //        errorMsg = saveResult.Error!;
-            //}
+            if (isNewRequition)
+            {
+                var addResult = await RecruitmentService.AddRecruitmentRequestAsync(_recruitmentRequest, _cts.Token);
+                isSuccess = addResult.Success;
+                if (!isSuccess)
+                    errorMsg = addResult.Error!;
+                else
+                {
+                    // Set flag to enable reload of _recruitmentRequests when navigating back to the Employe Search page
+                    _forceLoad = true;
+                }
+            }
+            else
+            {
+                var saveResult = await RecruitmentService.UpdateRecruitmentRequestAsync(_recruitmentRequest, _cts.Token);
+                isSuccess = saveResult.Success;
+                if (!isSuccess)
+                    errorMsg = saveResult.Error!;
+            }
 
             if (isSuccess)
             {
