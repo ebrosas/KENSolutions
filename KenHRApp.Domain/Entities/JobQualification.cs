@@ -13,11 +13,23 @@ namespace KenHRApp.Domain.Entities
     {
         #region Properties
         public int AutoId { get; set; }
+
+        [Column(TypeName = "varchar(20)")]
         public string QualificationCode { get; set; } = null!;
+
+        [NotMapped]
         public string Qualification { get; set; } = null!;
+
+        [Column(TypeName = "varchar(20)")]
         public string StreamCode { get; set; } = null!;
+
+        [NotMapped]
         public string Stream { get; set; } = null!;
+
+        [Column(TypeName = "varchar(20)")]
         public string? SpecializationCode { get; set; } = null;
+
+        [NotMapped]
         public string? Specialization { get; set; } = null;
 
         [Column(TypeName = "varchar(500)")]

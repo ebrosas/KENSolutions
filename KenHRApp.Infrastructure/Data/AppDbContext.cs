@@ -276,7 +276,7 @@ namespace KenHRApp.Infrastructure.Data
                        .HasName("PK_RecruitmentRequest_RequisitionId");
                    entity.Property(r => r.CreatedDate)
                        .HasDefaultValue(DateTime.Now);
-                   entity.HasIndex(e => new { e.EmploymentTypeCode, e.PositionTypeCode, e.CompanyCode, e.DepartmentCode, e.EmployeeClass, e.JobTitleCode, e.PayGradeCode })
+                   entity.HasIndex(e => new { e.EmploymentTypeCode, e.PositionTypeCode, e.CompanyCode, e.DepartmentCode, e.EmployeeClassCode, e.JobTitleCode, e.PayGradeCode })
                      .HasDatabaseName("IX_RecruitmentRequisition_CompoKeys")
                      .IsUnique()
                      .HasFilter(null);

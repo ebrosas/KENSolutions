@@ -241,7 +241,7 @@ namespace KenHRApp.Application.Services
                 {
                     qualificationList = recruitment.QualificationList.Select(e => new JobQualification
                     {
-                        AutoId = e.AutoId,
+                        //AutoId = e.AutoId,
                         RequisitionId = e.RequisitionId,
                         QualificationCode = e.QualificationCode,
                         StreamCode = e.StreamCode,

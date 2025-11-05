@@ -593,7 +593,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         {
             var deptName = Uri.EscapeDataString(recruitment.DepartmentName);
 
-            // Initialize DTO object to be passed to  the requisition form
+            #region Initialize DTO object to be passed to  the requisition form
             // Pass via NavigationManager and a shared state service 
             AppState.RecruitmentRequest = new RecruitmentRequestDTO
             {
@@ -605,6 +605,16 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 MaxAge = 75,
                 DepartmentCode = recruitment.DepartmentCode,
                 DepartmentName = recruitment.DepartmentName,
+                EmploymentTypeCode = "ETYPFULLTIME",  
+                EmploymentType = "Full Time",
+                QualificationModeCode = "QMFULLTIME",
+                QualificationMode = "Full Time",
+                PositionTypeCode = "POSTYPNEW",
+                PositionType = "New",
+                InterviewProcessCode = "INTPRCPARALLEL",
+                InterviewProcess = "Parallel",
+                CompanyCode = "CUSTGARMCO",
+                Company = "GARMCO",
                 SalaryRangeType = "Monthly",
                 YearlySalaryRangeMin = 0,
                 YearlySalaryRangeMax = 100000,
@@ -619,6 +629,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 HourlySalaryRangeMax = 100,
                 HourlySalaryRangeCurrency = "BHD"
             };
+            #endregion
 
             // Open the requisition form
             Navigation.NavigateTo($"/Recruitment/recruitmentrequest?RequisitionId={recruitment.BudgetId}&DepartmentName={deptName}&ActionType=Add");

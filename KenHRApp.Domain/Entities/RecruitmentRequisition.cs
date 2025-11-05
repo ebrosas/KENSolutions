@@ -105,12 +105,18 @@ namespace KenHRApp.Domain.Entities
         public int? MinAge { get; set; }
         public int? MaxAge { get; set; }
 
-        public string? RequiredGender { get; set; } = null;       
+        [Column(TypeName = "varchar(50)")]
+        public string? RequiredGender { get; set; } = null;
+
+        [Column(TypeName = "varchar(200)")]
         public string? RequiredAsset { get; set; } = null;
+
+        [Column(TypeName = "varchar(200)")]
         public string? VideoDescriptionURL { get; set; } = null;
         #endregion
 
         #region Compensation and Benefits
+        [Column(TypeName = "varchar(50)")]
         public string? SalaryRangeType { get; set; } = null;
 
         public int? YearlySalaryRange { get; set; }

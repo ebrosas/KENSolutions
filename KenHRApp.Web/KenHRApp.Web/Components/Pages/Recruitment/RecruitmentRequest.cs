@@ -8,6 +8,7 @@ using MudBlazor;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
 using KenHRApp.Domain.Entities;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace KenHRApp.Web.Components.Pages.Recruitment
 {
@@ -191,7 +192,17 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             {
                 #region Initialize recruitment request based on the AppState
                 _recruitmentRequest.DepartmentCode = AppState.RecruitmentRequest.DepartmentCode;
-                _recruitmentRequest.DepartmentName = AppState.RecruitmentRequest.DepartmentName;    
+                _recruitmentRequest.DepartmentName = AppState.RecruitmentRequest.DepartmentName;
+                _recruitmentRequest.EmploymentTypeCode = AppState.RecruitmentRequest.EmploymentTypeCode;
+                _recruitmentRequest.EmploymentType = AppState.RecruitmentRequest.EmploymentType;
+                _recruitmentRequest.QualificationModeCode = AppState.RecruitmentRequest.QualificationModeCode;
+                _recruitmentRequest.QualificationMode = AppState.RecruitmentRequest.QualificationMode;
+                _recruitmentRequest.PositionTypeCode = AppState.RecruitmentRequest.PositionTypeCode;
+                _recruitmentRequest.PositionType = AppState.RecruitmentRequest.PositionType;
+                _recruitmentRequest.InterviewProcessCode = AppState.RecruitmentRequest.InterviewProcessCode;
+                _recruitmentRequest.InterviewProcess = AppState.RecruitmentRequest.InterviewProcess;
+                _recruitmentRequest.CompanyCode = AppState.RecruitmentRequest.CompanyCode;
+                _recruitmentRequest.Company = AppState.RecruitmentRequest.Company;
                 _recruitmentRequest.MinAge = AppState.RecruitmentRequest.MinAge;
                 _recruitmentRequest.MaxAge = AppState.RecruitmentRequest.MaxAge;
                 _recruitmentRequest.MinRelevantExperience = AppState.RecruitmentRequest.MinRelevantExperience;
@@ -210,7 +221,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 _recruitmentRequest.DailySalaryRangeCurrency = AppState.RecruitmentRequest.DailySalaryRangeCurrency;
                 _recruitmentRequest.HourlySalaryRangeMin = AppState.RecruitmentRequest.HourlySalaryRangeMin;
                 _recruitmentRequest.HourlySalaryRangeMax = AppState.RecruitmentRequest.HourlySalaryRangeMax;
-                _recruitmentRequest.HourlySalaryRangeCurrency = AppState.RecruitmentRequest.HourlySalaryRangeCurrency;
+                _recruitmentRequest.HourlySalaryRangeCurrency = AppState.RecruitmentRequest.HourlySalaryRangeCurrency;                                
                 #endregion
             }
 

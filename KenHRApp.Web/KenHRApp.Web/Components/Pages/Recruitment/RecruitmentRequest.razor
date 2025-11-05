@@ -337,7 +337,7 @@
                                                          Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu"
                                                          FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                                                          Hideable="true" PageSize="5"
-                                                         EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                                                          EditTrigger="DataGridEditTrigger.Manual" ReadOnly="@(!_allowGridEdit)" EditMode="DataGridEditMode.Form"
                                                          TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
                                                 <ToolBarContent>
                                                     <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
@@ -403,15 +403,15 @@
                                     <MudItem xs="3" Class="px-0">
                                         <MudPaper Elevation="0" Class="p-0 w-100 mt-2 ps-2 pe-4">
                                              <MudButtonGroup Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">
-                                                 <MudButton StartIcon="@Icons.Material.Rounded.AddBox" IconColor="Color.Success" OnClick="AddChip" title="Add entered skill to the list">Add</MudButton>
-                                                 <MudButton StartIcon="@Icons.Material.Rounded.Refresh" IconColor="Color.Warning" OnClick="ClearChips" title="Clear skills list">Reset</MudButton>
+                                                 <MudButton StartIcon="@Icons.Material.Rounded.AddBox" IconColor="Color.Success" OnClick="AddChip" Disabled="@_isDisabled"  title="Add entered skill to the list">Add</MudButton>
+                                                 <MudButton StartIcon="@Icons.Material.Rounded.Refresh" IconColor="Color.Warning" OnClick="ClearChips" Disabled="@_isDisabled" title="Clear skills list">Reset</MudButton>
                                             </MudButtonGroup>
                                         </MudPaper>
                                     </MudItem>
                                 </MudGrid>
                                 <MudGrid Spacing="0" Class="mt-0">
                                     <MudStack Justify="@Justify.Center" Class="mud-width-full">
-                                        <MudChipSet T="string" SelectedColor="Color.Secondary"
+                                         <MudChipSet T="string" SelectedColor="Color.Secondary" Disabled="@_isDisabled"
                                                     AllClosable="@true"
                                                     CheckMark="@true" Size="Size.Medium"
                                                     SelectionMode="@SelectionMode.MultiSelection"
@@ -581,8 +581,8 @@
                                 <MudGrid Spacing="0">                                    
                                     <MudItem xs="6" Class="px-4">
                                         <MudPaper Elevation="0" Class="p-0 w-100 d-flex flex-column">
-                                            <MudSlider @bind-Value="_recruitmentRequest.YearlySalaryRange"  
-                                                Disabled="@(_recruitmentRequest.SalaryRangeType == "Yearly" ? false: true)"
+                                            <MudSlider @bind-Value="_recruitmentRequest.YearlySalaryRange"
+                                                       Disabled="@(_isDisabled || _recruitmentRequest.SalaryRangeType == "Yearly" ? false: true)"
                                                 Min="@_recruitmentRequest.YearlySalaryRangeMin" Max="_recruitmentRequest.YearlySalaryRangeMax"
                                                 Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
                                                 Yearly Salary Range: @(_recruitmentRequest.YearlySalaryRange > _recruitmentRequest.YearlySalaryRangeMin ? $"{_recruitmentRequest.YearlySalaryRangeMin.ToString("N0")} - {_recruitmentRequest.YearlySalaryRange.ToString("N0")} {_recruitmentRequest.YearlySalaryRangeCurrency}" : $"{_recruitmentRequest.YearlySalaryRangeMin.ToString("N0")} {_recruitmentRequest.YearlySalaryRangeCurrency}")
@@ -596,7 +596,7 @@
                                     <MudItem xs="6" Class="px-4">
                                         <MudPaper Elevation="0" Class="p-0 w-100 d-flex flex-column">
                                             <MudSlider @bind-Value="_recruitmentRequest.MonthlySalaryRange" 
-                                                Disabled="@(_recruitmentRequest.SalaryRangeType == "Monthly" ? false: true)"
+                                                Disabled="@(_isDisabled || _recruitmentRequest.SalaryRangeType == "Monthly" ? false: true)"
                                                 Min="@_recruitmentRequest.MonthlySalaryRangeMin" Max="_recruitmentRequest.MonthlySalaryRangeMax"
                                                 Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
                                                 Monthly Salary Range: @(_recruitmentRequest.MonthlySalaryRange > _recruitmentRequest.MonthlySalaryRangeMin ? $"{_recruitmentRequest.MonthlySalaryRangeMin.ToString("N0")} - {_recruitmentRequest.MonthlySalaryRange.ToString("N0")} {_recruitmentRequest.MonthlySalaryRangeCurrency}" : $"{_recruitmentRequest.MonthlySalaryRangeMin.ToString("N0")} {_recruitmentRequest.MonthlySalaryRangeCurrency}")
@@ -611,8 +611,8 @@
                                 <MudGrid Spacing="0">
                                     <MudItem xs="6" Class="px-4">
                                         <MudPaper Elevation="0" Class="p-0 w-100 d-flex flex-column">
-                                            <MudSlider @bind-Value="_recruitmentRequest.DailySalaryRange" 
-                                                Disabled="@(_recruitmentRequest.SalaryRangeType == "Daily" ? false: true)"
+                                            <MudSlider @bind-Value="_recruitmentRequest.DailySalaryRange"
+                                                       Disabled="@(_isDisabled || _recruitmentRequest.SalaryRangeType == "Daily" ? false: true)"
                                                 Min="@_recruitmentRequest.DailySalaryRangeMin" Max="_recruitmentRequest.DailySalaryRangeMax"
                                                 Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
                                                 Daily Salary Range: @(_recruitmentRequest.DailySalaryRange > _recruitmentRequest.DailySalaryRangeMin ? $"{_recruitmentRequest.DailySalaryRangeMin.ToString("N0")} - {_recruitmentRequest.DailySalaryRange.ToString("N0")} {_recruitmentRequest.DailySalaryRangeCurrency}" : $"{_recruitmentRequest.DailySalaryRangeMin.ToString("N0")} {_recruitmentRequest.DailySalaryRangeCurrency}")
@@ -625,8 +625,8 @@
                                     </MudItem>
                                     <MudItem xs="6" Class="px-4">
                                         <MudPaper Elevation="0" Class="p-0 w-100 d-flex flex-column">
-                                            <MudSlider @bind-Value="_recruitmentRequest.HourlySalaryRange" 
-                                                Disabled="@(_recruitmentRequest.SalaryRangeType == "Hourly" ? false: true)"
+                                            <MudSlider @bind-Value="_recruitmentRequest.HourlySalaryRange"
+                                                       Disabled="@(_isDisabled || _recruitmentRequest.SalaryRangeType == "Hourly" ? false: true)"
                                                 Min="@_recruitmentRequest.HourlySalaryRangeMin" Max="_recruitmentRequest.HourlySalaryRangeMax"
                                                 Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled" ValueLabel="true">
                                                 Hourly Salary Range: @(_recruitmentRequest.HourlySalaryRange > _recruitmentRequest.HourlySalaryRangeMin ? $"{_recruitmentRequest.HourlySalaryRangeMin.ToString("N0")} - {_recruitmentRequest.HourlySalaryRange.ToString("N0")} {_recruitmentRequest.HourlySalaryRangeCurrency}" : $"{_recruitmentRequest.HourlySalaryRangeMin.ToString("N0")} {_recruitmentRequest.HourlySalaryRangeCurrency}")
