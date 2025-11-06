@@ -42,5 +42,10 @@ namespace KenHRApp.Domain.Entities
         [Column(TypeName = "datetime")]
         public DateTime? LastUpdateDate { get; set; } = null;
         #endregion
+
+        #region Extended Properties
+        [NotMapped]
+        public List<RecruitmentRequisition> ActiveRecruitmentList { get; set; } = new List<RecruitmentRequisition>();
+        #endregion
     }
 }

@@ -1,7 +1,9 @@
-
 Recruitment Request page:
 
-Fields:
+Business Rules:
+
+
+Form Fields:
 
 TotalWorkExperience:
 Min: 0
@@ -31,7 +33,17 @@ Hourly Salary Range:
 Min: 0
 Max: 100
 
-Development Tasks List:
+To-do Task List:
 
-- Disable the Qualifications List grid after save
--  
+1. Disable the following objects after clicking the Create Requisition button
+	- Qualifications List grid (done)
+	- Add & Reset Skills buttons (done)
+	- Skills chipsets (done)
+	- Monthly Salary Range slider (done)
+2. Hide the "Create Requisition" button then show the following buttons:
+	- Edit
+	- Save
+	- Undo
+	- Refresh
+	- Delete
+	

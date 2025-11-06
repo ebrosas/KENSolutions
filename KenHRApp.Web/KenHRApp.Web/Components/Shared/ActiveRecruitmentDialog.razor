@@ -1,0 +1,139 @@
+﻿@using KenHRApp.Web.Components.Common
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@DialogIcon" Class="mr-1 mb-n1" Size="Size.Medium" Color="@DialogIconColor" />
+            @DialogTitle
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudGrid Spacing="0">
+                <MudItem xs="12" Class="px-0">
+                    <MudAppBar Class="rounded-t-lg mt-0 pt-0 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
+                        <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">ACTIVE RECRUITMENT LIST</MudText>
+                        <MudSpacer />
+                    </MudAppBar>
+                    <MudPaper Elevation="5" Square="true" Class="w-100">
+                        <MudDataGrid T="RecruitmentRequestDTO" Items="@RecruitmentBudget.ActiveRecruitmentList"
+                                     Hover="true" Striped="true" class="qualification-grid"
+                                     Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu"
+                                     FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                                     Hideable="true" PageSize="5"
+                                     EditTrigger="DataGridEditTrigger.Manual" ReadOnly="true" EditMode="DataGridEditMode.Form"
+                                     TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                            <ToolBarContent>
+                                <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                                    <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
+                                                  Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"
+                                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                                    </MudTextField>
+                                </MudPaper>
+                                <MudSpacer />
+                                <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                    <MudSwitch @bind-Value="_enableFilter" Color="Color.Success" UncheckedColor="Color.Default" Style="font-size: 14px;"
+                                               Label="Enable Custom Filter" LabelPlacement="Placement.Start" />
+                                </MudPaper>
+                            </ToolBarContent>
+                            <Columns>
+                                <PropertyColumn Property="x => x.RequisitionId" Hidden Editable="false" />
+                                 <PropertyColumn Property="x => x.Company" Class="col-remarks" />
+                                 <PropertyColumn Property="x => x.DepartmentName" Title="Department" Class="col-qualification" />
+                                 <PropertyColumn Property="x => x.JobTitle" Title="Job Title" Class="col-qualification" />
+                                 <PropertyColumn Property="x => x.PayGradeDesc" Title="Pay Grade" Class="col-qualification" />
+                                 <PropertyColumn Property="x => x.EmploymentType" Title="Employment Type" Class="col-qualification" />
+                                 <PropertyColumn Property="x => x.QualificationMode" Title="Mode" Class="col-stream" />
+                                 <PropertyColumn Property="x => x.PositionType" Title="Position Type" Class="col-specialization" />
+                                 <PropertyColumn Property="x => x.Education" Class="col-remarks" />
+                                 <PropertyColumn Property="x => x.EmployeeClass" Title="Employee Class" Class="col-remarks" />
+                                 <PropertyColumn Property="x => x.Ethnicity" Class="col-remarks" />
+                                 <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                                     <CellTemplate Context="row">
+                                         <MudStack Row>
+                                            <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">View Details</MudButton>
+                                        </MudStack>
+                                    </CellTemplate>
+                                </TemplateColumn>
+                            </Columns>
+                            <NoRecordsContent>
+                                <div class="no-data-box">
+                                    <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
+                                    <span>No data found</span>
+                                </div>
+                            </NoRecordsContent>
+                            <PagerContent>
+                                <MudDataGridPager T="JobQualificationDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                            </PagerContent>
+                        </MudDataGrid>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+
+    <DialogActions>         
+         <MudButton Color="Color.Default" Variant="Variant.Text" Size="Size.Medium" OnClick="Cancel">Cancel</MudButton>
+         <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+ @code {
+    #region Fields
+    private MudForm _form = new();
+    private string _searchString = string.Empty;
+    private bool _enableFilter = false;
+    #endregion
+
+    #region Parameters and Injections
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public string DialogTitle { get; set; } = "Confirmation";
+
+    [Parameter]
+    public string DialogIcon { get; set; } = "fas fa-info-circle";
+
+    [Parameter]
+    public Color DialogIconColor { get; set; } = Color.Info;
+
+    [Parameter]
+    public RecruitmentBudgetDTO RecruitmentBudget { get; set; } = new();
+
+    [Parameter]
+    public List<RecruitmentRequestDTO> RecruitmentList { get; set; } = new List<RecruitmentRequestDTO>();
+
+    [Parameter]
+    public bool IsClearable { get; set; } = true;
+
+    [Parameter]
+    public bool IsDisabled { get; set; } = true;
+
+    [Parameter] 
+    public bool IsEditMode { get; set; }
+    #endregion
+
+    #region Page Methods
+    protected override void OnInitialized()
+    {
+        // public IReadOnlyList<RecruitmentRequisition> ActiveRecruitmentList { get; set; } = new List<RecruitmentRequisition>();
+
+        // if (DepartmentList != null)
+        //     _departmentArray = DepartmentList.Select(d => d.DepartmentName).OrderBy(d => d).ToArray();
+    }
+    #endregion
+
+    #region Private Methods
+    private async Task Save()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        MudDialog.Close(DialogResult.Ok(RecruitmentBudget));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+    
+    #endregion
+}

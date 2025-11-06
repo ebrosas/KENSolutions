@@ -89,7 +89,7 @@
                                                  <CellTemplate Context="row">
                                                      <MudChip T="string" Size=Size.Small Color="Color.Secondary" Label="true" Class="fw-bold" Style="font-size: 14px;">
                                                          @row.Item.DepartmentName
-                                                </MudChip>
+                                                    </MudChip>
                                                 </CellTemplate>
                                                 @* <EditTemplate Context="row">
                                                      <MudAutocomplete @bind-Value="row.Item.DepartmentName"
@@ -135,11 +135,12 @@
                                                 </EditTemplate>
                                             </PropertyColumn>
                                              <PropertyColumn Property="x => x.RequisitionCount" Title="Active Requisitions" Class="col-requisition-count" Editable="false">
-                                                 @* <EditTemplate Context="row">
-                                                     <MudNumericField @bind-Value="row.Item.RequisitionCount" Label="Active Requisitions" Variant="Variant.Outlined"
-                                                                      HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
-                                                                      Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                 </EditTemplate> *@
+                                                 <CellTemplate Context="row">
+                                                    <MudLink Underline="Underline.Always" Disabled="@(row.Item.RequisitionCount > 0 ? false : true)"
+                                                              OnClick="@(() => OpenActiveRecruitments(row.Item))">
+                                                         @row.Item.RequisitionCount
+                                                    </MudLink>
+                                                </CellTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.ExitCount" Title="Exit Employees" Class="col-exit-count">
                                                  <EditTemplate Context="row">

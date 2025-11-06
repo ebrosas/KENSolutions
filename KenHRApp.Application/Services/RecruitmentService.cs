@@ -53,6 +53,7 @@ namespace KenHRApp.Application.Services
                     Remarks = e.Remarks,
                     CreatedDate = e.CreatedDate,
                     LastUpdateDate = e.LastUpdateDate
+                    //ActiveRecruitmentList = e.ActiveRecruitmentList
                 }).ToList();
 
                 return Result<List<RecruitmentBudgetDTO>>.SuccessResult(budgetList);

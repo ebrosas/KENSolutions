@@ -457,6 +457,96 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
             }            
         }
+
+        private async Task OpenActiveRecruitments(RecruitmentBudgetDTO budget)
+        {
+            try
+            {
+                // Clone the object so the dialog can edit without affecting the grid until Save
+                var editableCopy = new RecruitmentBudgetDTO
+                {
+                    BudgetId = budget.BudgetId,
+                    DepartmentCode = budget.DepartmentCode,
+                    DepartmentName = budget.DepartmentName,
+                    BudgetDescription = budget.BudgetDescription,
+                    BudgetHeadCount = budget.BudgetHeadCount,
+                    ActiveCount = budget.ActiveCount,
+                    ExitCount = budget.ExitCount,
+                    RequisitionCount = budget.RequisitionCount,
+                    NetGapCount = budget.NetGapCount,
+                    NewIndentCount = budget.NewIndentCount,
+                    OnHold = budget.OnHold,
+                    Remarks = budget.Remarks,
+                    CreatedDate = budget.CreatedDate,
+                    LastUpdateDate = budget.LastUpdateDate,
+                    ActiveRecruitmentList = budget.ActiveRecruitmentList
+                };
+
+                var parameters = new DialogParameters
+                {
+                    ["RecruitmentBudget"] = editableCopy,
+                    //["RecruitmentList"] = budget.ActiveRecruitmentList,
+                    ["DialogTitle"] = "Active Recruitments",
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = true
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                var dialog = await DialogService.ShowAsync<ActiveRecruitmentDialog>("Active Recruitments", parameters, options);
+                var result = await dialog.Result;
+
+                if (result != null && !result.Canceled)
+                {
+                    var updated = (RecruitmentBudgetDTO)result.Data!;
+
+                    //#region Get selected department
+                    //if (!string.IsNullOrEmpty(updated.DepartmentName))
+                    //{
+                    //    DepartmentDTO? department = _departmentList.Where(d => d.DepartmentName == updated.DepartmentName).FirstOrDefault();
+                    //    if (department != null)
+                    //        updated.DepartmentCode = department.DepartmentCode;
+                    //}
+                    //#endregion
+
+                    //// Update in-memory grid item
+                    //var index = _budgetList.FindIndex(x => x.BudgetId == updated.BudgetId);
+                    //if (index >= 0)
+                    //{
+                    //    _budgetList[index] = updated;
+                    //    await InvokeAsync(StateHasChanged);
+                    //}
+
+                    //#region Persist changes to DB
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
+
+                    //// Set the overlay message
+                    //overlayMessage = "Saving budget changes, please wait...";
+
+                    //_ = SaveChangeAsync(async () =>
+                    //{
+                    //    _isRunning = false;
+
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, updated);
+                    //#endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
         #endregion
 
         #region Private Methods

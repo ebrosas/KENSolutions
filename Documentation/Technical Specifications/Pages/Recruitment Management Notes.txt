@@ -1,0 +1,9 @@
+Recruitment Request page:
+
+Business Rules:
+* Formula for computing the value of Net Gap field:
+	Net Gap = Headcount Budget - (Active Employees + Active Requisition) + Exit Employees
+
+
+
+	

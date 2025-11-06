@@ -1,4 +1,5 @@
 ﻿using KenHRApp.Application.Common.Validations;
+using KenHRApp.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -69,6 +70,8 @@ namespace KenHRApp.Application.DTOs
             get { return OnHold ? "Yes" : "No"; }
             set { }
         }
+
+        public List<RecruitmentRequestDTO> ActiveRecruitmentList { get; set; } = new List<RecruitmentRequestDTO>();
         #endregion
 
         #region Public Methods

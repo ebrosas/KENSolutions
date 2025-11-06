@@ -638,13 +638,13 @@ namespace KenHRApp.Web.Components.Pages
         private async Task ShowDeleteDialog()
         {
             var parameters = new DialogParameters
-        {
-            { "DialogTitle", "Confirm Delete"},
-            { "DialogIcon", _iconDelete },
-            { "ContentText", "Do you really want to delete this record? Note that this process cannot be undone." },
-            { "ConfirmText", "Delete" },
-            { "Color", Color.Error }
-        };
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", "Do you really want to delete this record? Note that this process cannot be undone." },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error }
+            };
 
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.TopCenter, CloseOnEscapeKey = true };
             var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Confirmation:", parameters, options);

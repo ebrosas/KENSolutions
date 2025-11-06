@@ -5,6 +5,11 @@
 	SELECT * FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
 	ORDER BY a.UDCGDesc1
 
+	--General
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'CUSTOMERLIST')
+
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = 8
@@ -33,11 +38,7 @@
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'ATTENDANCEMODE')
-
-	--General
-	SELECT a.* 
-	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
-	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'CURRENCYTYPE')
+		
 
 	SELECT a.EmployeeId, a.EmployeeNo, 
 		a.EmploymentTypeCode, a.RoleCode, a.JobTitleCode, a.FirstAttendanceModeCode, a.SecondAttendanceModeCode, a.ThirdAttendanceModeCode,
@@ -81,7 +82,8 @@
 
 	SELECT * FROM kenuser.RecruitmentBudget a
 
-	
+	SELECT * FROM [kenuser].[RecruitmentRequest] a
+	WHERE a.DepartmentCode = '7600'
 
 /*	Data updates:
 

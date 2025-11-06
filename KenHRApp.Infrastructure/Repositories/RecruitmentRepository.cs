@@ -43,26 +43,46 @@ namespace KenHRApp.Infrastructure.Repositories
 
                 if (model != null)
                 {
-                    #region Initialize entity list
+                    #region Initialize entity list                    
+                    RecruitmentBudget budget;
+
                     foreach (var item in model)
                     {
-                        budgetList.Add(new RecruitmentBudget()
+                        budget = new RecruitmentBudget()
                         {
                             BudgetId = item.RecruitmentBudget.BudgetId,
                             DepartmentCode = item.RecruitmentBudget.DepartmentCode,
                             DepartmentName = item.DepartmentName,
                             BudgetHeadCount = item.RecruitmentBudget.BudgetHeadCount,
-                            BudgetDescription = item.RecruitmentBudget.BudgetDescription,   
+                            BudgetDescription = item.RecruitmentBudget.BudgetDescription,
                             ActiveCount = item.RecruitmentBudget.ActiveCount,
                             ExitCount = item.RecruitmentBudget.ExitCount,
                             RequisitionCount = item.RecruitmentBudget.RequisitionCount,
-                            NetGapCount = item.RecruitmentBudget.NetGapCount,
                             NewIndentCount = item.RecruitmentBudget.NewIndentCount,
                             OnHold = item.RecruitmentBudget.OnHold,
                             Remarks = item.RecruitmentBudget.Remarks,
                             CreatedDate = item.RecruitmentBudget.CreatedDate,
                             LastUpdateDate = item.RecruitmentBudget.LastUpdateDate
-                        });
+                        };
+
+                        // Calculate the Net Gap Count
+                        budget.NetGapCount = budget.BudgetHeadCount - (budget.ActiveCount ?? 0  + budget.RequisitionCount ?? 0) + budget.ExitCount;
+
+                        #region Find the number of active Recruitment Requisitions
+                        var recruitmentList = await _db.RecruitmentRequests.Where(a => a.DepartmentCode.Trim() == budget.DepartmentCode.Trim()).ToListAsync();
+                        if (recruitmentList != null && recruitmentList.Any())
+                        {
+                            budget.RequisitionCount = recruitmentList.Count;
+                            budget.ActiveRecruitmentList = recruitmentList;
+                        }
+                        else
+                        {
+                            budget.RequisitionCount = 0;
+                        }
+                        #endregion
+
+                        // Add to the list
+                        budgetList.Add(budget);
                     }
                     #endregion
                 }
