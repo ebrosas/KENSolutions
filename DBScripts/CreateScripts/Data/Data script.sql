@@ -85,6 +85,8 @@
 	SELECT * FROM [kenuser].[RecruitmentRequest] a
 	WHERE a.DepartmentCode = '7600'
 
+	select * from [kenuser].[JobQualification] a
+
 /*	Data updates:
 
 	BEGIN TRAN T1

@@ -2,6 +2,8 @@
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -69,37 +71,87 @@ namespace KenHRApp.Infrastructure.Repositories
                         // Calculate the Net Gap Count
                         budget.NetGapCount = budget.BudgetHeadCount - (budget.ActiveCount ?? 0  + budget.RequisitionCount ?? 0) + budget.ExitCount;
 
-                        #region Find the number of active Recruitment Requisitions
-                        var recruitmentList = await _db.RecruitmentRequests.Where(a => a.DepartmentCode.Trim() == budget.DepartmentCode.Trim()).ToListAsync();
-                        if (recruitmentList != null && recruitmentList.Any())
+                        #region Get the active recruitment requisitions for each department code
+                        if (!string.IsNullOrEmpty(budget.DepartmentCode))
                         {
-                            requisitionList = recruitmentList!.Select(a => new RecruitmentRequisition
+                            var repoResult = await GetRecruitmentListAsync(budget.DepartmentCode);
+                            if (repoResult.Success)
                             {
-                                RequisitionId = a.RequisitionId,
-                                EmploymentTypeCode = a.EmploymentTypeCode,
-                                EmploymentType = a.EmploymentType,
-                                QualificationModeCode = a.QualificationModeCode,
-                                QualificationMode = a.QualificationMode,
-                                PositionTypeCode = a.PositionTypeCode,
-                                PositionType = a.PositionType,
-                                InterviewProcessCode = a.InterviewProcessCode,
-                                InterviewProcess = a.InterviewProcess,
-                                IsPreAssessment = a.IsPreAssessment,
-                                CompanyCode = a.CompanyCode,
-                                Company = a.Company,
-                                DepartmentCode = a.DepartmentCode,
-                                DepartmentName = a.DepartmentName,
-                                CountryCode = a.CountryCode,
-                                Country = a.Country,
-                                EducationCode = a.EducationCode,
-                                Education = a.Education,
-                                EmployeeClassCode = a.EmployeeClassCode,
-                                EmployeeClass = a.EmployeeClass,
-                                JobTitle = a.JobTitle,
-                                PayGradeDesc = a.PayGradeDesc,
-                                Ethnicity = a.Ethnicity
-                            }).ToList();
+                                requisitionList = repoResult.Value!.Select(e => new RecruitmentRequisition
+                                {
+                                    RequisitionId = e.RequisitionId,
+                                    EmploymentTypeCode = e.EmploymentTypeCode,
+                                    EmploymentType = e.EmploymentType,
+                                    QualificationModeCode = e.QualificationModeCode,
+                                    QualificationMode = e.QualificationMode,
+                                    PositionTypeCode = e.PositionTypeCode,
+                                    PositionType = e.PositionType,
+                                    InterviewProcessCode = e.InterviewProcessCode,
+                                    InterviewProcess = e.InterviewProcess,
+                                    IsPreAssessment = e.IsPreAssessment,
+                                    CompanyCode = e.CompanyCode,
+                                    Company = e.Company,
+                                    DepartmentCode = e.DepartmentCode,
+                                    DepartmentName = e.DepartmentName,
+                                    CountryCode = e.CountryCode,
+                                    Country = e.Country,
+                                    EducationCode = e.EducationCode,
+                                    Education = e.Education,
+                                    EmployeeClassCode = e.EmployeeClassCode,
+                                    EmployeeClass = e.EmployeeClass,
+                                    EthnicityCode = e.EthnicityCode,
+                                    Ethnicity = e.Ethnicity,
+                                    JobTitleCode = e.JobTitleCode,
+                                    JobTitle = e.JobTitle,
+                                    PayGradeCode = e.PayGradeCode,
+                                    PayGradeDesc = e.PayGradeDesc,
+                                    PositionDescription = e.PositionDescription,
+                                    TotalWorkExperience = e.TotalWorkExperience,
+                                    MinWorkExperience = e.MinWorkExperience,
+                                    MaxWorkExperience = e.MaxWorkExperience,
+                                    TotalRelevantExperience = e.TotalRelevantExperience,
+                                    MinRelevantExperience = e.MinRelevantExperience,
+                                    MaxRelevantExperience = e.MaxRelevantExperience,
+                                    AgeRange = e.AgeRange,
+                                    MinAge = e.MinAge,
+                                    MaxAge = e.MaxAge,
+                                    RequiredGender = e.RequiredGender,
+                                    RequiredAsset = e.RequiredAsset,
+                                    VideoDescriptionURL = e.VideoDescriptionURL,
+                                    SalaryRangeType = e.SalaryRangeType,
+                                    YearlySalaryRange = e.YearlySalaryRange,
+                                    YearlySalaryRangeMin = e.YearlySalaryRangeMin,
+                                    YearlySalaryRangeMax = e.YearlySalaryRangeMax,
+                                    YearlySalaryRangeCurrency = e.YearlySalaryRangeCurrency,
+                                    MonthlySalaryRange = e.MonthlySalaryRange,
+                                    MonthlySalaryRangeMin = e.MonthlySalaryRangeMin,
+                                    MonthlySalaryRangeMax = e.MonthlySalaryRangeMax,
+                                    MonthlySalaryRangeCurrency = e.MonthlySalaryRangeCurrency,
+                                    DailySalaryRange = e.DailySalaryRange,
+                                    DailySalaryRangeMin = e.DailySalaryRangeMin,
+                                    DailySalaryRangeMax = e.DailySalaryRangeMax,
+                                    DailySalaryRangeCurrency = e.DailySalaryRangeCurrency,
+                                    HourlySalaryRange = e.HourlySalaryRange,
+                                    HourlySalaryRangeMin = e.HourlySalaryRangeMin,
+                                    HourlySalaryRangeMax = e.HourlySalaryRangeMax,
+                                    HourlySalaryRangeCurrency = e.HourlySalaryRangeCurrency,
+                                    Responsibilities = e.Responsibilities,
+                                    Competencies = e.Competencies,
+                                    GeneralRemarks = e.GeneralRemarks,
+                                    CreatedByNo = e.CreatedByNo,
+                                    CreatedByUserID = e.CreatedByUserID,
+                                    CreatedByName = e.CreatedByName,
+                                    CreatedDate = e.CreatedDate,
+                                    LastUpdatedByNo = e.LastUpdatedByNo,
+                                    LastUpdatedUserID = e.LastUpdatedUserID,
+                                    LastUpdatedName = e.LastUpdatedName,
+                                    LastUpdateDate = e.LastUpdateDate
+                                }).ToList();
+                            }
+                        }
 
+                        if (requisitionList != null && requisitionList.Any())
+                        {
                             budget.RequisitionCount = requisitionList.Count;
                             budget.ActiveRecruitmentList = requisitionList;
                         }
@@ -119,6 +171,140 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 // Log error here if needed (Serilog, NLog, etc.)
                 return Result<List<RecruitmentBudget>?>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<List<RecruitmentRequisition>?>> GetRecruitmentListAsync(string? departmentCode)
+        {
+            List<RecruitmentRequisition> recruitmentList = new List<RecruitmentRequisition>();
+
+            try
+            {
+                var model = await (from r in _db.RecruitmentRequests
+                                   join dm in _db.DepartmentMasters on r.DepartmentCode equals dm.DepartmentCode
+                                   join et in _db.UserDefinedCodes on r.EmploymentTypeCode equals et.UDCCode
+                                   join pt in _db.UserDefinedCodes on r.PositionTypeCode equals pt.UDCCode
+                                   join com in _db.UserDefinedCodes on r.CompanyCode equals com.UDCCode
+                                   join ec in _db.UserDefinedCodes on r.EmployeeClassCode equals ec.UDCCode
+                                   join jt in _db.UserDefinedCodes on r.JobTitleCode equals jt.UDCCode
+                                   join pg in _db.UserDefinedCodes on r.PayGradeCode equals pg.UDCCode
+                                   join qm in _db.UserDefinedCodes on r.QualificationModeCode equals qm.UDCCode
+                                   join ip in _db.UserDefinedCodes on r.InterviewProcessCode equals ip.UDCCode
+                                   join country in _db.UserDefinedCodes on r.CountryCode equals country.UDCCode into gjCountry from subCountry in gjCountry.DefaultIfEmpty()
+                                   join education in _db.UserDefinedCodes on r.EducationCode equals education.UDCCode into gjEducation from subEducation in gjEducation.DefaultIfEmpty()
+                                   join ethnicity in _db.UserDefinedCodes on r.EthnicityCode equals ethnicity.UDCCode into gjEthnicity from subEthnicity in gjEthnicity.DefaultIfEmpty()
+                                   where (r.DepartmentCode == departmentCode) 
+                                   //&& r.EmploymentTypeCode == et.UDCCode
+                                   //&& r.PositionTypeCode == pt.UDCCode && r.CompanyCode == com.UDCCode
+                                   //&& r.EmployeeClassCode == ec.UDCCode && r.JobTitleCode == jt.UDCCode
+                                   //&& r.PayGradeCode == pg.UDCCode)
+                                   select new
+                                   {
+                                       RecruitmentRequest = r,
+                                       DepartmentName = dm.DepartmentName,
+                                       EmploymentType = et.UDCDesc1,
+                                       QualificationMode = qm.UDCDesc1,
+                                       PositionType = pt.UDCDesc1,
+                                       InterviewProcess = ip.UDCDesc1,
+                                       Company = com.UDCDesc1,
+                                       Country = subCountry != null ? subCountry.UDCDesc1 : null,
+                                       Education = subEducation != null ? subEducation.UDCDesc1 : null,
+                                       EmployeeClass = ec.UDCDesc1,
+                                       Ethnicity = subEthnicity != null ? subEthnicity.UDCDesc1 : null,
+                                       JobTitle = jt.UDCDesc1,
+                                       PayGradeDesc = pg.UDCDesc1
+                                   }).ToListAsync();
+
+                if (model != null)
+                {
+                    #region Initialize entity list                    
+                    RecruitmentRequisition recruitment;
+
+                    foreach (var item in model)
+                    {
+                        recruitment = new RecruitmentRequisition()
+                        {
+                            RequisitionId = item.RecruitmentRequest.RequisitionId,
+                            EmploymentTypeCode = item.RecruitmentRequest.EmploymentTypeCode,
+                            EmploymentType = item.EmploymentType,
+                            QualificationModeCode = item.RecruitmentRequest.QualificationModeCode,
+                            QualificationMode = item.QualificationMode,
+                            PositionTypeCode = item.RecruitmentRequest.PositionTypeCode,
+                            PositionType = item.PositionType,
+                            InterviewProcessCode = item.RecruitmentRequest.InterviewProcessCode,
+                            InterviewProcess = item.InterviewProcess,
+                            IsPreAssessment = item.RecruitmentRequest.IsPreAssessment,
+                            CompanyCode = item.RecruitmentRequest.CompanyCode,
+                            Company = item.Company,
+                            DepartmentCode = item.RecruitmentRequest.DepartmentCode,
+                            DepartmentName = item.DepartmentName,
+                            CountryCode = item.RecruitmentRequest.CountryCode,
+                            Country = item.Country,
+                            EducationCode = item.RecruitmentRequest.EducationCode,
+                            Education = item.Education,
+                            EmployeeClassCode = item.RecruitmentRequest.EmployeeClassCode,
+                            EmployeeClass = item.EmployeeClass,
+                            EthnicityCode = item.RecruitmentRequest.EthnicityCode,
+                            Ethnicity = item.Ethnicity,
+                            JobTitleCode = item.RecruitmentRequest.JobTitleCode,
+                            JobTitle = item.JobTitle,
+                            PayGradeCode = item.RecruitmentRequest.PayGradeCode,
+                            PayGradeDesc = item.PayGradeDesc,
+                            PositionDescription = item.RecruitmentRequest.PositionDescription,
+                            TotalWorkExperience = item.RecruitmentRequest.TotalWorkExperience,
+                            MinWorkExperience = item.RecruitmentRequest.MinWorkExperience,
+                            MaxWorkExperience = item.RecruitmentRequest.MaxWorkExperience,
+                            TotalRelevantExperience = item.RecruitmentRequest.TotalRelevantExperience,
+                            MinRelevantExperience = item.RecruitmentRequest.MinRelevantExperience,
+                            MaxRelevantExperience = item.RecruitmentRequest.MaxRelevantExperience,
+                            AgeRange = item.RecruitmentRequest.AgeRange,
+                            MinAge = item.RecruitmentRequest.MinAge,
+                            MaxAge = item.RecruitmentRequest.MaxAge,
+                            RequiredGender = item.RecruitmentRequest.RequiredGender,
+                            RequiredAsset = item.RecruitmentRequest.RequiredAsset,
+                            VideoDescriptionURL = item.RecruitmentRequest.VideoDescriptionURL,
+                            SalaryRangeType = item.RecruitmentRequest.SalaryRangeType,
+                            YearlySalaryRange = item.RecruitmentRequest.YearlySalaryRange,
+                            YearlySalaryRangeMin = item.RecruitmentRequest.YearlySalaryRangeMin,
+                            YearlySalaryRangeMax = item.RecruitmentRequest.YearlySalaryRangeMax,
+                            YearlySalaryRangeCurrency = item.RecruitmentRequest.YearlySalaryRangeCurrency,
+                            MonthlySalaryRange = item.RecruitmentRequest.MonthlySalaryRange,
+                            MonthlySalaryRangeMin = item.RecruitmentRequest.MonthlySalaryRangeMin,
+                            MonthlySalaryRangeMax = item.RecruitmentRequest.MonthlySalaryRangeMax,
+                            MonthlySalaryRangeCurrency = item.RecruitmentRequest.MonthlySalaryRangeCurrency,
+                            DailySalaryRange = item.RecruitmentRequest.DailySalaryRange,
+                            DailySalaryRangeMin = item.RecruitmentRequest.DailySalaryRangeMin,
+                            DailySalaryRangeMax = item.RecruitmentRequest.DailySalaryRangeMax,
+                            DailySalaryRangeCurrency = item.RecruitmentRequest.DailySalaryRangeCurrency,
+                            HourlySalaryRange = item.RecruitmentRequest.HourlySalaryRange,
+                            HourlySalaryRangeMin = item.RecruitmentRequest.HourlySalaryRangeMin,
+                            HourlySalaryRangeMax = item.RecruitmentRequest.HourlySalaryRangeMax,
+                            HourlySalaryRangeCurrency = item.RecruitmentRequest.HourlySalaryRangeCurrency,
+                            Responsibilities = item.RecruitmentRequest.Responsibilities,
+                            Competencies = item.RecruitmentRequest.Competencies,
+                            GeneralRemarks = item.RecruitmentRequest.GeneralRemarks,
+                            CreatedByNo = item.RecruitmentRequest.CreatedByNo,
+                            CreatedByUserID = item.RecruitmentRequest.CreatedByUserID,
+                            CreatedByName = item.RecruitmentRequest.CreatedByName,
+                            CreatedDate = item.RecruitmentRequest.CreatedDate,
+                            LastUpdatedByNo = item.RecruitmentRequest.LastUpdatedByNo,
+                            LastUpdatedUserID = item.RecruitmentRequest.LastUpdatedUserID,
+                            LastUpdatedName = item.RecruitmentRequest.LastUpdatedName,
+                            LastUpdateDate = item.RecruitmentRequest.LastUpdateDate
+                        };
+
+                        // Add to the list
+                        recruitmentList.Add(recruitment);
+                    }
+                    #endregion
+                }
+
+                return Result<List<RecruitmentRequisition>?>.SuccessResult(recruitmentList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<RecruitmentRequisition>?>.Failure($"Database error: {ex.Message}");
             }
         }
 
