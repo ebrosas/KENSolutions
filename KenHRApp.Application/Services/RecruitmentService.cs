@@ -52,8 +52,33 @@ namespace KenHRApp.Application.Services
                     OnHold = e.OnHold.HasValue ? Convert.ToBoolean(e.OnHold) : false,
                     Remarks = e.Remarks,
                     CreatedDate = e.CreatedDate,
-                    LastUpdateDate = e.LastUpdateDate
-                    //ActiveRecruitmentList = e.ActiveRecruitmentList
+                    LastUpdateDate = e.LastUpdateDate,
+                    ActiveRecruitmentList = e.ActiveRecruitmentList!.Select(a => new RecruitmentRequestDTO
+                    {
+                        RequisitionId = a.RequisitionId,
+                        //EmploymentTypeCode = a.EmploymentTypeCode,
+                        //EmploymentType = a.EmploymentType,
+                        //QualificationModeCode = a.QualificationModeCode,
+                        QualificationMode = a.QualificationMode,
+                        //PositionTypeCode = a.PositionTypeCode,
+                        PositionType = a.PositionType,
+                        //InterviewProcessCode = a.InterviewProcessCode,
+                        //InterviewProcess = a.InterviewProcess,
+                        //IsPreAssessment = a.IsPreAssessment,
+                        //CompanyCode = a.CompanyCode,
+                        Company = a.Company,
+                        //DepartmentCode = a.DepartmentCode,
+                        DepartmentName = a.DepartmentName,
+                        //CountryCode = a.CountryCode,
+                        //Country = a.Country,
+                        //EducationCode = a.EducationCode,
+                        Education = a.Education,
+                        //EmployeeClassCode = a.EmployeeClassCode,
+                        EmployeeClass = a.EmployeeClass,
+                        JobTitle = a.JobTitle,
+                        PayGradeDesc = a.PayGradeDesc,
+                        Ethnicity = a.Ethnicity
+                    }).ToList()
                 }).ToList();
 
                 return Result<List<RecruitmentBudgetDTO>>.SuccessResult(budgetList);

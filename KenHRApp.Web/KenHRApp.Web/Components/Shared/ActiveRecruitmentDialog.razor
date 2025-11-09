@@ -12,7 +12,7 @@
             <MudGrid Spacing="0">
                 <MudItem xs="12" Class="px-0">
                     <MudAppBar Class="rounded-t-lg mt-0 pt-0 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
-                        <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">ACTIVE RECRUITMENT LIST</MudText>
+                        <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">REQUISITION LIST</MudText>
                         <MudSpacer />
                     </MudAppBar>
                     <MudPaper Elevation="5" Square="true" Class="w-100">
@@ -51,7 +51,7 @@
                                  <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                                      <CellTemplate Context="row">
                                          <MudStack Row>
-                                            <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">View Details</MudButton>
+                                            <MudButton Size="@Size.Small" Variant="@Variant.Outlined" Color="@Color.Secondary">View Details</MudButton>
                                         </MudStack>
                                     </CellTemplate>
                                 </TemplateColumn>
@@ -62,8 +62,8 @@
                                     <span>No data found</span>
                                 </div>
                             </NoRecordsContent>
-                            <PagerContent>
-                                <MudDataGridPager T="JobQualificationDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                            <PagerContent>                                
+                                <MudDataGridPager T="RecruitmentRequestDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />                                
                             </PagerContent>
                         </MudDataGrid>
                     </MudPaper>
@@ -72,9 +72,10 @@
         </MudForm>
     </DialogContent>
 
-    <DialogActions>         
-         <MudButton Color="Color.Default" Variant="Variant.Text" Size="Size.Medium" OnClick="Cancel">Cancel</MudButton>
-         <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
+    <DialogActions>
+        <MudPaper Class="me-3">
+            <MudButton Color="Color.Info" Variant="Variant.Filled" Size="Size.Small" OnClick="Okay">Close</MudButton>
+        </MudPaper>
     </DialogActions>
 </MudDialog>
 
@@ -117,6 +118,8 @@
     #region Page Methods
     protected override void OnInitialized()
     {
+        int activeCount = RecruitmentBudget.ActiveRecruitmentList.Count;
+
         // public IReadOnlyList<RecruitmentRequisition> ActiveRecruitmentList { get; set; } = new List<RecruitmentRequisition>();
 
         // if (DepartmentList != null)
@@ -134,6 +137,7 @@
     }
 
     private void Cancel() => MudDialog.Cancel();
+    private void Okay() => MudDialog.Close(DialogResult.Ok(RecruitmentBudget));
     
     #endregion
 }

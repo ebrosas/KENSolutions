@@ -478,9 +478,39 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     OnHold = budget.OnHold,
                     Remarks = budget.Remarks,
                     CreatedDate = budget.CreatedDate,
-                    LastUpdateDate = budget.LastUpdateDate,
-                    ActiveRecruitmentList = budget.ActiveRecruitmentList
+                    LastUpdateDate = budget.LastUpdateDate
+                    //ActiveRecruitmentList = budget.ActiveRecruitmentList
                 };
+
+                List<RecruitmentRequestDTO> requisitionList = new List<RecruitmentRequestDTO>();
+                requisitionList.Add(new RecruitmentRequestDTO()
+                {
+                    RequisitionId = 2,
+                    EmploymentTypeCode = "ETYPFULLTIME",
+                    EmploymentType = "Full Time",
+                    QualificationModeCode = "QMFULLTIME",
+                    QualificationMode = "Full Time",
+                    PositionTypeCode = "POSTYPNEW",
+                    PositionType = "New",
+                    InterviewProcessCode = "INTPRCPARALLEL",
+                    InterviewProcess = "Parallel",
+                    IsPreAssessment = true,
+                    CompanyCode = "CUSTGARMCO",
+                    Company = "GARMCO",
+                    DepartmentCode = "7600",
+                    DepartmentName = "ICT",
+                    CountryCode = "BH",
+                    Country = "Bahrain",
+                    EducationCode = "ELCOLLEGEGRAD",
+                    Education = "College Graduate",
+                    EmployeeClassCode = "ECBAHRAINI",
+                    EmployeeClass = "Bahraini",
+                    JobTitle = "000676",
+                    PayGradeDesc = "Accountant",
+                    Ethnicity = "Bahraini"
+                });
+
+                editableCopy.ActiveRecruitmentList = requisitionList;
 
                 var parameters = new DialogParameters
                 {

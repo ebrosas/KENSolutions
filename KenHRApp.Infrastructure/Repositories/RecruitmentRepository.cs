@@ -45,6 +45,7 @@ namespace KenHRApp.Infrastructure.Repositories
                 {
                     #region Initialize entity list                    
                     RecruitmentBudget budget;
+                    List<RecruitmentRequisition> requisitionList = new List<RecruitmentRequisition>();
 
                     foreach (var item in model)
                     {
@@ -72,13 +73,38 @@ namespace KenHRApp.Infrastructure.Repositories
                         var recruitmentList = await _db.RecruitmentRequests.Where(a => a.DepartmentCode.Trim() == budget.DepartmentCode.Trim()).ToListAsync();
                         if (recruitmentList != null && recruitmentList.Any())
                         {
-                            budget.RequisitionCount = recruitmentList.Count;
-                            budget.ActiveRecruitmentList = recruitmentList;
+                            requisitionList = recruitmentList!.Select(a => new RecruitmentRequisition
+                            {
+                                RequisitionId = a.RequisitionId,
+                                EmploymentTypeCode = a.EmploymentTypeCode,
+                                EmploymentType = a.EmploymentType,
+                                QualificationModeCode = a.QualificationModeCode,
+                                QualificationMode = a.QualificationMode,
+                                PositionTypeCode = a.PositionTypeCode,
+                                PositionType = a.PositionType,
+                                InterviewProcessCode = a.InterviewProcessCode,
+                                InterviewProcess = a.InterviewProcess,
+                                IsPreAssessment = a.IsPreAssessment,
+                                CompanyCode = a.CompanyCode,
+                                Company = a.Company,
+                                DepartmentCode = a.DepartmentCode,
+                                DepartmentName = a.DepartmentName,
+                                CountryCode = a.CountryCode,
+                                Country = a.Country,
+                                EducationCode = a.EducationCode,
+                                Education = a.Education,
+                                EmployeeClassCode = a.EmployeeClassCode,
+                                EmployeeClass = a.EmployeeClass,
+                                JobTitle = a.JobTitle,
+                                PayGradeDesc = a.PayGradeDesc,
+                                Ethnicity = a.Ethnicity
+                            }).ToList();
+
+                            budget.RequisitionCount = requisitionList.Count;
+                            budget.ActiveRecruitmentList = requisitionList;
                         }
                         else
-                        {
                             budget.RequisitionCount = 0;
-                        }
                         #endregion
 
                         // Add to the list
