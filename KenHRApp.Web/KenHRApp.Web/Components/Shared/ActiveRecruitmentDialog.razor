@@ -1,5 +1,8 @@
 ﻿@using KenHRApp.Web.Components.Common
 
+@inject IAppState AppState 
+@inject NavigationManager NavigationManager
+
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
@@ -17,7 +20,7 @@
                     </MudAppBar>
                     <MudPaper Elevation="5" Square="true" Class="w-100">
                         <MudDataGrid T="RecruitmentRequestDTO" Items="@RecruitmentBudget.ActiveRecruitmentList"
-                                     Hover="true" Striped="true" class="qualification-grid"
+                                     Hover="true" Striped="true" class="recruitment-grid"
                                      Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu"
                                      FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                                      Hideable="true" PageSize="5"
@@ -37,21 +40,21 @@
                                 </MudPaper>
                             </ToolBarContent>
                             <Columns>
-                                <PropertyColumn Property="x => x.RequisitionId" Hidden Editable="false" />
-                                 <PropertyColumn Property="x => x.Company" Class="col-remarks" />
-                                 <PropertyColumn Property="x => x.DepartmentName" Title="Department" Class="col-qualification" />
-                                 <PropertyColumn Property="x => x.JobTitle" Title="Job Title" Class="col-qualification" />
-                                 <PropertyColumn Property="x => x.PayGradeDesc" Title="Pay Grade" Class="col-qualification" />
-                                 <PropertyColumn Property="x => x.EmploymentType" Title="Employment Type" Class="col-qualification" />
-                                 <PropertyColumn Property="x => x.QualificationMode" Title="Mode" Class="col-stream" />
-                                 <PropertyColumn Property="x => x.PositionType" Title="Position Type" Class="col-specialization" />
-                                 <PropertyColumn Property="x => x.Education" Class="col-remarks" />
-                                 <PropertyColumn Property="x => x.EmployeeClass" Title="Employee Class" Class="col-remarks" />
-                                 <PropertyColumn Property="x => x.Ethnicity" Class="col-remarks" />
+                                <PropertyColumn Property="x => x.RequisitionId" Title="Requisition No." Class="col-requisition-id" />
+                                <PropertyColumn Property="x => x.Company" Class="col-company" />
+                                <PropertyColumn Property="x => x.DepartmentName" Title="Department" Class="col-department" />
+                                <PropertyColumn Property="x => x.JobTitle" Title="Job Title" Class="col-job-title" />
+                                <PropertyColumn Property="x => x.PayGradeDesc" Title="Pay Grade" Class="col-pay-grade" />
+                                <PropertyColumn Property="x => x.EmploymentType" Title="Employment Type" Class="col-employment-type" />
+                                <PropertyColumn Property="x => x.QualificationMode" Title="Mode" Class="col-mode" />
+                                <PropertyColumn Property="x => x.PositionType" Title="Position Type" Class="col-position-type" />
+                                <PropertyColumn Property="x => x.Education" Class="col-education" />
+                                <PropertyColumn Property="x => x.EmployeeClass" Title="Employee Class" Class="col-employee-class" />
+                                <PropertyColumn Property="x => x.Ethnicity" Class="col-ethnicity" />
                                  <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                                      <CellTemplate Context="row">
                                          <MudStack Row>
-                                            <MudButton Size="@Size.Small" Variant="@Variant.Outlined" Color="@Color.Secondary">View Details</MudButton>
+                                            <MudButton Size="@Size.Small" Variant="@Variant.Outlined" Color="@Color.Secondary" OnClick="@(()=>OpenRequisition(row.Item))">View Details</MudButton>
                                         </MudStack>
                                     </CellTemplate>
                                 </TemplateColumn>
@@ -119,11 +122,7 @@
     protected override void OnInitialized()
     {
         int activeCount = RecruitmentBudget.ActiveRecruitmentList.Count;
-
-        // public IReadOnlyList<RecruitmentRequisition> ActiveRecruitmentList { get; set; } = new List<RecruitmentRequisition>();
-
-        // if (DepartmentList != null)
-        //     _departmentArray = DepartmentList.Select(d => d.DepartmentName).OrderBy(d => d).ToArray();
+                
     }
     #endregion
 
@@ -138,6 +137,14 @@
 
     private void Cancel() => MudDialog.Cancel();
     private void Okay() => MudDialog.Close(DialogResult.Ok(RecruitmentBudget));
-    
+
+    private void OpenRequisition(RecruitmentRequestDTO recruitment)
+    {
+        // Pass via NavigationManager and a shared state service
+        AppState.RecruitmentRequest = recruitment;
+
+        // Open the requisition form
+        NavigationManager.NavigateTo($"/Recruitment/recruitmentrequest?RequisitionId={recruitment.RequisitionId}&ActionType=View");
+    }
     #endregion
 }

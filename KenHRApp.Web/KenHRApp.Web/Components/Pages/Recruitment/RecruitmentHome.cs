@@ -482,36 +482,6 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     ActiveRecruitmentList = budget.ActiveRecruitmentList
                 };
 
-                //List<RecruitmentRequestDTO> requisitionList = new List<RecruitmentRequestDTO>();
-                //requisitionList.Add(new RecruitmentRequestDTO()
-                //{
-                //    RequisitionId = 2,
-                //    EmploymentTypeCode = "ETYPFULLTIME",
-                //    EmploymentType = "Full Time",
-                //    QualificationModeCode = "QMFULLTIME",
-                //    QualificationMode = "Full Time",
-                //    PositionTypeCode = "POSTYPNEW",
-                //    PositionType = "New",
-                //    InterviewProcessCode = "INTPRCPARALLEL",
-                //    InterviewProcess = "Parallel",
-                //    IsPreAssessment = true,
-                //    CompanyCode = "CUSTGARMCO",
-                //    Company = "GARMCO",
-                //    DepartmentCode = "7600",
-                //    DepartmentName = "ICT",
-                //    CountryCode = "BH",
-                //    Country = "Bahrain",
-                //    EducationCode = "ELCOLLEGEGRAD",
-                //    Education = "College Graduate",
-                //    EmployeeClassCode = "ECBAHRAINI",
-                //    EmployeeClass = "Bahraini",
-                //    JobTitle = "000676",
-                //    PayGradeDesc = "Accountant",
-                //    Ethnicity = "Bahraini"
-                //});
-
-                //editableCopy.ActiveRecruitmentList = requisitionList;
-
                 var parameters = new DialogParameters
                 {
                     ["RecruitmentBudget"] = editableCopy,
@@ -534,43 +504,10 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 var dialog = await DialogService.ShowAsync<ActiveRecruitmentDialog>("Active Recruitments", parameters, options);
                 var result = await dialog.Result;
 
-                if (result != null && !result.Canceled)
-                {
-                    var updated = (RecruitmentBudgetDTO)result.Data!;
-
-                    //#region Get selected department
-                    //if (!string.IsNullOrEmpty(updated.DepartmentName))
-                    //{
-                    //    DepartmentDTO? department = _departmentList.Where(d => d.DepartmentName == updated.DepartmentName).FirstOrDefault();
-                    //    if (department != null)
-                    //        updated.DepartmentCode = department.DepartmentCode;
-                    //}
-                    //#endregion
-
-                    //// Update in-memory grid item
-                    //var index = _budgetList.FindIndex(x => x.BudgetId == updated.BudgetId);
-                    //if (index >= 0)
-                    //{
-                    //    _budgetList[index] = updated;
-                    //    await InvokeAsync(StateHasChanged);
-                    //}
-
-                    //#region Persist changes to DB
-                    //// Set flag to display the loading panel
-                    //_isRunning = true;
-
-                    //// Set the overlay message
-                    //overlayMessage = "Saving budget changes, please wait...";
-
-                    //_ = SaveChangeAsync(async () =>
-                    //{
-                    //    _isRunning = false;
-
-                    //    // Shows the spinner overlay
-                    //    await InvokeAsync(StateHasChanged);
-                    //}, updated);
-                    //#endregion
-                }
+                //if (result != null && !result.Canceled)
+                //{
+                //    var response = (RecruitmentBudgetDTO)result.Data!;
+                //}
             }
             catch (Exception ex)
             {

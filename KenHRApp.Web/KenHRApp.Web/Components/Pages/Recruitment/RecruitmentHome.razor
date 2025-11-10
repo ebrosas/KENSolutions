@@ -136,10 +136,14 @@
                                             </PropertyColumn>
                                              <PropertyColumn Property="x => x.RequisitionCount" Title="Active Requisitions" Class="col-requisition-count" Editable="false">
                                                  <CellTemplate Context="row">
-                                                    <MudLink Underline="Underline.Always" Disabled="@(row.Item.RequisitionCount > 0 ? false : true)"
+                                                    @* <MudLink Underline="Underline.Always" Disabled="@(row.Item.RequisitionCount > 0 ? false : true)"
                                                               OnClick="@(() => OpenActiveRecruitments(row.Item))">
                                                          @row.Item.RequisitionCount
-                                                    </MudLink>
+                                                    </MudLink> *@
+                                                     <MudBadge Content="row.Item.RequisitionCount" Color="@(row.Item.RequisitionCount > 0 ? Color.Success : Color.Error)" title="@($"{row.Item.RequisitionCount} active requisitions")"
+                                                               Overlap="true" Bordered="false" Class="mx-6 my-4">
+                                                         <MudIconButton Icon="@Icons.Material.Filled.People" Color="@(row.Item.RequisitionCount > 0 ? Color.Info : Color.Default)" OnClick="@(() => OpenActiveRecruitments(row.Item))" />
+                                                    </MudBadge>
                                                 </CellTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.ExitCount" Title="Exit Employees" Class="col-exit-count">

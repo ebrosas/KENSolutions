@@ -1691,6 +1691,141 @@ h1:focus {
     text-overflow: ellipsis; /* adds ... if too long */
 }
 /* #endregion */
+
+/* #region Recruitment Requisition Grid stylesheet  */
+.recruitment-grid .no-data-box {
+    display: flex;
+    justify-content: flex-start; /* align content to the LEFT */
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    background-color: #f8f9fa; /* light gray */
+    border: 1px solid #FBE9E7;
+    border-radius: 6px;
+    color: #856404; /* dark yellow-brown */
+    font-weight: 600;
+}
+
+.recruitment-grid .no-data-icon {
+    font-size: 20px;
+    color: #6c757d; /* muted gray */
+}
+
+.recruitment-grid .mud-table {
+    table-layout: fixed;
+    width: 100%;
+    text-align: left;
+}
+
+/* Format table header */
+.recruitment-grid .mud-table-head {
+    background-color: #BBDEFB;
+    font-weight: bold !important;
+    text-align: center !important;
+    font-size: 14px !important;
+    text-decoration: underline;
+    height: 20px;
+    line-height: 20px;
+}
+
+/* Format table cell */
+.recruitment-grid .mud-table-cell {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
+    font-size: 14px;
+}
+
+/* Grid Column widths */
+.recruitment-grid .col-requisition-id {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recruitment-grid .col-company {
+    width: 150px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recruitment-grid .col-department {
+    width: 150px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recruitment-grid .col-job-title {
+    width: 180px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 80px;
+}
+
+.recruitment-grid .col-pay-grade {
+    width: 70px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recruitment-grid .col-employment-type {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recruitment-grid .col-mode {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recruitment-grid .col-position-type {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recruitment-grid .col-education {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recruitment-grid .col-employee-class {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recruitment-grid .col-ethnicity {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recruitment-grid .flex-column {
+    width: auto; /* allow flex growth */
+    flex: 1; /* take remaining space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* adds ... if too long */
+}
+/* #endregion */
+
 /* #endregion */
 
 /*#region MudDrawer Styles  */

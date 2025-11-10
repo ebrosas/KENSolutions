@@ -181,55 +181,56 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 ActionType == ActionTypes.View.ToString())
             {
                 _isDisabled = true;
+
+                _recruitmentRequest = AppState.RecruitmentRequest!;
             }
             else if (ActionType == ActionTypes.Add.ToString())
             {
                 _isDisabled = false;
                 _saveBtnEnabled = true;
-            }
 
-            if (AppState.RecruitmentRequest != null)
-            {
-                #region Initialize recruitment request based on the AppState
-                _recruitmentRequest.DepartmentCode = AppState.RecruitmentRequest.DepartmentCode;
-                _recruitmentRequest.DepartmentName = AppState.RecruitmentRequest.DepartmentName;
-                _recruitmentRequest.EmploymentTypeCode = AppState.RecruitmentRequest.EmploymentTypeCode;
-                _recruitmentRequest.EmploymentType = AppState.RecruitmentRequest.EmploymentType;
-                _recruitmentRequest.QualificationModeCode = AppState.RecruitmentRequest.QualificationModeCode;
-                _recruitmentRequest.QualificationMode = AppState.RecruitmentRequest.QualificationMode;
-                _recruitmentRequest.PositionTypeCode = AppState.RecruitmentRequest.PositionTypeCode;
-                _recruitmentRequest.PositionType = AppState.RecruitmentRequest.PositionType;
-                _recruitmentRequest.InterviewProcessCode = AppState.RecruitmentRequest.InterviewProcessCode;
-                _recruitmentRequest.InterviewProcess = AppState.RecruitmentRequest.InterviewProcess;
-                _recruitmentRequest.CompanyCode = AppState.RecruitmentRequest.CompanyCode;
-                _recruitmentRequest.Company = AppState.RecruitmentRequest.Company;
-                _recruitmentRequest.MinAge = AppState.RecruitmentRequest.MinAge;
-                _recruitmentRequest.MaxAge = AppState.RecruitmentRequest.MaxAge;
-                _recruitmentRequest.MinRelevantExperience = AppState.RecruitmentRequest.MinRelevantExperience;
-                _recruitmentRequest.MaxRelevantExperience = AppState.RecruitmentRequest.MaxRelevantExperience;
-                _recruitmentRequest.MinWorkExperience = AppState.RecruitmentRequest.MinWorkExperience;
-                _recruitmentRequest.MaxWorkExperience = AppState.RecruitmentRequest.MaxWorkExperience;
-                _recruitmentRequest.SalaryRangeType = AppState.RecruitmentRequest.SalaryRangeType;
-                _recruitmentRequest.YearlySalaryRangeMin = AppState.RecruitmentRequest.YearlySalaryRangeMin;
-                _recruitmentRequest.YearlySalaryRangeMax = AppState.RecruitmentRequest.YearlySalaryRangeMax;
-                _recruitmentRequest.YearlySalaryRangeCurrency = AppState.RecruitmentRequest.YearlySalaryRangeCurrency;
-                _recruitmentRequest.MonthlySalaryRangeMin = AppState.RecruitmentRequest.MonthlySalaryRangeMin;
-                _recruitmentRequest.MonthlySalaryRangeMax = AppState.RecruitmentRequest.MonthlySalaryRangeMax;
-                _recruitmentRequest.MonthlySalaryRangeCurrency = AppState.RecruitmentRequest.MonthlySalaryRangeCurrency;
-                _recruitmentRequest.DailySalaryRangeMin = AppState.RecruitmentRequest.DailySalaryRangeMin;
-                _recruitmentRequest.DailySalaryRangeMax = AppState.RecruitmentRequest.DailySalaryRangeMax;
-                _recruitmentRequest.DailySalaryRangeCurrency = AppState.RecruitmentRequest.DailySalaryRangeCurrency;
-                _recruitmentRequest.HourlySalaryRangeMin = AppState.RecruitmentRequest.HourlySalaryRangeMin;
-                _recruitmentRequest.HourlySalaryRangeMax = AppState.RecruitmentRequest.HourlySalaryRangeMax;
-                _recruitmentRequest.HourlySalaryRangeCurrency = AppState.RecruitmentRequest.HourlySalaryRangeCurrency;                                
-                #endregion
+                if (AppState.RecruitmentRequest != null)
+                {
+                    #region Initialize recruitment request based on the AppState
+                    _recruitmentRequest.DepartmentCode = AppState.RecruitmentRequest.DepartmentCode;
+                    _recruitmentRequest.DepartmentName = AppState.RecruitmentRequest.DepartmentName;
+                    _recruitmentRequest.EmploymentTypeCode = AppState.RecruitmentRequest.EmploymentTypeCode;
+                    _recruitmentRequest.EmploymentType = AppState.RecruitmentRequest.EmploymentType;
+                    _recruitmentRequest.QualificationModeCode = AppState.RecruitmentRequest.QualificationModeCode;
+                    _recruitmentRequest.QualificationMode = AppState.RecruitmentRequest.QualificationMode;
+                    _recruitmentRequest.PositionTypeCode = AppState.RecruitmentRequest.PositionTypeCode;
+                    _recruitmentRequest.PositionType = AppState.RecruitmentRequest.PositionType;
+                    _recruitmentRequest.InterviewProcessCode = AppState.RecruitmentRequest.InterviewProcessCode;
+                    _recruitmentRequest.InterviewProcess = AppState.RecruitmentRequest.InterviewProcess;
+                    _recruitmentRequest.CompanyCode = AppState.RecruitmentRequest.CompanyCode;
+                    _recruitmentRequest.Company = AppState.RecruitmentRequest.Company;
+                    _recruitmentRequest.MinAge = AppState.RecruitmentRequest.MinAge;
+                    _recruitmentRequest.MaxAge = AppState.RecruitmentRequest.MaxAge;
+                    _recruitmentRequest.MinRelevantExperience = AppState.RecruitmentRequest.MinRelevantExperience;
+                    _recruitmentRequest.MaxRelevantExperience = AppState.RecruitmentRequest.MaxRelevantExperience;
+                    _recruitmentRequest.MinWorkExperience = AppState.RecruitmentRequest.MinWorkExperience;
+                    _recruitmentRequest.MaxWorkExperience = AppState.RecruitmentRequest.MaxWorkExperience;
+                    _recruitmentRequest.SalaryRangeType = AppState.RecruitmentRequest.SalaryRangeType;
+                    _recruitmentRequest.YearlySalaryRangeMin = AppState.RecruitmentRequest.YearlySalaryRangeMin;
+                    _recruitmentRequest.YearlySalaryRangeMax = AppState.RecruitmentRequest.YearlySalaryRangeMax;
+                    _recruitmentRequest.YearlySalaryRangeCurrency = AppState.RecruitmentRequest.YearlySalaryRangeCurrency;
+                    _recruitmentRequest.MonthlySalaryRangeMin = AppState.RecruitmentRequest.MonthlySalaryRangeMin;
+                    _recruitmentRequest.MonthlySalaryRangeMax = AppState.RecruitmentRequest.MonthlySalaryRangeMax;
+                    _recruitmentRequest.MonthlySalaryRangeCurrency = AppState.RecruitmentRequest.MonthlySalaryRangeCurrency;
+                    _recruitmentRequest.DailySalaryRangeMin = AppState.RecruitmentRequest.DailySalaryRangeMin;
+                    _recruitmentRequest.DailySalaryRangeMax = AppState.RecruitmentRequest.DailySalaryRangeMax;
+                    _recruitmentRequest.DailySalaryRangeCurrency = AppState.RecruitmentRequest.DailySalaryRangeCurrency;
+                    _recruitmentRequest.HourlySalaryRangeMin = AppState.RecruitmentRequest.HourlySalaryRangeMin;
+                    _recruitmentRequest.HourlySalaryRangeMax = AppState.RecruitmentRequest.HourlySalaryRangeMax;
+                    _recruitmentRequest.HourlySalaryRangeCurrency = AppState.RecruitmentRequest.HourlySalaryRangeCurrency;
+                    #endregion
+                }
+
+                BeginLoadComboboxTask();
             }
 
             // Initialize slider state
-            //_recruitmentRequest.SalaryRangeType ??= "Monthly";
             UpdateSliderStates(_recruitmentRequest.SalaryRangeType!);
-
-            BeginLoadComboboxTask();
         }
 
         protected override void OnParametersSet()
