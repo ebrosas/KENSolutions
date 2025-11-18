@@ -273,6 +273,28 @@
                                         </MudAppBar>
                                         <MudPaper Elevation="5" Class="p-0 w-100">
                                             <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white"><strong>Note:</strong> Recruiters having status FnF Initiated, FnF InProcess, NewJoinee Or Existing are visible for selection.</MudText>
+                                            <MudStack AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                                                @foreach (var recruiter in _recruiterList)
+                                                {
+                                                    <MudCard Class="pa-4" Style="width: 250px;" Elevation="5">
+                                                        <MudCardContent>
+                                                            <MudAvatar Size="Size.Large" Class="mb-3" Color="Color.Tertiary">
+                                                                <MudIcon Color="Color.Dark" Icon="@Icons.Custom.Uncategorized.Radioactive" Size="Size.Large" />
+                                                            </MudAvatar>                                                                
+                                                            <MudText Typo="Typo.h6" Class="mb-2" Align="Align.Center">
+                                                                @recruiter.FirstName @recruiter.MiddleName @recruiter.LastName
+                                                            </MudText>
+                                                            <MudDivider Class="my-2" />
+                                                            <MudText Typo="Typo.subtitle2" Align="Align.Center">
+                                                                <b>Employee No:</b> @recruiter.EmployeeNo
+                                                            </MudText>
+                                                            <MudText Typo="Typo.subtitle2" Align="Align.Center">
+                                                                <b>Workload:</b> @recruiter.WorkloadCount
+                                                            </MudText>
+                                                        </MudCardContent>
+                                                    </MudCard>
+                                                }
+                                            </MudStack>
                                         </MudPaper>
                                     </MudStack>
                                 </MudItem>

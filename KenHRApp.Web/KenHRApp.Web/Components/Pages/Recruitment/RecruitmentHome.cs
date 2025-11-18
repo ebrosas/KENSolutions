@@ -36,6 +36,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private CancellationTokenSource? _cts;
         private string _searchString = string.Empty;
         public string? _selectedRecruitment = null;
+        private List<RecruiterDTO> _recruiterList = new List<RecruiterDTO>();
 
         #region Flags
         private bool _showErrorAlert = false;
@@ -92,7 +93,40 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             // Initialize the EditContext 
             _editContext = new EditContext(_recruitmentBudget);
 
-            BeginLoadComboboxTask();            
+            BeginLoadComboboxTask();
+
+            #region Populate recruiters
+            _recruiterList.Add(new RecruiterDTO()
+            {
+                EmployeeId = 1,
+                EmployeeNo = 10003632,
+                FirstName = "Ervin",
+                MiddleName = "Olinas",
+                LastName = "Brosas",
+                Gender = "MALE",
+                WorkloadCount = 5
+            });
+            _recruiterList.Add(new RecruiterDTO()
+            {
+                EmployeeId = 2,
+                EmployeeNo = 10003656,
+                FirstName = "Tafsir",
+                MiddleName = "Ahmad",
+                LastName = "Siddiq",
+                Gender = "MALE",
+                WorkloadCount = 3
+            });
+            _recruiterList.Add(new RecruiterDTO()
+            {
+                EmployeeId = 3,
+                EmployeeNo = 10003589,
+                FirstName = "Antonina",
+                MiddleName = "Ramirez",
+                LastName = "Brosas",
+                Gender = "FEMALE",
+                WorkloadCount = 10
+            });
+            #endregion
         }
 
         protected override void OnParametersSet()
@@ -691,6 +725,16 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
 
             // Open the requisition form
             Navigation.NavigateTo($"/Recruitment/recruitmentrequest?RequisitionId={recruitment.BudgetId}&DepartmentName={deptName}&ActionType=Add");
+        }
+
+        private string GetProfileImage(string? gender)
+        {
+            return gender?.ToLower() switch
+            {
+                "male" => "images/avatars/male.png",
+                "female" => "images/avatars/female.jpg",
+                _ => "images/avatars/default.png"
+            };
         }
         #endregion
 
