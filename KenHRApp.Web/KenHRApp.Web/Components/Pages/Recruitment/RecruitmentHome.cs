@@ -35,6 +35,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         private string overlayMessage = "Please wait...";
         private CancellationTokenSource? _cts;
         private string _searchString = string.Empty;
+        public string? _selectedRecruitment = null;
 
         #region Flags
         private bool _showErrorAlert = false;
