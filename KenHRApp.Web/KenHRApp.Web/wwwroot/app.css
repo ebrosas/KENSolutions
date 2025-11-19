@@ -54,6 +54,12 @@ h1:focus {
 .full-height {
     height: 95vh;
 }
+
+.text-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 /* #endregion */
 
 /* #region Navigation Styles (MudAppBar, MudDrawer) */

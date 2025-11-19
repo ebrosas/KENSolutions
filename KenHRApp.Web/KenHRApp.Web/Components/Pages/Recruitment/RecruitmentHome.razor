@@ -271,17 +271,19 @@
                                             <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Assign the Requisition</MudText>
                                             <MudSpacer />
                                         </MudAppBar>
-                                        <MudPaper Elevation="5" Class="p-0 w-100">
+                                        <MudPaper Elevation="5" Class="pb-4 w-100 ">
                                             <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white"><strong>Note:</strong> Recruiters having status FnF Initiated, FnF InProcess, NewJoinee Or Existing are visible for selection.</MudText>
                                             <MudStack AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Row="true" Spacing="2" Wrap="Wrap.Wrap">
                                                 @foreach (var recruiter in _recruiterList)
                                                 {
-                                                    <MudCard Class="pa-4" Style="width: 250px;" Elevation="5">
-                                                        <MudCardContent>
-                                                            <MudAvatar Size="Size.Large" Class="mb-3" Color="Color.Tertiary">
-                                                                <MudIcon Color="Color.Dark" Icon="@Icons.Custom.Uncategorized.Radioactive" Size="Size.Large" />
-                                                            </MudAvatar>                                                                
-                                                            <MudText Typo="Typo.h6" Class="mb-2" Align="Align.Center">
+                                                    <MudCard Class="pb-4" Style="width: 250px;" Elevation="5">
+                                                        <MudCardContent>                                                           
+                                                            <MudStack AlignItems="AlignItems.Center">
+                                                                <MudAvatar Size="Size.Large" Class="mb-3" Color="Color.Tertiary">
+                                                                    <MudImage Src="@GetProfileImage(recruiter.Gender)"></MudImage>
+                                                                </MudAvatar>
+                                                            </MudStack>
+                                                            <MudText Typo="Typo.h6" Class="mb-2 text-ellipsis" Align="Align.Center" Color="Color.Info">
                                                                 @recruiter.FirstName @recruiter.MiddleName @recruiter.LastName
                                                             </MudText>
                                                             <MudDivider Class="my-2" />
@@ -291,6 +293,17 @@
                                                             <MudText Typo="Typo.subtitle2" Align="Align.Center">
                                                                 <b>Workload:</b> @recruiter.WorkloadCount
                                                             </MudText>
+                                                            <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center">
+                                                                <MudSwitch Value="@recruiter.IsAssigned"
+                                                                    ValueChanged="@((bool value) => OnAssignedChanged(recruiter, value))"
+                                                                    ThumbIcon="@(recruiter.IsAssigned==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" 
+                                                                    ThumbIconColor="@(recruiter.IsAssigned==true ? Color.Success : Color.Error)">
+                                                                    <MudText Typo="Typo.subtitle1" Class="@(recruiter.IsAssigned==true ? "fw-bold" : "fw-normal")"
+                                                                        Color="@(recruiter.IsAssigned==true ? Color.Success : Color.Dark)">
+                                                                        @(recruiter.IsAssigned==true ? "Assigned" : "Assign")
+                                                                    </MudText>
+                                                                </MudSwitch>
+                                                            </MudStack>
                                                         </MudCardContent>
                                                     </MudCard>
                                                 }

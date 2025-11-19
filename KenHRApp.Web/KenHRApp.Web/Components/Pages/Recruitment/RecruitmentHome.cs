@@ -732,9 +732,22 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             return gender?.ToLower() switch
             {
                 "male" => "images/avatars/male.png",
-                "female" => "images/avatars/female.jpg",
+                "female" => "images/avatars/female.png",
                 _ => "images/avatars/default.png"
             };
+        }
+
+        private void OnAssignedChanged(RecruiterDTO selectedRecruiter, bool newValue)
+        {
+            // First, set IsAssigned = false for all recruiters
+            foreach (var recruiter in _recruiterList)
+                recruiter.IsAssigned = false;
+
+            // Then assign only the selected recruiter if the switch is turned ON
+            selectedRecruiter.IsAssigned = newValue;
+
+            // Trigger UI refresh (if needed)
+            StateHasChanged();
         }
         #endregion
 

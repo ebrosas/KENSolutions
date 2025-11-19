@@ -16,6 +16,7 @@ namespace KenHRApp.Application.DTOs
         public string LastName { get; set; } = null!;
         public int? WorkloadCount { get; set; }
         public string? Gender { get; set; } = null;
+        public bool IsAssigned { get; set; } = false;
         #endregion
     }
 }
