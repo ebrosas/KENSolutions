@@ -136,12 +136,9 @@
                                             </PropertyColumn>
                                              <PropertyColumn Property="x => x.RequisitionCount" Title="Active Requisitions" Class="col-requisition-count" Editable="false">
                                                  <CellTemplate Context="row">
-                                                    @* <MudLink Underline="Underline.Always" Disabled="@(row.Item.RequisitionCount > 0 ? false : true)"
-                                                              OnClick="@(() => OpenActiveRecruitments(row.Item))">
-                                                         @row.Item.RequisitionCount
-                                                    </MudLink> *@
                                                      <MudBadge Content="row.Item.RequisitionCount" Color="@(row.Item.RequisitionCount > 0 ? Color.Success : Color.Default)" title="@($"{row.Item.RequisitionCount} active requisitions")"
-                                                               Overlap="true" Bordered="false" Class="mx-6 my-4">
+                                                        Overlap="true" Bordered="false" Class="mx-6 my-4">
+                                                         @* <MudIcon Icon="@Icons.Material.Filled.People" Color="@(row.Item.RequisitionCount > 0 ? Color.Info : Color.Default)" onclick="@(() => OpenActiveRecruitments(row.Item))" /> *@
                                                          <MudIconButton Icon="@Icons.Material.Filled.People" Color="@(row.Item.RequisitionCount > 0 ? Color.Info : Color.Default)" OnClick="@(() => OpenActiveRecruitments(row.Item))" />
                                                     </MudBadge>
                                                 </CellTemplate>
@@ -173,7 +170,7 @@
                                              </PropertyColumn>
                                              <PropertyColumn Property="x => x.OnHoldDesc" Title="On-hold?" Class="col-onhold" Required="false">
                                                  <CellTemplate Context="row">
-                                                     <MudChip T="string" Size=Size.Small Color="@(row.Item.OnHoldDesc == "Yes" ? Color.Error : Color.Success)">
+                                                     <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" Color="@(row.Item.OnHoldDesc == "Yes" ? Color.Error : Color.Success)">
                                                          @row.Item.OnHoldDesc
                                                     </MudChip>
                                                 </CellTemplate>
