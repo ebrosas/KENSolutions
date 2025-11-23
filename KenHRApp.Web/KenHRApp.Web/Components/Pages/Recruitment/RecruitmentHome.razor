@@ -87,7 +87,7 @@
                                              </PropertyColumn>
                                              <PropertyColumn Property="x => x.DepartmentName" Title="Department" Class="col-dept-name" Editable="false" StickyLeft="true">
                                                  <CellTemplate Context="row">
-                                                     <MudChip T="string" Size=Size.Small Color="Color.Secondary" Label="true" Class="fw-bold" Style="font-size: 14px;">
+                                                     <MudChip T="string" Size=Size.Small Color="Color.Primary" Label="true" Class="fw-bold" Style="font-size: 14px;">
                                                          @row.Item.DepartmentName
                                                     </MudChip>
                                                 </CellTemplate>
@@ -220,7 +220,7 @@
                             </MudPaper>
                         </MudStack>
                      </MudStep>
-                     <MudStep Title="Talent Acquisition">
+                    <MudStep Title="Talent Acquisition" OnClick="GetAllRequisitions">
                         <MudText Typo="Typo.subtitle1" Color="Color.Primary">
                             <strong>
                                 Manage recruitment requisition and assign recruiter
@@ -228,41 +228,47 @@
                         </MudText>                        
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudGrid Spacing="3">
-                                <MudItem xs="3">
+                                <MudItem xs="4">
                                     <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
                                         <MudAppBar Class="rounded-l-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
-                                            <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Requisitions</MudText>
+                                            <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Requisition List</MudText>
                                             <MudSpacer />
                                          </MudAppBar>
                                         <MudPaper Elevation="5" Class="p-0 w-100">
-                                            <MudList T="string" @bind-SelectedValue="_selectedRecruitment" SelectionMode="SelectionMode.SingleSelection" ReadOnly="false" Color="@Color.Info">
-                                                <MudListSubheader>
-                                                    Your drink:
-                                                    <MudChip Color="@Color.Info">
-                                                        @(_selectedRecruitment ?? "You are dry")
-                                                    </MudChip>
-                                                </MudListSubheader>
-                                                <MudListItem Text="Milk" />
-                                                <MudListItem Text="Sparkling Water" Value='"Carbonated H²O"' />
-                                                <MudListItem Text="Teas">
-                                                    <NestedList>
-                                                        <MudListItem Text="English Tea" Value='"Earl Grey"' />
-                                                        <MudListItem Text="Chinese Tea" Value='"Gunpowder Tea"' />
-                                                        <MudListItem Text="Bubble Tea" />
-                                                    </NestedList>
-                                                </MudListItem>
-                                                <MudListItem Text="Coffees">
-                                                    <NestedList>
-                                                        <MudListItem Text="Irish Coffee" />
-                                                        <MudListItem Text="Double Espresso" />
-                                                        <MudListItem Text="Cafe Latte" />
-                                                    </NestedList>
-                                                </MudListItem>
+                                            <MudList T="RecruitmentRequestDTO" Dense="true" Elevation="1" SelectionMode="SelectionMode.SingleSelection">
+                                                @foreach (var request in _recruitmentList)
+                                                {
+                                                    <MudListItem>
+                                                        <MudStack Direction="Column" Spacing="1">
+
+                                                            <!-- Department Name -->
+                                                            <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="fw-bold">
+                                                                @request.DepartmentName
+                                                            </MudText>
+
+                                                            <!-- Created Date and Time -->
+                                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                                Created On: @request.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")
+                                                            </MudText>
+
+                                                            <!-- Employee Name and Number -->
+                                                            <MudText Typo="Typo.body2">
+                                                                Created By: @request.CreatedByName (@request.CreatedByNo)
+                                                            </MudText>
+
+                                                            <!-- Current Status -->
+                                                            <MudText Typo="Typo.body2" Color="Color.Info" Class="fw-semibold">
+                                                                Status: @request.StatusDesc
+                                                            </MudText>
+
+                                                        </MudStack>
+                                                    </MudListItem>
+                                                }
                                             </MudList>
                                         </MudPaper>
                                      </MudStack>
                                 </MudItem>
-                                <MudItem xs="9">
+                                <MudItem xs="8">
                                     <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
                                         <MudAppBar Class="rounded-r-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
                                             <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Assign the Requisition</MudText>

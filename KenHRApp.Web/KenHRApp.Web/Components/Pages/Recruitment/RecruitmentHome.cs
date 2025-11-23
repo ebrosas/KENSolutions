@@ -82,6 +82,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
 
         private List<RecruitmentBudgetDTO> _budgetList = new List<RecruitmentBudgetDTO>();
         private IReadOnlyList<DepartmentDTO> _departmentList = new List<DepartmentDTO>();
+        private List<RecruitmentRequestDTO> _recruitmentList = new List<RecruitmentRequestDTO>();
         private string[]? _departmentArray = null;
         #endregion
 
@@ -324,6 +325,22 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
             }, forceLoad);
+        }
+
+        private void GetAllRequisitions()
+        {
+            _isRunning = true;
+
+            // Set the overlay message
+            overlayMessage = "Loading recruitment requisitions, please wait...";
+
+            _ = GetRecruitmentListAsync(async () =>
+            {
+                _isRunning = false;
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            });
         }
 
         private async Task AddBudgetAsync()
@@ -902,6 +919,34 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
                     _errorMessage.AppendLine(errorMsg);
                     ShowHideError(true);
                 }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        public async Task GetRecruitmentListAsync(Func<Task> callback)
+        {
+            await Task.Delay(200);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+
+            var repoResult = await RecruitmentService.GetRecruitmentListAsync();
+            if (repoResult.Success)
+            {
+                _recruitmentList = repoResult.Value!;
+            }
+            else
+            {
+                // Show error message
+                _errorMessage.AppendLine(repoResult.Error);
+
+                ShowHideError(true);
             }
 
             if (callback != null)

@@ -193,7 +193,7 @@ namespace KenHRApp.Infrastructure.Repositories
                                    join country in _db.UserDefinedCodes on r.CountryCode equals country.UDCCode into gjCountry from subCountry in gjCountry.DefaultIfEmpty()
                                    join education in _db.UserDefinedCodes on r.EducationCode equals education.UDCCode into gjEducation from subEducation in gjEducation.DefaultIfEmpty()
                                    join ethnicity in _db.UserDefinedCodes on r.EthnicityCode equals ethnicity.UDCCode into gjEthnicity from subEthnicity in gjEthnicity.DefaultIfEmpty()
-                                   where (r.DepartmentCode == departmentCode) 
+                                   where (r.DepartmentCode == departmentCode || string.IsNullOrEmpty(departmentCode)) 
                                    //&& r.EmploymentTypeCode == et.UDCCode
                                    //&& r.PositionTypeCode == pt.UDCCode && r.CompanyCode == com.UDCCode
                                    //&& r.EmployeeClassCode == ec.UDCCode && r.JobTitleCode == jt.UDCCode

@@ -16,6 +16,7 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<bool>> DeleteRecruitmentBudgetAsync(int budgetID, CancellationToken cancellationToken = default);
         Task<Result<int>> AddRecruitmentRequestAsync(RecruitmentRequestDTO recruitment, CancellationToken cancellationToken = default);
         Task<Result<int>> UpdateRecruitmentRequestAsync(RecruitmentRequestDTO recruitment, CancellationToken cancellationToken = default);
+        Task<Result<List<RecruitmentRequestDTO>>> GetRecruitmentListAsync(string departmentCode = "");
         #endregion
     }
 }

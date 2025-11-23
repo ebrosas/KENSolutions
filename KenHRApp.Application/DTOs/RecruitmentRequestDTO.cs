@@ -177,6 +177,9 @@ namespace KenHRApp.Application.DTOs
 
         [Display(Name = "Last Updated Date")]
         public DateTime? LastUpdateDate { get; set; } = null;
+
+        public string? StatusCode { get; set; } = null;
+        public string? StatusDesc { get; set; } = null;
         #endregion
 
         #region Extended Properties

@@ -445,6 +445,97 @@ namespace KenHRApp.Application.Services
                 return Result<int>.Failure(ex.Message.ToString());
             }
         }
+
+        public async Task<Result<List<RecruitmentRequestDTO>>> GetRecruitmentListAsync(string departmentCode = "")
+        {
+            List<RecruitmentRequestDTO> requisitionList = new List<RecruitmentRequestDTO>();
+
+            try
+            {
+                var repoResult = await _repository.GetRecruitmentListAsync(departmentCode);
+                if (!repoResult.Success)
+                {
+                    return Result<List<RecruitmentRequestDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                requisitionList = repoResult.Value!.Select(e => new RecruitmentRequestDTO
+                {
+                    RequisitionId = e.RequisitionId,
+                    EmploymentTypeCode = e.EmploymentTypeCode,
+                    EmploymentType = e.EmploymentType,
+                    QualificationModeCode = e.QualificationModeCode,
+                    QualificationMode = e.QualificationMode,
+                    PositionTypeCode = e.PositionTypeCode,
+                    PositionType = e.PositionType,
+                    InterviewProcessCode = e.InterviewProcessCode,
+                    InterviewProcess = e.InterviewProcess,
+                    IsPreAssessment = e.IsPreAssessment,
+                    CompanyCode = e.CompanyCode,
+                    Company = e.Company,
+                    DepartmentCode = e.DepartmentCode,
+                    DepartmentName = e.DepartmentName,
+                    CountryCode = e.CountryCode,
+                    Country = e.Country,
+                    EducationCode = e.EducationCode,
+                    Education = e.Education,
+                    EmployeeClassCode = e.EmployeeClassCode,
+                    EmployeeClass = e.EmployeeClass,
+                    EthnicityCode = e.EthnicityCode,
+                    Ethnicity = e.Ethnicity,
+                    JobTitleCode = e.JobTitleCode,
+                    JobTitle = e.JobTitle,
+                    PayGradeCode = e.PayGradeCode,
+                    PayGradeDesc = e.PayGradeDesc,
+                    PositionDescription = e.PositionDescription,
+                    TotalWorkExperience = e.TotalWorkExperience,
+                    MinWorkExperience = e.MinWorkExperience.HasValue ? Convert.ToInt32(e.MinWorkExperience) : 0,
+                    MaxWorkExperience = e.MaxWorkExperience.HasValue ? Convert.ToInt32(e.MaxWorkExperience) : 0,
+                    TotalRelevantExperience = e.TotalRelevantExperience,
+                    MinRelevantExperience = e.MinRelevantExperience.HasValue ? Convert.ToInt32(e.MinRelevantExperience) : 0,
+                    MaxRelevantExperience = e.MaxRelevantExperience.HasValue ? Convert.ToInt32(e.MaxRelevantExperience) : 0,
+                    AgeRange = e.AgeRange,
+                    MinAge = e.MinAge.HasValue ? Convert.ToInt32(e.MinAge) : 0,
+                    MaxAge = e.MaxAge.HasValue ? Convert.ToInt32(e.MaxAge) : 0,
+                    RequiredGender = e.RequiredGender,
+                    RequiredAsset = e.RequiredAsset,
+                    VideoDescriptionURL = e.VideoDescriptionURL,
+                    SalaryRangeType = e.SalaryRangeType,
+                    YearlySalaryRange = e.YearlySalaryRange.HasValue ? Convert.ToInt32(e.YearlySalaryRange) : 0,
+                    YearlySalaryRangeMin = e.YearlySalaryRangeMin.HasValue ? Convert.ToInt32(e.YearlySalaryRangeMin) : 0,
+                    YearlySalaryRangeMax = e.YearlySalaryRangeMax.HasValue ? Convert.ToInt32(e.YearlySalaryRangeMax) : 0,
+                    YearlySalaryRangeCurrency = e.YearlySalaryRangeCurrency,
+                    MonthlySalaryRange = e.MonthlySalaryRange.HasValue ? Convert.ToInt32(e.MonthlySalaryRange) : 0,
+                    MonthlySalaryRangeMin = e.MonthlySalaryRangeMin.HasValue ? Convert.ToInt32(e.MonthlySalaryRangeMin) : 0,
+                    MonthlySalaryRangeMax = e.MonthlySalaryRangeMax.HasValue ? Convert.ToInt32(e.MonthlySalaryRangeMax) : 0,
+                    MonthlySalaryRangeCurrency = e.MonthlySalaryRangeCurrency,
+                    DailySalaryRange = e.DailySalaryRange.HasValue ? Convert.ToInt32(e.DailySalaryRange) : 0,
+                    DailySalaryRangeMin = e.DailySalaryRangeMin.HasValue ? Convert.ToInt32(e.DailySalaryRangeMin) : 0,
+                    DailySalaryRangeMax = e.DailySalaryRangeMax.HasValue ? Convert.ToInt32(e.DailySalaryRangeMax) : 0,
+                    DailySalaryRangeCurrency = e.DailySalaryRangeCurrency,
+                    HourlySalaryRange = e.HourlySalaryRange.HasValue ? Convert.ToInt32(e.HourlySalaryRange) : 0,
+                    HourlySalaryRangeMin = e.HourlySalaryRangeMin.HasValue ? Convert.ToInt32(e.HourlySalaryRangeMin) : 0,
+                    HourlySalaryRangeMax = e.HourlySalaryRangeMax.HasValue ? Convert.ToInt32(e.HourlySalaryRangeMax) : 0,
+                    HourlySalaryRangeCurrency = e.HourlySalaryRangeCurrency,
+                    Responsibilities = e.Responsibilities,
+                    Competencies = e.Competencies,
+                    GeneralRemarks = e.GeneralRemarks,
+                    CreatedByNo = e.CreatedByNo,
+                    CreatedByUserID = e.CreatedByUserID,
+                    CreatedByName = e.CreatedByName,
+                    CreatedDate = e.CreatedDate,
+                    LastUpdatedByNo = e.LastUpdatedByNo,
+                    LastUpdatedUserID = e.LastUpdatedUserID,
+                    LastUpdatedName = e.LastUpdatedName,
+                    LastUpdateDate = e.LastUpdateDate
+                }).ToList();
+
+                return Result<List<RecruitmentRequestDTO>>.SuccessResult(requisitionList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<RecruitmentRequestDTO>>.Failure(ex.Message.ToString() ?? "Unknown error in GetRecruitmentListAsync() method.");
+            }
+        }
         #endregion
     }
 }
