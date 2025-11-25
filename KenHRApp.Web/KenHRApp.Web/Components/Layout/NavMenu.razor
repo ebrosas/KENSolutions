@@ -87,7 +87,7 @@
     </MudNavGroup>
     <MudNavGroup Title="Time & Attendance" Icon="fas fa-calendar-check" Class="navlink-icon-sm navMenu">
         <MudNavLink Href="/users" Icon="fas fa-user-edit" Class="navMenu navlink-icon-sm">Self Service</MudNavLink>
-        <MudNavLink Href="/security" Icon="fas fa-people-carry" Class="navMenu navlink-icon-sm">Shift Roster</MudNavLink>
+        <MudNavLink Icon="fas fa-people-carry" Class="navMenu navlink-icon-sm" OnClick="ShowShiftRoster">Shift Roster</MudNavLink>
         <MudNavLink Href="/security" Icon="far fa-calendar-plus" Class="navMenu navlink-icon-sm">Extratime Request</MudNavLink>
         <MudNavLink Href="/security" Icon="fas fa-tasks" Class="navMenu navlink-icon-sm">Manual Attendance</MudNavLink>
         <MudNavLink Href="/security" Icon="fas fa-eraser" Class="navMenu navlink-icon-sm">Reason of Absence</MudNavLink>
@@ -213,6 +213,12 @@
     private void ShowRecruitment()
     {
         NavigationManager.NavigateTo("/Recruitment/recruitmenthome");
+        Actions.InvokeShowHideDrawer();
+    }
+
+    private void ShowShiftRoster()
+    {
+        NavigationManager.NavigateTo("/TimeAttendance/mastershiftroster");
         Actions.InvokeShowHideDrawer();
     }
     #endregion
