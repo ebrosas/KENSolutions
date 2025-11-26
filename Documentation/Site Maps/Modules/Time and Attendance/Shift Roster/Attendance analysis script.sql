@@ -1,5 +1,5 @@
 
-	--Shift Timing Schedule
+	--Shift Roster
 	SELECT * FROM tas.Master_ShiftPatternTitles a
 	WHERE RTRIM(a.ShiftPatCode) = 'AB'
 
