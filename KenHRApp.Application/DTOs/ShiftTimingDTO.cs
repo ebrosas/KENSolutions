@@ -31,7 +31,7 @@ namespace KenHRApp.Application.DTOs
 
         [Required(ErrorMessage = "Depart From is required")]
         [Display(Name = "Depart From")]
-        public TimeSpan? DepartFrom { get; set; }
+        public TimeSpan DepartFrom { get; set; }
         
         [Display(Name = "Depart To")]
         public TimeSpan? DepartTo { get; set; }
@@ -45,7 +45,7 @@ namespace KenHRApp.Application.DTOs
 
         [Required(ErrorMessage = "Ramadan Depart From is required")]
         [Display(Name = "Ramadan Depart From")]
-        public TimeSpan? RDepartFrom { get; set; }
+        public TimeSpan RDepartFrom { get; set; }
 
         [Display(Name = "Ramadan Depart To")]
         public TimeSpan? RDepartTo { get; set; }
@@ -74,6 +74,14 @@ namespace KenHRApp.Application.DTOs
             get
             {
                 return $"({LastUpdateEmpNo}) {LastUpdatedByName}";
+            }
+        }
+
+        public string ShiftTiming
+        {
+            get
+            {
+                return $"{ShiftCode} - {ShiftDescription}";
             }
         }
         #endregion

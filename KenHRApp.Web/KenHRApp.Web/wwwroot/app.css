@@ -1832,6 +1832,121 @@ h1:focus {
 }
 /* #endregion */
 
+/* #region Shift Roster grid stylesheet  */
+.shift-roster-grid .no-data-box {
+    display: flex;
+    justify-content: flex-start; /* align content to the LEFT */
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    background-color: #f8f9fa; /* light gray */
+    border: 1px solid #FBE9E7;
+    border-radius: 6px;
+    color: #856404; /* dark yellow-brown */
+    font-weight: 600;
+}
+
+.shift-roster-grid .no-data-icon {
+    font-size: 20px;
+    color: #6c757d; /* muted gray */
+}
+
+.shift-roster-grid .mud-table {
+    table-layout: fixed;
+    width: 100%;
+    text-align: left;
+}
+
+/* Format table header */
+.shift-roster-grid .mud-table-head {
+    background-color: #BBDEFB;
+    font-weight: bold !important;
+    text-align: center !important;
+    font-size: 14px !important;
+    text-decoration: underline;
+    height: 20px;
+    line-height: 20px;
+}
+
+/* Format table cell */
+.shift-roster-grid .mud-table-cell {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
+    font-size: 14px;
+}
+
+/* Grid Column widths */
+.shift-roster-grid .col-shift-pattern {
+    width: 150px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shift-roster-grid .col-shift-timing {
+    width: 130px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shift-roster-grid .col-shift-time {
+    width: 120px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 80px;
+}
+
+.shift-roster-grid .col-created-date {
+    width: 120px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shift-roster-grid .col-created-by {
+    width: 250px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shift-roster-grid .col-updated-date {
+    width: 120px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shift-roster-grid .col-updated-by {
+    width: 250px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shift-roster-grid .flex-column {
+    width: auto; /* allow flex growth */
+    flex: 1; /* take remaining space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* adds ... if too long */
+}
+/* #endregion */
+
+/* #region <ToolBarContent> styling within MudDataGrid */
+.shift-grid .mud-datagrid-toolbar {
+    height: 150px;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+}
+/* #endregion */
+
 /* #endregion */
 
 /*#region MudDrawer Styles  */
