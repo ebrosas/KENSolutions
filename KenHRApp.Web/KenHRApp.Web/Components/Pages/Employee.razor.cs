@@ -318,7 +318,7 @@ namespace KenHRApp.Web.Components.Pages
 
         private void EmergencyStartedEditingItem(EmergencyContactDTO item)
         {
-            //_events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+            //_events.Insert(0, $"Event = StartedEditingShiftTimingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
         }
 
         private void EmergencyCommittedItemChanges(EmergencyContactDTO item)

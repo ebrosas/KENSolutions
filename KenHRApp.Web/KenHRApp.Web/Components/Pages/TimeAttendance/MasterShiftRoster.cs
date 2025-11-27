@@ -60,7 +60,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _showErrorAlert = false;
         private bool _hasValidationError = false;
         private bool _isRunning = false;
-        private bool _enableFilter = false;
+        private bool _enableShiftTimingFilter = false;
+        private bool _enableShiftPointerFilter = false;
         #endregion
 
         #region Enums
@@ -148,7 +149,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Grid Events 
-        private Func<ShiftTimingDTO, bool> _quickFilter => x =>
+        private Func<ShiftTimingDTO, bool> _shiftTimingFilter => x =>
         {
             if (string.IsNullOrWhiteSpace(_searchString))
                 return true;
@@ -169,12 +170,47 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         //    e.Cancel = true; // Prevent the DataGrid's internal edit form from appearing
         //}
 
-        private async Task StartedEditingItem(ShiftTimingDTO item)
+        private async Task StartedEditingShiftTimingItem(ShiftTimingDTO item)
         {
             //await EditBudgetAsync(item);
         }
 
-        private void CommittedItemChanges(ShiftTimingDTO item)
+        private async Task StartedEditingShiftPointerItem(ShiftPointerDTO item)
+        {
+            //await EditBudgetAsync(item);
+        }
+
+        private void CommittedShiftTimingItemChanges(ShiftTimingDTO item)
+        {
+            try
+            {
+                if (item == null) return;
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Saving changes, please wait...";
+
+                //_ = SaveChangeAsync(async () =>
+                //{
+                //    _isRunning = false;
+
+                //    // Shows the spinner overlay
+                //    await InvokeAsync(StateHasChanged);
+                //}, item);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Save cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private void CommittedShiftTimingItemChanges(ShiftPointerDTO item)
         {
             try
             {
@@ -310,7 +346,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 ShiftPatternCode = _shiftPattern.ShiftPatternCode ?? string.Empty,
                 ShiftCode = _selectedTimingForSequence,
                 ShiftPointer = (_shiftPattern.ShiftPointerList.Count > 0) ? _shiftPattern.ShiftPointerList.Max(x => x.ShiftPointer) + 1 : 1,
-                Remarks = string.Empty
+                ShiftTiming = string.Empty
             };
 
             _shiftPattern.ShiftPointerList.Add(newPointer);

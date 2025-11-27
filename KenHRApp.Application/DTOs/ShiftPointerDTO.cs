@@ -11,7 +11,7 @@ namespace KenHRApp.Application.DTOs
         #region Properties
         public int ShiftPointerId { get; set; }
         public int ShiftPointer { get; set; }
-        public string? Remarks { get; set; } = null;
+        public string ShiftTiming { get; set; } = null!;
         #endregion
 
         #region Reference Navigation

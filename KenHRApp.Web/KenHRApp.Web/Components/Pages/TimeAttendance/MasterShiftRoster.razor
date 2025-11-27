@@ -80,11 +80,11 @@
                             <MudPaper Elevation="5" Square="true" Class="w-100">
                                 <div class="shift-roster-grid">
                                     <MudDataGrid T="ShiftTimingDTO" Items="@_shiftPattern.ShiftTimingList" Hover="true" Striped="true" Class="shift-grid"
-                                                 Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
-                                                 QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                                                 Filterable="_enableShiftTimingFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                                                 QuickFilter="@_shiftTimingFilter" Hideable="true" PageSize="5"
                                                  EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Cell"
-                                                 StartedEditingItem="@StartedEditingItem"
-                                                 CommittedItemChanges="@CommittedItemChanges"
+                                                 StartedEditingItem="@StartedEditingShiftTimingItem"
+                                                 CommittedItemChanges="@CommittedShiftTimingItemChanges"
                                                  TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
                                         <ToolBarContent>
                                             <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0" Width="220px">
@@ -106,11 +106,11 @@
                                                 </MudSelect>
                                             </MudPaper>
                                             <MudPaper Class="ms-3" Elevation="0">
-                                                <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new qualification" OnClick="AddTimingToSchedule" />
+                                                <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new shift timing" OnClick="AddTimingToSchedule" />
                                             </MudPaper>
                                             <MudSpacer />
                                             <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
-                                                <MudSwitch @bind-Value="_enableFilter" Color="Color.Success" UncheckedColor="Color.Default" Style="font-size: 14px;"
+                                                <MudSwitch @bind-Value="_enableShiftTimingFilter" Color="Color.Success" UncheckedColor="Color.Default" Style="font-size: 14px;"
                                                            Label="Enable Custom Filter" LabelPlacement="Placement.Start" />
                                             </MudPaper>
                                         </ToolBarContent>
@@ -280,32 +280,73 @@
                         </TitleContent>
                         <ChildContent>
                             <MudPaper Class="pa-4">
-                                <MudGrid AlignItems="Center" Class="mb-3">
-                                    <MudItem xs="12" sm="8">
-                                        <MudSelect T="string"
-                                                   @bind-Value="_selectedTimingForSequence"
-                                                   Label="Shift Timing"
-                                                   Variant="Variant.Text"
-                                                   Margin="Margin.Dense"
-                                                   Placeholder="Please Select"
-                                                   AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
-                                                   AdornmentColor="Color.Default"
-                                                   HelperText="Select job title"
-                                                   HelperTextOnFocus="true"
-                                                   Immediate="true"
-                                                   Dense="true"
-                                                   Typo="Typo.subtitle2">
-                                            @foreach (var job in _shiftTimingLookup)
-                                            {
-                                                <MudSelectItem Value="@job.Key">@($"{job.Key} - {job.Value}")</MudSelectItem>
-                                            }
-                                        </MudSelect>
-                                    </MudItem>
-
-                                    <MudItem xs="12" sm="4" Class="d-flex justify-end">
-                                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@AddPointerToSequence">Add</MudButton>
-                                    </MudItem>
-                                </MudGrid>
+                                <div class="shift-roster-grid">
+                                    <MudDataGrid T="ShiftPointerDTO" Items="@_shiftPattern.ShiftPointerList" Hover="true" Striped="true" Class="shift-grid"
+                                                 Filterable="_enableShiftTimingFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                                                 Hideable="true" PageSize="5"
+                                                 EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Cell"
+                                                 StartedEditingItem="@StartedEditingShiftPointerItem"
+                                                 CommittedItemChanges="@CommittedShiftTimingItemChanges"
+                                                 TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                                        <ToolBarContent>
+                                            <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0" Width="220px">
+                                                <MudSelect T="string"
+                                                           @bind-Value="_selectedTimingForSequence"
+                                                           Label="Shift Timing"
+                                                           Variant="Variant.Outlined"
+                                                           Margin="Margin.Dense"
+                                                           Placeholder="Please Select"
+                                                           AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                                           AdornmentColor="Color.Default"
+                                                           Immediate="true"
+                                                           Dense="true"
+                                                           Typo="Typo.subtitle2">
+                                                    @foreach (var job in _shiftTimingLookup)
+                                                    {
+                                                        <MudSelectItem Value="@job.Key">@($"{job.Key} - {job.Value}")</MudSelectItem>
+                                                    }
+                                                </MudSelect>
+                                            </MudPaper>
+                                            <MudPaper Class="ms-3" Elevation="0">
+                                                <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new shift pointer" OnClick="AddPointerToSequence" />
+                                            </MudPaper>
+                                            <MudSpacer />
+                                            <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                                <MudSwitch @bind-Value="_enableShiftPointerFilter" Color="Color.Success" UncheckedColor="Color.Default" Style="font-size: 14px;"
+                                                           Label="Enable Custom Filter" LabelPlacement="Placement.Start" />
+                                            </MudPaper>
+                                        </ToolBarContent>
+                                        <Columns>
+                                            <PropertyColumn Property="x => x.ShiftPointerId" Hidden Editable="false">
+                                                 <EditTemplate Context="row">
+                                                     @* Empty to prevent rendering *@
+                                                 </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.ShiftPointer" Title="Shift Pointer" Class="col-created-date" Editable="false" />
+                                            @* <PropertyColumn Property="x => x.ShiftTiming" Title="Group Name" Class="col-group-name">
+                                                 <EditTemplate Context="row">
+                                                     <MudSelect @bind-Value="row.Item.ShiftTiming" Variant="Variant.Text" Margin="Margin.Dense" Label="Group Name"
+                                                        Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                                        HelperText="Filter by employment status" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
+                                                         @foreach (var group in _groupList)
+                                                        {
+                                                            <MudSelectItem Value="group.UDCCode">@group.UDCDesc1</MudSelectItem>
+                                                        }
+                                                    </MudSelect>
+                                                </EditTemplate>
+                                            </PropertyColumn> *@
+                                        </Columns>
+                                        <NoRecordsContent>
+                                            <div class="no-data-box">
+                                                <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
+                                                <span>No data found</span>
+                                            </div>
+                                        </NoRecordsContent>
+                                        <PagerContent>
+                                            <MudDataGridPager T="ShiftPointerDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                                        </PagerContent>
+                                    </MudDataGrid>
+                                </div>                                
                             </MudPaper>
                         </ChildContent>                        
                     </MudExpansionPanel>
