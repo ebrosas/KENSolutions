@@ -31,43 +31,48 @@
         <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
             <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="4" Class="mud-primary-text" />
 
-            <MudPaper Elevation="5" Square="true" Class="w-100 mt-2">
+            <MudPaper Elevation="5" Square="true" Class="w-100 mt-0 ps-4">
                 <MudGrid>
-                    <MudItem xs="12" sm="4">
+                    <MudItem xs="12" sm="2">
                         <MudTextField @bind-Value="_shiftPattern.ShiftPatternCode"
-                                      Label="Shift Pattern Code"
+                                      Label="Shift Roster Code"
                                       For="@(()=>_shiftPattern.ShiftPatternCode)"
                                       Required="true"
                                       RequiredError="Shift Roster Code is required"
+                                      Typo="Typo.subtitle2"
                                       MaxLength="10" />
                     </MudItem>
-
-                    <MudItem xs="12" sm="8">
+                    <MudItem xs="12" sm="5">
                         <MudTextField @bind-Value="_shiftPattern.ShiftPatternDescription"
                                       Label="Description"
+                                      For="@(()=>_shiftPattern.ShiftPatternDescription)"
+                                      Typo="Typo.subtitle2"
+                                      MaxLength="200" />
+                        @* <MudTextField @bind-Value="_shiftPattern.ShiftPatternDescription"
+                                      Label="Description"
                                       Lines="3"
-                                      MaxLength="300" />
+                                      MaxLength="300" /> *@
                     </MudItem>
-
-                    <MudItem xs="12" sm="3">
+                    @* <MudItem xs="12" sm="3" Class="d-flex justify-end">
                         <MudSwitch @bind-Value="_shiftPattern.IsFlexiTime" Color="Color.Success" UncheckedColor="Color.Default"
                                    Label="Is Flexitime?" LabelPlacement="Placement.Start" />
+                    </MudItem> *@
+                    <MudItem xs="12" sm="2">
+                        <MudPaper Elevation="0" Class="d-flex align-content-end">
+                            <MudSwitch @bind-Value="_shiftPattern.IsActive" Color="Color.Success" UncheckedColor="Color.Default"
+                                       Label="Is Active?" LabelPlacement="Placement.Start" />
+                        </MudPaper>                        
                     </MudItem>
-
                     <MudItem xs="12" sm="3">
-                        <MudSwitch @bind-Value="_shiftPattern.IsActive" Color="Color.Success" UncheckedColor="Color.Default"
-                                   Label="Is Active?" LabelPlacement="Placement.Start" />
-                    </MudItem>
-
-                    <MudItem xs="12" sm="6" Class="d-flex justify-end">
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@SaveMasterAsync">Save</MudButton>
-                        <MudButton Variant="Variant.Outlined" Class="ml-2" OnClick="@ResetForm">Reset</MudButton>
+                        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="@SaveMasterAsync">Save</MudButton>
+                        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Error" Class="ml-1" OnClick="@SaveMasterAsync">Delete</MudButton>
+                        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Default" Class="ml-1" OnClick="@ResetForm">Reset</MudButton>
                     </MudItem>
                 </MudGrid>
 
                 @* <MudDivider Class="my-4" /> *@
 
-                <MudExpansionPanels Elevation="0" MultiExpansion="true">
+                <MudExpansionPanels Elevation="0" MultiExpansion="true" Class="mt-2">
                     <!-- SHIFT TIMING SCHEDULE PANEL -->
                     <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters Expanded>
                         <TitleContent>
@@ -82,10 +87,11 @@
                                     <MudDataGrid T="ShiftTimingDTO" Items="@_shiftPattern.ShiftTimingList" Hover="true" Striped="true" Class="shift-grid"
                                                  Filterable="_enableShiftTimingFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                                                  QuickFilter="@_shiftTimingFilter" Hideable="true" PageSize="5"
-                                                 EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Cell"
+                                                 EditTrigger="DataGridEditTrigger.OnRowClick" ReadOnly="false" EditMode="DataGridEditMode.Cell"
                                                  StartedEditingItem="@StartedEditingShiftTimingItem"
                                                  CommittedItemChanges="@CommittedShiftTimingItemChanges"
-                                                 TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                                                 TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true"
+                                                 @ref="_timingGrid">
                                         <ToolBarContent>
                                             <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0" Width="220px">
                                                 <MudSelect T="string"
@@ -99,9 +105,9 @@
                                                            Immediate="true"
                                                            Dense="true"
                                                            Typo="Typo.subtitle2">
-                                                    @foreach (var job in _shiftTimingLookup)
+                                                    @foreach (var shift in _shiftMaterList)
                                                     {
-                                                        <MudSelectItem Value="@job.Key">@($"{job.Key} - {job.Value}")</MudSelectItem>
+                                                        <MudSelectItem Value="shift.ShiftCode">@($"{shift.ShiftCode} - {shift.ShiftDescription}")</MudSelectItem>
                                                     }
                                                 </MudSelect>
                                             </MudPaper>
@@ -120,118 +126,46 @@
                                                      @* Empty to prevent rendering *@
                                                  </EditTemplate>
                                              </PropertyColumn>
-                                             <PropertyColumn Property="x => x.ShiftPatternCode" Title="Shift Pattern Code" Class="col-shift-pattern">
-                                                 <EditTemplate Context="row">
-                                                     <MudTextField @bind-Value="row.Item.ShiftPatternCode" For="@(() => row.Item.ShiftPatternCode)"
-                                                                   Label="Shift Pattern Code"
-                                                                   HelperText="Maximum input is 10 chars."
-                                                                   Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="10" MaxLength="10"
-                                                                   Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                 </EditTemplate>
-                                             </PropertyColumn>
-                                             <PropertyColumn Property="x => x.ShiftDescription" Title="Shift Timing" Class="col-shift-timing">
-                                                 <EditTemplate Context="row">
-                                                     <MudTextField @bind-Value="row.Item.ShiftDescription" For="@(() => row.Item.ShiftDescription)"
-                                                                   Label="Shift Description"
-                                                                   HelperText="Maximum input is 200 chars."
-                                                                   Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="200" MaxLength="200"
-                                                                   Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                 </EditTemplate>
-                                             </PropertyColumn>
-                                             <PropertyColumn Property="x => x.ArrivalFrom" Title="Arrival From" Class="col-shift-time">
-                                                 <CellTemplate Context="row">
-                                                     @row.Item.ArrivalFrom?.ToString("hh:mm")
-                                                </CellTemplate>
+                                             <PropertyColumn Property="x => x.ShiftPatternCode" Title="Shift Pattern Code" Class="col-shift-pattern" />
+                                             <PropertyColumn Property="x => x.ShiftDescription" Title="Shift Timing" Class="col-shift-timing" Editable="false" />
+                                             <PropertyColumn Property="x => x.ArrivalFrom" Title="Arrival From" Class="col-shift-time">                                                 
                                                 <EditTemplate Context="row">
-                                                    <MudTextField @bind-Value="row.Item.ArrivalFrom" For="@(() => row.Item.ArrivalFrom)"
-                                                                  Label="Arrival From"
-                                                                  HelperText="Specify the shift shaving time"
-                                                                  Variant="Variant.Outlined" HelperTextOnFocus="true"
-                                                                  Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                     <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.ArrivalFrom" />
                                                 </EditTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.ArrivalTo" Title="Arrival To" Class="col-shift-time">
-                                                <CellTemplate Context="row">
-                                                    @row.Item.ArrivalTo.ToString("hh:mm")
-                                                </CellTemplate>
+                                            <PropertyColumn Property="x => x.ArrivalTo" Title="Arrival To" Class="col-shift-time">                                                
                                                 <EditTemplate Context="row">
-                                                    <MudTextField @bind-Value="row.Item.ArrivalTo" For="@(() => row.Item.ArrivalTo)"
-                                                                  Label="Arrival To"
-                                                                  HelperText="Specify the shift start time"
-                                                                  Variant="Variant.Outlined" HelperTextOnFocus="true"
-                                                                  Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                    <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.ArrivalTo" />
                                                 </EditTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.DepartFrom" Title="Depart From" Class="col-shift-time">
-                                                <CellTemplate Context="row">
-                                                    @row.Item.DepartFrom.ToString("hh:mm")
-                                                </CellTemplate>
                                                 <EditTemplate Context="row">
-                                                    <MudTextField @bind-Value="row.Item.DepartFrom" For="@(() => row.Item.DepartFrom)"
-                                                                  Label="Depart From"
-                                                                  HelperText="Specify the shift end time"
-                                                                  Variant="Variant.Outlined" HelperTextOnFocus="true"
-                                                                  Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                    <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.DepartFrom" />
                                                 </EditTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.DepartTo" Title="Depart To" Class="col-shift-time">
-                                                <CellTemplate Context="row">
-                                                    @row.Item.DepartTo?.ToString("hh:mm")
-                                                </CellTemplate>
+                                            <PropertyColumn Property="x => x.DepartTo" Title="Depart To" Class="col-shift-time">                                                
                                                 <EditTemplate Context="row">
-                                                    <MudTextField @bind-Value="row.Item.DepartTo" For="@(() => row.Item.DepartTo)"
-                                                                  Label="Depart To"
-                                                                  HelperText="Specify the shift shaving end time"
-                                                                  Variant="Variant.Outlined" HelperTextOnFocus="true"
-                                                                  Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                     <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.DepartTo" />
                                                 </EditTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.RArrivalFrom" Title="Arrival From (Ramadan)" Class="col-shift-time">
-                                                <CellTemplate Context="row">
-                                                    @row.Item.RArrivalFrom?.ToString("hh:mm")
-                                                </CellTemplate>
+                                            <PropertyColumn Property="x => x.RArrivalFrom" Title="Arrival From (Ramadan)" Class="col-shift-time">                                                
                                                 <EditTemplate Context="row">
-                                                    <MudTextField @bind-Value="row.Item.RArrivalFrom" For="@(() => row.Item.RArrivalFrom)"
-                                                                  Label="Arrival From"
-                                                                  HelperText="Specify the shift shaving time"
-                                                                  Variant="Variant.Outlined" HelperTextOnFocus="true"
-                                                                  Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                     <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RArrivalFrom" />
                                                 </EditTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.RArrivalTo" Title="Arrival To (Ramadan)" Class="col-shift-time">
-                                                <CellTemplate Context="row">
-                                                    @row.Item.RArrivalTo.ToString("hh:mm")
-                                                </CellTemplate>
+                                            <PropertyColumn Property="x => x.RArrivalTo" Title="Arrival To (Ramadan)" Class="col-shift-time">                                                
                                                 <EditTemplate Context="row">
-                                                    <MudTextField @bind-Value="row.Item.RArrivalTo" For="@(() => row.Item.RArrivalTo)"
-                                                                  Label="Arrival To"
-                                                                  HelperText="Specify the shift start time"
-                                                                  Variant="Variant.Outlined" HelperTextOnFocus="true"
-                                                                  Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                     <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RArrivalTo" />
                                                 </EditTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.RDepartFrom" Title="Depart From (Ramadan)" Class="col-shift-time">
-                                                <CellTemplate Context="row">
-                                                    @row.Item.RDepartFrom.ToString("hh:mm")
-                                                </CellTemplate>
+                                            <PropertyColumn Property="x => x.RDepartFrom" Title="Depart From (Ramadan)" Class="col-shift-time">                                                
                                                 <EditTemplate Context="row">
-                                                    <MudTextField @bind-Value="row.Item.RDepartFrom" For="@(() => row.Item.RDepartFrom)"
-                                                                  Label="Depart From"
-                                                                  HelperText="Specify the shift end time"
-                                                                  Variant="Variant.Outlined" HelperTextOnFocus="true"
-                                                                  Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                     <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RDepartFrom" />
                                                 </EditTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.RDepartTo" Title="Depart To (Ramadan)" Class="col-shift-time">
-                                                <CellTemplate Context="row">
-                                                    @row.Item.RDepartTo?.ToString("hh:mm")
-                                                </CellTemplate>
+                                            <PropertyColumn Property="x => x.RDepartTo" Title="Depart To (Ramadan)" Class="col-shift-time">                                                
                                                 <EditTemplate Context="row">
-                                                    <MudTextField @bind-Value="row.Item.RDepartTo" For="@(() => row.Item.RDepartTo)"
-                                                                  Label="Depart To"
-                                                                  HelperText="Specify the shift shaving end time"
-                                                                  Variant="Variant.Outlined" HelperTextOnFocus="true"
-                                                                  Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                     <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RDepartTo" />
                                                 </EditTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.CreatedByFullName" Hidden Editable="false" Class="col-created-by">
@@ -241,7 +175,7 @@
                                              </PropertyColumn>
                                              <PropertyColumn Property="x => x.CreatedDate" Title="Created Date" Class="col-created-date" Editable="false">
                                                  <CellTemplate Context="row">
-                                                     @row.Item.CreatedDate.ToString("dd-MMM-yyyy")
+                                                     @row.Item.CreatedDate.ToString("dd-MMM-yyyy h:mm tt")
                                                 </CellTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.LastUpdateByFullName" Hidden Editable="false" Class="col-updated-by">
@@ -254,6 +188,21 @@
                                                      @row.Item.LastUpdateDate?.ToString("dd-MMM-yyyy")
                                                 </CellTemplate>
                                             </PropertyColumn>
+                                            <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                                                <CellTemplate Context="row">
+                                                    <MudIconButton Color="Color.Info" title="Edit shift schedule" Class="show-btn fa-icon-btn"
+                                                                   OnClick="@row.Actions.StartEditingItemAsync">
+                                                        <ChildContent>
+                                                            <i class="fas fa-edit fa-1x"></i>
+                                                        </ChildContent>
+                                                    </MudIconButton>
+                                                    <MudIconButton Color="Color.Error" title="Delete shift schedule" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
+                                                        <ChildContent>
+                                                            <i class="fas fa-trash-alt fa-1x"></i>
+                                                        </ChildContent>
+                                                    </MudIconButton>
+                                                </CellTemplate>
+                                            </TemplateColumn>
                                         </Columns>
                                         <NoRecordsContent>
                                             <div class="no-data-box">
@@ -284,7 +233,7 @@
                                     <MudDataGrid T="ShiftPointerDTO" Items="@_shiftPattern.ShiftPointerList" Hover="true" Striped="true" Class="shift-grid"
                                                  Filterable="_enableShiftTimingFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                                                  Hideable="true" PageSize="5"
-                                                 EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Cell"
+                                                 EditTrigger="DataGridEditTrigger.OnRowClick" ReadOnly="false" EditMode="DataGridEditMode.Cell"
                                                  StartedEditingItem="@StartedEditingShiftPointerItem"
                                                  CommittedItemChanges="@CommittedShiftTimingItemChanges"
                                                  TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
@@ -293,7 +242,7 @@
                                                 <MudSelect T="string"
                                                            @bind-Value="_selectedTimingForSequence"
                                                            Label="Shift Timing"
-                                                           Variant="Variant.Outlined"
+                                                           Variant="Variant.Filled"
                                                            Margin="Margin.Dense"
                                                            Placeholder="Please Select"
                                                            AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
@@ -322,19 +271,23 @@
                                                      @* Empty to prevent rendering *@
                                                  </EditTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.ShiftPointer" Title="Shift Pointer" Class="col-created-date" Editable="false" />
-                                            @* <PropertyColumn Property="x => x.ShiftTiming" Title="Group Name" Class="col-group-name">
+                                            <PropertyColumn Property="x => x.ShiftPointer" Title="Shift Pointer" Class="col-shift-pointer" Editable="false" />
+                                            <PropertyColumn Property="x => x.ShiftDescription" Title="Shift Timing" Class="col-shift-timing">
                                                  <EditTemplate Context="row">
-                                                     <MudSelect @bind-Value="row.Item.ShiftTiming" Variant="Variant.Text" Margin="Margin.Dense" Label="Group Name"
+                                                     <MudSelect @bind-Value="row.Item.ShiftCode" Variant="Variant.Text" Margin="Margin.Dense" Label="Group Name"
                                                         Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
-                                                        HelperText="Filter by employment status" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
-                                                         @foreach (var group in _groupList)
+                                                        HelperText="Filter by shift timing" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
+                                                        @foreach (var shift in _shiftMaterList)
                                                         {
-                                                            <MudSelectItem Value="group.UDCCode">@group.UDCDesc1</MudSelectItem>
+                                                            <MudSelectItem Value="shift.ShiftCode">@shift.ShiftDescription</MudSelectItem>
                                                         }
+                                                        @* @foreach (var shift in _shiftTimingLookup)
+                                                        {
+                                                            <MudSelectItem Value="@shift.Key">@($"{shift.Key} - {shift.Value}")</MudSelectItem>
+                                                        } *@
                                                     </MudSelect>
                                                 </EditTemplate>
-                                            </PropertyColumn> *@
+                                            </PropertyColumn>
                                         </Columns>
                                         <NoRecordsContent>
                                             <div class="no-data-box">

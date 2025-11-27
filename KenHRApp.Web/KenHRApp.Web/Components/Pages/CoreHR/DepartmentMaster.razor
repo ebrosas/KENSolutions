@@ -47,9 +47,6 @@
                                              Clearable="true" Typo="Typo.subtitle2"
                                              MaxItems="@(_groupList != null ? _groupList.Count : 10)"
                                              Modal="true" />
-                            @* <MudTextField @bind-Value="_description" Label="Description" HelperText="Enter description search string"
-                                          Variant="Variant.Text" HelperTextOnFocus="true" Counter="100" MaxLength="100"
-                                          Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" /> *@
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="3">
@@ -118,7 +115,7 @@
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Dark" Label="Download Master Data" />
                  </MudMenu>
              </MudAppBar>
-             <MudPaper Elevation="5" Square="true" Class="w-100">
+             <MudPaper Elevation="5" Square="true" Class="w-100 mb-3">
                  <MudDataGrid T="DepartmentDTO" Items="@_departmentList" Hover="true" Striped="true" Class="department-master-grid"
                     Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                     QuickFilter="@_quickFilter" Hideable="true" PageSize="5"

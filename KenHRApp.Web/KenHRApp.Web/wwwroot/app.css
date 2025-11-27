@@ -1887,7 +1887,14 @@ h1:focus {
 }
 
 .shift-roster-grid .col-shift-timing {
-    width: 130px !important;
+    width: 150px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shift-roster-grid .col-shift-pointer {
+    width: 120px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;

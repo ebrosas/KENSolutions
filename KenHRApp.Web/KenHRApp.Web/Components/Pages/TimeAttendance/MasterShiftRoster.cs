@@ -1,6 +1,7 @@
 ﻿using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
+using KenHRApp.Web.Components.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
@@ -64,6 +65,24 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _enableShiftPointerFilter = false;
         #endregion
 
+        #region Dialog Box Button Icons
+        private readonly string _iconDelete = "fas fa-trash-alt";
+        private readonly string _iconCancel = "fas fa-window-close";
+        private readonly string _iconError = "fas fa-times-circle";
+        private readonly string _iconInfo = "fas fa-info-circle";
+        private readonly string _iconWarning = "fas fa-exclamation-circle";
+        #endregion
+
+        #region Collections        
+        private List<BreadcrumbItem> _breadcrumbItems =
+        [
+            new("Home", href: "/", icon: Icons.Material.Filled.Home),
+            new("Shift Roster", href: null, disabled: true, @Icons.Material.Outlined.Shield)
+        ];
+
+        private List<ShiftMasterDTO> _shiftMaterList = new List<ShiftMasterDTO>();
+        #endregion
+
         #region Enums
         private enum NotificationType
         {
@@ -84,14 +103,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
         #endregion
 
-        #region Collections        
-        private List<BreadcrumbItem> _breadcrumbItems =
-        [
-            new("Home", href: "/", icon: Icons.Material.Filled.Home),
-            new("Shift Roster", href: null, disabled: true, @Icons.Material.Outlined.Shield)
-        ];
-        #endregion
-
         #region Page Events
         protected override void OnInitialized()
         {
@@ -102,6 +113,72 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // For demo, initialize default selection
             _selectedTimingForSchedule = _shiftTimingLookup.Keys.FirstOrDefault();
             _selectedTimingForSequence = _shiftTimingLookup.Keys.FirstOrDefault();
+
+            #region Populate shift master list
+            _shiftMaterList.Add(new ShiftMasterDTO()
+            {
+                ShiftCode = "D",
+                ShiftDescription = "Day",
+                ArrivalFrom = new TimeSpan(6,0,0),
+                ArrivalTo = new TimeSpan(7, 30, 0),
+                DepartFrom = new TimeSpan(16, 0, 0),
+                DepartTo = new TimeSpan(16, 30, 0),
+                DurationNormal = 8,
+                RArrivalFrom = new TimeSpan(6, 0, 0),
+                RArrivalTo = new TimeSpan(7, 30, 0),
+                RDepartFrom = new TimeSpan(13, 30, 0),
+                RDepartTo = new TimeSpan(14, 00, 0),
+                DurationRamadan = 6
+            });
+
+            _shiftMaterList.Add(new ShiftMasterDTO()
+            {
+                ShiftCode = "M",
+                ShiftDescription = "Morning",
+                ArrivalFrom = new TimeSpan(6, 0, 0),
+                ArrivalTo = new TimeSpan(7, 0, 0),
+                DepartFrom = new TimeSpan(15, 0, 0),
+                DepartTo = new TimeSpan(15, 30, 0),
+                DurationNormal = 8,
+                RArrivalFrom = new TimeSpan(6, 0, 0),
+                RArrivalTo = new TimeSpan(7, 0, 0),
+                RDepartFrom = new TimeSpan(13, 0, 0),
+                RDepartTo = new TimeSpan(13, 30, 0),
+                DurationRamadan = 6
+            });
+
+            _shiftMaterList.Add(new ShiftMasterDTO()
+            {
+                ShiftCode = "E",
+                ShiftDescription = "Evening",
+                ArrivalFrom = new TimeSpan(14, 0, 0),
+                ArrivalTo = new TimeSpan(15, 0, 0),
+                DepartFrom = new TimeSpan(23, 0, 0),
+                DepartTo = new TimeSpan(23, 30, 0),
+                DurationNormal = 8,
+                RArrivalFrom = new TimeSpan(14, 0, 0),
+                RArrivalTo = new TimeSpan(15, 0, 0),
+                RDepartFrom = new TimeSpan(21, 0, 0),
+                RDepartTo = new TimeSpan(21, 30, 0),
+                DurationRamadan = 6
+            });
+
+            _shiftMaterList.Add(new ShiftMasterDTO()
+            {
+                ShiftCode = "N",
+                ShiftDescription = "Night",
+                ArrivalFrom = new TimeSpan(22, 0, 0),
+                ArrivalTo = new TimeSpan(23, 0, 0),
+                DepartFrom = new TimeSpan(7, 0, 0),
+                DepartTo = new TimeSpan(7, 30, 0),
+                DurationNormal = 8,
+                RArrivalFrom = new TimeSpan(22, 0, 0),
+                RArrivalTo = new TimeSpan(23, 0, 0),
+                RDepartFrom = new TimeSpan(5, 0, 0),
+                RDepartTo = new TimeSpan(5, 30, 0),
+                DurationRamadan = 6
+            });
+            #endregion
 
             // if editing existing, load lists into _shiftPattern.ShiftTimingList and ShiftPointerList
         }
@@ -303,30 +380,49 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private async Task AddTimingToSchedule()
         {
-            if (string.IsNullOrWhiteSpace(_selectedTimingForSchedule))
+            if (string.IsNullOrEmpty(_shiftPattern.ShiftPatternCode))
+            {
+                ShowNotification("Shift Pattern Code must be defined.", NotificationType.Error);
                 return;
+            }
+
+            if (string.IsNullOrWhiteSpace(_selectedTimingForSchedule))
+            {
+                ShowNotification("Shift Timing must be selected from the drop-down box.", NotificationType.Error);
+                return;
+            }
 
             // Do not add duplicates (same ShiftCode for this pattern)
             if (_shiftPattern.ShiftTimingList.Any(x => x.ShiftCode == _selectedTimingForSchedule && x.ShiftPatternCode == _shiftPattern.ShiftPatternCode))
             {
-                // show a snackbar or message - for brevity using Console
-                Console.WriteLine("Timing already exists in schedule");
+                await ShowErrorMessage(MessageBoxTypes.Info, "Duplicate Record", "Timing already exists in schedule.");
                 return;
             }
 
-            var newTiming = new ShiftTimingDTO
+            ShiftMasterDTO? selectedShift = _shiftMaterList.Where(a => a.ShiftCode == _selectedTimingForSchedule).FirstOrDefault();
+            if (selectedShift != null)
             {
-                ShiftPatternCode = _shiftPattern.ShiftPatternCode ?? string.Empty,
-                ShiftCode = _selectedTimingForSchedule,
-                ShiftDescription = _shiftTimingLookup[_selectedTimingForSchedule],
-                CreatedDate = DateTime.Now,
-                CreatedByEmpNo = null,
-                CreatedByName = "System"
-                // other defaults as needed
-            };
+                var newTiming = new ShiftTimingDTO
+                {
+                    ShiftPatternCode = _shiftPattern.ShiftPatternCode ?? string.Empty,
+                    ShiftCode = _selectedTimingForSchedule,
+                    ShiftDescription = _shiftTimingLookup[_selectedTimingForSchedule],
+                    ArrivalFrom = selectedShift.ArrivalFrom,
+                    ArrivalTo = selectedShift.ArrivalTo,
+                    DepartFrom = selectedShift.DepartFrom,
+                    DepartTo = selectedShift.DepartTo,
+                    RArrivalFrom = selectedShift.RArrivalFrom,
+                    RArrivalTo = selectedShift.RArrivalTo,
+                    RDepartFrom = selectedShift.RDepartFrom,
+                    RDepartTo = selectedShift.RDepartTo,
+                    CreatedDate = DateTime.Now,
+                    CreatedByEmpNo = 10003632,
+                    CreatedByName = "ERVIN OLINAS BROSAS"
+                };
 
-            _shiftPattern.ShiftTimingList.Add(newTiming);
-            await _timingGrid?.ReloadServerData();
+                _shiftPattern.ShiftTimingList.Add(newTiming);
+                await _timingGrid!.ReloadServerData();
+            }
         }
 
         private async Task RemoveTimingAsync(ShiftTimingDTO timing)
@@ -346,7 +442,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 ShiftPatternCode = _shiftPattern.ShiftPatternCode ?? string.Empty,
                 ShiftCode = _selectedTimingForSequence,
                 ShiftPointer = (_shiftPattern.ShiftPointerList.Count > 0) ? _shiftPattern.ShiftPointerList.Max(x => x.ShiftPointer) + 1 : 1,
-                ShiftTiming = string.Empty
+                ShiftDescription = _shiftTimingLookup.GetValueOrDefault(_selectedTimingForSequence)
             };
 
             _shiftPattern.ShiftPointerList.Add(newPointer);
@@ -393,6 +489,71 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 IsFlexiTime = false,
                 ShiftPatternCode = string.Empty
             };
+        }
+
+        private async Task ConfirmDelete(ShiftTimingDTO shiftTiming)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to delete the department '{shiftTiming.ShiftDescription}'?" },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error },
+                { "DialogIconColor", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Confirmation", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                //BeginDeleteDepartment(department);
+            }
+        }
+
+        private async Task ShowErrorMessage(MessageBoxTypes msgboxType, string title, string content)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", title},
+                { "DialogIcon", msgboxType == MessageBoxTypes.Error ? _iconError
+                        : msgboxType == MessageBoxTypes.Warning ? _iconWarning
+                        : _iconInfo  },
+                { "ContentText", content },
+                {
+                    "Color", msgboxType == MessageBoxTypes.Error ? Color.Error
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
+                },
+                {
+                    "DialogIconColor", msgboxType == MessageBoxTypes.Error ? Color.Error
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
+                }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.Center,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<InfoDialog>(title, parameters, options);
+            var result = await dialog.Result;
         }
         #endregion
     }

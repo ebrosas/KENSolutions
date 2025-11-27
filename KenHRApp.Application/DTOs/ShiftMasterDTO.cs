@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace KenHRApp.Application.DTOs
 {
-    public class ShiftTimingDTO
+    public class ShiftMasterDTO
     {
         #region Properties
-        public int ShiftTimingId { get; set; }
+        public int ShiftMasterId { get; set; }
 
         [Required(ErrorMessage = "Shift Code is required")]
         [Display(Name = "Shift Code")]
@@ -27,28 +27,32 @@ namespace KenHRApp.Application.DTOs
 
         [Required(ErrorMessage = "Arrival To is required")]
         [Display(Name = "Arrival To")]
-        public TimeSpan? ArrivalTo { get; set; }
+        public TimeSpan ArrivalTo { get; set; }
 
         [Required(ErrorMessage = "Depart From is required")]
         [Display(Name = "Depart From")]
-        public TimeSpan? DepartFrom { get; set; }
-        
+        public TimeSpan DepartFrom { get; set; }
+
         [Display(Name = "Depart To")]
         public TimeSpan? DepartTo { get; set; }
+
+        public int DurationNormal { get; set; } = 0;
 
         [Display(Name = "Ramadan Arrival From")]
         public TimeSpan? RArrivalFrom { get; set; }
 
         [Required(ErrorMessage = "Ramadan Arrival To is required")]
         [Display(Name = "Ramadan Arrival To")]
-        public TimeSpan? RArrivalTo { get; set; }
+        public TimeSpan RArrivalTo { get; set; }
 
         [Required(ErrorMessage = "Ramadan Depart From is required")]
         [Display(Name = "Ramadan Depart From")]
-        public TimeSpan? RDepartFrom { get; set; }
+        public TimeSpan RDepartFrom { get; set; }
 
         [Display(Name = "Ramadan Depart To")]
         public TimeSpan? RDepartTo { get; set; }
+
+        public int DurationRamadan { get; set; } = 0;
 
         public int? CreatedByEmpNo { get; set; }
         public string? CreatedByName { get; set; } = null;
@@ -58,37 +62,6 @@ namespace KenHRApp.Application.DTOs
         public int? LastUpdateEmpNo { get; set; }
         public string? LastUpdateUserID { get; set; } = null;
         public string? LastUpdatedByName { get; set; } = null;
-        #endregion
-
-        #region Extended Properties
-        public string CreatedByFullName
-        {
-            get
-            {
-                return $"({CreatedByEmpNo}) {CreatedByName}";
-            }
-        }
-
-        public string LastUpdateByFullName
-        {
-            get
-            {
-                return $"({LastUpdateEmpNo}) {LastUpdatedByName}";
-            }
-        }
-
-        public string ShiftTiming
-        {
-            get
-            {
-                return $"{ShiftCode} - {ShiftDescription}";
-            }
-        }
-        #endregion
-
-        #region Reference Navigation to Recruitment Request   
-        public string ShiftPatternCode { get; set; } = null!;
-        public ShiftPatternMasterDTO ShiftPatternMaster { get; set; } = null!;
         #endregion
     }
 }
