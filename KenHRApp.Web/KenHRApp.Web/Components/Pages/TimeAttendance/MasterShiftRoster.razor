@@ -105,7 +105,7 @@
                                                            Immediate="true"
                                                            Dense="true"
                                                            Typo="Typo.subtitle2">
-                                                    @foreach (var shift in _shiftMaterList)
+                                                    @foreach (var shift in _shiftMasterList)
                                                     {
                                                         <MudSelectItem Value="shift.ShiftCode">@($"{shift.ShiftCode} - {shift.ShiftDescription}")</MudSelectItem>
                                                     }
@@ -174,7 +174,7 @@
                                                  </EditTemplate>
                                              </PropertyColumn>
                                              <PropertyColumn Property="x => x.CreatedDate" Title="Created Date" Class="col-created-date" Editable="false">
-                                                 <CellTemplate Context="row">
+                                                <CellTemplate Context="row">
                                                      @row.Item.CreatedDate.ToString("dd-MMM-yyyy h:mm tt")
                                                 </CellTemplate>
                                             </PropertyColumn>
@@ -183,25 +183,17 @@
                                                      @* Empty to prevent rendering *@
                                                  </EditTemplate>
                                              </PropertyColumn>
-                                             <PropertyColumn Property="x => x.LastUpdateDate" Title="Last Updated Date" Class="col-updated-date" Editable="false">
+                                             <PropertyColumn Property="x => x.LastUpdateDate" Title="Last Updated Date" Class="col-updated-date" Editable="false" Hidden="true">
                                                  <CellTemplate Context="row">
                                                      @row.Item.LastUpdateDate?.ToString("dd-MMM-yyyy")
                                                 </CellTemplate>
                                             </PropertyColumn>
                                             <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
-                                                <CellTemplate Context="row">
-                                                    <MudIconButton Color="Color.Info" title="Edit shift schedule" Class="show-btn fa-icon-btn"
-                                                                   OnClick="@row.Actions.StartEditingItemAsync">
-                                                        <ChildContent>
-                                                            <i class="fas fa-edit fa-1x"></i>
-                                                        </ChildContent>
-                                                    </MudIconButton>
-                                                    <MudIconButton Color="Color.Error" title="Delete shift schedule" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
-                                                        <ChildContent>
-                                                            <i class="fas fa-trash-alt fa-1x"></i>
-                                                        </ChildContent>
-                                                    </MudIconButton>
-                                                </CellTemplate>
+                                                <EditTemplate Context="row">
+                                                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Filled.Delete"
+                                                        Color="Color.Error" title="Delete shift timing schedule"
+                                                        OnClick="@(() => DeleteShiftTiming(row.Item))" />
+                                                </EditTemplate>
                                             </TemplateColumn>
                                         </Columns>
                                         <NoRecordsContent>
@@ -228,7 +220,7 @@
                             </div>
                         </TitleContent>
                         <ChildContent>
-                            <MudPaper Class="pa-4">
+                            <MudPaper Elevation="5" Square="true" Class="w-100">
                                 <div class="shift-roster-grid">
                                     <MudDataGrid T="ShiftPointerDTO" Items="@_shiftPattern.ShiftPointerList" Hover="true" Striped="true" Class="shift-grid"
                                                  Filterable="_enableShiftTimingFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
@@ -236,7 +228,8 @@
                                                  EditTrigger="DataGridEditTrigger.OnRowClick" ReadOnly="false" EditMode="DataGridEditMode.Cell"
                                                  StartedEditingItem="@StartedEditingShiftPointerItem"
                                                  CommittedItemChanges="@CommittedShiftTimingItemChanges"
-                                                 TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                                                 TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true"
+                                                 @ref="_pointerGrid">
                                         <ToolBarContent>
                                             <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0" Width="220px">
                                                 <MudSelect T="string"
@@ -250,10 +243,14 @@
                                                            Immediate="true"
                                                            Dense="true"
                                                            Typo="Typo.subtitle2">
-                                                    @foreach (var job in _shiftTimingLookup)
+                                                    @foreach (var shift in _shiftMasterPointerList)
+                                                    {
+                                                        <MudSelectItem Value="shift.ShiftCode">@($"{shift.ShiftCode} - {shift.ShiftDescription}")</MudSelectItem>
+                                                    }
+                                                    @* @foreach (var job in _shiftTimingLookup)
                                                     {
                                                         <MudSelectItem Value="@job.Key">@($"{job.Key} - {job.Value}")</MudSelectItem>
-                                                    }
+                                                    } *@
                                                 </MudSelect>
                                             </MudPaper>
                                             <MudPaper Class="ms-3" Elevation="0">
@@ -271,23 +268,30 @@
                                                      @* Empty to prevent rendering *@
                                                  </EditTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.ShiftPointer" Title="Shift Pointer" Class="col-shift-pointer" Editable="false" />
+                                            <PropertyColumn Property="x => x.ShiftPointer" Title="Shift Pointer" Class="col-shift-pointer" Editable="false">
+                                                 <CellTemplate Context="row">
+                                                     @row.Item.ShiftPointer.ToString("N0")
+                                                </CellTemplate>
+                                            </PropertyColumn>
                                             <PropertyColumn Property="x => x.ShiftDescription" Title="Shift Timing" Class="col-shift-timing">
-                                                 <EditTemplate Context="row">
-                                                     <MudSelect @bind-Value="row.Item.ShiftCode" Variant="Variant.Text" Margin="Margin.Dense" Label="Group Name"
+                                                <EditTemplate Context="row">
+                                                     <MudSelect @bind-Value="row.Item.ShiftCode" Variant="Variant.Outlined" Margin="Margin.Dense" 
                                                         Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
-                                                        HelperText="Filter by shift timing" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
-                                                        @foreach (var shift in _shiftMaterList)
+                                                        Immediate="true" Typo="Typo.subtitle2">
+                                                         @foreach (var shift in _shiftMasterPointerList)
                                                         {
                                                             <MudSelectItem Value="shift.ShiftCode">@shift.ShiftDescription</MudSelectItem>
                                                         }
-                                                        @* @foreach (var shift in _shiftTimingLookup)
-                                                        {
-                                                            <MudSelectItem Value="@shift.Key">@($"{shift.Key} - {shift.Value}")</MudSelectItem>
-                                                        } *@
                                                     </MudSelect>
                                                 </EditTemplate>
                                             </PropertyColumn>
+                                            <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                                                <EditTemplate Context="row">
+                                                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Filled.Delete"
+                                                                   Color="Color.Error" title="Delete shift timing sequence"
+                                                                   OnClick="@(() => DeleteShiftSequence(row.Item))" />
+                                                </EditTemplate>
+                                            </TemplateColumn>
                                         </Columns>
                                         <NoRecordsContent>
                                             <div class="no-data-box">
