@@ -1880,28 +1880,28 @@ h1:focus {
 
 /* Grid Column widths */
 .shift-roster-grid .col-shift-pattern {
-    width: 150px !important;
+    width: 120px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-shift-timing {
-    width: 150px !important;
+    width: 120px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-shift-pointer {
-    width: 120px !important;
+    width: 100px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-shift-time {
-    width: 120px !important;
+    width: 100px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1909,14 +1909,14 @@ h1:focus {
 }
 
 .shift-roster-grid .col-created-date {
-    width: 120px !important;
+    width: 100px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-created-by {
-    width: 250px !important;
+    width: 200px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;

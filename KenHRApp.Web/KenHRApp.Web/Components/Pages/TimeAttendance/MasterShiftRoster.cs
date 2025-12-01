@@ -1,7 +1,9 @@
 ﻿using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
+using KenHRApp.Application.Services;
 using KenHRApp.Domain.Entities;
+using KenHRApp.Web.Components.Pages.Recruitment;
 using KenHRApp.Web.Components.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -77,6 +79,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _isClearable = false;
         private bool _isEditMode = false;
         private bool _saveBtnEnabled = false;
+        private bool _forceLoad = false;
+        private bool _allowGridEdit = false;
         #endregion
 
         #region Dialog Box Button Icons
@@ -131,6 +135,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             // Initialize the EditContext 
             _editContext = new EditContext(_shiftPattern);
+
+            // Set action to Add mode 
+            ActionType = ActionTypes.Add.ToString();
 
             if (ActionType == ActionTypes.Edit.ToString() ||
                 ActionType == ActionTypes.View.ToString())
@@ -258,13 +265,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set the overlay message
                 overlayMessage = "Saving changes, please wait...";
 
-                //_ = SaveQualificationAsync(async () =>
-                //{
-                //    _isRunning = false;
+                _ = SaveShiftRosterAsync(async () =>
+                {
+                    _isRunning = false;
 
-                //    // Shows the spinner overlay
-                //    await InvokeAsync(StateHasChanged);
-                //});
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+                });
             }
             catch (OperationCanceledException)
             {
@@ -621,6 +628,70 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (pointer == null) return;
             _shiftPattern.ShiftPointerList.Remove(pointer);
             await _pointerGrid?.ReloadServerData();
+        }
+
+        private async Task SaveShiftRosterAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            bool isNewRequition = _shiftPattern.ShiftPatternId == 0;
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = true;
+            string errorMsg = string.Empty;
+
+            if (isNewRequition)
+            {
+                //var addResult = await RecruitmentService.AddRecruitmentRequestAsync(_recruitmentRequest, _cts.Token);
+                //isSuccess = addResult.Success;
+                //if (!isSuccess)
+                //    errorMsg = addResult.Error!;
+                //else
+                //{
+                //    // Set flag to enable reload of _recruitmentRequests when navigating back to the Employe Search page
+                //    _forceLoad = true;
+                //}
+            }
+            else
+            {
+                //var saveResult = await RecruitmentService.UpdateRecruitmentRequestAsync(_recruitmentRequest, _cts.Token);
+                //isSuccess = saveResult.Success;
+                //if (!isSuccess)
+                //    errorMsg = saveResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Reset flags
+                _isEditMode = false;
+                _allowGridEdit = false;
+                _saveBtnEnabled = false;
+                _isDisabled = true;
+
+                // Show notification
+                if (isNewRequition)
+                    ShowNotification("Shift Roster has been created successfully!", NotificationType.Success);
+                else
+                    ShowNotification("Shift Roster changes has been saved successfully!", NotificationType.Success);
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(errorMsg);
+                ShowHideError(true);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
         }
 
         private async Task SaveMasterAsync()

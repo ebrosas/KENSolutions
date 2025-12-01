@@ -32,7 +32,7 @@
         <MudPaper class="paper-header w-100 px-4" Elevation="0">          
             <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="4" Class="mud-primary-text" />
             <MudSpacer></MudSpacer>
-            <MudPaper>
+            <MudPaper Elevation="0">
                 @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
                 {
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit"
@@ -52,20 +52,21 @@
                                Size="Size.Small" Color="Color.Warning" Disabled="@(!_isEditMode)" OnClick="SaveMasterAsync">
                         Undo
                     </MudButton>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh"
-                               Size="Size.Small" Color="Color.Tertiary" Disabled="@(_isEditMode)" OnClick="SaveMasterAsync">
-                        Refresh
-                    </MudButton>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete"
-                               Size="Size.Small" Color="Color.Error" Disabled="@_isEditMode" OnClick="@SaveMasterAsync">
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Class="ml-1"
+                        Size="Size.Small" Color="Color.Error" Disabled="@_isEditMode" OnClick="@SaveMasterAsync">
                         Delete
                     </MudButton>
                 }
 
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" Class="ml-1"
+                           Size="Size.Small" Color="Color.Secondary" Disabled="@(_isEditMode)">
+                    Reset
+                </MudButton>
+
                 @if (ActionType == ActionTypes.Add.ToString())
                 {
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Class="ml-1" OnClick="@SaveMasterAsync"
-                               Size="Size.Small" Color="Color.Error">
+                               Size="Size.Small" Color="Color.Default">
                         Cancel
                     </MudButton>
                 }
@@ -79,9 +80,8 @@
                         <MudTextField @bind-Value="_shiftPattern.ShiftPatternCode" Label="Shift Roster Code"
                                 For="@(() => _shiftPattern.ShiftPatternCode)"
                                 HelperText="Max. text input is 20 chars." Variant="Variant.Text" HelperTextOnFocus="true"
-                                Counter="20" MaxLength="20" Disabled="@_isDisabled"
-                                Required="true"
-                                RequiredError="Shift Roster Code is required"
+                                Disabled="@_isDisabled"
+                                Required="true" RequiredError="Shift Roster Code is required"
                                 Clearable="@_isClearable" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                     </MudItem>
                     <MudItem xs="12" sm="5">
@@ -97,7 +97,7 @@
                     </MudItem> *@
                     <MudItem xs="12" sm="2">
                         <MudPaper Elevation="0" Class="d-flex align-content-end">
-                            <MudSwitch @bind-Value="_shiftPattern.IsActive" Color="Color.Success" UncheckedColor="Color.Default"
+                            <MudSwitch @bind-Value="_shiftPattern.IsActive" Color="Color.Primary" UncheckedColor="Color.Default"
                                        Label="Is Active?" LabelPlacement="Placement.Start" />
                         </MudPaper>                        
                     </MudItem>
@@ -120,7 +120,7 @@
                         <ChildContent>
                             <MudPaper Elevation="5" Square="true" Class="w-100">
                                 <div class="shift-roster-grid">
-                                    <MudDataGrid T="ShiftTimingDTO" Items="@_shiftPattern.ShiftTimingList" Hover="true" Striped="true" Class="shift-grid"
+                                    <MudDataGrid T="ShiftTimingDTO" Items="@_shiftPattern.ShiftTimingList" Hover="true" Striped="true" 
                                                  Filterable="_enableShiftTimingFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                                                  QuickFilter="@_shiftTimingFilter" Hideable="true" PageSize="5"
                                                  EditTrigger="DataGridEditTrigger.OnRowClick" ReadOnly="false" EditMode="DataGridEditMode.Cell"
@@ -164,7 +164,13 @@
                                                  </EditTemplate>
                                              </PropertyColumn>
                                              <PropertyColumn Property="x => x.ShiftPatternCode" Title="Shift Pattern Code" Class="col-shift-pattern" />
-                                             <PropertyColumn Property="x => x.ShiftDescription" Title="Shift Timing" Class="col-shift-timing" Editable="false" />
+                                            <PropertyColumn Property="x => x.ShiftDescription" Title="Shift Timing" Class="col-shift-timing" Editable="false">
+                                                 <CellTemplate Context="row">
+                                                     <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" Color="Color.Error">
+                                                         @row.Item.ShiftDescription
+                                                    </MudChip>
+                                                </CellTemplate>
+                                            </PropertyColumn>
                                              <PropertyColumn Property="x => x.ArrivalFrom" Title="Arrival From" Class="col-shift-time">                                                 
                                                 <EditTemplate Context="row">
                                                      <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.ArrivalFrom" />
@@ -259,7 +265,7 @@
                         <ChildContent>
                             <MudPaper Elevation="5" Square="true" Class="w-100 mb-4">
                                 <div class="shift-roster-grid">
-                                    <MudDataGrid T="ShiftPointerDTO" Items="@_shiftPattern.ShiftPointerList" Hover="true" Striped="true" Class="shift-grid"
+                                    <MudDataGrid T="ShiftPointerDTO" Items="@_shiftPattern.ShiftPointerList" Hover="true" Striped="true" 
                                                  Filterable="_enableShiftPointerFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                                                  Hideable="true" PageSize="5"
                                                  EditTrigger="DataGridEditTrigger.OnRowClick" ReadOnly="false" EditMode="DataGridEditMode.Cell"
@@ -303,7 +309,7 @@
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.ShiftPointer" Title="Shift Pointer" Class="col-shift-pointer" Editable="false">
                                                  <CellTemplate Context="row">
-                                                     @row.Item.ShiftPointer.ToString("N0")
+                                                    <MudAvatar Size="Size.Small" Color="Color.Tertiary">@row.Item.ShiftPointer.ToString("N0")</MudAvatar>
                                                 </CellTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.ShiftDescription" Title="Shift Timing" Class="col-shift-timing">
@@ -353,4 +359,11 @@
     </EditForm>
 </MudContainer>
 
-
+<!-- Full-screen overlay -->
+@if (_isRunning)
+{
+    <div class="fullscreen-overlay">
+        <MudProgressCircular Indeterminate="true" Size="Size.Medium" Color="Color.Info" />
+        <MudText Typo="Typo.h6" Class="mt-2 text-white">@overlayMessage</MudText>
+        </div>
+}
