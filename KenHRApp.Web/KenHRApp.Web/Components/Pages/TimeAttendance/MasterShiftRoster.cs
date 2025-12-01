@@ -1,6 +1,7 @@
 ﻿using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
+using KenHRApp.Domain.Entities;
 using KenHRApp.Web.Components.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -18,6 +19,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IAppState AppState { get; set; } = default!;
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string ActionType { get; set; } = ActionTypes.View.ToString();
         #endregion
 
         #region Fields
@@ -57,12 +62,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string? _selectedTimingForSequence;
         #endregion
 
+        #region Constants
+        private readonly string CONST_DAYOFF_CODE = "O";
+        private readonly string CONST_DAYOFF_DESC = "Weekend";
+        #endregion
+
         #region Flags
         private bool _showErrorAlert = false;
         private bool _hasValidationError = false;
         private bool _isRunning = false;
         private bool _enableShiftTimingFilter = false;
         private bool _enableShiftPointerFilter = false;
+        private bool _isDisabled = false;
+        private bool _isClearable = false;
+        private bool _isEditMode = false;
+        private bool _saveBtnEnabled = false;
         #endregion
 
         #region Dialog Box Button Icons
@@ -85,6 +99,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Enums
+        private enum ActionTypes
+        {
+            View,
+            Edit,
+            Add,
+            Delete
+        }
+
         private enum NotificationType
         {
             Normal,
@@ -110,10 +132,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Initialize the EditContext 
             _editContext = new EditContext(_shiftPattern);
 
-            // example: load existing master record (or keep empty for new)
-            // For demo, initialize default selection
-            _selectedTimingForSchedule = _shiftTimingLookup.Keys.FirstOrDefault();
-            _selectedTimingForSequence = _shiftTimingLookup.Keys.FirstOrDefault();
+            if (ActionType == ActionTypes.Edit.ToString() ||
+                ActionType == ActionTypes.View.ToString())
+            {
+                _isDisabled = true;
+            }
+            else if (ActionType == ActionTypes.Add.ToString())
+            {
+                _isDisabled = false;
+                _saveBtnEnabled = true;
+            }
+
+                // example: load existing master record (or keep empty for new)
+                // For demo, initialize default selection
+                _selectedTimingForSchedule = _shiftTimingLookup.Keys.FirstOrDefault();
+            //_selectedTimingForSequence = _shiftTimingLookup.Keys.FirstOrDefault();
 
             #region Populate shift master list
             _shiftMasterList.Add(new ShiftMasterDTO()
@@ -182,21 +215,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             #endregion
 
             #region Populate Shift Master Pointer List
-            _shiftMasterPointerList.Add(new ShiftMasterDTO()
-            {
-                ShiftCode = "D",
-                ShiftDescription = "Day",
-                ArrivalFrom = new TimeSpan(6, 0, 0),
-                ArrivalTo = new TimeSpan(7, 30, 0),
-                DepartFrom = new TimeSpan(16, 0, 0),
-                DepartTo = new TimeSpan(16, 30, 0),
-                DurationNormal = 8,
-                RArrivalFrom = new TimeSpan(6, 0, 0),
-                RArrivalTo = new TimeSpan(7, 30, 0),
-                RDepartFrom = new TimeSpan(13, 30, 0),
-                RDepartTo = new TimeSpan(14, 00, 0),
-                DurationRamadan = 6
-            });
+            //_shiftMasterPointerList.Add(new ShiftMasterDTO()
+            //{
+            //    ShiftCode = "D",
+            //    ShiftDescription = "Day",
+            //    ArrivalFrom = new TimeSpan(6, 0, 0),
+            //    ArrivalTo = new TimeSpan(7, 30, 0),
+            //    DepartFrom = new TimeSpan(16, 0, 0),
+            //    DepartTo = new TimeSpan(16, 30, 0),
+            //    DurationNormal = 8,
+            //    RArrivalFrom = new TimeSpan(6, 0, 0),
+            //    RArrivalTo = new TimeSpan(7, 30, 0),
+            //    RDepartFrom = new TimeSpan(13, 30, 0),
+            //    RDepartTo = new TimeSpan(14, 00, 0),
+            //    DurationRamadan = 6
+            //});
             #endregion
 
             // if editing existing, load lists into _shiftPattern.ShiftTimingList and ShiftPointerList
@@ -492,6 +525,36 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             ShiftMasterDTO? selectedShift = _shiftMasterList.Where(a => a.ShiftCode == _selectedTimingForSchedule).FirstOrDefault();
             if (selectedShift != null)
             {
+                #region Add shift timing to the "Shift Timing Sequence" grid
+                if (!_shiftMasterPointerList.Any(x => x.ShiftCode == selectedShift.ShiftCode))
+                {
+                    if (_shiftMasterPointerList.Count == 0)
+                    {
+                        // Add Day-off shift timing
+                        _shiftMasterPointerList.Add(new ShiftMasterDTO()
+                        {
+                            ShiftCode = CONST_DAYOFF_CODE,
+                            ShiftDescription = CONST_DAYOFF_DESC
+                        });
+                    }
+
+                    _shiftMasterPointerList.Add(new ShiftMasterDTO()
+                    {
+                        ShiftCode = selectedShift.ShiftCode,
+                        ShiftDescription = selectedShift.ShiftDescription,
+                        ArrivalFrom = selectedShift.ArrivalFrom,
+                        ArrivalTo = selectedShift.ArrivalTo,
+                        DepartFrom = selectedShift.DepartFrom,
+                        DepartTo = selectedShift.DepartTo,
+                        RArrivalFrom = selectedShift.RArrivalFrom,
+                        RArrivalTo = selectedShift.RArrivalTo,
+                        RDepartFrom = selectedShift.RDepartFrom,
+                        RDepartTo = selectedShift.RDepartTo
+                    });
+                }
+                #endregion
+
+                #region Add new shift timing to the grid                                
                 var newTiming = new ShiftTimingDTO
                 {
                     ShiftPatternCode = _shiftPattern.ShiftPatternCode ?? string.Empty,
@@ -510,26 +573,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     CreatedByName = "ERVIN OLINAS BROSAS"
                 };
 
-                // Add shift timing to the "Shift Timing Sequence"
-                if (!_shiftMasterPointerList.Any(x => x.ShiftCode == selectedShift.ShiftCode))
-                {
-                    _shiftMasterPointerList.Add(new ShiftMasterDTO()
-                    {
-                        ShiftCode = selectedShift.ShiftCode,
-                        ShiftDescription = selectedShift.ShiftDescription,
-                        ArrivalFrom = selectedShift.ArrivalFrom,
-                        ArrivalTo = selectedShift.ArrivalTo,
-                        DepartFrom = selectedShift.DepartFrom,
-                        DepartTo = selectedShift.DepartTo,
-                        RArrivalFrom = selectedShift.RArrivalFrom,
-                        RArrivalTo = selectedShift.RArrivalTo,
-                        RDepartFrom = selectedShift.RDepartFrom,
-                        RDepartTo = selectedShift.RDepartTo
-                    });
-                }
-
                 _shiftPattern.ShiftTimingList.Add(newTiming);
                 await _timingGrid!.ReloadServerData();
+                #endregion
             }
         }
 

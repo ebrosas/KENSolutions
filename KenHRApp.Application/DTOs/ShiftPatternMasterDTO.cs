@@ -14,7 +14,7 @@ namespace KenHRApp.Application.DTOs
 
         [Required(ErrorMessage = "Shift Roster Code is required")]
         [Display(Name = "Shift Roster Code")]
-        [StringLength(10, ErrorMessage = "Shift Roster Code can't be more than 10 characters.")]
+        [StringLength(20, ErrorMessage = "Shift Roster Code can't be more than 20 characters.")]
         public string ShiftPatternCode { get; set; } = null!;
 
         [Display(Name = "Shift Roster Description")]
