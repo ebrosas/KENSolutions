@@ -59,7 +59,7 @@
                 }
 
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" Class="ml-1"
-                           Size="Size.Small" Color="Color.Secondary" Disabled="@(_isEditMode)">
+                           Size="Size.Small" Color="Color.Warning" Disabled="@(_isEditMode)">
                     Reset
                 </MudButton>
 
@@ -97,7 +97,7 @@
                     </MudItem> *@
                     <MudItem xs="12" sm="2">
                         <MudPaper Elevation="0" Class="d-flex align-content-end">
-                            <MudSwitch @bind-Value="_shiftPattern.IsActive" Color="Color.Primary" UncheckedColor="Color.Default"
+                            <MudSwitch @bind-Value="_shiftPattern.IsActive" Color="Color.Info" UncheckedColor="Color.Default"
                                        Label="Is Active?" LabelPlacement="Placement.Start" />
                         </MudPaper>                        
                     </MudItem>
@@ -166,49 +166,49 @@
                                              <PropertyColumn Property="x => x.ShiftPatternCode" Title="Shift Pattern Code" Class="col-shift-pattern" />
                                             <PropertyColumn Property="x => x.ShiftDescription" Title="Shift Timing" Class="col-shift-timing" Editable="false">
                                                  <CellTemplate Context="row">
-                                                     <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" Color="Color.Error">
+                                                     <MudChip T="string" Size=Size.Small Variant="Variant.Filled" Color="Color.Secondary">
                                                          @row.Item.ShiftDescription
                                                     </MudChip>
                                                 </CellTemplate>
                                             </PropertyColumn>
                                              <PropertyColumn Property="x => x.ArrivalFrom" Title="Arrival From" Class="col-shift-time">                                                 
                                                 <EditTemplate Context="row">
-                                                     <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.ArrivalFrom" />
+                                                     <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.ArrivalFrom" />
                                                 </EditTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.ArrivalTo" Title="Arrival To" Class="col-shift-time">                                                
                                                 <EditTemplate Context="row">
-                                                    <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.ArrivalTo" />
+                                                    <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.ArrivalTo" />
                                                 </EditTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.DepartFrom" Title="Depart From" Class="col-shift-time">
                                                 <EditTemplate Context="row">
-                                                    <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.DepartFrom" />
+                                                    <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.DepartFrom" />
                                                 </EditTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.DepartTo" Title="Depart To" Class="col-shift-time">                                                
                                                 <EditTemplate Context="row">
-                                                     <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.DepartTo" />
+                                                     <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.DepartTo" />
                                                 </EditTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.RArrivalFrom" Title="Arrival From (Ramadan)" Class="col-shift-time">                                                
                                                 <EditTemplate Context="row">
-                                                     <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RArrivalFrom" />
+                                                     <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RArrivalFrom" />
                                                 </EditTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.RArrivalTo" Title="Arrival To (Ramadan)" Class="col-shift-time">                                                
                                                 <EditTemplate Context="row">
-                                                     <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RArrivalTo" />
+                                                     <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RArrivalTo" />
                                                 </EditTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.RDepartFrom" Title="Depart From (Ramadan)" Class="col-shift-time">                                                
                                                 <EditTemplate Context="row">
-                                                     <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RDepartFrom" />
+                                                    <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RDepartFrom" />
                                                 </EditTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.RDepartTo" Title="Depart To (Ramadan)" Class="col-shift-time">                                                
                                                 <EditTemplate Context="row">
-                                                     <MudTimePicker AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RDepartTo" />
+                                                    <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RDepartTo" />
                                                 </EditTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.CreatedByFullName" Hidden Editable="false" Class="col-created-by">
@@ -309,7 +309,7 @@
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.ShiftPointer" Title="Shift Pointer" Class="col-shift-pointer" Editable="false">
                                                  <CellTemplate Context="row">
-                                                    <MudAvatar Size="Size.Small" Color="Color.Tertiary">@row.Item.ShiftPointer.ToString("N0")</MudAvatar>
+                                                    <MudAvatar Size="Size.Small" Color="Color.Info">@row.Item.ShiftPointer.ToString("N0")</MudAvatar>
                                                 </CellTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.ShiftDescription" Title="Shift Timing" Class="col-shift-timing">
