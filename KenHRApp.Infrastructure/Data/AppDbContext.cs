@@ -34,6 +34,9 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<RecruitmentBudget> RecruitmentBudgets => Set<RecruitmentBudget>();
         public DbSet<JobQualification> JobQualifications => Set<JobQualification>();
         public DbSet<RecruitmentRequisition> RecruitmentRequests => Set<RecruitmentRequisition>();
+        public DbSet<MasterShiftPatternTitle> MasterShiftPatternTitles => Set<MasterShiftPatternTitle>();
+        public DbSet<MasterShiftTime> MasterShiftTimes => Set<MasterShiftTime>();
+        public DbSet<MasterShiftPattern> MasterShiftPatterns => Set<MasterShiftPattern>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -287,6 +290,36 @@ namespace KenHRApp.Infrastructure.Data
                         .IsRequired()
                         .OnDelete(DeleteBehavior.Cascade);
                });
+
+            modelBuilder.Entity<MasterShiftPatternTitle>(
+              entity =>
+              {
+                  entity.ToTable("MasterShiftPatternTitle");
+                  entity.HasKey(d => d.ShiftPatternId)
+                      .HasName("PK_MasterShiftPatternTitle_ShiftPatternId");
+                  entity.Property(r => r.CreatedDate)
+                      .HasDefaultValue(DateTime.Now);
+                  entity.HasIndex(e => e.ShiftPatternCode)
+                    .HasDatabaseName("IX_MasterShiftPatternTitle_UniqueKey")
+                    .IsUnique()
+                    .HasFilter(null);
+
+                  #region Set relationships 
+                  entity.HasMany(e => e.ShiftTimingList)
+                        .WithOne(e => e.MasterShiftPatternTitle)
+                        .HasPrincipalKey(e => e.ShiftPatternId)     // Map to ShiftPatternId primary key of MasterShiftPatternTitle principal
+                        .HasForeignKey(c => c.ShiftPatternId)
+                        .IsRequired()
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                  entity.HasMany(e => e.ShiftPointerList)
+                        .WithOne(e => e.MasterShiftPatternTitle)
+                        .HasPrincipalKey(e => e.ShiftPatternId)      // Map to ShiftPatternId primary key of MasterShiftPatternTitle principal
+                        .HasForeignKey(s => s.ShiftPatternId)
+                        .IsRequired()
+                        .OnDelete(DeleteBehavior.Cascade);
+                  #endregion
+              });
             #endregion
 
             #region Set Employee navigation                         
