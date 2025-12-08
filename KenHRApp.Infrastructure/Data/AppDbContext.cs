@@ -291,6 +291,28 @@ namespace KenHRApp.Infrastructure.Data
                         .OnDelete(DeleteBehavior.Cascade);
                });
 
+            modelBuilder.Entity<MasterShiftTime>(
+            entity =>
+            {
+                entity.ToTable("MasterShiftTime");
+                entity.HasKey(c => c.ShiftTimingId)
+                    .HasName("PK_MasterShiftTime_ShiftTimingId");
+                entity.HasIndex(e => new { e.ShiftPatternCode, e.ShiftCode })
+                     .HasDatabaseName("IX_MasterShiftTime_CompoKeys")
+                     .IsUnique();
+            });
+
+            modelBuilder.Entity<MasterShiftPattern>(
+            entity =>
+            {
+                entity.ToTable("MasterShiftPattern");
+                entity.HasKey(c => c.ShiftPointerId)
+                    .HasName("PK_MasterShiftPattern_ShiftPointerId");
+                entity.HasIndex(e => new { e.ShiftPatternCode, e.ShiftCode })
+                     .HasDatabaseName("IX_MasterShiftPattern_CompoKeys")
+                     .IsUnique();
+            });
+
             modelBuilder.Entity<MasterShiftPatternTitle>(
               entity =>
               {
@@ -307,15 +329,15 @@ namespace KenHRApp.Infrastructure.Data
                   #region Set relationships 
                   entity.HasMany(e => e.ShiftTimingList)
                         .WithOne(e => e.MasterShiftPatternTitle)
-                        .HasPrincipalKey(e => e.ShiftPatternId)     // Map to ShiftPatternId primary key of MasterShiftPatternTitle principal
-                        .HasForeignKey(c => c.ShiftPatternId)
+                        .HasPrincipalKey(e => e.ShiftPatternCode)     // Map to ShiftPatternCode alternate key of MasterShiftPatternTitle principal
+                        .HasForeignKey(c => c.ShiftPatternCode)
                         .IsRequired()
                         .OnDelete(DeleteBehavior.Cascade);
 
                   entity.HasMany(e => e.ShiftPointerList)
                         .WithOne(e => e.MasterShiftPatternTitle)
-                        .HasPrincipalKey(e => e.ShiftPatternId)      // Map to ShiftPatternId primary key of MasterShiftPatternTitle principal
-                        .HasForeignKey(s => s.ShiftPatternId)
+                        .HasPrincipalKey(e => e.ShiftPatternCode)      // Map to ShiftPatternCode alternate key of MasterShiftPatternTitle principal
+                        .HasForeignKey(s => s.ShiftPatternCode)
                         .IsRequired()
                         .OnDelete(DeleteBehavior.Cascade);
                   #endregion

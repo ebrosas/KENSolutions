@@ -35,7 +35,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2025, 12, 7, 13, 15, 58, 848, DateTimeKind.Utc).AddTicks(8441));
+                        .HasDefaultValue(new DateTime(2025, 12, 8, 13, 50, 34, 2, DateTimeKind.Utc).AddTicks(2859));
 
                     b.Property<string>("DepartmentCode")
                         .IsRequired()
@@ -1001,6 +1001,184 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.ToTable("LanguageSkill", "kenuser");
                 });
 
+            modelBuilder.Entity("KenHRApp.Domain.Entities.MasterShiftPattern", b =>
+                {
+                    b.Property<int>("ShiftPointerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShiftPointerId"));
+
+                    b.Property<string>("ShiftCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<string>("ShiftDescription")
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("ShiftPatternCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)")
+                        .HasComment("Foreign key that references alternate key: MasterShiftPatternTitle.ShiftPatternCode");
+
+                    b.Property<int>("ShiftPointer")
+                        .HasColumnType("int");
+
+                    b.HasKey("ShiftPointerId")
+                        .HasName("PK_MasterShiftPattern_ShiftPointerId");
+
+                    b.HasIndex("ShiftPatternCode", "ShiftCode")
+                        .IsUnique()
+                        .HasDatabaseName("IX_MasterShiftPattern_CompoKeys");
+
+                    b.ToTable("MasterShiftPattern", "kenuser");
+                });
+
+            modelBuilder.Entity("KenHRApp.Domain.Entities.MasterShiftPatternTitle", b =>
+                {
+                    b.Property<int>("ShiftPatternId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShiftPatternId"));
+
+                    b.Property<int?>("CreatedByEmpNo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("CreatedByUserID")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValue(new DateTime(2025, 12, 8, 16, 50, 34, 4, DateTimeKind.Local).AddTicks(7206));
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsDayShift")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsFlexiTime")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<int?>("LastUpdateEmpNo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LastUpdateUserID")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("LastUpdatedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("ShiftPatternCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("ShiftPatternDescription")
+                        .HasColumnType("varchar(300)");
+
+                    b.HasKey("ShiftPatternId")
+                        .HasName("PK_MasterShiftPatternTitle_ShiftPatternId");
+
+                    b.HasIndex("ShiftPatternCode")
+                        .IsUnique()
+                        .HasDatabaseName("IX_MasterShiftPatternTitle_UniqueKey");
+
+                    b.ToTable("MasterShiftPatternTitle", "kenuser");
+                });
+
+            modelBuilder.Entity("KenHRApp.Domain.Entities.MasterShiftTime", b =>
+                {
+                    b.Property<int>("ShiftTimingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShiftTimingId"));
+
+                    b.Property<TimeSpan?>("ArrivalFrom")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("ArrivalTo")
+                        .HasColumnType("time");
+
+                    b.Property<int?>("CreatedByEmpNo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("CreatedByUserID")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<TimeSpan>("DepartFrom")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan?>("DepartTo")
+                        .HasColumnType("time");
+
+                    b.Property<int>("DurationNormal")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DurationRamadan")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("LastUpdateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<int?>("LastUpdateEmpNo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LastUpdateUserID")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("LastUpdatedByName")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<TimeSpan?>("RArrivalFrom")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan?>("RArrivalTo")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan?>("RDepartFrom")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan?>("RDepartTo")
+                        .HasColumnType("time");
+
+                    b.Property<string>("ShiftCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<string>("ShiftDescription")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("ShiftPatternCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)")
+                        .HasComment("Foreign key that references alternate key: MasterShiftPatternTitle.ShiftPatternCode");
+
+                    b.HasKey("ShiftTimingId")
+                        .HasName("PK_MasterShiftTime_ShiftTimingId");
+
+                    b.HasIndex("ShiftPatternCode", "ShiftCode")
+                        .IsUnique()
+                        .HasDatabaseName("IX_MasterShiftTime_CompoKeys");
+
+                    b.ToTable("MasterShiftTime", "kenuser");
+                });
+
             modelBuilder.Entity("KenHRApp.Domain.Entities.OtherDocument", b =>
                 {
                     b.Property<int>("AutoId")
@@ -1150,7 +1328,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2025, 12, 7, 16, 15, 58, 849, DateTimeKind.Local).AddTicks(653));
+                        .HasDefaultValue(new DateTime(2025, 12, 8, 16, 50, 34, 2, DateTimeKind.Local).AddTicks(4811));
 
                     b.Property<string>("DepartmentCode")
                         .IsRequired()
@@ -1221,7 +1399,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2025, 12, 7, 16, 15, 58, 849, DateTimeKind.Local).AddTicks(9257));
+                        .HasDefaultValue(new DateTime(2025, 12, 8, 16, 50, 34, 3, DateTimeKind.Local).AddTicks(2687));
 
                     b.Property<int?>("DailySalaryRange")
                         .HasColumnType("int");
@@ -1583,6 +1761,30 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Navigation("Employee");
                 });
 
+            modelBuilder.Entity("KenHRApp.Domain.Entities.MasterShiftPattern", b =>
+                {
+                    b.HasOne("KenHRApp.Domain.Entities.MasterShiftPatternTitle", "MasterShiftPatternTitle")
+                        .WithMany("ShiftPointerList")
+                        .HasForeignKey("ShiftPatternCode")
+                        .HasPrincipalKey("ShiftPatternCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MasterShiftPatternTitle");
+                });
+
+            modelBuilder.Entity("KenHRApp.Domain.Entities.MasterShiftTime", b =>
+                {
+                    b.HasOne("KenHRApp.Domain.Entities.MasterShiftPatternTitle", "MasterShiftPatternTitle")
+                        .WithMany("ShiftTimingList")
+                        .HasForeignKey("ShiftPatternCode")
+                        .HasPrincipalKey("ShiftPatternCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MasterShiftPatternTitle");
+                });
+
             modelBuilder.Entity("KenHRApp.Domain.Entities.OtherDocument", b =>
                 {
                     b.HasOne("KenHRApp.Domain.Entities.Employee", "Employee")
@@ -1641,6 +1843,13 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Navigation("OtherDocuments");
 
                     b.Navigation("Qualifications");
+                });
+
+            modelBuilder.Entity("KenHRApp.Domain.Entities.MasterShiftPatternTitle", b =>
+                {
+                    b.Navigation("ShiftPointerList");
+
+                    b.Navigation("ShiftTimingList");
                 });
 
             modelBuilder.Entity("KenHRApp.Domain.Entities.RecruitmentRequisition", b =>

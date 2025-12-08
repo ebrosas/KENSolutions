@@ -72,8 +72,10 @@ namespace KenHRApp.Domain.Entities
         #endregion
 
         #region Reference Navigation to MasterShiftPatternTitle
-        [Comment("Foreign key that references primary key: MasterShiftPatternTitle.ShiftPatternId")]
-        public int ShiftPatternId { get; set; }
+        [Comment("Foreign key that references alternate key: MasterShiftPatternTitle.ShiftPatternCode")]
+        [Column(TypeName = "varchar(20)")]
+        public string ShiftPatternCode { get; set; } = null!;
+
         public MasterShiftPatternTitle MasterShiftPatternTitle { get; set; } = null!;
         #endregion
     }
