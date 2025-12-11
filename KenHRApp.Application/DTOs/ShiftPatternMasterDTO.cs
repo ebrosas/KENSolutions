@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +25,14 @@ namespace KenHRApp.Application.DTOs
         public bool IsActive { get; set; }
         public bool? IsDayShift { get; set; }
         public bool? IsFlexiTime { get; set; }
+        public int? CreatedByEmpNo { get; set; }
+        public string? CreatedByName { get; set; } = null;
+        public string? CreatedByUserID { get; set; } = null;
+        public DateTime? CreatedDate { get; set; } = null;
+        public DateTime? LastUpdateDate { get; set; } = null;
+        public int? LastUpdateEmpNo { get; set; }
+        public string? LastUpdateUserID { get; set; } = null;
+        public string? LastUpdatedByName { get; set; } = null;
         #endregion
 
         #region Reference Navigations

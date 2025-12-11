@@ -16,6 +16,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
     public partial class MasterShiftRoster
     {
         #region Parameters and Injections
+        [Inject] private IAttendanceService AttendanceService { get; set; } = default!;
         [Inject] private IDialogService DialogService { get; set; } = default!;
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
@@ -648,22 +649,28 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             if (isNewRequition)
             {
-                //var addResult = await RecruitmentService.AddRecruitmentRequestAsync(_recruitmentRequest, _cts.Token);
-                //isSuccess = addResult.Success;
-                //if (!isSuccess)
-                //    errorMsg = addResult.Error!;
-                //else
-                //{
-                //    // Set flag to enable reload of _recruitmentRequests when navigating back to the Employe Search page
-                //    _forceLoad = true;
-                //}
+                // Set the user who created the record and the timestamp
+                _shiftPattern.CreatedDate = DateTime.Now;
+
+                var addResult = await AttendanceService.AddShiftRosterMasterAsync(_shiftPattern, _cts.Token);
+                isSuccess = addResult.Success;
+                if (!isSuccess)
+                    errorMsg = addResult.Error!;
+                else
+                {
+                    // Set flag to enable reload of _recruitmentRequests when navigating back to the Employe Search page
+                    _forceLoad = true;
+                }
             }
             else
             {
-                //var saveResult = await RecruitmentService.UpdateRecruitmentRequestAsync(_recruitmentRequest, _cts.Token);
-                //isSuccess = saveResult.Success;
-                //if (!isSuccess)
-                //    errorMsg = saveResult.Error!;
+                // Set the user who created the record and the timestamp
+                _shiftPattern.CreatedDate = DateTime.Now;
+
+                var saveResult = await AttendanceService.UpdateShiftRosterMasterAsync(_shiftPattern, _cts.Token);
+                isSuccess = saveResult.Success;
+                if (!isSuccess)
+                    errorMsg = saveResult.Error!;
             }
 
             if (isSuccess)
@@ -678,7 +685,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 if (isNewRequition)
                     ShowNotification("Shift Roster has been created successfully!", NotificationType.Success);
                 else
-                    ShowNotification("Shift Roster changes has been saved successfully!", NotificationType.Success);
+                    ShowNotification("Shift Roster has been updated successfully!", NotificationType.Success);
             }
             else
             {

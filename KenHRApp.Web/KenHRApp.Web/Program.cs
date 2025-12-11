@@ -32,10 +32,14 @@ builder.Services.AddMemoryCache();
 //builder.Services.AddScoped<IdentityUserAccessor>();
 //builder.Services.AddScoped<IdentityRedirectManager>();
 //builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
+
+// Register repositories and services
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IRecruitmentRepository, RecruitmentRepository>();
+builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IRecruitmentService, RecruitmentService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddScoped<IAppCacheRepository, AppCacheRepository>();
 builder.Services.AddScoped<IAppCacheService, AppCacheService>();
 builder.Services.AddScoped<IAppState, AppState>();

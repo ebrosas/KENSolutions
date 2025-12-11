@@ -206,6 +206,34 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<int>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<bool>> DeleteShiftRosterMasterAsync(int shiftPatternId, CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var shiftRoster = await _db.MasterShiftPatternTitles.FindAsync(shiftPatternId);
+                if (shiftRoster == null)
+                    throw new Exception("Could not delete shift roster because record is not found in the database.");
+
+                _db.MasterShiftPatternTitles.Remove(shiftRoster);
+
+                int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
+                if (rowsDeleted > 0)
+                    isSuccess = true;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }
