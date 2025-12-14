@@ -308,7 +308,7 @@ namespace KenHRApp.Infrastructure.Data
                 entity.ToTable("MasterShiftPattern");
                 entity.HasKey(c => c.ShiftPointerId)
                     .HasName("PK_MasterShiftPattern_ShiftPointerId");
-                entity.HasIndex(e => new { e.ShiftPatternCode, e.ShiftCode })
+                entity.HasIndex(e => new { e.ShiftPatternCode, e.ShiftCode, e.ShiftPointer })
                      .HasDatabaseName("IX_MasterShiftPattern_CompoKeys")
                      .IsUnique();
             });

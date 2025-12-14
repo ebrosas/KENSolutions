@@ -87,6 +87,10 @@
 
 	select * from [kenuser].[JobQualification] a
 
+	SELECT * FROM kenuser.MasterShiftPatternTitle a 
+	SELECT * FROM kenuser.MasterShiftTime a
+	SELECT * FROM kenuser.MasterShiftPattern a
+
 /*	Data updates:
 
 	BEGIN TRAN T1
