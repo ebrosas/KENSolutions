@@ -25,6 +25,44 @@ namespace KenHRApp.Application.Services
         #endregion
 
         #region Public Methods
+        public async Task<Result<List<ShiftPatternMasterDTO>>> SearchShiftRosterMasterAsync(byte loadType, string? shiftPatternCode, string? shiftCode, byte? activeFlag)
+        {
+            List<ShiftPatternMasterDTO> shiftRosterList = new List<ShiftPatternMasterDTO>();
+            try
+            {
+                var repoResult = await _repository.SearchShiftRosterMasterAsync(loadType, shiftPatternCode, shiftCode, activeFlag);
+
+                if (!repoResult.Success)
+                {
+                    return Result<List<ShiftPatternMasterDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                shiftRosterList = repoResult.Value!.Select(e => new ShiftPatternMasterDTO
+                {
+                    ShiftPatternId = e.ShiftPatternId,
+                    ShiftPatternCode = e.ShiftPatternCode,
+                    ShiftPatternDescription = e.ShiftPatternDescription,
+                    IsActive = e.IsActive,
+                    IsDayShift = e.IsDayShift,
+                    IsFlexiTime = e.IsFlexiTime,
+                    CreatedByEmpNo = e.CreatedByEmpNo,
+                    CreatedByName = e.CreatedByName,
+                    CreatedByUserID = e.CreatedByUserID,
+                    CreatedDate = e.CreatedDate,
+                    LastUpdateDate = e.LastUpdateDate,
+                    LastUpdateEmpNo = e.LastUpdateEmpNo,
+                    LastUpdateUserID = e.LastUpdateUserID,
+                    LastUpdatedByName = e.LastUpdatedByName
+                }).ToList();
+
+                return Result<List<ShiftPatternMasterDTO>>.SuccessResult(shiftRosterList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<ShiftPatternMasterDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching shift roster records from the database.");
+            }
+        }
+
         public async Task<Result<int>> AddShiftRosterMasterAsync(ShiftPatternMasterDTO shiftRoster, CancellationToken cancellationToken = default)
         {
             try

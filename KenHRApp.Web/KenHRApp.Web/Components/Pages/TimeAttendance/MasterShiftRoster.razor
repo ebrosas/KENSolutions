@@ -58,9 +58,9 @@
                     </MudButton>
                 }
 
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" Class="ml-1"
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" Class="ml-1" ButtonType="ButtonType.Reset"
                            Size="Size.Small" Color="Color.Warning" Disabled="@(_isEditMode)">
-                    Reset
+                    Refresh
                 </MudButton>
 
                 @if (ActionType == ActionTypes.Add.ToString())
@@ -88,7 +88,7 @@
                         <MudTextField @bind-Value="_shiftPattern.ShiftPatternDescription" Label="Description"
                                 For="@(() => _shiftPattern.ShiftPatternDescription)"
                                 HelperText="Type a brief description about the shift roster" Variant="Variant.Text" HelperTextOnFocus="true"
-                                Counter="300" MaxLength="20" Disabled="@_isDisabled"
+                                Counter="300" MaxLength="300" Disabled="@_isDisabled"
                                 Clearable="@_isClearable" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                     </MudItem>
                     @* <MudItem xs="12" sm="3" Class="d-flex justify-end">

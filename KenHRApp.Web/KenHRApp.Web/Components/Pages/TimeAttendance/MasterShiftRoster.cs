@@ -256,6 +256,22 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             try
             {
+                #region Check for Shift Timing Schedule
+                if (_shiftPattern.ShiftTimingList.Any() == false)   
+                {
+                    ShowNotification("At least one (1) Shift timing must be added to the Shift Timing Schedule.", NotificationType.Error);
+                    return;
+                }
+                #endregion
+
+                #region Check for Shift Timing Sequence
+                if (_shiftPattern.ShiftPointerList.Any() == false)
+                {
+                    ShowNotification("At least one (1) Shift pointer must be added to the Shift Timing Sequence.", NotificationType.Error);
+                    return;
+                }
+                #endregion
+
                 // If we got here, model is valid
                 _hasValidationError = false;
                 _validationMessages.Clear();
@@ -268,7 +284,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 _ = SaveShiftRosterAsync(async () =>
                 {
-                    _isRunning = false;
+                    _isRunning = false;                                        
 
                     // Shows the spinner overlay
                     await InvokeAsync(StateHasChanged);
@@ -680,6 +696,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _allowGridEdit = false;
                 _saveBtnEnabled = false;
                 _isDisabled = true;
+
+                // Hide error message if any
+                ShowHideError(false);
 
                 // Show notification
                 if (isNewRequition)

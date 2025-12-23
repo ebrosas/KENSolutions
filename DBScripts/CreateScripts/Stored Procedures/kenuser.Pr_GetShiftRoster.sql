@@ -14,7 +14,7 @@ ALTER PROCEDURE kenuser.Pr_GetShiftRoster
 	@loadType				TINYINT,
 	@shiftPatternCode		VARCHAR(20) = NULL,
 	@shiftCode				VARCHAR(10) = NULL,
-	@activeFlag				TINYINT = 0
+	@activeFlag				TINYINT = NULL
 )
 AS
 BEGIN
@@ -69,6 +69,7 @@ PARAMETERS:
 	@activeFlag				TINYINT = 0
 
 	EXEC kenuser.Pr_GetShiftRoster 0
+	EXEC kenuser.Pr_GetShiftRoster 0, 'D5'
 	EXEC kenuser.Pr_GetShiftRoster 0, '', '', 1
 
 

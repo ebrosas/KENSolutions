@@ -25,12 +25,61 @@ namespace KenHRApp.Infrastructure.Repositories
         #endregion
 
         #region Public Methods
+        public async Task<Result<List<MasterShiftPatternTitle>?>> SearchShiftRosterMasterAsync(byte loadType, string? shiftPatternCode, string? shiftCode, byte? activeFlag)
+        {
+            List<MasterShiftPatternTitle> shiftRosterList = new List<MasterShiftPatternTitle>();
+
+            try
+            {
+                var model = await _db.MasterShiftPatternTitles
+                    .FromSqlRaw("EXEC kenuser.Pr_GetShiftRoster @loadType = {0}, @shiftPatternCode = {1}, @shiftCode = {2}, @activeFlag = {3}",
+                    loadType, shiftPatternCode!, shiftCode!, activeFlag!)
+                    .ToListAsync();
+                if (model != null)
+                {
+                    foreach (var item in model)
+                    {
+                        shiftRosterList.Add(new MasterShiftPatternTitle()
+                        {
+                            ShiftPatternId = item.ShiftPatternId,
+                            ShiftPatternCode = item.ShiftPatternCode, 
+                            ShiftPatternDescription = item.ShiftPatternDescription, 
+                            IsActive = item.IsActive, 
+                            IsDayShift = item.IsDayShift,
+                            IsFlexiTime = item.IsFlexiTime,
+                            CreatedByEmpNo = item.CreatedByEmpNo,
+                            CreatedByName = item.CreatedByName, 
+                            CreatedByUserID = item.CreatedByUserID, 
+                            CreatedDate = item.CreatedDate, 
+                            LastUpdateDate = item.LastUpdateDate, 
+                            LastUpdateEmpNo = item.LastUpdateEmpNo,
+                            LastUpdateUserID = item.LastUpdateUserID, 
+                            LastUpdatedByName = item.LastUpdatedByName
+                        });
+                    }
+                }
+
+                return Result<List<MasterShiftPatternTitle>?>.SuccessResult(shiftRosterList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<MasterShiftPatternTitle>?>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
         public async Task<Result<int>> AddShiftRosterMasterAsync(MasterShiftPatternTitle shiftRoster, CancellationToken cancellationToken = default)
         {
             int rowsUpdated = 0;
 
             try
             {
+                MasterShiftPatternTitle? duplicateShiftRoster = await _db.MasterShiftPatternTitles
+                    .FirstOrDefaultAsync(x => x.ShiftPatternCode == shiftRoster.ShiftPatternCode, cancellationToken);
+
+                if (duplicateShiftRoster != null)
+                    throw new InvalidOperationException("Duplicate Shift Pattern Code found. Please use a different code.");
+
                 // Save to database
                 _db.MasterShiftPatternTitles.Add(shiftRoster);
 
@@ -40,7 +89,7 @@ namespace KenHRApp.Infrastructure.Repositories
             }
             catch (InvalidOperationException invEx)
             {
-                throw new Exception(invEx.Message.ToString());
+                return Result<int>.Failure($"Data Validation Error: {invEx.Message}");
             }
             catch (Exception ex)
             {
