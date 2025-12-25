@@ -1886,6 +1886,13 @@ h1:focus {
     text-overflow: ellipsis;
 }
 
+.shift-roster-grid .col-shift-description {
+    width: 200px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .shift-roster-grid .col-shift-timing {
     width: 120px !important;
     text-align: left;
@@ -1934,6 +1941,16 @@ h1:focus {
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.shift-roster-grid .col-active {
+    width: 100px !important;
+    text-align: left;
+}
+
+.shift-roster-grid .col-flexitime {
+    width: 100px !important;
+    text-align: left;
 }
 
 .shift-roster-grid .flex-column {

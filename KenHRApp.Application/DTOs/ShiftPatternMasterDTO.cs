@@ -35,6 +35,42 @@ namespace KenHRApp.Application.DTOs
         public string? LastUpdatedByName { get; set; } = null;
         #endregion
 
+        #region Extended Properties
+        public string IsActiveDesc
+        {
+            get { return IsActive ? "Yes" : "No"; }
+            set { }
+        }
+
+        public string IsFlexiTimeDesc
+        {
+            get { return IsFlexiTime!.Value ? "Yes" : "No"; }
+            set { }
+        }
+
+        public string CreatedByFullName
+        {
+            get 
+            {
+                if (CreatedByEmpNo.HasValue && !string.IsNullOrEmpty(CreatedByName))
+                    return $"{CreatedByEmpNo} - {CreatedByName}";
+                else
+                    return string.Empty;
+            }
+        }
+
+        public string LastUpdatedByFullName
+        {
+            get
+            {
+                if (LastUpdateEmpNo.HasValue && !string.IsNullOrEmpty(LastUpdatedByName))
+                    return $"{LastUpdateEmpNo} - {LastUpdatedByName}";
+                else
+                    return string.Empty;
+            }
+        }   
+        #endregion
+
         #region Reference Navigations
         public List<ShiftTimingDTO> ShiftTimingList { get; set; } = new List<ShiftTimingDTO>();
         public List<ShiftPointerDTO> ShiftPointerList { get; set; } = new List<ShiftPointerDTO>();

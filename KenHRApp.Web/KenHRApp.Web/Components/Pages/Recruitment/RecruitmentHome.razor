@@ -32,9 +32,9 @@
         <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
             <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="4" Class="mud-primary-text" />
 
-            <MudPaper Elevation="5" Square="true" Class="w-100 mt-2">
+            <MudPaper Elevation="5" Square="true" Class="w-100 mt-2 mb-4">
                 <MudStepper NonLinear ShowResetButton Ripple="true">
-                     <MudStep Title="Planning & Budgeting">
+                    <MudStep Title="Planning & Budgeting">
                         <MudText Typo="Typo.subtitle1" Color="Color.Primary"><strong>
                             Manage budget attributes, defined job position, and create job posting </strong>
                         </MudText>
@@ -49,7 +49,7 @@
                                  </MudMenu>
                              </MudAppBar>
                              <MudPaper Elevation="5" Square="true" Class="w-100">
-                                <div class="budget-grid">                                
+                                <div class="budget-grid mb-4">                                
                                     <MudDataGrid T="RecruitmentBudgetDTO" Items="@_budgetList" Hover="true" Striped="true" 
                                         Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                                         QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
@@ -219,7 +219,7 @@
                                 </div>
                             </MudPaper>
                         </MudStack>
-                     </MudStep>
+                    </MudStep>
                     <MudStep Title="Talent Acquisition" OnClick="GetAllRequisitions">
                         <MudText Typo="Typo.subtitle1" Color="Color.Primary">
                             <strong>

@@ -122,6 +122,20 @@
 	DELETE FROM [dbo].[__EFMigrationsHistory]
 	WHERE MigrationID = '20250913143228_UpdateFamilyMember'
 
+	UPDATE kenuser.MasterShiftPatternTitle
+	SET CreatedByEmpNo = 10003632,
+		CreatedByName = 'ERVIN OLINAS BROSAS',
+		CreatedByUserID = 'ervin',
+		CreatedDate = GETDATE()
+	WHERE ShiftPatternId = 2
+
+	UPDATE kenuser.MasterShiftPatternTitle
+	SET LastUpdateEmpNo = 10003632,
+		LastUpdatedByName = 'ERVIN OLINAS BROSAS',
+		LastUpdateUserID = 'ervin',
+		LastUpdateDate = GETDATE()
+	WHERE ShiftPatternId = 2
+
 	COMMIT TRAN T1
 
 */
