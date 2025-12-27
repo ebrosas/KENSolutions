@@ -53,7 +53,7 @@ namespace KenHRApp.Application.DTOs
         public int? CreatedByEmpNo { get; set; }
         public string? CreatedByName { get; set; } = null;
         public string? CreatedByUserID { get; set; } = null;
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime? CreatedDate { get; set; } = DateTime.Now;
         public DateTime? LastUpdateDate { get; set; }
         public int? LastUpdateEmpNo { get; set; }
         public string? LastUpdateUserID { get; set; } = null;

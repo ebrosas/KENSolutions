@@ -20,7 +20,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
-        [Inject] private IAppState AppState { get; set; } = default!;
+        [Inject] private IAppState AppState { get; set; } = default!;                
         #endregion
 
         #region Fields
@@ -41,12 +41,20 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _isTaskFinished = false;
         #endregion
 
+        #region Dialog Box Button Icons
+        private readonly string _iconDelete = "fas fa-trash-alt";
+        private readonly string _iconCancel = "fas fa-window-close";
+        private readonly string _iconError = "fas fa-times-circle";
+        private readonly string _iconInfo = "fas fa-info-circle";
+        private readonly string _iconWarning = "fas fa-exclamation-circle";
+        #endregion
+
         #region Collections        
         private List<ShiftPatternMasterDTO> _shiftRosterList = new List<ShiftPatternMasterDTO>();
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/", icon: Icons.Material.Filled.Home),
-            new("Shift Roster", href: null, disabled: true, @Icons.Material.Outlined.Shield)
+            new("Shift Roster Master", href: null, disabled: true, @Icons.Material.Filled.CalendarMonth)
         ];
         #endregion
 
@@ -112,91 +120,38 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task AddShiftRoster()
+        private async Task ConfirmDelete(ShiftPatternMasterDTO shiftRoster)
         {
-            //var parameters = new DialogParameters
-            //{
-            //    ["Department"] = new ShiftPatternMasterDTO(),
-            //    ["GroupList"] = _groupList,
-            //    ["EmployeeList"] = _employeeList,
-            //    ["IsClearable"] = true,
-            //    ["IsDisabled"] = false
-            //};
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to delete the shift roster '{shiftRoster.ShiftPatternCode} - {shiftRoster.ShiftPatternDescription}'?" },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error },
+                { "DialogIconColor", Color.Error }
+            };
 
-            //var options = new DialogOptions
-            //{
-            //    CloseOnEscapeKey = true,
-            //    BackdropClick = false,
-            //    FullWidth = true,
-            //    MaxWidth = MaxWidth.Large
-            //};
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
 
-            //var dialog = await DialogService.ShowAsync<DepartmentEditDialog>("Add New Department", parameters, options);
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Confirmation", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                BeginDeleteShiftRoster(shiftRoster);
+            }
+        }
 
-            //var result = await dialog.Result;
-            //if (result != null && !result.Canceled)
-            //{
-            //    var newDept = (ShiftPatternMasterDTO)result.Data!;
-            //    newDept.DepartmentId = 0;
-
-            //    #region Check for duplicate entries
-            //    var duplicateDepartment = _departmentList.FirstOrDefault(g => g.DepartmentCode.Trim().ToUpper() == newDept.DepartmentCode.Trim().ToUpper()
-            //        && g.DepartmentName.Trim().ToUpper() == newDept.DepartmentName.Trim().ToUpper());
-            //    if (duplicateDepartment != null)
-            //    {
-            //        // Show error
-            //        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The Department Code and Name already exists. Please enter a different Department Code and Name.");
-            //        return;
-            //    }
-            //    #endregion
-
-            //    #region Get the selected Group Name
-            //    if (!string.IsNullOrEmpty(newDept.GroupCode))
-            //    {
-            //        UserDefinedCodeDTO? udc = _groupList.Where(d => d.UDCCode == newDept.GroupCode).FirstOrDefault();
-            //        if (udc != null)
-            //            newDept.GroupName = udc.UDCDesc1;
-            //    }
-            //    #endregion
-
-            //    #region Get the selected Department Head
-            //    if (!string.IsNullOrEmpty(newDept.SuperintendentName))
-            //    {
-            //        EmployeeDTO? headEmp = _employeeList.Where(d => d.EmployeeFullName == newDept.SuperintendentName).FirstOrDefault();
-            //        if (headEmp != null)
-            //            newDept.SuperintendentEmpNo = headEmp.EmployeeNo;
-            //    }
-            //    #endregion
-
-            //    #region Get the selected Department Manager
-            //    if (!string.IsNullOrEmpty(newDept.ManagerName))
-            //    {
-            //        EmployeeDTO? managerEmp = _employeeList.Where(d => d.EmployeeFullName == newDept.ManagerName).FirstOrDefault();
-            //        if (managerEmp != null)
-            //            newDept.ManagerEmpNo = managerEmp.EmployeeNo;
-            //    }
-            //    #endregion
-
-            //    newDept.IsActiveDesc = newDept.IsActive ? "Yes" : "No";
-
-            //    // Set the Update Date
-            //    newDept.CreatedAt = DateTime.Now;
-
-            //    // Set flag to display the loading panel
-            //    _isRunning = true;
-
-            //    // Set the overlay message
-            //    overlayMessage = "Adding department, please wait...";
-
-            //    _ = SaveChangeAsync(async () =>
-            //    {
-            //        _isRunning = false;
-
-            //        // Shows the spinner overlay
-            //        await InvokeAsync(StateHasChanged);
-
-            //    }, newDept);
-            //}
+        private void AddShiftRoster()
+        {
+            Navigation.NavigateTo($"/TimeAttendance/mastershiftroster?ActionType=Add");
         }
         #endregion
 
@@ -272,6 +227,44 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 await InvokeAsync(StateHasChanged);
             }, forceLoad);
         }
+
+        private void BeginDeleteShiftRoster(ShiftPatternMasterDTO shiftRoster)
+        {
+            try
+            {
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Deleting Shift Roster, please wait...";
+
+                _ = DeleteShiftRosterAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    // Remove locally from the list so UI updates immediately
+                    _shiftRosterList.Remove(shiftRoster);
+
+                    StateHasChanged();
+
+                }, shiftRoster);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Delete cancelled (navigated away).", SnackBarTypes.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", SnackBarTypes.Error);
+            }
+        }
+        private void GetShiftRosterDetail(ShiftPatternMasterDTO shiftRoster)
+        {
+            Navigation.NavigateTo($"/TimeAttendance/mastershiftroster?ShiftPatternId={shiftRoster.ShiftPatternId}&ActionType=View");
+        }
         #endregion
 
         #region Database Methods
@@ -282,7 +275,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Reset error messages
             _errorMessage.Clear();
 
-            var repoResult = await AttendanceService.SearchShiftRosterMasterAsync(0, null, null, null);
+            var repoResult = await AttendanceService.SearchShiftRosterMasterAsync(0, null, null, null, null);
             if (repoResult.Success)
             {
                 _shiftRosterList = repoResult.Value!;
@@ -293,6 +286,54 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _errorMessage.AppendLine(repoResult.Error);
 
                 ShowHideError(true);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task DeleteShiftRosterAsync(Func<Task> callback, ShiftPatternMasterDTO shiftRoster)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            if (shiftRoster.ShiftPatternId == 0)
+            {
+                errorMsg = "Shift Pattern ID is not defined.";
+            }
+            else
+            {
+                var deleteResult = await AttendanceService.DeleteShiftRosterMasterAsync(shiftRoster.ShiftPatternId, _cts.Token);
+                isSuccess = deleteResult.Success;
+                if (!isSuccess)
+                    errorMsg = deleteResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Show notification
+                ShowNotification("The selected Shift Roster has been deleted successfully!", SnackBarTypes.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(errorMsg);
+                    ShowHideError(true);
+                }
             }
 
             if (callback != null)

@@ -26,6 +26,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Parameter]
         [SupplyParameterFromQuery]
         public string ActionType { get; set; } = ActionTypes.View.ToString();
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public int ShiftPatternId { get; set; } = 0;
         #endregion
 
         #region Fields
@@ -96,7 +100,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/", icon: Icons.Material.Filled.Home),
-            new("Shift Roster", href: null, disabled: true, @Icons.Material.Outlined.Shield)
+            new("Shift Roster Master", href: "/TimeAttendance/shiftrostersearch", icon: @Icons.Material.Filled.CalendarMonth),
+            new("Shift Roster Detail", href: null, disabled: true, @Icons.Material.Filled.EditNote)
         ];
 
         private List<ShiftMasterDTO> _shiftMasterList = new List<ShiftMasterDTO>();
@@ -138,17 +143,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _editContext = new EditContext(_shiftPattern);
 
             // Set action to Add mode 
-            ActionType = ActionTypes.Add.ToString();
+            //ActionType = ActionTypes.Add.ToString();
 
             if (ActionType == ActionTypes.Edit.ToString() ||
                 ActionType == ActionTypes.View.ToString())
             {
                 _isDisabled = true;
+
+                if (ShiftPatternId > 0)
+                    BeginGetShiftRosterDetail();
             }
             else if (ActionType == ActionTypes.Add.ToString())
             {
                 _isDisabled = false;
                 _saveBtnEnabled = true;
+                _allowGridEdit = true;
             }
 
                 // example: load existing master record (or keep empty for new)
@@ -239,8 +248,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             //    DurationRamadan = 6
             //});
             #endregion
-
-            // if editing existing, load lists into _shiftPattern.ShiftTimingList and ShiftPointerList
         }
         #endregion
 
@@ -465,6 +472,75 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         }
         #endregion
 
+        #region Button Event Handlers
+        private async Task HandleEditButton()
+        {
+            try
+            {
+                _isRunning = true;
+                overlayMessage = "Entering edit mode, please wait...";
+                StateHasChanged(); // immediate render
+
+                // do your async work
+                await Task.Delay(500);
+
+                // Set the flags
+                _isEditMode = true;
+                _allowGridEdit = true;
+                _saveBtnEnabled = true;
+                _isDisabled = false;
+
+                // Hide error message if any
+                ShowHideError(false);
+            }
+            catch (Exception ex)
+            {
+                overlayMessage = $"Error: {ex.Message}";
+            }
+            finally
+            {
+                _isRunning = false;     // ✅ must execute
+                StateHasChanged();      // ✅ must re-render
+            }
+        }
+
+        private void HandleUndoButton()
+        {
+            // Set flag to display the loading panel
+            _isRunning = true;
+
+            // Set the overlay message
+            overlayMessage = "Undoing changes, please wait...";
+
+            _ = GetShiftRosterDetailAsync(async () =>
+            {
+                // Reset the flags
+                _isEditMode = false;
+                _allowGridEdit = false;
+                _isDisabled = true;
+                _isRunning = false;
+                _saveBtnEnabled = false;
+                _hasValidationError = false;
+                _validationMessages.Clear();
+
+                // Reset error messages
+                _errorMessage.Clear();
+                ShowHideError(false);
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            }, _shiftPattern.ShiftPatternId);
+        }
+
+        private void HandleRefreshButton()
+        {
+            if (_shiftPattern.ShiftPatternId > 0)
+            {
+                BeginGetShiftRosterDetail();
+            }
+        }
+        #endregion
+
         #region Private Methods
         private void ShowHideError(bool value)
         {
@@ -479,6 +555,54 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Reset error messages
                 _errorMessage.Clear();
             }
+        }
+
+        private async Task ShowDeleteDialog()
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", "Do you really want to delete this shift roster? Note that this process cannot be undone." },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error }
+            };
+
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.TopCenter, CloseOnEscapeKey = true };
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Confirmation:", parameters, options);
+
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                BeginDeleteShiftRoster();
+            }
+        }
+
+        private async Task ShowCancelDialog()
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Cancel"},
+                { "DialogIcon", _iconCancel },
+                { "ContentText", "Do you really want to cancel adding new shift roster?" },
+                { "ConfirmText", "Yes" },
+                { "CancelText", "No" },
+                { "Color", Color.Success }
+            };
+
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.TopCenter, CloseOnEscapeKey = true };
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Cancel Confirmation:", parameters, options);
+
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                CancelAddShiftRoster();
+            }
+        }
+
+        private void CancelAddShiftRoster()
+        {
+            Navigation.NavigateTo("/TimeAttendance/shiftrostersearch");
         }
 
         private void ShowNotification(string message, NotificationType type)
@@ -705,6 +829,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     ShowNotification("Shift Roster has been created successfully!", NotificationType.Success);
                 else
                     ShowNotification("Shift Roster has been updated successfully!", NotificationType.Success);
+
+                // Go back to Shift Roster Master page
+                Navigation.NavigateTo("/TimeAttendance/shiftrostersearch");
             }
             else
             {
@@ -818,6 +945,172 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             var dialog = await DialogService.ShowAsync<InfoDialog>(title, parameters, options);
             var result = await dialog.Result;
+        }
+        #endregion
+
+        #region Database Methods
+        private void BeginGetShiftRosterDetail()
+        {
+            _isRunning = true;
+
+            // Set the overlay message
+            overlayMessage = "Loading shift roster details, please wait...";
+
+            _ = GetShiftRosterDetailAsync(async () =>
+            {
+                _isRunning = false;
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            }, ShiftPatternId);
+        }
+
+        private async Task GetShiftRosterDetailAsync(Func<Task> callback, int shiftPatternId)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(1000);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Clear shift timing items in the "Shift Timing Sequence" grid
+            _shiftMasterPointerList.Clear();
+
+            var result = await AttendanceService.GetShiftRosterDetailAsync(shiftPatternId);
+            if (result.Success)
+            {
+                _shiftPattern = result.Value!;
+
+                // Recreate the EditContext with the loaded _shiftPattern
+                _editContext = new EditContext(_shiftPattern);
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.Append(result.Error);
+
+                ShowHideError(true);
+            }
+
+            #region Populate Shift Timing drop-down items in "Shift Timing Sequence" grid
+            if (_shiftPattern.ShiftTimingList != null && _shiftPattern.ShiftTimingList.Any())
+            {
+                foreach (var shiftTiming in _shiftPattern.ShiftTimingList)
+                {
+                    if (!_shiftMasterPointerList.Any(x => x.ShiftCode == shiftTiming.ShiftCode))
+                    {
+                        if (_shiftMasterPointerList.Count == 0)
+                        {
+                            // Add Day-off shift timing
+                            _shiftMasterPointerList.Add(new ShiftMasterDTO()
+                            {
+                                ShiftCode = CONST_DAYOFF_CODE,
+                                ShiftDescription = CONST_DAYOFF_DESC
+                            });
+                        }
+
+                        _shiftMasterPointerList.Add(new ShiftMasterDTO()
+                        {
+                            ShiftCode = shiftTiming.ShiftCode,
+                            ShiftDescription = shiftTiming.ShiftDescription,
+                            ArrivalFrom = shiftTiming.ArrivalFrom,
+                            ArrivalTo = shiftTiming.ArrivalTo!.Value,
+                            DepartFrom = shiftTiming.DepartFrom!.Value,
+                            DepartTo = shiftTiming.DepartTo,
+                            RArrivalFrom = shiftTiming.RArrivalFrom,
+                            RArrivalTo = shiftTiming.RArrivalTo!.Value,
+                            RDepartFrom = shiftTiming.RDepartFrom!.Value,
+                            RDepartTo = shiftTiming.RDepartTo
+                        });
+                    }
+                }
+            }
+            #endregion
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private void BeginDeleteShiftRoster()
+        {
+            try
+            {
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Deleting employee record, please wait...";
+
+                _ = DeleteShiftRosterAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    // Go back to Shift Roster Master page
+                    Navigation.NavigateTo("/TimeAttendance/shiftrostersearch");
+                });
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Delete cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task DeleteShiftRosterAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            if (_shiftPattern.ShiftPatternId == 0)
+            {
+                errorMsg = "Shift Pattern ID is not defined.";
+            }
+            else
+            {
+                var deleteResult = await AttendanceService.DeleteShiftRosterMasterAsync(_shiftPattern.ShiftPatternId, _cts.Token);
+                isSuccess = deleteResult.Success;
+                if (!isSuccess)
+                    errorMsg = deleteResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Show notification
+                ShowNotification("Shift Roster record has been deleted successfully!", NotificationType.Success);                                
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(errorMsg);
+                    ShowHideError(true);
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
         }
         #endregion
     }

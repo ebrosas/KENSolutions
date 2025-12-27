@@ -1,6 +1,6 @@
 ﻿@page "/TimeAttendance/shiftrostersearch"
 
-<MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Shift Roster</MudText>
+<MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Shift Roster Master</MudText>
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
     @if (_showErrorAlert)
     {
@@ -18,8 +18,7 @@
                 <MudSpacer />
                 <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add New Shift Roster" OnClick="AddShiftRoster" />
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Dark" Label="Download Master Data" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Manage Employee Shift Roster" />
                  </MudMenu>
             </MudAppBar>
             <MudPaper Elevation="5" Square="true" Class="w-100 mb-2">
@@ -116,7 +115,22 @@
                             <CellTemplate>
                                 @context.Item.LastUpdateDate?.ToString("dd-MMM-yyyy")
                             </CellTemplate>
-                        </PropertyColumn>                                                
+                        </PropertyColumn>      
+                        <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                            <CellTemplate Context="row">
+                                <MudIconButton Color="Color.Info" title="View shift roster details" Class="show-btn fa-icon-btn"
+                                               OnClick="() => GetShiftRosterDetail(row.Item)">
+                                    <ChildContent>
+                                        <i class="fas fa-eye fa-1x"></i>
+                                    </ChildContent>
+                                </MudIconButton>
+                                <MudIconButton Color="Color.Error" title="Delete shift roster record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
+                                    <ChildContent>
+                                        <i class="fas fa-trash-alt fa-1x"></i>
+                                    </ChildContent>
+                                </MudIconButton>
+                            </CellTemplate>
+                        </TemplateColumn>
                     </Columns>
                     <NoRecordsContent>
                          <div class="no-data-box">

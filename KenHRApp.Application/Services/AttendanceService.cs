@@ -25,12 +25,12 @@ namespace KenHRApp.Application.Services
         #endregion
 
         #region Public Methods
-        public async Task<Result<List<ShiftPatternMasterDTO>>> SearchShiftRosterMasterAsync(byte loadType, string? shiftPatternCode, string? shiftCode, byte? activeFlag)
+        public async Task<Result<List<ShiftPatternMasterDTO>>> SearchShiftRosterMasterAsync(byte loadType, int? shiftPatternId, string? shiftPatternCode, string? shiftCode, byte? activeFlag)
         {
             List<ShiftPatternMasterDTO> shiftRosterList = new List<ShiftPatternMasterDTO>();
             try
             {
-                var repoResult = await _repository.SearchShiftRosterMasterAsync(loadType, shiftPatternCode, shiftCode, activeFlag);
+                var repoResult = await _repository.SearchShiftRosterMasterAsync(loadType, shiftPatternId, shiftPatternCode, shiftCode, activeFlag);
 
                 if (!repoResult.Success)
                 {
@@ -60,6 +60,78 @@ namespace KenHRApp.Application.Services
             catch (Exception ex)
             {
                 return Result<List<ShiftPatternMasterDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching shift roster records from the database.");
+            }
+        }
+
+        public async Task<Result<ShiftPatternMasterDTO?>> GetShiftRosterDetailAsync(int shiftPatternId)
+        {
+            ShiftPatternMasterDTO? shiftRoster = null;
+
+            try
+            {
+                var repoResult = await _repository.GetShiftRosterDetailAsync(shiftPatternId);
+                if (!repoResult.Success)
+                {
+                    return Result<ShiftPatternMasterDTO?>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null)
+                {
+                    shiftRoster = new ShiftPatternMasterDTO
+                    {
+                        ShiftPatternId = model.ShiftPatternId,
+                        ShiftPatternCode = model.ShiftPatternCode,
+                        ShiftPatternDescription = model.ShiftPatternDescription,
+                        IsActive = model.IsActive,
+                        IsDayShift = model.IsDayShift,
+                        IsFlexiTime = model.IsFlexiTime,
+                        CreatedByEmpNo = model.CreatedByEmpNo,
+                        CreatedByName = model.CreatedByName,
+                        CreatedByUserID = model.CreatedByUserID,
+                        CreatedDate = model.CreatedDate,
+                        LastUpdateDate = model.LastUpdateDate,
+                        LastUpdateEmpNo = model.LastUpdateEmpNo,
+                        LastUpdateUserID = model.LastUpdateUserID,
+                        LastUpdatedByName = model.LastUpdatedByName,
+                        ShiftTimingList = model.ShiftTimingList!.Select(e => new ShiftTimingDTO
+                        {
+                            ShiftTimingId = e.ShiftTimingId,
+                            ShiftCode = e.ShiftCode,
+                            ShiftDescription = e.ShiftDescription,
+                            ArrivalFrom = e.ArrivalFrom,
+                            ArrivalTo = e.ArrivalTo,
+                            DepartFrom = e.DepartFrom,
+                            DepartTo = e.DepartTo,
+                            RArrivalFrom = e.RArrivalFrom,
+                            RArrivalTo = e.RArrivalTo,
+                            RDepartFrom = e.RDepartFrom,
+                            RDepartTo = e.RDepartTo,
+                            CreatedByEmpNo = e.CreatedByEmpNo,
+                            CreatedByName = e.CreatedByName,
+                            CreatedByUserID = e.CreatedByUserID,
+                            CreatedDate = e.CreatedDate,
+                            LastUpdateDate = e.LastUpdateDate,
+                            LastUpdateEmpNo = e.LastUpdateEmpNo,
+                            LastUpdateUserID = e.LastUpdateUserID,
+                            LastUpdatedByName = e.LastUpdatedByName
+                        }).ToList(),
+                        ShiftPointerList = model.ShiftPointerList!.Select(e => new ShiftPointerDTO
+                        {
+                            ShiftPointerId = e.ShiftPointerId,
+                            ShiftPatternCode = e.ShiftPatternCode,
+                            ShiftCode = e.ShiftCode,
+                            ShiftDescription = e.ShiftDescription,
+                            ShiftPointer = e.ShiftPointer
+                        }).ToList()
+                    };
+                }
+
+                return Result<ShiftPatternMasterDTO?>.SuccessResult(shiftRoster);
+            }
+            catch (Exception ex)
+            {
+                return Result<ShiftPatternMasterDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching shift roster records from the database.");
             }
         }
 

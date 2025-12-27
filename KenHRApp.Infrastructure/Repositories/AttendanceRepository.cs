@@ -25,15 +25,15 @@ namespace KenHRApp.Infrastructure.Repositories
         #endregion
 
         #region Public Methods
-        public async Task<Result<List<MasterShiftPatternTitle>?>> SearchShiftRosterMasterAsync(byte loadType, string? shiftPatternCode, string? shiftCode, byte? activeFlag)
+        public async Task<Result<List<MasterShiftPatternTitle>?>> SearchShiftRosterMasterAsync(byte loadType, int? shiftPatternId, string? shiftPatternCode, string? shiftCode, byte? activeFlag)
         {
             List<MasterShiftPatternTitle> shiftRosterList = new List<MasterShiftPatternTitle>();
 
             try
             {
                 var model = await _db.MasterShiftPatternTitles
-                    .FromSqlRaw("EXEC kenuser.Pr_GetShiftRoster @loadType = {0}, @shiftPatternCode = {1}, @shiftCode = {2}, @activeFlag = {3}",
-                    loadType, shiftPatternCode!, shiftCode!, activeFlag!)
+                    .FromSqlRaw("EXEC kenuser.Pr_GetShiftRoster @loadType = {0}, @shiftPatternId = {1}, @shiftPatternCode = {2}, @shiftCode = {3}, @activeFlag = {4}",
+                    loadType, shiftPatternId!, shiftPatternCode!, shiftCode!, activeFlag!)
                     .ToListAsync();
                 if (model != null)
                 {
@@ -65,6 +65,103 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 // Log error here if needed (Serilog, NLog, etc.)
                 return Result<List<MasterShiftPatternTitle>?>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<MasterShiftPatternTitle?>> GetShiftRosterDetailAsync(int shiftPatternId)
+        {
+            MasterShiftPatternTitle? shiftRoster = null;
+
+            try
+            {
+                var model = await _db.MasterShiftPatternTitles
+                    .FromSqlRaw("EXEC kenuser.Pr_GetShiftRoster @loadType = {0}, @shiftPatternId = {1}, @shiftPatternCode = {2}, @shiftCode = {3}, @activeFlag = {4}",
+                    1, shiftPatternId, string.Empty, string.Empty, 0)
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    shiftRoster = new MasterShiftPatternTitle()
+                    {
+                        ShiftPatternId = model[0].ShiftPatternId,
+                        ShiftPatternCode = model[0].ShiftPatternCode,
+                        ShiftPatternDescription = model[0].ShiftPatternDescription,
+                        IsActive = model[0].IsActive,
+                        IsDayShift = model[0].IsDayShift,
+                        IsFlexiTime = model[0].IsFlexiTime,
+                        CreatedByEmpNo = model[0].CreatedByEmpNo,
+                        CreatedByName = model[0].CreatedByName,
+                        CreatedByUserID = model[0].CreatedByUserID,
+                        CreatedDate = model[0].CreatedDate,
+                        LastUpdateDate = model[0].LastUpdateDate,
+                        LastUpdateEmpNo = model[0].LastUpdateEmpNo,
+                        LastUpdateUserID = model[0].LastUpdateUserID,
+                        LastUpdatedByName = model[0].LastUpdatedByName
+                    };
+
+                    #region Get Shift Timing Schedule
+                    var shiftTimingSchedModel = await (from mst in _db.MasterShiftTimes
+                                                       where mst.ShiftPatternCode.Trim() == shiftRoster.ShiftPatternCode.Trim()
+                                                       select mst).ToListAsync();
+                    if (shiftTimingSchedModel != null)
+                    {
+                        foreach (var item in shiftTimingSchedModel)
+                        {
+                            shiftRoster.ShiftTimingList.Add(new MasterShiftTime()
+                            {
+                                ShiftTimingId = item.ShiftTimingId,
+                                ShiftPatternCode = item.ShiftPatternCode,
+                                ShiftCode = item.ShiftCode,
+                                ShiftDescription = item.ShiftDescription,
+                                ArrivalFrom = item.ArrivalFrom,
+                                ArrivalTo = item.ArrivalTo,
+                                DepartFrom = item.DepartFrom,
+                                DepartTo = item.DepartTo,
+                                DurationNormal = item.DurationNormal,
+                                RArrivalFrom = item.RArrivalFrom,
+                                RArrivalTo = item.RArrivalTo,
+                                RDepartFrom = item.RDepartFrom,
+                                RDepartTo = item.RDepartTo,
+                                DurationRamadan = item.DurationRamadan,
+                                CreatedByEmpNo = item.CreatedByEmpNo,
+                                CreatedByName = item.CreatedByName,
+                                CreatedByUserID = item.CreatedByUserID,
+                                CreatedDate = item.CreatedDate,
+                                LastUpdateDate = item.LastUpdateDate,
+                                LastUpdateEmpNo = item.LastUpdateEmpNo,
+                                LastUpdateUserID = item.LastUpdateUserID,
+                                LastUpdatedByName = item.LastUpdatedByName
+                            });
+                        }
+                    }
+                    #endregion
+
+                    #region Get Shift Timing Sequence
+                    var shiftTimingSeqModel = await (from msp in _db.MasterShiftPatterns
+                                                     where msp.ShiftPatternCode.Trim() == shiftRoster.ShiftPatternCode.Trim()
+                                                       select msp).ToListAsync();
+                    if (shiftTimingSeqModel != null)
+                    {
+                        foreach (var item in shiftTimingSeqModel)
+                        {
+                            shiftRoster.ShiftPointerList.Add(new MasterShiftPattern()
+                            {
+                                ShiftCode = item.ShiftCode,
+                                ShiftPatternCode = item.ShiftPatternCode,
+                                ShiftPointerId = item.ShiftPointerId,
+                                ShiftPointer = item.ShiftPointer,
+                                ShiftDescription = item.ShiftDescription
+                            });
+                        }
+                    }
+                    #endregion
+                }
+
+                return Result<MasterShiftPatternTitle?>.SuccessResult(shiftRoster);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<MasterShiftPatternTitle?>.Failure($"Database error: {ex.Message}");
             }
         }
 

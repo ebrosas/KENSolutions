@@ -88,8 +88,21 @@
 	select * from [kenuser].[JobQualification] a
 
 	SELECT * FROM kenuser.MasterShiftPatternTitle a 
+	WHERE a.ShiftPatternId = 2
+
 	SELECT * FROM kenuser.MasterShiftTime a
+	WHERE a.ShiftPatternCode = 
+	(
+		SELECT x.ShiftPatternCode FROM kenuser.MasterShiftPatternTitle x 
+		WHERE x.ShiftPatternId = 2
+	)
+
 	SELECT * FROM kenuser.MasterShiftPattern a
+	WHERE a.ShiftPatternCode = 
+	(
+		SELECT x.ShiftPatternCode FROM kenuser.MasterShiftPatternTitle x 
+		WHERE x.ShiftPatternId = 2
+	)
 
 /*	Data updates:
 

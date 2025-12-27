@@ -12,6 +12,7 @@
 ALTER PROCEDURE kenuser.Pr_GetShiftRoster
 (   		
 	@loadType				TINYINT,
+	@shiftPatternId			INT = 0,
 	@shiftPatternCode		VARCHAR(20) = NULL,
 	@shiftCode				VARCHAR(10) = NULL,
 	@activeFlag				TINYINT = NULL
@@ -58,17 +59,40 @@ BEGIN
 		ORDER BY a.ShiftPatternCode
 	END 
 
+	ELSE IF @loadType = 1
+	BEGIN 
+
+		SELECT	a.ShiftPatternId,
+				a.ShiftPatternCode,
+				a.ShiftPatternDescription,
+				a.IsActive,
+				a.IsDayShift,
+				a.IsFlexiTime,
+				a.CreatedByEmpNo,
+				a.CreatedByName,
+				a.CreatedByUserID,
+				a.CreatedDate,
+				a.LastUpdateDate,
+				a.LastUpdateEmpNo,
+				a.LastUpdateUserID,
+				a.LastUpdatedByName
+		FROM kenuser.MasterShiftPatternTitle a WITH (NOLOCK)
+		WHERE a.ShiftPatternId = @shiftPatternId
+	END 
+
 END
 
 /*	Debug:
 
 PARAMETERS:
 	@loadType				TINYINT,
+	@shiftPatternId			INT = 0,
 	@shiftPatternCode		VARCHAR(20) = NULL,
 	@shiftCode				VARCHAR(10) = NULL,
 	@activeFlag				TINYINT = 0
 
 	EXEC kenuser.Pr_GetShiftRoster 0
+	EXEC kenuser.Pr_GetShiftRoster 1, 2
 	EXEC kenuser.Pr_GetShiftRoster 0, 'D5'
 	EXEC kenuser.Pr_GetShiftRoster 0, '', '', 1
 

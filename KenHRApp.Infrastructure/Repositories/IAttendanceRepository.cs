@@ -14,7 +14,8 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<int>> AddShiftRosterMasterAsync(MasterShiftPatternTitle shiftRoster, CancellationToken cancellationToken = default);
         Task<Result<int>> UpdateShiftRosterMasterAsync(MasterShiftPatternTitle dto, CancellationToken cancellationToken = default);
         Task<Result<bool>> DeleteShiftRosterMasterAsync(int shiftPatternId, CancellationToken cancellationToken = default);
-        Task<Result<List<MasterShiftPatternTitle>?>> SearchShiftRosterMasterAsync(byte loadType, string? shiftPatternCode, string? shiftCode, byte? activeFlag);
+        Task<Result<List<MasterShiftPatternTitle>?>> SearchShiftRosterMasterAsync(byte loadType, int? shiftPatternId, string? shiftPatternCode, string? shiftCode, byte? activeFlag);
+        Task<Result<MasterShiftPatternTitle?>> GetShiftRosterDetailAsync(int shiftPatternId);
         #endregion
     }
 }

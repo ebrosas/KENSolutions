@@ -607,7 +607,7 @@ namespace KenHRApp.Web.Components.Pages
                 _allowGridEdit = false;
                 _isDisabled = true;
                 _isRunning = false;
-
+                _saveBtnEnabled = false;
                 _hasValidationError = false;
                 _validationMessages.Clear();
 
