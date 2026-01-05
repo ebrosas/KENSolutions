@@ -1,0 +1,391 @@
+﻿using KenHRApp.Application.Common.Interfaces;
+using KenHRApp.Application.DTOs;
+using KenHRApp.Application.Interfaces;
+using KenHRApp.Application.Services;
+using KenHRApp.Domain.Entities;
+using KenHRApp.Web.Components.Shared;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.Extensions.Logging;
+using MudBlazor;
+using System.Globalization;
+using System.Text;
+
+namespace KenHRApp.Web.Components.Pages.TimeAttendance
+{
+    public partial class EmployeeShiftRoster
+    {
+        #region Parameters and Injections
+        [Inject] private IAttendanceService AttendanceService { get; set; } = default!;
+        [Inject] private IDialogService DialogService { get; set; } = default!;
+        [Inject] private ISnackbar Snackbar { get; set; } = default!;
+        [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
+        [Inject] private NavigationManager Navigation { get; set; } = default!;
+        [Inject] private IAppState AppState { get; set; } = default!;
+        [Inject] private IAppCacheService AppCacheService { get; set; } = default!;
+        [Inject] private ILogger<Employee> Logger { get; set; } = default!;
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public bool ForceLoad { get; set; } = false;
+        #endregion
+
+        #region Fields
+        private MudDatePicker _dojPicker;
+        private IReadOnlyList<EmployeeMasterDTO> employeeList = new List<EmployeeMasterDTO>();
+        private IReadOnlyList<UserDefinedCodeDTO> _employeeStatusList = new List<UserDefinedCodeDTO>();
+        private IReadOnlyList<UserDefinedCodeDTO> _employmentTypeList = new List<UserDefinedCodeDTO>();
+        private IReadOnlyList<DepartmentDTO> _departmentList = new List<DepartmentDTO>();
+        private IReadOnlyList<EmployeeDTO> _managerList = new List<EmployeeDTO>();
+
+        private UserDefinedCodeDTO? _selectedEmployeeStatus = null;
+        private UserDefinedCodeDTO? _selectedEmploymentType = null;
+        private StringBuilder _errorMessage = new StringBuilder();
+
+        private string _selectedDepartment = string.Empty;
+        private string[]? _departmentArray = null;
+        private string? _departmentCode = null;
+        private string _selectedManager = string.Empty;
+        private string[]? _managerArray = null;
+
+        private int? _employeeCode = null;
+        private string? _firstName = null;
+        private string? _lastName = null;
+        private int? _reportingManager = null;
+        private DateTime? _dateOfJoining = null;
+        private string? _employeeType = null;
+        private string overlayMessage = "Please wait...";
+        private string _departmentCacheKey = string.Empty;
+        private string _employeeCacheKey = string.Empty;
+
+        #region Flags
+        private bool _isSearchHovered = false;
+        private bool _isResetHovered = false;
+        private bool _isTaskFinished = false;
+        private bool _isRunning = false;
+        private bool _showErrorAlert = false;
+        #endregion
+
+        private enum UDCKeys
+        {
+            EMPSTATUS,  // Employee Status
+            EMPLOYTYPE, // Employment Type
+            DEPARTMENT  // Departments
+        }
+
+        private List<BreadcrumbItem> _breadcrumbItems =
+        [
+            new("Home", href: "/", icon: Icons.Material.Filled.Home),
+            new("Shift Roster Master", href: "/TimeAttendance/shiftrostersearch", icon: @Icons.Material.Filled.CalendarMonth),
+            new("Manage Shift Roster", href: null, disabled: true, @Icons.Material.Filled.EditNote)
+        ];
+        #endregion
+
+        #region Page Methods
+        public void Dispose()
+        {
+            // Cleanup resources
+            Logger.LogInformation("Employee page disposed");
+        }
+
+        protected override void OnInitialized()
+        {
+            BeginLoadComboboxTask();
+
+            if (LookupCache.IsEmployeeSearch)
+            {
+                LookupCache.IsEmployeeSearch = false;
+                BeginSearchEmployeeTask(ForceLoad);
+            }
+        }
+        #endregion
+
+        #region Asynchronous Tasks
+        private void BeginLoadComboboxTask()
+        {
+            _isTaskFinished = false;
+            _isRunning = true;
+
+            // Set the overlay message
+            overlayMessage = "Initializing form, please wait...";
+
+            _ = LoadComboboxAsync(async () =>
+            {
+                _isTaskFinished = true;
+                _isRunning = false;
+
+                if (_errorMessage.Length > 0)
+                    ShowHideError(true);
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            });
+        }
+
+        private async Task LoadComboboxAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(300);
+
+            // Populate Employee Status dropdown
+            var repoResult = await LookupCache.GetEmployeeStatusAsync();
+            if (repoResult.Success)
+            {
+                _employeeStatusList = repoResult.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(repoResult.Error);
+            }
+
+            // Populate Employment Type dropdown
+            repoResult = await LookupCache.GetEmploymentTypeAsync();
+            if (repoResult.Success)
+            {
+                _employmentTypeList = repoResult.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(repoResult.Error);
+            }
+
+            #region Get Department list
+            var deptResult = await LookupCache.GetDepartmentMasterAsync();
+            if (deptResult.Success)
+            {
+                _departmentList = deptResult.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(deptResult.Error);
+            }
+
+            if (_departmentList != null)
+            {
+                _departmentArray = _departmentList.Select(d => d.DepartmentName).OrderBy(d => d).ToArray();
+
+                // Save departments into cache via Application service
+                _departmentCacheKey = await AppCacheService.StoreDepartmentsAsync(_departmentList.ToList());
+            }
+            #endregion
+
+            #region Get Reporting Manager list
+            var managerResult = await LookupCache.GetReportingManagerAsync();
+            if (managerResult.Success)
+            {
+                _managerList = managerResult.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(managerResult.Error);
+            }
+
+            if (_managerList != null)
+            {
+                _managerArray = _managerList.Select(d => d.EmployeeFullName).OrderBy(d => d).ToArray();
+
+                // Save employees into cache via Application service
+                _employeeCacheKey = await AppCacheService.StoreEmployeesAsync(_managerList.ToList());
+            }
+            #endregion
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private void BeginSearchEmployeeTask(bool forceLoad = false)
+        {
+            _isTaskFinished = false;
+            _isRunning = true;
+
+            // Set the overlay message
+            overlayMessage = "Loading employee list, please wait...";
+
+            /*
+            Notes:
+            - The underscore makes the method call asynchronous, non-blocking, and explicit that we don’t care about the result.
+            - By assigning it to _, you’re telling the compiler: "Yes, I know this returns a Task, but I’m intentionally not awaiting it. Run it in the background."
+            - It’s like saying “fire-and-forget”.
+            - In short, The underscore _ is a discard assignment — it suppresses compiler warnings when you deliberately ignore the return value of a method.
+            */
+
+            _ = SearchEmployeeAsync(async () =>
+            {
+                _isTaskFinished = true;
+                _isRunning = false;
+
+                /* Notes:
+                * StateHasChanged → refresh the UI.
+                * InvokeAsync → marshal that call to the right Blazor thread.
+                * await → make sure the re-render finishes in a safe, async-friendly way.
+                */
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            }, forceLoad);
+        }
+
+        private async Task SearchEmployeeAsync(Func<Task> callback, bool forceLoad = false)
+        {
+            // Simulate async work
+            // This creates a task that waits asynchronously for 3000 milliseconds (3 seconds).
+            // The method “pauses” here and gives control back to the runtime until the timer completes.
+            // Await makes the method asynchronous — the UI stays responsive during the 3-second delay.
+            await Task.Delay(1000);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Get the department code
+            _departmentCode = string.Empty;
+            if (!string.IsNullOrEmpty(_selectedDepartment))
+            {
+                DepartmentDTO? departmentDTO = _departmentList.Where(d => d.DepartmentName == _selectedDepartment).FirstOrDefault();
+                if (departmentDTO != null)
+                    _departmentCode = departmentDTO.DepartmentCode;
+            }
+
+            _reportingManager = null;
+            if (!string.IsNullOrEmpty(_selectedManager))
+            {
+                EmployeeDTO? selectedManager = _managerList.Where(a => a.EmployeeFullName == _selectedManager).FirstOrDefault();
+                if (selectedManager != null)
+                    _reportingManager = selectedManager.EmployeeNo;
+            }
+
+            var result = await LookupCache.SearchEmployeeAsync(_employeeCode, _firstName, _lastName, _reportingManager,
+                _dateOfJoining, _selectedEmployeeStatus?.UDCCode, _selectedEmploymentType?.UDCCode, _departmentCode, forceLoad);
+            if (result.Success)
+            {
+                // Set the flag to indicate that search has been invoked
+                LookupCache.IsEmployeeSearch = true;
+
+                employeeList = result.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.Append(result.Error);
+
+                ShowHideError(true);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private void BeginRefreshPageTask()
+        {
+            _isTaskFinished = false;
+            _isRunning = true;
+
+            // Set the overlay message
+            overlayMessage = "Refreshing form, please wait...";
+
+            _ = RefreshPageAsync(async () =>
+            {
+                _isTaskFinished = true;
+                _isRunning = false;
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            });
+        }
+
+        private async Task RefreshPageAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(1000);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Clear field mappings
+            _employeeCode = null;
+            _firstName = null;
+            _lastName = null;
+            _reportingManager = null;
+            _dateOfJoining = null;
+            _employeeType = null;
+            _departmentCode = null;
+            _selectedEmployeeStatus = null;
+            _selectedEmploymentType = null;
+            _selectedDepartment = string.Empty;
+            employeeList = new List<EmployeeMasterDTO>();
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+        #endregion
+
+        #region Database Methods
+        private async Task<IEnumerable<string>> SearchDepartment(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _departmentArray!;
+            }
+
+            return _departmentArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchReportingManager(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _managerArray!;
+            }
+
+            return _managerArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+        #endregion
+
+        #region Private Methods
+        private void ShowHideError(bool value)
+        {
+            if (value)
+            {
+                _showErrorAlert = true;
+            }
+            else
+            {
+                _showErrorAlert = false;
+
+                // Reset error messages
+                _errorMessage.Clear();
+            }
+        }
+
+        private void GoToEmployeeDetail(EmployeeMasterDTO employee)
+        {
+            Navigation.NavigateTo($"/employees?EmployeeId={employee.EmployeeId}&ActionType=View&DepartmentCacheKey={_departmentCacheKey}&EmployeeCacheKey={_employeeCacheKey}");
+        }
+
+        private void AddNewEmployee()
+        {
+            Navigation.NavigateTo($"/employees?EmployeeId=0&ActionType=Add&DepartmentCacheKey={_departmentCacheKey}&EmployeeCacheKey={_employeeCacheKey}");
+        }
+        #endregion
+    }
+}

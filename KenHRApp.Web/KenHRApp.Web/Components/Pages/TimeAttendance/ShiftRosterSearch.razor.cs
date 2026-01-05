@@ -153,6 +153,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             Navigation.NavigateTo($"/TimeAttendance/mastershiftroster?ActionType=Add");
         }
+
+        private void OpenEmployeeShiftRoster()
+        {
+            Navigation.NavigateTo($"/TimeAttendance/employeeshiftroster");
+        }
         #endregion
 
         #region Private Methods
