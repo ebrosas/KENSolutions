@@ -224,6 +224,7 @@ namespace KenHRApp.Infrastructure.Repositories
                 {
                     #region Delete entity items that don't exist in the DTO
                     var shiftTimingNotInDTO = _db.MasterShiftTimes.AsEnumerable()
+                                    .Where(st => st.ShiftPatternCode == dto.ShiftPatternCode)
                                     .ExceptBy(dto.ShiftTimingList.Select(d => d.ShiftTimingId), e => e.ShiftTimingId)
                                     .ToList();
                     if (shiftTimingNotInDTO.Any())
@@ -297,6 +298,7 @@ namespace KenHRApp.Infrastructure.Repositories
                 {
                     #region Delete entity items that don't exist in the DTO
                     var shiftPointerNotInDTO = _db.MasterShiftPatterns.AsEnumerable()
+                                    .Where(st => st.ShiftPatternCode == dto.ShiftPatternCode)
                                     .ExceptBy(dto.ShiftPointerList.Select(d => d.ShiftPointerId), e => e.ShiftPointerId)
                                     .ToList();
                     if (shiftPointerNotInDTO.Any())

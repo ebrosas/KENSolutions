@@ -56,7 +56,7 @@
                                  @* Empty to prevent rendering *@
                              </EditTemplate>
                          </PropertyColumn>
-                         <PropertyColumn Property="x => x.ShiftPatternCode" Title="Shift Pattern Code" Class="col-shift-pattern" StickyLeft="true">
+                         <PropertyColumn Property="x => x.ShiftPatternCode" Title="Shift Roster Code" Class="col-shift-pattern" StickyLeft="true">
                              <CellTemplate Context="row">
                                  <MudChip T="string" Size=Size.Small Color="Color.Primary" Label="true" Class="fw-bold" Style="font-size: 14px;">
                                      @row.Item.ShiftPatternCode
@@ -103,7 +103,7 @@
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.CreatedDate" Title="Created Date" Class="col-created-date" Editable="false">
                             <CellTemplate>
-                                @context.Item.CreatedDate?.ToString("dd-MMM-yyyy")
+                                @context.Item.CreatedDate?.ToString("dd-MMM-yyyy hh:mm tt")
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.LastUpdatedByFullName" Title="Updated By" Class="col-updated-by" Editable="false">
@@ -113,7 +113,7 @@
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.LastUpdateDate" Title="Updated Date" Class="col-updated-date" Editable="false">
                             <CellTemplate>
-                                @context.Item.LastUpdateDate?.ToString("dd-MMM-yyyy")
+                                @context.Item.LastUpdateDate?.ToString("dd-MMM-yyyy hh:mm tt")
                             </CellTemplate>
                         </PropertyColumn>      
                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">

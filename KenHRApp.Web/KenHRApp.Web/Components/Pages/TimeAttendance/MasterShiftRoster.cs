@@ -805,7 +805,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             else
             {
                 // Set the user who created the record and the timestamp
-                _shiftPattern.CreatedDate = DateTime.Now;
+                _shiftPattern.LastUpdateDate = DateTime.Now;
 
                 var saveResult = await AttendanceService.UpdateShiftRosterMasterAsync(_shiftPattern, _cts.Token);
                 isSuccess = saveResult.Success;
@@ -845,31 +845,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Hide the spinner overlay
                 await callback.Invoke();
             }
-        }
-
-        private async Task SaveMasterAsync()
-        {
-            if (_form == null) return;
-            await _form.Validate();
-
-            if (!_form.IsValid)
-            {
-                // show error message; do not save
-                Console.WriteLine("Form invalid");
-                return;
-            }
-
-            // Ensure shift code on child items are in sync with header's ShiftPatternCode
-            foreach (var t in _shiftPattern.ShiftTimingList)
-                t.ShiftPatternCode = _shiftPattern.ShiftPatternCode;
-
-            foreach (var p in _shiftPattern.ShiftPointerList)
-                p.ShiftPatternCode = _shiftPattern.ShiftPatternCode;
-
-            // TODO: call your API/service to save _shiftPattern
-            // await _shiftPatternService.SaveAsync(_shiftPattern);
-
-            Console.WriteLine("Saved (replace this with real save)");
         }
 
         private void ResetForm()
