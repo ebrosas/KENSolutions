@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KenHRApp.Application.Common.Validations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -27,8 +28,11 @@ namespace KenHRApp.Application.DTOs
 
         [Required(ErrorMessage = "Effective Date is required")]
         [Display(Name = "Effective Date")]
+        [EffectiveDateValidation("EndingDate")] // ✅ custom validation
         public DateTime? EffectiveDate { get; set; }
 
+        [Display(Name = "Ending Date")]
+        [EndingDateValidation("EffectiveDate")] // ✅ custom validation
         public DateTime? EndingDate { get; set; } = null;
 
         [Required(ErrorMessage = "Shift Roster Code is required")]

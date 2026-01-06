@@ -37,25 +37,49 @@ namespace KenHRApp.Infrastructure.Repositories
                     .ToListAsync();
                 if (model != null)
                 {
+                    MasterShiftPatternTitle shiftRoster = null;
                     foreach (var item in model)
                     {
-                        shiftRosterList.Add(new MasterShiftPatternTitle()
+                        shiftRoster = new MasterShiftPatternTitle()
                         {
                             ShiftPatternId = item.ShiftPatternId,
-                            ShiftPatternCode = item.ShiftPatternCode, 
-                            ShiftPatternDescription = item.ShiftPatternDescription, 
-                            IsActive = item.IsActive, 
+                            ShiftPatternCode = item.ShiftPatternCode,
+                            ShiftPatternDescription = item.ShiftPatternDescription,
+                            IsActive = item.IsActive,
                             IsDayShift = item.IsDayShift,
                             IsFlexiTime = item.IsFlexiTime,
                             CreatedByEmpNo = item.CreatedByEmpNo,
-                            CreatedByName = item.CreatedByName, 
-                            CreatedByUserID = item.CreatedByUserID, 
-                            CreatedDate = item.CreatedDate, 
-                            LastUpdateDate = item.LastUpdateDate, 
+                            CreatedByName = item.CreatedByName,
+                            CreatedByUserID = item.CreatedByUserID,
+                            CreatedDate = item.CreatedDate,
+                            LastUpdateDate = item.LastUpdateDate,
                             LastUpdateEmpNo = item.LastUpdateEmpNo,
-                            LastUpdateUserID = item.LastUpdateUserID, 
+                            LastUpdateUserID = item.LastUpdateUserID,
                             LastUpdatedByName = item.LastUpdatedByName
-                        });
+                        };
+
+                        #region Get the Shift Pointers
+                        var shiftPointerModel = await (from msp in _db.MasterShiftPatterns
+                                                       where msp.ShiftPatternCode.Trim() == shiftRoster.ShiftPatternCode.Trim()
+                                                       select msp).ToListAsync();
+                        if (shiftPointerModel != null)
+                        {
+                            foreach (var pointer in shiftPointerModel)
+                            {
+                                shiftRoster.ShiftPointerList.Add(new MasterShiftPattern()
+                                {
+                                    ShiftCode = pointer.ShiftCode,
+                                    ShiftPatternCode = pointer.ShiftPatternCode,
+                                    ShiftPointerId = pointer.ShiftPointerId,
+                                    ShiftPointer = pointer.ShiftPointer,
+                                    ShiftDescription = pointer.ShiftDescription
+                                });
+                            }
+                        }
+                        #endregion
+
+                        // Add to the collection
+                        shiftRosterList.Add(shiftRoster);
                     }
                 }
 

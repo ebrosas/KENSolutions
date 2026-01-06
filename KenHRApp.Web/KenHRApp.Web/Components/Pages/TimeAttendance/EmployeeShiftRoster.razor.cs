@@ -36,6 +36,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Fields
+        // The master DTO bound to the form
+        private EmployeeRosterDTO _shiftRoster = new EmployeeRosterDTO();
+        private EditForm _editForm;
+        private EditContext? _editContext;
+        private List<string> _validationMessages = new();
         private MudDatePicker _dojPicker;
         private MudDataGrid<EmployeeRosterDTO>? _rosterGrid;        
         private UserDefinedCodeDTO? _selectedEmployeeStatus = null;
@@ -57,6 +62,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string overlayMessage = "Please wait...";
         private string _departmentCacheKey = string.Empty;
         private string _employeeCacheKey = string.Empty;
+        private string _shiftPatternCacheKey = string.Empty;
 
         #region Flags
         private bool _isSearchHovered = false;
@@ -68,6 +74,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _allowGridEdit = false;
         private bool _isDisabled = false;
         private bool _saveBtnEnabled = false;
+        private bool _hasValidationError = false;
         #endregion
 
         #region Enums
@@ -117,7 +124,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private IReadOnlyList<UserDefinedCodeDTO> _employmentTypeList = new List<UserDefinedCodeDTO>();
         private IReadOnlyList<DepartmentDTO> _departmentList = new List<DepartmentDTO>();
         private IReadOnlyList<EmployeeDTO> _managerList = new List<EmployeeDTO>();
-        private List<ShiftPatternMasterDTO> _shiftPatternList = new List<ShiftPatternMasterDTO>();
+        private IReadOnlyList<ShiftPatternMasterDTO> _shiftPatternList = new List<ShiftPatternMasterDTO>();
         private List<ShiftPointerDTO> _shiftPointerList = new List<ShiftPointerDTO>();
         private IReadOnlyList<UserDefinedCodeDTO> _changeTypeList = new List<UserDefinedCodeDTO>();
         #endregion        
@@ -133,6 +140,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         protected override void OnInitialized()
         {
+            // Initialize the EditContext 
+            _editContext = new EditContext(_shiftRoster);
+
             if (ActionType == ActionTypes.Edit.ToString() ||
                 ActionType == ActionTypes.View.ToString())
             {
@@ -151,6 +161,46 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 LookupCache.IsEmployeeSearch = false;
                 BeginSearchEmployeeTask(ForceLoad);
+            }
+        }
+        #endregion
+
+        #region Validation Methods
+        private void HandleInvalidSubmit(EditContext context)
+        {
+            _hasValidationError = true;
+            _validationMessages = context.GetValidationMessages().ToList();
+        }
+
+        private void HandleValidSubmit(EditContext context)
+        {
+            try
+            {
+                // If we got here, model is valid
+                _hasValidationError = false;
+                _validationMessages.Clear();
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Saving changes, please wait...";
+
+                //_ = SaveShiftRosterAsync(async () =>
+                //{
+                //    _isRunning = false;
+
+                //    // Shows the spinner overlay
+                //    await InvokeAsync(StateHasChanged);
+                //});
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Save cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
             }
         }
         #endregion
@@ -188,6 +238,28 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             catch (Exception ex)
             {
                 ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private void OnShiftRosterChanged(EmployeeRosterDTO row, string newValue)
+        {
+            if (row.ShiftPatternCode != newValue)
+            {
+                row.ShiftPatternCode = newValue;
+
+                // Get the associated shift pointers
+                if (_shiftPatternList.Any())
+                {
+                    ShiftPatternMasterDTO? shiftPattern = _shiftPatternList.Where(s => s.ShiftPatternCode.Trim() == newValue).FirstOrDefault();
+                    if (shiftPattern != null)
+                    {
+                        _shiftPointerList = shiftPattern.ShiftPointerList;
+                    }
+                }
+
+                // Reset pointer when roster changes
+                row.ShiftPointer = 0;
+                row.ShiftPointerId = 0;
             }
         }
         #endregion
@@ -295,6 +367,27 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Save employees into cache via Application service
                 _employeeCacheKey = await AppCacheService.StoreEmployeesAsync(_managerList.ToList());
             }
+            #endregion
+
+            #region Get Shift Pattern list
+            var shiftPatternResult = await LookupCache.GetShiftPatternAsync(true);
+            if (shiftPatternResult.Success)
+            {
+                _shiftPatternList = shiftPatternResult.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(shiftPatternResult.Error);
+            }
+
+            //if (_shiftPatternList != null)
+            //{
+            //    _departmentArray = _departmentList.Select(d => d.DepartmentName).OrderBy(d => d).ToArray();
+
+            //    // Save departments into cache via Application service
+            //    _shiftPatternCacheKey = await AppCacheService.StoreDepartmentsAsync(_departmentList.ToList());
+            //}
             #endregion
 
             if (callback != null)

@@ -19,18 +19,13 @@ namespace KenHRApp.Application.Common.Interfaces
 
         Task<Result<IReadOnlyList<EmployeeMasterDTO>>> SearchEmployeeAsync(int? empNo, string? firstName, string? lastName, int? managerEmpNo,
             DateTime? joiningDate, string? statusCode, string? employmentType, string? departmentCode, bool forceLoad = false);
-
         Task<Result<IReadOnlyList<UserDefinedCodeDTO>>> GetUserDefinedCodeAsync(string udcKey, bool forceLoad = false);
-
         Task<Result<IReadOnlyList<UserDefinedCodeDTO>>> GetEmploymentTypeAsync(bool forceLoad = false);
-
         Task<Result<IReadOnlyList<UserDefinedCodeDTO>>> GetEmployeeStatusAsync(bool forceLoad = false);
-
         Task<Result<IReadOnlyList<DepartmentDTO>>> GetDepartmentMasterAsync(bool forceLoad = false);
-
         Task<Result<IReadOnlyList<EmployeeDTO>>> GetReportingManagerAsync(bool forceLoad = false);
-
         Task<Result<IReadOnlyList<UserDefinedCodeDTO>>> GetChangeTypeAsync(bool forceLoad = false);
+        Task<Result<IReadOnlyList<ShiftPatternMasterDTO>>> GetShiftPatternAsync(bool forceLoad = false);
         #endregion
     }
 }

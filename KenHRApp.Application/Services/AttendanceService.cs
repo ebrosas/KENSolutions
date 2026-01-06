@@ -52,7 +52,15 @@ namespace KenHRApp.Application.Services
                     LastUpdateDate = e.LastUpdateDate,
                     LastUpdateEmpNo = e.LastUpdateEmpNo,
                     LastUpdateUserID = e.LastUpdateUserID,
-                    LastUpdatedByName = e.LastUpdatedByName
+                    LastUpdatedByName = e.LastUpdatedByName,
+                    ShiftPointerList = e.ShiftPointerList!.Select(e => new ShiftPointerDTO
+                    {
+                        ShiftPointerId = e.ShiftPointerId,
+                        ShiftPatternCode = e.ShiftPatternCode,
+                        ShiftCode = e.ShiftCode,
+                        ShiftDescription = e.ShiftDescription,
+                        ShiftPointer = e.ShiftPointer
+                    }).ToList()
                 }).ToList();
 
                 return Result<List<ShiftPatternMasterDTO>>.SuccessResult(shiftRosterList);

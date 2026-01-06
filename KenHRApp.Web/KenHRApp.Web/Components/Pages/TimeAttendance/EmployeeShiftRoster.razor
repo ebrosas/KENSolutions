@@ -2,270 +2,303 @@
 
 <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Manage Employee Shift Roster</MudText>
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
-    @if (_showErrorAlert)
-    {
-        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
-                  ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
-            @_errorMessage
-        </MudAlert>
-    }
-    <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
-        <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-primary-text" />
+    <EditForm EditContext="@_editContext" @ref="_editForm"
+        OnValidSubmit="HandleValidSubmit" 
+        OnInvalidSubmit="HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        @if (_hasValidationError && _validationMessages.Any())
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
+                <ul style="margin:0; padding-left:20px;">
+                    @foreach (var msg in _validationMessages)
+                    {
+                        <li>
+                            <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
+                            </li>
+                    }
+                </ul>
+            </MudAlert>
+        }
 
-        <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
-            <MudPaper Elevation="0" Square="true" Class="w-100">
-                <MudGrid Spacing="5">
-                    <MudItem xs="2">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudTextField @bind-Value="_employeeCode" Label="Employee No." HelperText="Max. input is 20 chars."
-                                          Variant="Variant.Text" HelperTextOnFocus="true" Counter="20" MaxLength="20"
-                                          Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                        </MudPaper>
-                    </MudItem>
-                    <MudItem xs="3">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudTextField @bind-Value="_firstName" Label="First Name" HelperText="Max. input is 50 chars."
-                                          Variant="Variant.Text" HelperTextOnFocus="true" Counter="50" MaxLength="50"
-                                          Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                        </MudPaper>
-                    </MudItem>
-                    <MudItem xs="3">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudTextField @bind-Value="_lastName" Label="Last Name" HelperText="Max. input is 50 chars."
-                                          Variant="Variant.Text" HelperTextOnFocus="true" Counter="50" MaxLength="50"
-                                          Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                        </MudPaper>
-                    </MudItem>
-                    <MudItem xs="2">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudDatePicker @ref="_dojPicker" Label="Date of Joining" Editable="true" @bind-Date="_dateOfJoining" Margin="Margin.Dense" Color="Color.Primary"
-                                           HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" Clearable="true" AutoClose="true"
-                                           Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Text">
-                                <PickerActions Context="dateContext">
-                                    <MudButton Class="mr-auto align-self-start" OnClick="@(() => _dojPicker.ClearAsync())">Clear</MudButton>
-                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _dateOfJoining = DateTime.Today))">Today</MudButton>
-                                    <MudButton Color="Color.Primary" OnClick="@(() => _dojPicker.CloseAsync())">OK</MudButton>
-                                </PickerActions>
-                            </MudDatePicker>
-                        </MudPaper>
-                    </MudItem>
-                    <MudItem xs="2">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudAutocomplete @bind-Value="_selectedManager"
-                                             SearchFunc="SearchReportingManager!"
-                                             Variant="Variant.Text"
-                                             Label="Reporting Manager"
-                                             Margin="Margin.Normal"
-                                             Dense="true"
-                                             Placeholder="Please Select"
-                                             HelperText="Type a key to search for value"
-                                             HelperTextOnFocus="true"
-                                             Clearable="true" Typo="Typo.subtitle2"
-                                             MaxItems="@(_managerList != null ? _managerList.Count : 10)"
-                                             Modal="true" />
-                        </MudPaper>
-                    </MudItem>
-                </MudGrid>
-                <MudGrid Spacing="5">
-                    <MudItem xs="2">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudSelect T="UserDefinedCodeDTO" @bind-Value="_selectedEmployeeStatus" Variant="Variant.Text" Margin="Margin.Dense" Label="Employee Status"
-                                       Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
-                                       HelperText="Filter by employment status" HelperTextOnFocus="true" Clearable="true" Immediate="true" Typo="Typo.subtitle2">
-                                @foreach (var status in _employeeStatusList)
-                                {
-                                    <MudSelectItem Value="status">@status.UDCDesc1</MudSelectItem>
-                                }
-                            </MudSelect>
-                        </MudPaper>
-                    </MudItem>
-                    <MudItem xs="3">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudSelect T="UserDefinedCodeDTO" @bind-Value="_selectedEmploymentType" Variant="Variant.Text" Margin="Margin.Dense" Label="Employement Type"
-                                       Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
-                                       HelperText="Filter by employment type" HelperTextOnFocus="true" Clearable="true" Immediate="true" Typo="Typo.subtitle2">
-                                @foreach (var empType in _employmentTypeList)
-                                {
-                                    <MudSelectItem Value="empType">@empType.UDCDesc1</MudSelectItem>
-                                }
-                            </MudSelect>
-                        </MudPaper>
-                    </MudItem>
-                    <MudItem xs="3">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudAutocomplete @bind-Value="_selectedDepartment"
-                                             SearchFunc="SearchDepartment!"
-                                             Variant="Variant.Text"
-                                             Label="Department"
-                                             Margin="Margin.Normal"
-                                             Dense="true"
-                                             Placeholder="Please Select"
-                                             HelperText="Type a key to search for value"
-                                             HelperTextOnFocus="true"
-                                             Clearable="true" Typo="Typo.subtitle2"
-                                             MaxItems="@(_departmentList != null ? _departmentList.Count : 10)"
-                                             Modal="true" />
-                        </MudPaper>
-                    </MudItem>
-                    <MudItem xs="4">
-                        <MudPaper Class="d-flex gap-2 justify-content-start align-items-baseline ms-2 pt-5" Elevation="0">
-                            <div @onmouseover="() => _isSearchHovered = true" @onmouseout="() => _isSearchHovered = false">
-                                <MudButton Variant="@(_isSearchHovered ? Variant.Filled : Variant.Outlined)"
-                                           StartIcon="@Icons.Material.Filled.PersonSearch" Class="px-3"
-                                           Color="Color.Info" Size="Size.Small" OnClick="@(() => BeginSearchEmployeeTask(true))">
-                                    <MudText Typo="Typo.button" HtmlTag="h3">Search</MudText>
-                                </MudButton>
-                            </div>
-                            <div @onmouseover="() => _isResetHovered = true" @onmouseout="() => _isResetHovered = false">
-                                <MudButton Variant="@(_isResetHovered ? Variant.Filled : Variant.Outlined)"
-                                           StartIcon="@Icons.Material.Filled.Refresh" Class="px-3"
-                                           Color="Color.Warning" Size="Size.Small" OnClick="BeginRefreshPageTask">
-                                    <MudText Typo="Typo.button" HtmlTag="h3">Reset</MudText>
-                                </MudButton>
-                            </div>
-                        </MudPaper>
-                    </MudItem>
-                </MudGrid>
-            </MudPaper>
-            <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
-                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LIST OF EMPLOYEES</MudText>
-                <MudSpacer />
-                <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add New Employee" OnClick="AddNewEmployee" />
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Dark" Label="Download Master Data" />
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Upload" IconColor="Color.Dark" Label="Upload Employees" />
-                 </MudMenu>
-             </MudAppBar>
-             <MudPaper Elevation="4" Square="true" Class="w-100">
-                <div class="shift-roster-grid">
-                    <MudDataGrid T="EmployeeRosterDTO" Items="@employeeList" Hover="true" Striped="true"
-                        Filterable="_enableGridFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
-                        Hideable="true" PageSize="5"
-                        EditTrigger="DataGridEditTrigger.OnRowClick" ReadOnly="@(!_allowGridEdit)" EditMode="DataGridEditMode.Cell"
-                        StartedEditingItem="@StartedEditingGridItem"
-                        CommittedItemChanges="@CommittedGridItemChanges"
-                        TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true"
-                        @ref="_rosterGrid">
-                         <Columns>
-                             <PropertyColumn Property="x => x.EmployeeId" Hidden />
-                             <PropertyColumn Property="x => x.EmployeeNo" Title="Employee No." Class="col-employee-code" Editable="false" />
-                             <PropertyColumn Property="x => x.EmployeeName" Title="Employee Name" Class="col-first-name" />
-                             <PropertyColumn Property="x => x.HireDate" Title="Date of Join" Class="col-joining-date">
-                                 <CellTemplate>
-                                     @context.Item.HireDate?.ToString("dd-MMM-yyyy")
-                                </CellTemplate>
-                            </PropertyColumn>
-                            <PropertyColumn Property="x => x.EmploymentTypeCode" Hidden />
-                            <PropertyColumn Property="x => x.EmploymentType" Title="Employment Type" Class="col-employment-type" />
-                            <PropertyColumn Property="x => x.ReportingManagerCode" Hidden />
-                            <PropertyColumn Property="x => x.ReportingManager" Title="Reporting Manager" Class="col-reporting-manager" />
-                            <PropertyColumn Property="x => x.DepartmentFullName" Title="Department" Class="col-department" />
-                            <PropertyColumn Property="x => x.EmployeeStatusCode" Hidden />
-                            <PropertyColumn Property="x => x.ShiftPatternDescription" Title="Shift Roster" Class="col-shift-timing">
-                                 <EditTemplate Context="row">
-                                     <MudSelect @bind-Value="row.Item.ShiftPatternCode" Variant="Variant.Outlined" Margin="Margin.Dense"
-                                        Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
-                                        Required RequiredError="Shift Roster is required"
-                                        Immediate="true" Typo="Typo.subtitle2">
-                                         @foreach (var shift in _shiftPatternList)
-                                        {
-                                            <MudSelectItem Value="shift.ShiftPatternCode">@shift.ShiftPatternDescription</MudSelectItem>
-                                        }
-                                    </MudSelect>
-                                </EditTemplate>
-                            </PropertyColumn>
-                            <PropertyColumn Property="x => x.ShiftPointer" Title="Shift Pointer" Class="col-shift-timing">
-                                <EditTemplate Context="row">
-                                    <MudSelect @bind-Value="row.Item.ShiftPointerId" Variant="Variant.Outlined" Margin="Margin.Dense"
-                                        Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
-                                        Required RequiredError="Shift Pointer is required"
-                                        Immediate="true" Typo="Typo.subtitle2">
-                                        @foreach (var pointer in _shiftPointerList)
-                                        {
-                                            <MudSelectItem Value="pointer.ShiftPointerId">@pointer.ShiftPointer</MudSelectItem>
-                                        }
-                                    </MudSelect>
-                                </EditTemplate>
-                            </PropertyColumn>
-                            <PropertyColumn Property="x => x.ChangeTypeDesc" Title="Change Type" Class="col-shift-timing">
-                                <EditTemplate Context="row">
-                                    <MudSelect @bind-Value="row.Item.ChangeTypeCode" Variant="Variant.Outlined" Margin="Margin.Dense"
-                                        Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
-                                        Required RequiredError="Change Type is required"
-                                        Immediate="true" Typo="Typo.subtitle2">
-                                        @foreach (var ct in _changeTypeList)
-                                        {
-                                            <MudSelectItem Value="ct.UDCCode">@ct.UDCDesc1</MudSelectItem>
-                                        }
-                                    </MudSelect>
-                                </EditTemplate>
-                            </PropertyColumn>
-                            <PropertyColumn Property="x => x.EffectiveDate" Title="Effective Date" Class="col-shift-time">
-                                <EditTemplate Context="row">
-                                    <MudDatePicker Color="Color.Info" Editable="true" @bind-Date="row.Item.EffectiveDate"
-                                        Required RequiredError="Effective Date is required"
-                                        Placeholder="Select Date" />
-                                </EditTemplate>
-                            </PropertyColumn>
-                            <PropertyColumn Property="x => x.EndingDate" Title="Ending Date" Class="col-shift-time">
-                                <EditTemplate Context="row">
-                                    <MudDatePicker Color="Color.Info" Editable="true" @bind-Date="row.Item.EndingDate" Placeholder="Select Date" />
-                                </EditTemplate>
-                            </PropertyColumn>
-                            <PropertyColumn Property="x => x.CreatedByFullName" Hidden Editable="false" Class="col-created-by">
-                                 <EditTemplate Context="row">
-                                     @* Empty to prevent rendering *@
-                                 </EditTemplate>
-                             </PropertyColumn>
-                             <PropertyColumn Property="x => x.CreatedDate" Title="Created Date" Class="col-created-date" Editable="false">
-                                 <CellTemplate Context="row">
-                                     @row.Item.CreatedDate?.ToString("dd-MMM-yyyy h:mm tt")
-                                </CellTemplate>
-                            </PropertyColumn>
-                            <PropertyColumn Property="x => x.LastUpdateByFullName" Hidden Editable="false" Class="col-updated-by">
-                                 <EditTemplate Context="row">
-                                     @* Empty to prevent rendering *@
-                                 </EditTemplate>
-                             </PropertyColumn>
-                             <PropertyColumn Property="x => x.LastUpdateDate" Title="Last Updated Date" Class="col-updated-date" Editable="false">
-                                 <CellTemplate Context="row">
-                                     @row.Item.LastUpdateDate?.ToString("dd-MMM-yyyy h:mm tt")
-                                </CellTemplate>
-                            </PropertyColumn>
-                            <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
-                                <CellTemplate>
-                                    <MudIconButton Color="Color.Info" title="View and edit employee information" Class="show-btn fa-icon-btn"
-                                                   OnClick="@(()=>GoToEmployeeDetail(context.Item))">
-                                        <ChildContent>
-                                            <i class="fas fa-edit fa-1x"></i>
-                                        </ChildContent>
-                                    </MudIconButton>
-                                    <MudIconButton Color="Color.Error" title="Delete employee record" Class="hide-btn fa-icon-btn" OnClick="@context.Actions.StartEditingItemAsync">
-                                        <ChildContent>
-                                            <i class="fas fa-trash-alt fa-lg"></i>
-                                        </ChildContent>
-                                    </MudIconButton>
-                                </CellTemplate>
-                            </TemplateColumn>
-                        </Columns>
-                        <NoRecordsContent>
-                            <div class="no-data-box">
-                                <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
-                                <span>No data found</span>
-                            </div>
-                        </NoRecordsContent>
-                    </MudDataGrid>
-                </div>                 
-            </MudPaper>
-            <MudScrollToTop TopOffset="100"
-                            Selector="#mainPanel"
-                            VisibleCssClass="visible absolute"
-                            HiddenCssClass="hidden absolute">
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
-            </MudScrollToTop>
-        </MudStack>
-    </div>
+        @if (_showErrorAlert)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
+                      ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
+                @_errorMessage
+            </MudAlert>
+        }
+
+        <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
+            <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-primary-text" />
+
+            <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
+                <MudPaper Elevation="0" Square="true" Class="w-100">
+                    <MudGrid Spacing="5">
+                        <MudItem xs="2">
+                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                <MudTextField @bind-Value="_employeeCode" Label="Employee No." HelperText="Max. input is 20 chars."
+                                              Variant="Variant.Text" HelperTextOnFocus="true" Counter="20" MaxLength="20"
+                                              Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                <MudTextField @bind-Value="_firstName" Label="First Name" HelperText="Max. input is 50 chars."
+                                              Variant="Variant.Text" HelperTextOnFocus="true" Counter="50" MaxLength="50"
+                                              Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                <MudTextField @bind-Value="_lastName" Label="Last Name" HelperText="Max. input is 50 chars."
+                                              Variant="Variant.Text" HelperTextOnFocus="true" Counter="50" MaxLength="50"
+                                              Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                <MudDatePicker @ref="_dojPicker" Label="Date of Joining" Editable="true" @bind-Date="_dateOfJoining" Margin="Margin.Dense" Color="Color.Primary"
+                                               HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" Clearable="true" AutoClose="true"
+                                               Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Text">
+                                    <PickerActions Context="dateContext">
+                                        <MudButton Class="mr-auto align-self-start" OnClick="@(() => _dojPicker.ClearAsync())">Clear</MudButton>
+                                        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _dateOfJoining = DateTime.Today))">Today</MudButton>
+                                        <MudButton Color="Color.Primary" OnClick="@(() => _dojPicker.CloseAsync())">OK</MudButton>
+                                    </PickerActions>
+                                </MudDatePicker>
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                <MudAutocomplete @bind-Value="_selectedManager"
+                                                 SearchFunc="SearchReportingManager!"
+                                                 Variant="Variant.Text"
+                                                 Label="Reporting Manager"
+                                                 Margin="Margin.Normal"
+                                                 Dense="true"
+                                                 Placeholder="Please Select"
+                                                 HelperText="Type a key to search for value"
+                                                 HelperTextOnFocus="true"
+                                                 Clearable="true" Typo="Typo.subtitle2"
+                                                 MaxItems="@(_managerList != null ? _managerList.Count : 10)"
+                                                 Modal="true" />
+                            </MudPaper>
+                        </MudItem>
+                    </MudGrid>
+                    <MudGrid Spacing="5">
+                        <MudItem xs="2">
+                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                <MudSelect T="UserDefinedCodeDTO" @bind-Value="_selectedEmployeeStatus" Variant="Variant.Text" Margin="Margin.Dense" Label="Employee Status"
+                                           Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                           HelperText="Filter by employment status" HelperTextOnFocus="true" Clearable="true" Immediate="true" Typo="Typo.subtitle2">
+                                    @foreach (var status in _employeeStatusList)
+                                    {
+                                        <MudSelectItem Value="status">@status.UDCDesc1</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                <MudSelect T="UserDefinedCodeDTO" @bind-Value="_selectedEmploymentType" Variant="Variant.Text" Margin="Margin.Dense" Label="Employement Type"
+                                           Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                           HelperText="Filter by employment type" HelperTextOnFocus="true" Clearable="true" Immediate="true" Typo="Typo.subtitle2">
+                                    @foreach (var empType in _employmentTypeList)
+                                    {
+                                        <MudSelectItem Value="empType">@empType.UDCDesc1</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                <MudAutocomplete @bind-Value="_selectedDepartment"
+                                                 SearchFunc="SearchDepartment!"
+                                                 Variant="Variant.Text"
+                                                 Label="Department"
+                                                 Margin="Margin.Normal"
+                                                 Dense="true"
+                                                 Placeholder="Please Select"
+                                                 HelperText="Type a key to search for value"
+                                                 HelperTextOnFocus="true"
+                                                 Clearable="true" Typo="Typo.subtitle2"
+                                                 MaxItems="@(_departmentList != null ? _departmentList.Count : 10)"
+                                                 Modal="true" />
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudPaper Class="d-flex gap-2 justify-content-start align-items-baseline ms-2 pt-5" Elevation="0">
+                                <div @onmouseover="() => _isSearchHovered = true" @onmouseout="() => _isSearchHovered = false">
+                                    <MudButton Variant="@(_isSearchHovered ? Variant.Filled : Variant.Outlined)"
+                                               StartIcon="@Icons.Material.Filled.PersonSearch" Class="px-3"
+                                               Color="Color.Info" Size="Size.Small" OnClick="@(() => BeginSearchEmployeeTask(true))">
+                                        <MudText Typo="Typo.button" HtmlTag="h3">Search</MudText>
+                                    </MudButton>
+                                </div>
+                                <div @onmouseover="() => _isResetHovered = true" @onmouseout="() => _isResetHovered = false">
+                                    <MudButton Variant="@(_isResetHovered ? Variant.Filled : Variant.Outlined)"
+                                               StartIcon="@Icons.Material.Filled.Refresh" Class="px-3"
+                                               Color="Color.Warning" Size="Size.Small" OnClick="BeginRefreshPageTask">
+                                        <MudText Typo="Typo.button" HtmlTag="h3">Reset</MudText>
+                                    </MudButton>
+                                </div>
+                            </MudPaper>
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+                <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
+                    <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LIST OF EMPLOYEES</MudText>
+                    <MudSpacer />
+                    <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
+                         <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add New Employee" OnClick="AddNewEmployee" />
+                         <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
+                         <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Dark" Label="Download Master Data" />
+                         <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Upload" IconColor="Color.Dark" Label="Upload Employees" />
+                     </MudMenu>
+                 </MudAppBar>
+                 <MudPaper Elevation="4" Square="true" Class="w-100">
+                    <div class="shift-roster-grid">
+                        <MudDataGrid T="EmployeeRosterDTO" Items="@employeeList" Hover="true" Striped="true"
+                            Filterable="_enableGridFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                            Hideable="true" PageSize="5"
+                            EditTrigger="DataGridEditTrigger.OnRowClick" ReadOnly="@(!_allowGridEdit)" EditMode="DataGridEditMode.Cell"
+                            StartedEditingItem="@StartedEditingGridItem"
+                            CommittedItemChanges="@CommittedGridItemChanges"
+                            TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true"
+                            @ref="_rosterGrid">
+                             <Columns>
+                                 <PropertyColumn Property="x => x.EmployeeId" Hidden />
+                                 <PropertyColumn Property="x => x.EmployeeNo" Title="Employee No." Class="col-employee-code" Editable="false" />
+                                 <PropertyColumn Property="x => x.EmployeeName" Title="Employee Name" Class="col-first-name" />
+                                 <PropertyColumn Property="x => x.HireDate" Title="Date of Join" Class="col-joining-date" Hidden>
+                                     <CellTemplate Context="row">
+                                         @row.Item.HireDate?.ToString("dd-MMM-yyyy")
+                                    </CellTemplate>
+                                </PropertyColumn>
+                                <PropertyColumn Property="x => x.EmploymentTypeCode" Hidden />
+                                <PropertyColumn Property="x => x.EmploymentType" Title="Employment Type" Class="col-employment-type" />
+                                <PropertyColumn Property="x => x.ReportingManagerCode" Hidden />
+                                <PropertyColumn Property="x => x.ReportingManager" Title="Reporting Manager" Class="col-reporting-manager" />
+                                <PropertyColumn Property="x => x.DepartmentFullName" Title="Department" Class="col-department" />
+                                <PropertyColumn Property="x => x.EmployeeStatusCode" Hidden />
+                                <PropertyColumn Property="x => x.ShiftPatternDescription" Title="Shift Roster" Class="col-shift-timing">
+                                     <EditTemplate Context="row">
+                                         <MudSelect 
+                                            T="string" Value="row.Item.ShiftPatternCode"
+                                            ValueChanged="@((v) => OnShiftRosterChanged(row.Item, v))"
+                                            Variant="Variant.Outlined" Margin="Margin.Dense"
+                                            Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                            Required RequiredError="Shift Roster is required" 
+                                            Immediate="true" Typo="Typo.subtitle2">
+                                            @foreach (var shift in _shiftPatternList)
+                                            {
+                                                <MudSelectItem Value="shift.ShiftPatternCode">@shift.ShiftPatternCode</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </EditTemplate>
+                                </PropertyColumn>
+                                <PropertyColumn Property="x => x.ShiftPointer" Title="Shift Pointer" Class="col-shift-timing">
+                                    <EditTemplate Context="row">
+                                        <MudSelect @bind-Value="row.Item.ShiftPointerId" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                            Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                            Required RequiredError="Shift Pointer is required"
+                                            Immediate="true" Typo="Typo.subtitle2">
+                                            @foreach (var pointer in _shiftPointerList)
+                                            {
+                                                <MudSelectItem Value="pointer.ShiftPointerId">@($"{pointer.ShiftPointer} - {pointer.ShiftDescription}")</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </EditTemplate>
+                                </PropertyColumn>
+                                <PropertyColumn Property="x => x.ChangeTypeDesc" Title="Change Type" Class="col-shift-timing">
+                                    <EditTemplate Context="row">
+                                        <MudSelect @bind-Value="row.Item.ChangeTypeCode" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                            Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                            Required RequiredError="Change Type is required"
+                                            Immediate="true" Typo="Typo.subtitle2">
+                                            @foreach (var ct in _changeTypeList)
+                                            {
+                                                <MudSelectItem Value="ct.UDCCode">@ct.UDCDesc1</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </EditTemplate>
+                                </PropertyColumn>
+                                <PropertyColumn Property="x => x.EffectiveDate" Title="Effective Date" Class="col-shift-time">
+                                    <EditTemplate Context="row">
+                                        <MudDatePicker Color="Color.Info" Editable="true" 
+                                            @bind-Date="row.Item.EffectiveDate"
+                                            For="@(() => row.Item.EffectiveDate)"
+                                            Required RequiredError="Effective Date is required"
+                                            MinDate="DateTime.Today"
+                                            Clearable="true"
+                                            Placeholder="Select Date" />
+                                    </EditTemplate>
+                                </PropertyColumn>
+                                <PropertyColumn Property="x => x.EndingDate" Title="Ending Date" Class="col-shift-time">
+                                    <EditTemplate Context="row">
+                                        <MudDatePicker Color="Color.Info" Editable="true" 
+                                            @bind-Date="row.Item.EndingDate"
+                                            For="@(() => row.Item.EndingDate)"
+                                            MinDate="DateTime.Today"
+                                            Clearable="true"
+                                            Placeholder="Select Date" />
+                                    </EditTemplate>
+                                </PropertyColumn>
+                                <PropertyColumn Property="x => x.CreatedByFullName" Hidden Editable="false" Class="col-created-by">
+                                     <EditTemplate Context="row">
+                                         @* Empty to prevent rendering *@
+                                     </EditTemplate>
+                                 </PropertyColumn>
+                                 <PropertyColumn Property="x => x.CreatedDate" Title="Created Date" Class="col-created-date" Editable="false">
+                                     <CellTemplate Context="row">
+                                         @row.Item.CreatedDate?.ToString("dd-MMM-yyyy h:mm tt")
+                                    </CellTemplate>
+                                </PropertyColumn>
+                                <PropertyColumn Property="x => x.LastUpdateByFullName" Hidden Editable="false" Class="col-updated-by">
+                                     <EditTemplate Context="row">
+                                         @* Empty to prevent rendering *@
+                                     </EditTemplate>
+                                 </PropertyColumn>
+                                 <PropertyColumn Property="x => x.LastUpdateDate" Title="Last Updated Date" Class="col-updated-date" Editable="false">
+                                     <CellTemplate Context="row">
+                                         @row.Item.LastUpdateDate?.ToString("dd-MMM-yyyy h:mm tt")
+                                    </CellTemplate>
+                                </PropertyColumn>
+                                <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                                    <CellTemplate Context="row">
+                                        <MudIconButton Color="Color.Info" title="View and edit employee information" Class="show-btn fa-icon-btn"
+                                                       OnClick="@(()=>GoToEmployeeDetail(row.Item))">
+                                            <ChildContent>
+                                                <i class="fas fa-edit fa-1x"></i>
+                                            </ChildContent>
+                                        </MudIconButton>
+                                        <MudIconButton Color="Color.Error" title="Delete shift roster record" Class="hide-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
+                                            <ChildContent>
+                                                <i class="fas fa-trash-alt fa-lg"></i>
+                                            </ChildContent>
+                                        </MudIconButton>
+                                    </CellTemplate>
+                                </TemplateColumn>
+                            </Columns>
+                            <NoRecordsContent>
+                                <div class="no-data-box">
+                                    <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
+                                    <span>No data found</span>
+                                </div>
+                            </NoRecordsContent>
+                        </MudDataGrid>
+                    </div>                 
+                </MudPaper>
+                <MudScrollToTop TopOffset="100"
+                                Selector="#mainPanel"
+                                VisibleCssClass="visible absolute"
+                                HiddenCssClass="hidden absolute">
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+                </MudScrollToTop>
+            </MudStack>
+        </div>
+    </EditForm>
 </MudContainer>
 
 <!-- Full-screen overlay -->

@@ -15,6 +15,7 @@ namespace KenHRApp.Application.Common.Services
     {
         #region Fields
         private readonly IEmployeeService _employeeService;
+        private readonly IAttendanceService _attendanceService;
         private List<EmployeeMasterDTO>? _employeeList;
         private List<UserDefinedCodeDTO>? _userDefinedCodeList;
         private List<UserDefinedCodeDTO>? _employmentTypeList;
@@ -22,6 +23,7 @@ namespace KenHRApp.Application.Common.Services
         private List<UserDefinedCodeDTO>? _changeTypeList;
         private List<DepartmentDTO>? _departmentList;
         private List<EmployeeDTO>? _reportingManagerList;
+        private List<ShiftPatternMasterDTO>? _shiftPatternList;
 
         #region Enums
         private enum UDCKeys
@@ -36,9 +38,10 @@ namespace KenHRApp.Application.Common.Services
         #endregion
 
         #region Constructor
-        public LookupCacheService(IEmployeeService employeeService)
+        public LookupCacheService(IEmployeeService employeeService, IAttendanceService attendanceService)
         {
             _employeeService = employeeService;
+            _attendanceService = attendanceService;
         }
         #endregion
 
@@ -192,6 +195,22 @@ namespace KenHRApp.Application.Common.Services
             }
 
             return Result<IReadOnlyList<UserDefinedCodeDTO>>.SuccessResult(_changeTypeList!);
+        }
+
+        public async Task<Result<IReadOnlyList<ShiftPatternMasterDTO>>> GetShiftPatternAsync(bool forceLoad = false)
+        {
+            if ((_shiftPatternList == null || !_shiftPatternList.Any()) || forceLoad)
+            {
+                var repoResult = await _attendanceService.SearchShiftRosterMasterAsync(0, null, null, null, null);
+                if (!repoResult.Success)
+                {
+                    return Result<IReadOnlyList<ShiftPatternMasterDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                _shiftPatternList = repoResult.Value;
+            }
+
+            return Result<IReadOnlyList<ShiftPatternMasterDTO>>.SuccessResult(_shiftPatternList!);
         }
         #endregion
     }
