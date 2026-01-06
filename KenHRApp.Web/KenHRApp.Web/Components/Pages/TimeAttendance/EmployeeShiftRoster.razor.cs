@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 using MudBlazor;
 using System.Globalization;
+using System.IO.Pipelines;
 using System.Text;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
@@ -28,16 +29,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Parameter]
         [SupplyParameterFromQuery]
         public bool ForceLoad { get; set; } = false;
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string ActionType { get; set; } = ActionTypes.View.ToString();
         #endregion
 
         #region Fields
         private MudDatePicker _dojPicker;
-        private IReadOnlyList<EmployeeMasterDTO> employeeList = new List<EmployeeMasterDTO>();
-        private IReadOnlyList<UserDefinedCodeDTO> _employeeStatusList = new List<UserDefinedCodeDTO>();
-        private IReadOnlyList<UserDefinedCodeDTO> _employmentTypeList = new List<UserDefinedCodeDTO>();
-        private IReadOnlyList<DepartmentDTO> _departmentList = new List<DepartmentDTO>();
-        private IReadOnlyList<EmployeeDTO> _managerList = new List<EmployeeDTO>();
-
+        private MudDataGrid<EmployeeRosterDTO>? _rosterGrid;        
         private UserDefinedCodeDTO? _selectedEmployeeStatus = null;
         private UserDefinedCodeDTO? _selectedEmploymentType = null;
         private StringBuilder _errorMessage = new StringBuilder();
@@ -64,7 +64,37 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _isTaskFinished = false;
         private bool _isRunning = false;
         private bool _showErrorAlert = false;
+        private bool _enableGridFilter = false;
+        private bool _allowGridEdit = false;
+        private bool _isDisabled = false;
+        private bool _saveBtnEnabled = false;
         #endregion
+
+        #region Enums
+        private enum ActionTypes
+        {
+            View,
+            Edit,
+            Add,
+            Delete
+        }
+
+        private enum NotificationType
+        {
+            Normal,
+            Information,
+            Success,
+            Warning,
+            Error
+        }
+
+        private enum MessageBoxTypes
+        {
+            Info,
+            Confirm,
+            Warning,
+            Error
+        }
 
         private enum UDCKeys
         {
@@ -72,13 +102,26 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             EMPLOYTYPE, // Employment Type
             DEPARTMENT  // Departments
         }
+        #endregion
 
+        #region Collections
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/", icon: Icons.Material.Filled.Home),
             new("Shift Roster Master", href: "/TimeAttendance/shiftrostersearch", icon: @Icons.Material.Filled.CalendarMonth),
             new("Manage Shift Roster", href: null, disabled: true, @Icons.Material.Filled.EditNote)
         ];
+
+        private IReadOnlyList<EmployeeRosterDTO> employeeList = new List<EmployeeRosterDTO>();
+        private IReadOnlyList<UserDefinedCodeDTO> _employeeStatusList = new List<UserDefinedCodeDTO>();
+        private IReadOnlyList<UserDefinedCodeDTO> _employmentTypeList = new List<UserDefinedCodeDTO>();
+        private IReadOnlyList<DepartmentDTO> _departmentList = new List<DepartmentDTO>();
+        private IReadOnlyList<EmployeeDTO> _managerList = new List<EmployeeDTO>();
+        private List<ShiftPatternMasterDTO> _shiftPatternList = new List<ShiftPatternMasterDTO>();
+        private List<ShiftPointerDTO> _shiftPointerList = new List<ShiftPointerDTO>();
+        private IReadOnlyList<UserDefinedCodeDTO> _changeTypeList = new List<UserDefinedCodeDTO>();
+        #endregion        
+
         #endregion
 
         #region Page Methods
@@ -90,12 +133,61 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         protected override void OnInitialized()
         {
+            if (ActionType == ActionTypes.Edit.ToString() ||
+                ActionType == ActionTypes.View.ToString())
+            {
+                _isDisabled = true;
+            }
+            else if (ActionType == ActionTypes.Add.ToString())
+            {
+                _isDisabled = false;
+                _saveBtnEnabled = true;
+                _allowGridEdit = true;
+            }
+
             BeginLoadComboboxTask();
 
             if (LookupCache.IsEmployeeSearch)
             {
                 LookupCache.IsEmployeeSearch = false;
                 BeginSearchEmployeeTask(ForceLoad);
+            }
+        }
+        #endregion
+
+        #region Grid Events
+        private async Task StartedEditingGridItem(EmployeeRosterDTO item)
+        {
+            //await EditBudgetAsync(item);
+        }
+
+        private void CommittedGridItemChanges(EmployeeRosterDTO item)
+        {
+            try
+            {
+                if (item == null) return;
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Saving changes, please wait...";
+
+                //_ = SaveChangeAsync(async () =>
+                //{
+                //    _isRunning = false;
+
+                //    // Shows the spinner overlay
+                //    await InvokeAsync(StateHasChanged);
+                //}, item);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Save cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
             }
         }
         #endregion
@@ -144,6 +236,18 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (repoResult.Success)
             {
                 _employmentTypeList = repoResult.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(repoResult.Error);
+            }
+
+            // Populate Shift Pattern Change Type dropdown
+            repoResult = await LookupCache.GetChangeTypeAsync();
+            if (repoResult.Success)
+            {
+                _changeTypeList = repoResult.Value!;
             }
             else
             {
@@ -260,19 +364,35 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _reportingManager = selectedManager.EmployeeNo;
             }
 
-            var result = await LookupCache.SearchEmployeeAsync(_employeeCode, _firstName, _lastName, _reportingManager,
+            var repoResult = await LookupCache.SearchEmployeeAsync(_employeeCode, _firstName, _lastName, _reportingManager,
                 _dateOfJoining, _selectedEmployeeStatus?.UDCCode, _selectedEmploymentType?.UDCCode, _departmentCode, forceLoad);
-            if (result.Success)
+            if (repoResult.Success)
             {
                 // Set the flag to indicate that search has been invoked
                 LookupCache.IsEmployeeSearch = true;
 
-                employeeList = result.Value!;
+                employeeList = repoResult.Value!.Select(e => new EmployeeRosterDTO
+                {
+                    EmployeeId = e.EmployeeId,
+                    EmployeeNo = e.EmployeeNo,
+                    FirstName = e.FirstName,
+                    LastName = e.LastName,
+                    Gender = e.Gender,
+                    HireDate = e.HireDate,
+                    EmploymentTypeCode = e.EmploymentTypeCode,
+                    EmploymentType = e.EmploymentType,
+                    ReportingManagerCode = e.ReportingManagerCode,
+                    ReportingManager = e.ReportingManager,
+                    DepartmentCode = e.DepartmentCode,
+                    DepartmentName = e.DepartmentName,
+                    EmployeeStatusCode = e.EmployeeStatusCode,
+                    EmployeeStatus = e.EmployeeStatus
+                }).ToList();
             }
             else
             {
                 // Set the error message
-                _errorMessage.Append(result.Error);
+                _errorMessage.Append(repoResult.Error);
 
                 ShowHideError(true);
             }
@@ -321,7 +441,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _selectedEmployeeStatus = null;
             _selectedEmploymentType = null;
             _selectedDepartment = string.Empty;
-            employeeList = new List<EmployeeMasterDTO>();
+            employeeList = new List<EmployeeRosterDTO>();
 
             if (callback != null)
             {
@@ -377,7 +497,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private void GoToEmployeeDetail(EmployeeMasterDTO employee)
+        private void GoToEmployeeDetail(EmployeeRosterDTO employee)
         {
             Navigation.NavigateTo($"/employees?EmployeeId={employee.EmployeeId}&ActionType=View&DepartmentCacheKey={_departmentCacheKey}&EmployeeCacheKey={_employeeCacheKey}");
         }
@@ -385,6 +505,43 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private void AddNewEmployee()
         {
             Navigation.NavigateTo($"/employees?EmployeeId=0&ActionType=Add&DepartmentCacheKey={_departmentCacheKey}&EmployeeCacheKey={_employeeCacheKey}");
+        }
+
+        private void ShowNotification(string message, NotificationType type)
+        {
+            Snackbar.Clear();
+
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Configuration.PreventDuplicates = false;
+            Snackbar.Configuration.NewestOnTop = false;
+            Snackbar.Configuration.ShowCloseIcon = true;
+            Snackbar.Configuration.VisibleStateDuration = 5000;
+            Snackbar.Configuration.HideTransitionDuration = 500;
+            Snackbar.Configuration.ShowTransitionDuration = 500;
+            Snackbar.Configuration.SnackbarVariant = Variant.Filled;
+
+            switch (type)
+            {
+                case NotificationType.Information:
+                    Snackbar.Add(message, Severity.Info);
+                    break;
+
+                case NotificationType.Success:
+                    Snackbar.Add(message, Severity.Success);
+                    break;
+
+                case NotificationType.Warning:
+                    Snackbar.Add(message, Severity.Warning);
+                    break;
+
+                case NotificationType.Error:
+                    Snackbar.Add(message, Severity.Error);
+                    break;
+
+                default:
+                    Snackbar.Add(message, Severity.Normal);
+                    break;
+            }
         }
         #endregion
     }

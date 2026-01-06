@@ -29,6 +29,8 @@ namespace KenHRApp.Application.Common.Interfaces
         Task<Result<IReadOnlyList<DepartmentDTO>>> GetDepartmentMasterAsync(bool forceLoad = false);
 
         Task<Result<IReadOnlyList<EmployeeDTO>>> GetReportingManagerAsync(bool forceLoad = false);
+
+        Task<Result<IReadOnlyList<UserDefinedCodeDTO>>> GetChangeTypeAsync(bool forceLoad = false);
         #endregion
     }
 }

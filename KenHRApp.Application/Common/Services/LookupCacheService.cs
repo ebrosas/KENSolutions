@@ -19,15 +19,17 @@ namespace KenHRApp.Application.Common.Services
         private List<UserDefinedCodeDTO>? _userDefinedCodeList;
         private List<UserDefinedCodeDTO>? _employmentTypeList;
         private List<UserDefinedCodeDTO>? _employeeStatusList;
+        private List<UserDefinedCodeDTO>? _changeTypeList;
         private List<DepartmentDTO>? _departmentList;
         private List<EmployeeDTO>? _reportingManagerList;
 
         #region Enums
         private enum UDCKeys
         {
-            EMPSTATUS,  // Employee Status
-            EMPLOYTYPE, // Employment Type
-            DEPARTMENT  // Departments
+            EMPSTATUS,      // Employee Status
+            EMPLOYTYPE,     // Employment Type
+            DEPARTMENT,     // Departments
+            SHIFTCHANGETYPE // Shift Pattern Change Type
         }
         #endregion
 
@@ -174,6 +176,22 @@ namespace KenHRApp.Application.Common.Services
             }
 
             return Result<IReadOnlyList<EmployeeDTO>>.SuccessResult(_reportingManagerList!);
+        }
+
+        public async Task<Result<IReadOnlyList<UserDefinedCodeDTO>>> GetChangeTypeAsync(bool forceLoad = false)
+        {
+            if ((_changeTypeList == null || !_changeTypeList.Any()) || forceLoad)
+            {
+                var repoResult = await _employeeService.GetUserDefinedCodeAsync(UDCKeys.SHIFTCHANGETYPE.ToString());
+                if (!repoResult.Success)
+                {
+                    return Result<IReadOnlyList<UserDefinedCodeDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                _changeTypeList = repoResult.Value;
+            }
+
+            return Result<IReadOnlyList<UserDefinedCodeDTO>>.SuccessResult(_changeTypeList!);
         }
         #endregion
     }

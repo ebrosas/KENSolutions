@@ -2021,6 +2021,30 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@Amount						= NULL 
 		
 	*/
+
+	/*	Populate Shift Pattern Change Types
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'SHIFTCHANGETYPE'
+
+		SELECT	@UDCCode					= 'CTTEMP',
+				@UDCDesc1					= 'Temporary',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'CTPERMNT',
+				@UDCDesc1					= 'Permanent',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+		
+	*/
 	
 
 	IF @actionType = 0

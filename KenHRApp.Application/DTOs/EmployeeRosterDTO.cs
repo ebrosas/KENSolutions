@@ -7,23 +7,27 @@ using System.Threading.Tasks;
 
 namespace KenHRApp.Application.DTOs
 {
-    public class ShiftPatternChangeDTO
+    public class EmployeeRosterDTO
     {
         #region Properties
-        public int ShiftPatternChangeId { get; set; }
-
-        [Required(ErrorMessage = "Employee No. is required")]
-        [Display(Name = "Employee No.")]
-        public int EmpNo { get; set; }
-
-        public string? EmpName { get; set; } = null;
-        public string? Position { get; set; } = null;
-        public string? CostCenter { get; set; } = null;
-        public string? CostCenterName { get; set; } = null;
+        public int EmployeeId { get; set; }
+        public int EmployeeNo { get; set; }
+        public string? FirstName { get; set; } = null;
+        public string? LastName { get; set; } = null;
+        public string? Gender { get; set; } = null;
+        public DateTime? HireDate { get; set; } = null;
+        public string? EmploymentTypeCode { get; set; } = null;
+        public string? EmploymentType { get; set; } = null;
+        public string? ReportingManagerCode { get; set; } = null;
+        public string? ReportingManager { get; set; } = null;
+        public string? DepartmentCode { get; set; } = null;
+        public string? DepartmentName { get; set; } = null;
+        public string? EmployeeStatusCode { get; set; } = null;
+        public string? EmployeeStatus { get; set; } = null;
 
         [Required(ErrorMessage = "Effective Date is required")]
         [Display(Name = "Effective Date")]
-        public DateTime EffectiveDate { get; set; }
+        public DateTime? EffectiveDate { get; set; }
 
         public DateTime? EndingDate { get; set; } = null;
 
@@ -32,9 +36,13 @@ namespace KenHRApp.Application.DTOs
         [StringLength(20, ErrorMessage = "Shift Roster Code can't be more than 20 characters.")]
         public string ShiftPatternCode { get; set; } = null!;
 
+        public string? ShiftPatternDescription { get; set; } = null;
+
         [Required(ErrorMessage = "Shift Pointer is required")]
         [Display(Name = "Shift Pointer")]
         public int ShiftPointer { get; set; }
+
+        public int ShiftPointerId { get; set; }
 
         [Required(ErrorMessage = "Change Type is required")]
         [Display(Name = "Change Type")]
@@ -53,31 +61,24 @@ namespace KenHRApp.Application.DTOs
         #endregion
 
         #region Extended Properties
-        public string CostCenterFullName
+        public string EmployeeName
         {
-            get { return $"{CostCenter} - {CostCenterName}"; }
+            get { return $"{FirstName} {LastName}"; }
+        }
+
+        public string DepartmentFullName
+        {
+            get { return $"{DepartmentCode} - {DepartmentName}"; }
         }
 
         public string CreatedByFullName
         {
-            get
-            {
-                if (CreatedByEmpNo.HasValue && !string.IsNullOrEmpty(CreatedByName))
-                    return $"{CreatedByEmpNo} - {CreatedByName}";
-                else
-                    return string.Empty;
-            }
+            get { return $"{CreatedByEmpNo} - {CreatedByName}"; }
         }
 
-        public string LastUpdatedByFullName
+        public string LastUpdateByFullName
         {
-            get
-            {
-                if (LastUpdateEmpNo.HasValue && !string.IsNullOrEmpty(LastUpdatedByName))
-                    return $"{LastUpdateEmpNo} - {LastUpdatedByName}";
-                else
-                    return string.Empty;
-            }
+            get { return $"{LastUpdateEmpNo} - {LastUpdatedByName}"; }
         }
         #endregion
     }

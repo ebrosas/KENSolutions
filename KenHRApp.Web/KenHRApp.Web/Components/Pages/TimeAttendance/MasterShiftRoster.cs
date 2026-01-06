@@ -140,10 +140,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         protected override void OnInitialized()
         {
             // Initialize the EditContext 
-            _editContext = new EditContext(_shiftPattern);
-
-            // Set action to Add mode 
-            //ActionType = ActionTypes.Add.ToString();
+            _editContext = new EditContext(_shiftPattern);                        
 
             if (ActionType == ActionTypes.Edit.ToString() ||
                 ActionType == ActionTypes.View.ToString())
