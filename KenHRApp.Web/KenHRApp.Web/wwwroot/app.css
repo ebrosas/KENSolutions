@@ -1953,6 +1953,60 @@ h1:focus {
     text-align: left;
 }
 
+.shift-roster-grid .col-change-type {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shift-roster-grid .col-effective-date {
+    width: 70px !important;
+    text-align: left;
+    overflow: hidden;
+}
+
+.shift-roster-grid .col-ending-date {
+    width: 70px !important;
+    text-align: left;
+    overflow: hidden;
+}
+
+.shift-roster-grid .col-employee-no {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shift-roster-grid .col-employee-name {
+    width: 150px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shift-roster-grid .col-employment-type {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shift-roster-grid .col-reporting-manager {
+    width: 150px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shift-roster-grid .col-department {
+    width: 150px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .shift-roster-grid .flex-column {
     width: auto; /* allow flex growth */
     flex: 1; /* take remaining space */

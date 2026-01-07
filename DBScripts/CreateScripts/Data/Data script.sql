@@ -38,7 +38,12 @@
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'ATTENDANCEMODE')
-		
+
+	--Get Shift Pattern Change Types
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'SHIFTCHANGETYPE')	
+	
 
 	SELECT a.EmployeeId, a.EmployeeNo, 
 		a.EmploymentTypeCode, a.RoleCode, a.JobTitleCode, a.FirstAttendanceModeCode, a.SecondAttendanceModeCode, a.ThirdAttendanceModeCode,

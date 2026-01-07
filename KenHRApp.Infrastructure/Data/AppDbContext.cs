@@ -37,6 +37,7 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<MasterShiftPatternTitle> MasterShiftPatternTitles => Set<MasterShiftPatternTitle>();
         public DbSet<MasterShiftTime> MasterShiftTimes => Set<MasterShiftTime>();
         public DbSet<MasterShiftPattern> MasterShiftPatterns => Set<MasterShiftPattern>();
+        public DbSet<ShiftPatternChange> ShiftPatternChanges => Set<ShiftPatternChange>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -342,6 +343,17 @@ namespace KenHRApp.Infrastructure.Data
                         .OnDelete(DeleteBehavior.Cascade);
                   #endregion
               });
+
+            modelBuilder.Entity<ShiftPatternChange>(
+            entity =>
+            {
+                entity.ToTable("ShiftPatternChange");
+                entity.HasKey(s => s.AutoId)
+                    .HasName("PK_ShiftPatternChange_AutoId");
+                entity.HasIndex(e => new { e.EmpNo, e.ShiftPatternCode, e.ShiftPointer, e.EffectiveDate })
+                     .HasDatabaseName("IX_ShiftPatternChange_CompoKeys")
+                     .IsUnique();
+            });
             #endregion
 
             #region Set Employee navigation                         

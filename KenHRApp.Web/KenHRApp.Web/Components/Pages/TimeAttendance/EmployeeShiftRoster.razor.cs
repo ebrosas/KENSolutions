@@ -46,6 +46,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private UserDefinedCodeDTO? _selectedEmployeeStatus = null;
         private UserDefinedCodeDTO? _selectedEmploymentType = null;
         private StringBuilder _errorMessage = new StringBuilder();
+        private CancellationTokenSource? _cts;
 
         private string _selectedDepartment = string.Empty;
         private string[]? _departmentArray = null;
@@ -75,6 +76,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _isDisabled = false;
         private bool _saveBtnEnabled = false;
         private bool _hasValidationError = false;
+        private bool _isEditMode = false;
         #endregion
 
         #region Enums
@@ -141,7 +143,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         protected override void OnInitialized()
         {
             // Initialize the EditContext 
-            _editContext = new EditContext(_shiftRoster);
+            _editContext = new EditContext(employeeList);
 
             if (ActionType == ActionTypes.Edit.ToString() ||
                 ActionType == ActionTypes.View.ToString())
@@ -176,9 +178,46 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             try
             {
-                // If we got here, model is valid
                 _hasValidationError = false;
                 _validationMessages.Clear();
+
+                #region Perform data validation
+                // Check if there is employee roster defined in the datagrid
+                if (!employeeList.Any())
+                {                    
+                    ShowNotification("Unable to save because there is no employee shift roster record defined in the grid.", NotificationType.Warning);
+                    return;
+                }
+                else
+                {
+                    foreach (var item in employeeList)
+                    {
+                        if (string.IsNullOrEmpty(item.ShiftPatternCode))
+                        {
+                            _hasValidationError = true;
+                            _validationMessages.Add($"Employee No. {item.EmployeeNo} has no defined shift roster");
+                        }
+                        if (item.ShiftPointerId == 0)
+                        {
+                            _hasValidationError = true;
+                            _validationMessages.Add($"Employee No. {item.EmployeeNo} has no defined shift pointer");
+                        }
+                        if (string.IsNullOrEmpty(item.ChangeTypeCode))
+                        {
+                            _hasValidationError = true;
+                            _validationMessages.Add($"Employee No. {item.EmployeeNo} has no defined change type");
+                        }
+                        if (item.ChangeTypeCode == "CTTEMP" && !item.EndingDate.HasValue)
+                        {
+                            _hasValidationError = true;
+                            _validationMessages.Add($"Ending Date must be defined for employee no. {item.EmployeeNo} if Change Type is set to Temporary.");
+                        }
+                    }
+
+                    if (_hasValidationError)
+                        return;
+                }
+                #endregion
 
                 // Set flag to display the loading panel
                 _isRunning = true;
@@ -186,13 +225,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set the overlay message
                 overlayMessage = "Saving changes, please wait...";
 
-                //_ = SaveShiftRosterAsync(async () =>
-                //{
-                //    _isRunning = false;
+                _ = SaveShiftRosterAsync(async () =>
+                {
+                    _isRunning = false;
 
-                //    // Shows the spinner overlay
-                //    await InvokeAsync(StateHasChanged);
-                //});
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+                });
             }
             catch (OperationCanceledException)
             {
@@ -379,15 +418,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 // Set the error message
                 _errorMessage.AppendLine(shiftPatternResult.Error);
-            }
-
-            //if (_shiftPatternList != null)
-            //{
-            //    _departmentArray = _departmentList.Select(d => d.DepartmentName).OrderBy(d => d).ToArray();
-
-            //    // Save departments into cache via Application service
-            //    _shiftPatternCacheKey = await AppCacheService.StoreDepartmentsAsync(_departmentList.ToList());
-            //}
+            }                        
             #endregion
 
             if (callback != null)
@@ -535,6 +566,82 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _selectedEmploymentType = null;
             _selectedDepartment = string.Empty;
             employeeList = new List<EmployeeRosterDTO>();
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task SaveShiftRosterAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            bool isNewRequition = false;    // _shiftPattern.ShiftPatternId == 0;
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = true;
+            string errorMsg = string.Empty;
+
+            //if (isNewRequition)
+            //{
+            //    // Set the user who created the record and the timestamp
+            //    _shiftPattern.CreatedDate = DateTime.Now;
+
+            //    var addResult = await AttendanceService.AddShiftRosterMasterAsync(_shiftPattern, _cts.Token);
+            //    isSuccess = addResult.Success;
+            //    if (!isSuccess)
+            //        errorMsg = addResult.Error!;
+            //    else
+            //    {
+            //        // Set flag to enable reload of _recruitmentRequests when navigating back to the Employe Search page
+            //        _forceLoad = true;
+            //    }
+            //}
+            //else
+            //{
+            //    // Set the user who created the record and the timestamp
+            //    _shiftPattern.LastUpdateDate = DateTime.Now;
+
+            //    var saveResult = await AttendanceService.UpdateShiftRosterMasterAsync(_shiftPattern, _cts.Token);
+            //    isSuccess = saveResult.Success;
+            //    if (!isSuccess)
+            //        errorMsg = saveResult.Error!;
+            //}
+
+            if (isSuccess)
+            {
+                // Reset flags
+                _isEditMode = false;
+                _allowGridEdit = false;
+                _saveBtnEnabled = false;
+                _isDisabled = true;
+
+                // Hide error message if any
+                ShowHideError(false);
+
+                // Show notification
+                if (isNewRequition)
+                    ShowNotification("Shift Roster has been created successfully!", NotificationType.Success);
+                else
+                    ShowNotification("Shift Roster has been updated successfully!", NotificationType.Success);
+
+                // Go back to Shift Roster Master page
+                Navigation.NavigateTo("/TimeAttendance/shiftrostersearch");
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(errorMsg);
+                ShowHideError(true);
+            }
 
             if (callback != null)
             {

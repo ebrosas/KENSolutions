@@ -35,8 +35,8 @@ namespace KenHRApp.Application.DTOs
         [EndingDateValidation("EffectiveDate")] // ✅ custom validation
         public DateTime? EndingDate { get; set; } = null;
 
-        [Required(ErrorMessage = "Shift Roster Code is required")]
-        [Display(Name = "Shift Roster Code")]
+        [Required(ErrorMessage = "Shift Roster is required")]
+        [Display(Name = "Shift Roster")]
         [StringLength(20, ErrorMessage = "Shift Roster Code can't be more than 20 characters.")]
         public string ShiftPatternCode { get; set; } = null!;
 
@@ -46,6 +46,7 @@ namespace KenHRApp.Application.DTOs
         [Display(Name = "Shift Pointer")]
         public int ShiftPointer { get; set; }
 
+        [Required(ErrorMessage = "Shift Pointer is required")]
         public int ShiftPointerId { get; set; }
 
         [Required(ErrorMessage = "Change Type is required")]

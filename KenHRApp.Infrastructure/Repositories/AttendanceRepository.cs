@@ -406,6 +406,75 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<bool>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<int>> AddShiftPatternChangeAsync(List<ShiftPatternChange> dto, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (dto != null && dto.Any())
+                {
+                    foreach (var shiftRoster in dto)
+                    {
+                        var existingShiftRoster = await _db.ShiftPatternChanges
+                            .FirstOrDefaultAsync(sp => sp.EmpNo == shiftRoster.EmpNo &&
+                                sp.ShiftPatternCode == shiftRoster.ShiftPatternCode && 
+                                sp.ShiftPointer == shiftRoster.ShiftPointer &&
+                                sp.EffectiveDate == shiftRoster.EffectiveDate, cancellationToken);
+
+                        if (existingShiftRoster != null)
+                        {
+                            // Update existing shift roster
+                            existingShiftRoster.ChangeType = shiftRoster.ChangeType;
+                            existingShiftRoster.EffectiveDate = shiftRoster.EffectiveDate;
+                            existingShiftRoster.EndingDate = shiftRoster.EndingDate;
+                            existingShiftRoster.LastUpdateDate = shiftRoster.LastUpdateDate;
+                            existingShiftRoster.LastUpdateEmpNo = shiftRoster.LastUpdateEmpNo;
+                            existingShiftRoster.LastUpdatedByName = shiftRoster.LastUpdatedByName;
+                            existingShiftRoster.LastUpdateUserID = shiftRoster.LastUpdateUserID;
+
+                            // Save to database
+                            _db.ShiftPatternChanges.Update(existingShiftRoster);
+                        }
+                        else
+                        {
+                            // Add new Shift Timing
+                            var newShiftRoster = new ShiftPatternChange
+                            {
+                                EmpNo = shiftRoster.EmpNo,
+                                ShiftPatternCode = shiftRoster.ShiftPatternCode,
+                                ShiftPointer = shiftRoster.ShiftPointer,
+                                ChangeType = shiftRoster.ChangeType,
+                                EffectiveDate = shiftRoster.EffectiveDate,
+                                EndingDate = shiftRoster.EndingDate,
+                                CreatedDate = shiftRoster.CreatedDate,
+                                CreatedByEmpNo = shiftRoster.CreatedByEmpNo,
+                                CreatedByName = shiftRoster.CreatedByName,
+                                CreatedByUserID = shiftRoster.CreatedByUserID
+                            };
+
+                            await _db.ShiftPatternChanges.AddAsync(newShiftRoster, cancellationToken);
+                        }
+                    }
+                }
+
+                // Save to database
+                //_db.MasterShiftPatternTitles.Update(shiftRoster);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }
