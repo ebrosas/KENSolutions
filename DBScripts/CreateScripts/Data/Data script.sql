@@ -109,9 +109,13 @@
 		WHERE x.ShiftPatternId = 2
 	)
 
+	SELECT * FROM [kenuser].[ShiftPatternChange] a
+
 /*	Data updates:
 
 	BEGIN TRAN T1
+
+	DELETE FROM [kenuser].[ShiftPatternChange]
 
 	UPDATE kenuser.Employee
 	SET DepartmentCode = '7600',

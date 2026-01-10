@@ -218,15 +218,15 @@
                                 </PropertyColumn>
                                 <PropertyColumn Property="x => x.ShiftPointer" Title="Shift Pointer" Class="col-shift-pointer">
                                     <EditTemplate Context="row">
-                                        <MudSelect @bind-Value="row.Item.ShiftPointerId"
-                                            For="@(() => row.Item.ShiftPointerId)"
+                                        <MudSelect @bind-Value="row.Item.ShiftPointer"
+                                            For="@(() => row.Item.ShiftPointer)"
                                             Variant="Variant.Outlined" Margin="Margin.Dense"
                                             Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
                                             Required RequiredError="Shift Pointer is required"
                                             Immediate="true" Typo="Typo.subtitle2">
                                             @foreach (var pointer in _shiftPointerList)
                                             {
-                                                <MudSelectItem Value="pointer.ShiftPointerId">@($"{pointer.ShiftPointer} - {pointer.ShiftDescription}")</MudSelectItem>
+                                                <MudSelectItem Value="pointer.ShiftPointer">@($"{pointer.ShiftPointer} - {pointer.ShiftDescription}")</MudSelectItem>
                                             }
                                         </MudSelect>
                                     </EditTemplate>

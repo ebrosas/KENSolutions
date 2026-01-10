@@ -16,6 +16,7 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<int>> AddShiftRosterMasterAsync(ShiftPatternMasterDTO shiftRoster, CancellationToken cancellationToken = default);
         Task<Result<int>> UpdateShiftRosterMasterAsync(ShiftPatternMasterDTO shiftRoster, CancellationToken cancellationToken = default);
         Task<Result<bool>> DeleteShiftRosterMasterAsync(int shiftPatternId, CancellationToken cancellationToken = default);
+        Task<Result<int>> AddShiftPatternChangeAsync(List<EmployeeRosterDTO> shiftRosterList, CancellationToken cancellationToken = default);
         #endregion
     }
 }

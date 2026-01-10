@@ -197,7 +197,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             _hasValidationError = true;
                             _validationMessages.Add($"Employee No. {item.EmployeeNo} has no defined shift roster");
                         }
-                        if (item.ShiftPointerId == 0)
+                        if (item.ShiftPointer == 0)
                         {
                             _hasValidationError = true;
                             _validationMessages.Add($"Employee No. {item.EmployeeNo} has no defined shift pointer");
@@ -582,7 +582,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Reset error messages
             _errorMessage.Clear();
 
-            bool isNewRequition = false;    // _shiftPattern.ShiftPatternId == 0;
+            //bool isNewRequition = false;    
 
             // Initialize the cancellation token
             _cts = new CancellationTokenSource();
@@ -595,15 +595,16 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             //    // Set the user who created the record and the timestamp
             //    _shiftPattern.CreatedDate = DateTime.Now;
 
-            //    var addResult = await AttendanceService.AddShiftRosterMasterAsync(_shiftPattern, _cts.Token);
-            //    isSuccess = addResult.Success;
-            //    if (!isSuccess)
-            //        errorMsg = addResult.Error!;
-            //    else
-            //    {
-            //        // Set flag to enable reload of _recruitmentRequests when navigating back to the Employe Search page
-            //        _forceLoad = true;
-            //    }
+            var saveResult = await AttendanceService.AddShiftPatternChangeAsync(employeeList.ToList(), _cts.Token);
+            
+            isSuccess = saveResult.Success;
+            if (!isSuccess)
+                errorMsg = saveResult.Error!;
+            //else
+            //{
+            //    // Set flag to enable reload of _recruitmentRequests when navigating back to the Employe Search page
+            //    _forceLoad = true;
+            //}
             //}
             //else
             //{
@@ -628,10 +629,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 ShowHideError(false);
 
                 // Show notification
-                if (isNewRequition)
-                    ShowNotification("Shift Roster has been created successfully!", NotificationType.Success);
-                else
-                    ShowNotification("Shift Roster has been updated successfully!", NotificationType.Success);
+                ShowNotification("Employee Shift Roster has been saved successfully!", NotificationType.Success);
 
                 // Go back to Shift Roster Master page
                 Navigation.NavigateTo("/TimeAttendance/shiftrostersearch");

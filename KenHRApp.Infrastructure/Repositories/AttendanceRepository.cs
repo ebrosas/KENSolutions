@@ -460,8 +460,6 @@ namespace KenHRApp.Infrastructure.Repositories
                 }
 
                 // Save to database
-                //_db.MasterShiftPatternTitles.Update(shiftRoster);
-
                 rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
 
                 return Result<int>.SuccessResult(rowsUpdated);
