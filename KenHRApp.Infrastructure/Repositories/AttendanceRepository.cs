@@ -2,6 +2,7 @@
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -471,6 +472,104 @@ namespace KenHRApp.Infrastructure.Repositories
             catch (Exception ex)
             {
                 return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<List<ShiftPatternChange>?>> SearchShiftPatternChangeAsync(byte loadType, int? autoID, int? empNo, string? changeType, string? shiftPatternCode, DateTime? startDate, DateTime? endDate)
+        {
+            List<ShiftPatternChange> rosterChangeList = new List<ShiftPatternChange>();
+
+            try
+            {
+                var model = await _db.ShiftPatternChanges
+                    .FromSqlRaw("EXEC kenuser.PR_GetShiftPatternChange @loadType = {0}, @autoID = {1}, @empNo = {2}, @changeType = {3}, @shiftPatternCode = {4}, @startDate = {5}, @endDate = {6}",
+                    loadType, autoID!, empNo!, changeType!, shiftPatternCode!, startDate!, endDate!)
+                    .ToListAsync();
+                if (model != null)
+                {
+                    ShiftPatternChange rosterChange;
+                    foreach (var item in model)
+                    {
+                        rosterChange = new ShiftPatternChange()
+                        {
+                            AutoId = item.AutoId,
+                            EmpNo = item.EmpNo,
+                            EmpName = item.EmpName,
+                            DepartmentCode = item.DepartmentCode,
+                            DepartmentName = item.DepartmentName,
+                            ShiftPatternCode = item.ShiftPatternCode,
+                            ShiftPointer = item.ShiftPointer,
+                            ChangeType = item.ChangeType,
+                            ChangeTypeDesc = item.ChangeTypeDesc,
+                            EffectiveDate = item.EffectiveDate,
+                            EndingDate = item.EndingDate,
+                            CreatedByEmpNo = item.CreatedByEmpNo,
+                            CreatedByName = item.CreatedByName,
+                            CreatedByUserID = item.CreatedByUserID,
+                            CreatedDate = item.CreatedDate,
+                            LastUpdateDate = item.LastUpdateDate,
+                            LastUpdateEmpNo = item.LastUpdateEmpNo,
+                            LastUpdateUserID = item.LastUpdateUserID,
+                            LastUpdatedByName = item.LastUpdatedByName
+                        };
+
+                        // Add to the collection
+                        rosterChangeList.Add(rosterChange);
+                    }
+                }
+
+                return Result<List<ShiftPatternChange>?>.SuccessResult(rosterChangeList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<ShiftPatternChange>?>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<ShiftPatternChange?>> GetShiftPatternChangeAsync(int autoID)
+        {
+            ShiftPatternChange? rosterChange = null;
+
+            try
+            {
+                var model = await _db.ShiftPatternChanges
+                    .FromSqlRaw("EXEC kenuser.PR_GetShiftPatternChange @loadType = {0}, @autoID = {1}, @empNo = {2}, @changeType = {3}, @shiftPatternCode = {4}, @startDate = {5}, @endDate = {6}",
+                    1, autoID!, 0, string.Empty, string.Empty, DBNull.Value, DBNull.Value)
+                    .ToListAsync();
+
+                if (model != null && model.Any())
+                {
+                    rosterChange = new ShiftPatternChange()
+                    {
+                        AutoId = model[0].AutoId,
+                        EmpNo = model[0].EmpNo,
+                        EmpName = model[0].EmpName,
+                        DepartmentCode = model[0].DepartmentCode,
+                        DepartmentName = model[0].DepartmentName,
+                        ShiftPatternCode = model[0].ShiftPatternCode,
+                        ShiftPointer = model[0].ShiftPointer,
+                        ChangeType = model[0].ChangeType,
+                        ChangeTypeDesc = model[0].ChangeTypeDesc,
+                        EffectiveDate = model[0].EffectiveDate,
+                        EndingDate = model[0].EndingDate,
+                        CreatedByEmpNo = model[0].CreatedByEmpNo,
+                        CreatedByName = model[0].CreatedByName,
+                        CreatedByUserID = model[0].CreatedByUserID,
+                        CreatedDate = model[0].CreatedDate,
+                        LastUpdateDate = model[0].LastUpdateDate,
+                        LastUpdateEmpNo = model[0].LastUpdateEmpNo,
+                        LastUpdateUserID = model[0].LastUpdateUserID,
+                        LastUpdatedByName = model[0].LastUpdatedByName
+                    };
+                }
+
+                return Result<ShiftPatternChange?>.SuccessResult(rosterChange);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<ShiftPatternChange?>.Failure($"Database error: {ex.Message}");
             }
         }
         #endregion

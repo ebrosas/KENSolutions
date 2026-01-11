@@ -17,6 +17,8 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<List<MasterShiftPatternTitle>?>> SearchShiftRosterMasterAsync(byte loadType, int? shiftPatternId, string? shiftPatternCode, string? shiftCode, byte? activeFlag);
         Task<Result<MasterShiftPatternTitle?>> GetShiftRosterDetailAsync(int shiftPatternId);
         Task<Result<int>> AddShiftPatternChangeAsync(List<ShiftPatternChange> dto, CancellationToken cancellationToken = default);
+        Task<Result<List<ShiftPatternChange>?>> SearchShiftPatternChangeAsync(byte loadType, int? autoID, int? empNo, string? changeType, string? shiftPatternCode, DateTime? startDate, DateTime? endDate);
+        Task<Result<ShiftPatternChange?>> GetShiftPatternChangeAsync(int autoID);
         #endregion
     }
 }

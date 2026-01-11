@@ -9,7 +9,7 @@ namespace KenHRApp.Domain.Entities
 {
     public class ShiftPatternChange
     {
-        #region MyRegion
+        #region Properties
         public int AutoId { get; set; }
         public int EmpNo { get; set; }
 
@@ -48,6 +48,20 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "varchar(50)")]
         public string? LastUpdatedByName { get; set; } = null;
+        #endregion
+
+        #region Unmapped Properties
+        [NotMapped]
+        public string? EmpName { get; set; } = null;
+
+        [NotMapped]
+        public string? ChangeTypeDesc { get; set; } = null;
+
+        [NotMapped]
+        public string? DepartmentCode { get; set; } = null;
+
+        [NotMapped]
+        public string? DepartmentName { get; set; } = null;
         #endregion
     }
 }
