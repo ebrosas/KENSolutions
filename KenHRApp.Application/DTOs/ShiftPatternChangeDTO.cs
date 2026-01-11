@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -50,6 +51,8 @@ namespace KenHRApp.Application.DTOs
         public int? LastUpdateEmpNo { get; set; }
         public string? LastUpdateUserID { get; set; } = null;
         public string? LastUpdatedByName { get; set; } = null;
+        public string? DepartmentCode { get; set; } = null;
+        public string? DepartmentName { get; set; } = null;
         #endregion
 
         #region Extended Properties
@@ -75,6 +78,17 @@ namespace KenHRApp.Application.DTOs
             {
                 if (LastUpdateEmpNo.HasValue && !string.IsNullOrEmpty(LastUpdatedByName))
                     return $"{LastUpdateEmpNo} - {LastUpdatedByName}";
+                else
+                    return string.Empty;
+            }
+        }
+
+        public string DepartmentFullName
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(DepartmentCode) && !string.IsNullOrEmpty(DepartmentName))
+                    return $"{DepartmentCode} - {DepartmentName}";
                 else
                     return string.Empty;
             }

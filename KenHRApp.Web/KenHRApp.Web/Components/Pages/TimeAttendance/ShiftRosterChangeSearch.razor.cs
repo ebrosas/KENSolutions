@@ -1,18 +1,14 @@
 ﻿using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
-using KenHRApp.Application.Services;
-using KenHRApp.Domain.Entities;
 using KenHRApp.Web.Components.Shared;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
-using System.Globalization;
 using System.Text;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
-    public partial class ShiftRosterSearch
+    public partial class ShiftRosterChangeSearch
     {
         #region Parameters and Injections
         [Inject] private IAttendanceService AttendanceService { get; set; } = default!;
@@ -20,7 +16,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
-        [Inject] private IAppState AppState { get; set; } = default!;                
+        [Inject] private IAppState AppState { get; set; } = default!;
         #endregion
 
         #region Fields
@@ -29,7 +25,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string overlayMessage = "Please wait...";
         private CancellationTokenSource? _cts;
         private string _searchString = string.Empty;
-        private StringBuilder _errorMessage = new StringBuilder();        
+        private StringBuilder _errorMessage = new StringBuilder();
         private List<string> _events = new();
         #endregion
 
@@ -50,11 +46,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Collections        
-        private List<ShiftPatternMasterDTO> _shiftRosterList = new List<ShiftPatternMasterDTO>();
+        private List<ShiftPatternChangeDTO> _shiftRosterChangeList = new List<ShiftPatternChangeDTO>();
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/", icon: Icons.Material.Filled.Home),
-            new("Shift Roster Master", href: null, disabled: true, @Icons.Material.Filled.CalendarMonth)
+            new("Shift Roster Change History", href: null, disabled: true, @Icons.Material.Filled.History)
         ];
         #endregion
 
@@ -74,41 +70,53 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Page Events
         protected override void OnInitialized()
         {
-            BeginSearchShiftRoster();
+            BeginSearchShiftRosterChange();
         }
         #endregion
 
         #region Grid Events
-        private Func<ShiftPatternMasterDTO, bool> _quickFilter => x =>
+        private Func<ShiftPatternChangeDTO, bool> _quickFilter => x =>
         {
             if (string.IsNullOrWhiteSpace(_searchString))
+                return true;
+
+            if (x.EmpNo > 0 && x.EmpNo.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.EmpName) && x.EmpName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.DepartmentCode) && x.DepartmentCode.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.DepartmentName) && x.DepartmentName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             if (!string.IsNullOrEmpty(x.ShiftPatternCode) && x.ShiftPatternCode.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (!string.IsNullOrEmpty(x.ShiftPatternDescription) && x.ShiftPatternDescription.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(x.ChangeTypeDesc) && x.ChangeTypeDesc.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
-                        
+
             return false;
         };
 
-        private void StartedEditingItem(ShiftPatternMasterDTO item)
+        private void StartedEditingItem(ShiftPatternChangeDTO item)
         {
             _events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
         }
 
-        private void CanceledEditingItem(ShiftPatternMasterDTO item)
+        private void CanceledEditingItem(ShiftPatternChangeDTO item)
         {
             _events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
         }
 
-        private void CommittedItemChanges(ShiftPatternMasterDTO item)
+        private void CommittedItemChanges(ShiftPatternChangeDTO item)
         {
             try
             {
                 if (item == null) return;
-               
+
             }
             catch (OperationCanceledException)
             {
@@ -120,13 +128,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task ConfirmDelete(ShiftPatternMasterDTO shiftRoster)
+        private async Task ConfirmDelete(ShiftPatternChangeDTO shiftRoster)
         {
             var parameters = new DialogParameters
             {
                 { "DialogTitle", "Confirm Delete"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to delete the shift roster '{shiftRoster.ShiftPatternCode} - {shiftRoster.ShiftPatternDescription}'?" },
+                { "ContentText", $"Are you sure you want to delete the shift roster changes for the following employee: '{shiftRoster.EmpNo} - {shiftRoster.EmpName}'?" },
                 { "ConfirmText", "Delete" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -145,23 +153,18 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                BeginDeleteShiftRoster(shiftRoster);
+                BeginDeleteShiftRosterChange(shiftRoster);
             }
         }
 
         private void AddShiftRoster()
         {
-            Navigation.NavigateTo($"/TimeAttendance/mastershiftroster?ActionType=Add");
+            Navigation.NavigateTo($"/TimeAttendance/employeeshiftroster?ActionType=Add");
         }
 
         private void OpenEmployeeShiftRoster()
         {
             Navigation.NavigateTo($"/TimeAttendance/employeeshiftroster?ActionType=Add");
-        }
-
-        private void OpenShiftRosterChangeHistory()
-        {
-            Navigation.NavigateTo($"/TimeAttendance/rosterchangesearch?ActionType=View");
         }
         #endregion
 
@@ -220,15 +223,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private void BeginSearchShiftRoster(bool forceLoad = false)
+        private void BeginSearchShiftRosterChange(bool forceLoad = false)
         {
             _isTaskFinished = false;
             _isRunning = true;
 
             // Set the overlay message
-            overlayMessage = "Loading shift rosters, please wait...";
+            overlayMessage = "Loading shift roster change, please wait...";
 
-            _ = SearchShiftRosterAsync(async () =>
+            _ = SearchShiftRosterChangeAsync(async () =>
             {
                 _isTaskFinished = true;
                 _isRunning = false;
@@ -238,7 +241,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }, forceLoad);
         }
 
-        private void BeginDeleteShiftRoster(ShiftPatternMasterDTO shiftRoster)
+        private void BeginDeleteShiftRosterChange(ShiftPatternChangeDTO shiftRoster)
         {
             try
             {
@@ -246,9 +249,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _isRunning = true;
 
                 // Set the overlay message
-                overlayMessage = "Deleting Shift Roster, please wait...";
+                overlayMessage = "Deleting shift roster change, please wait...";
 
-                _ = DeleteShiftRosterAsync(async () =>
+                _ = DeleteShiftRosterChangeAsync(async () =>
                 {
                     _isRunning = false;
 
@@ -256,7 +259,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     await InvokeAsync(StateHasChanged);
 
                     // Remove locally from the list so UI updates immediately
-                    _shiftRosterList.Remove(shiftRoster);
+                    _shiftRosterChangeList.Remove(shiftRoster);
 
                     StateHasChanged();
 
@@ -271,24 +274,24 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 ShowNotification($"Error: {ex.Message}", SnackBarTypes.Error);
             }
         }
-        private void GetShiftRosterDetail(ShiftPatternMasterDTO shiftRoster)
+        private void GetShiftRosterDetail(ShiftPatternChangeDTO shiftRoster)
         {
-            Navigation.NavigateTo($"/TimeAttendance/mastershiftroster?ShiftPatternId={shiftRoster.ShiftPatternId}&ActionType=View");
+            //Navigation.NavigateTo($"/TimeAttendance/mastershiftroster?ShiftPatternId={shiftRoster.ShiftPatternId}&ActionType=View");
         }
         #endregion
 
         #region Database Methods
-        private async Task SearchShiftRosterAsync(Func<Task> callback, bool forceLoad = false)
+        private async Task SearchShiftRosterChangeAsync(Func<Task> callback, bool forceLoad = false)
         {
             await Task.Delay(500);
 
             // Reset error messages
             _errorMessage.Clear();
 
-            var repoResult = await AttendanceService.SearchShiftRosterMasterAsync(0, null, null, null, null);
+            var repoResult = await AttendanceService.SearchShiftPatternChangeAsync(0, 0, 0, string.Empty, string.Empty, null, null);
             if (repoResult.Success)
             {
-                _shiftRosterList = repoResult.Value!;
+                _shiftRosterChangeList = repoResult.Value!;
             }
             else
             {
@@ -305,7 +308,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task DeleteShiftRosterAsync(Func<Task> callback, ShiftPatternMasterDTO shiftRoster)
+        private async Task DeleteShiftRosterChangeAsync(Func<Task> callback, ShiftPatternChangeDTO shiftRoster)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(500);
@@ -319,17 +322,17 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             bool isSuccess = false;
             string errorMsg = string.Empty;
 
-            if (shiftRoster.ShiftPatternId == 0)
-            {
-                errorMsg = "Shift Pattern ID is not defined.";
-            }
-            else
-            {
-                var deleteResult = await AttendanceService.DeleteShiftRosterMasterAsync(shiftRoster.ShiftPatternId, _cts.Token);
-                isSuccess = deleteResult.Success;
-                if (!isSuccess)
-                    errorMsg = deleteResult.Error!;
-            }
+            //if (shiftRoster.ShiftPatternId == 0)
+            //{
+            //    errorMsg = "Shift Pattern ID is not defined.";
+            //}
+            //else
+            //{
+            //    var deleteResult = await AttendanceService.DeleteShiftRosterMasterAsync(shiftRoster.ShiftPatternId, _cts.Token);
+            //    isSuccess = deleteResult.Success;
+            //    if (!isSuccess)
+            //        errorMsg = deleteResult.Error!;
+            //}
 
             if (isSuccess)
             {

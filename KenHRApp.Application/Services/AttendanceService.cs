@@ -370,6 +370,99 @@ namespace KenHRApp.Application.Services
                 return Result<int>.Failure(ex.Message.ToString());
             }
         }
+
+        public async Task<Result<List<ShiftPatternChangeDTO>>> SearchShiftPatternChangeAsync(byte loadType, int? autoID, int? empNo, string? changeType, 
+            string? shiftPatternCode, DateTime? startDate, DateTime? endDate)
+        {
+            List<ShiftPatternChangeDTO> rosterChangeList = new List<ShiftPatternChangeDTO>();
+            
+            try
+            {
+                var repoResult = await _repository.SearchShiftPatternChangeAsync(loadType, autoID, empNo, changeType, 
+                    shiftPatternCode, startDate, endDate);
+
+                if (!repoResult.Success)
+                {
+                    return Result<List<ShiftPatternChangeDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                rosterChangeList = repoResult.Value!.Select(e => new ShiftPatternChangeDTO
+                {
+                    ShiftPatternChangeId = e.AutoId,
+                    EmpNo = e.EmpNo,
+                    EmpName = e.EmpName,
+                    DepartmentCode = e.DepartmentCode,
+                    DepartmentName = e.DepartmentName,
+                    ShiftPatternCode = e.ShiftPatternCode,
+                    ShiftPointer = e.ShiftPointer,
+                    ChangeTypeCode = e.ChangeType,
+                    ChangeTypeDesc = e.ChangeTypeDesc,
+                    EffectiveDate = e.EffectiveDate,
+                    EndingDate = e.EndingDate,
+                    CreatedByEmpNo = e.CreatedByEmpNo,
+                    CreatedByName = e.CreatedByName,
+                    CreatedByUserID = e.CreatedByUserID,
+                    CreatedDate = e.CreatedDate,
+                    LastUpdateDate = e.LastUpdateDate,
+                    LastUpdateEmpNo = e.LastUpdateEmpNo,
+                    LastUpdateUserID = e.LastUpdateUserID,
+                    LastUpdatedByName = e.LastUpdatedByName
+                }).ToList();
+
+                return Result<List<ShiftPatternChangeDTO>>.SuccessResult(rosterChangeList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<ShiftPatternChangeDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching shift roster records from the database.");
+            }
+        }
+
+        public async Task<Result<ShiftPatternChangeDTO?>> GetShiftPatternChangeAsync(int autoID)
+        {
+            ShiftPatternChangeDTO? rosterChange = null;
+
+            try
+            {
+                var repoResult = await _repository.GetShiftPatternChangeAsync(autoID);
+                if (!repoResult.Success)
+                {
+                    return Result<ShiftPatternChangeDTO?>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null)
+                {
+                    rosterChange = new ShiftPatternChangeDTO
+                    {
+                        ShiftPatternChangeId = model.AutoId,
+                        EmpNo = model.EmpNo,
+                        EmpName = model.EmpName,
+                        DepartmentCode = model.DepartmentCode,
+                        DepartmentName = model.DepartmentName,
+                        ShiftPatternCode = model.ShiftPatternCode,
+                        ShiftPointer = model.ShiftPointer,
+                        ChangeTypeCode = model.ChangeType,
+                        ChangeTypeDesc = model.ChangeTypeDesc,
+                        EffectiveDate = model.EffectiveDate,
+                        EndingDate = model.EndingDate,
+                        CreatedByEmpNo = model.CreatedByEmpNo,
+                        CreatedByName = model.CreatedByName,
+                        CreatedByUserID = model.CreatedByUserID,
+                        CreatedDate = model.CreatedDate,
+                        LastUpdateDate = model.LastUpdateDate,
+                        LastUpdateEmpNo = model.LastUpdateEmpNo,
+                        LastUpdateUserID = model.LastUpdateUserID,
+                        LastUpdatedByName = model.LastUpdatedByName
+                    };
+                }
+
+                return Result<ShiftPatternChangeDTO?>.SuccessResult(rosterChange);
+            }
+            catch (Exception ex)
+            {
+                return Result<ShiftPatternChangeDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the shift roster change records in the database.");
+            }
+        }
         #endregion
     }
 }

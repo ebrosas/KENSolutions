@@ -1,6 +1,6 @@
-﻿@page "/TimeAttendance/shiftrostersearch"
+﻿@page "/TimeAttendance/rosterchangesearch"
 
-<MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Shift Roster Master</MudText>
+<MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Shift Roster Change History</MudText>
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
     @if (_showErrorAlert)
     {
@@ -11,7 +11,7 @@
     }
     <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
         <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
-            CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
+                        CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
         <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
             <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
                 <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">SHIFT ROSTER LIST</MudText>
@@ -19,24 +19,23 @@
                 <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add New Shift Roster" OnClick="AddShiftRoster" />
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Manage Employee Shift Roster" OnClick="OpenEmployeeShiftRoster" />
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ManageHistory" IconColor="Color.Dark" Label="View Shift Roster Changes" OnClick="OpenShiftRosterChangeHistory" />
                  </MudMenu>
-            </MudAppBar>
-            <MudPaper Elevation="5" Square="true" Class="w-100 mb-2">
-                 <MudDataGrid T="ShiftPatternMasterDTO" Items="@_shiftRosterList" Hover="true" Striped="true" Class="shift-roster-grid"
-                    Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
-                    QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
-                    EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
-                    EditDialogOptions="new DialogOptions 
-                    { 
-                        MaxWidth = MaxWidth.Small, 
+             </MudAppBar>
+             <MudPaper Elevation="5" Square="true" Class="w-100 mb-2">
+                 <MudDataGrid T="ShiftPatternChangeDTO" Items="@_shiftRosterChangeList" Hover="true" Striped="true" Class="shift-roster-grid"
+                              Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                              QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                              EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                              EditDialogOptions="new DialogOptions
+                    {
+                        MaxWidth = MaxWidth.Small,
                         FullWidth = true,
                         BackdropClick = false,
                         CloseOnEscapeKey = false
                     }"
-                    StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
-                    TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
-                    <ToolBarContent>
+                              StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
+                              TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                     <ToolBarContent>
                          <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
                              <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
                                            Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"
@@ -50,9 +49,9 @@
                                  <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new shift roster" OnClick="AddShiftRoster" />
                              </MudPaper>
                          </MudPaper>
-                    </ToolBarContent>
-                    <Columns>
-                         <PropertyColumn Property="x => x.ShiftPatternId" Hidden Editable="false">
+                     </ToolBarContent>
+                     <Columns>
+                         <PropertyColumn Property="x => x.ShiftPatternChangeId" Hidden Editable="false">
                              <EditTemplate>
                                  @* Empty to prevent rendering *@
                              </EditTemplate>
@@ -65,16 +64,16 @@
                             </CellTemplate>
                             <EditTemplate>
                                 <MudTextField @bind-Value="context.Item.ShiftPatternCode" Label="Shift Pattern Code" HelperText="Maximum input is 20 chars."
-                                Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="20" MaxLength="20"
-                                Required RequiredError="Shift Pattern Code is required"
-                                Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                            </EditTemplate>
+                                              Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="20" MaxLength="20"
+                                                            Required RequiredError="Shift Pattern Code is required"
+                                               Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                             </EditTemplate>
                          </PropertyColumn>
-                         <PropertyColumn Property="x => x.ShiftPatternDescription" Title="Shift Description" Class="col-shift-description">
+                         @* <PropertyColumn Property="x => x.ShiftPatternDescription" Title="Shift Description" Class="col-shift-description">
                              <EditTemplate>
                                  <MudTextField @bind-Value="context.Item.ShiftPatternDescription" Label="Shift Description" HelperText="Maximum input is 300 chars."
-                                    Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="300" MaxLength="300"
-                                    Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                               Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="300" MaxLength="300"
+                                               Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                              </EditTemplate>
                          </PropertyColumn>
                          <PropertyColumn Property="x => x.IsActiveDesc" Title="Is Active?" Class="col-active" Required="false">
@@ -96,7 +95,7 @@
                             <EditTemplate>
                                 <MudSwitch @bind-Value="context.Item.IsFlexiTime" Color="Color.Success" UncheckedColor="Color.Error" Label="Is Flexitime?" />
                             </EditTemplate>
-                        </PropertyColumn>
+                        </PropertyColumn> *@
                         <PropertyColumn Property="x => x.CreatedByFullName" Title="Created By" Class="col-created-by" Editable="false">
                             <CellTemplate>
                                 @context.Item.CreatedByFullName
@@ -116,7 +115,7 @@
                             <CellTemplate>
                                 @context.Item.LastUpdateDate?.ToString("dd-MMM-yyyy hh:mm tt")
                             </CellTemplate>
-                        </PropertyColumn>      
+                        </PropertyColumn>
                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                             <CellTemplate Context="row">
                                 <MudIconButton Color="Color.Info" title="View shift roster details" Class="show-btn fa-icon-btn"
@@ -134,13 +133,13 @@
                         </TemplateColumn>
                     </Columns>
                     <NoRecordsContent>
-                         <div class="no-data-box">
-                             <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
-                             <span>No data found</span>
-                         </div>
+                        <div class="no-data-box">
+                            <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
+                            <span>No data found</span>
+                        </div>
                     </NoRecordsContent>
                     <PagerContent>
-                         <MudDataGridPager T="ShiftPatternMasterDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                        <MudDataGridPager T="ShiftPatternChangeDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
                     </PagerContent>
                 </MudDataGrid>
             </MudPaper>
@@ -160,5 +159,5 @@
     <div class="fullscreen-overlay">
         <MudProgressCircular Indeterminate="true" Size="Size.Medium" Color="Color.Info" />
         <MudText Typo="Typo.h6" Class="mt-2 text-white">@overlayMessage</MudText>
-    </div>
+        </div>
 }
