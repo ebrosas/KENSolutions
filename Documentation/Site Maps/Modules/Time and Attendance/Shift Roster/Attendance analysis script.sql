@@ -18,3 +18,6 @@
 	SELECT * FROM tas.syJDE_F0005 a
 	WHERE LTRIM(RTRIM(a.DRSY)) = '06' 
 		AND UPPER(LTRIM(RTRIM(a.DRRT))) = 'SH'
+
+	SELECT * FROM [tas].[Tran_ShiftPatternChanges] a WITH (NOLOCK)
+	ORDER BY a.AutoID DESC
