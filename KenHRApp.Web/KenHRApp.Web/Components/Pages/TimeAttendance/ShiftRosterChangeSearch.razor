@@ -22,126 +22,170 @@
                  </MudMenu>
              </MudAppBar>
              <MudPaper Elevation="5" Square="true" Class="w-100 mb-2">
-                 <MudDataGrid T="ShiftPatternChangeDTO" Items="@_shiftRosterChangeList" Hover="true" Striped="true" Class="shift-roster-grid"
-                              Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
-                              QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
-                              EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
-                              EditDialogOptions="new DialogOptions
+                <div class="shift-roster-grid mb-4">
+                     <MudDataGrid T="ShiftPatternChangeDTO" Items="@_shiftRosterChangeList" Hover="true" Striped="true"
+                                  TableClass="fixed-table" Dense="false" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true" Bordered="false"
+                                  Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                                  QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                                  EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                                  EditDialogOptions="new DialogOptions
                     {
                         MaxWidth = MaxWidth.Small,
                         FullWidth = true,
                         BackdropClick = false,
                         CloseOnEscapeKey = false
                     }"
-                              StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
-                              TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
-                     <ToolBarContent>
-                         <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
-                             <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
-                                           Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"
-                                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
-                             </MudTextField>
-                         </MudPaper>
-                         <MudSpacer />
-                         <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
-                             <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
-                             <MudPaper Class="ms-3" Elevation="0">
-                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new shift roster" OnClick="AddShiftRoster" />
+                                  StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges">
+                         <ToolBarContent>
+                             <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                                 <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
+                                               Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"
+                                               AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                                 </MudTextField>
                              </MudPaper>
-                         </MudPaper>
-                     </ToolBarContent>
-                     <Columns>
-                         <PropertyColumn Property="x => x.ShiftPatternChangeId" Hidden Editable="false">
-                             <EditTemplate>
-                                 @* Empty to prevent rendering *@
-                             </EditTemplate>
-                         </PropertyColumn>
-                         <PropertyColumn Property="x => x.ShiftPatternCode" Title="Shift Roster Code" Class="col-shift-pattern" StickyLeft="true">
-                             <CellTemplate Context="row">
-                                 <MudChip T="string" Size=Size.Small Color="Color.Primary" Label="true" Class="fw-bold" Style="font-size: 14px;">
-                                     @row.Item.ShiftPatternCode
-                                </MudChip>
-                            </CellTemplate>
-                            <EditTemplate>
-                                <MudTextField @bind-Value="context.Item.ShiftPatternCode" Label="Shift Pattern Code" HelperText="Maximum input is 20 chars."
-                                              Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="20" MaxLength="20"
-                                                            Required RequiredError="Shift Pattern Code is required"
-                                               Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                             </EditTemplate>
-                         </PropertyColumn>
-                         @* <PropertyColumn Property="x => x.ShiftPatternDescription" Title="Shift Description" Class="col-shift-description">
-                             <EditTemplate>
-                                 <MudTextField @bind-Value="context.Item.ShiftPatternDescription" Label="Shift Description" HelperText="Maximum input is 300 chars."
-                                               Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="300" MaxLength="300"
-                                               Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                             </EditTemplate>
-                         </PropertyColumn>
-                         <PropertyColumn Property="x => x.IsActiveDesc" Title="Is Active?" Class="col-active" Required="false">
-                             <CellTemplate Context="row">
-                                 <MudChip T="string" Size=Size.Small Color="@(row.Item.IsActiveDesc == "Yes" ? Color.Success : Color.Error)">
-                                     @row.Item.IsActiveDesc
-                                </MudChip>
-                            </CellTemplate>
-                            <EditTemplate>
-                                <MudSwitch @bind-Value="context.Item.IsActive" Color="Color.Success" UncheckedColor="Color.Error" Label="Is Active?" />
-                            </EditTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.IsFlexiTimeDesc" Title="Is Flexitime?" Class="col-flexitime" Required="false">
-                            <CellTemplate Context="row">
-                                <MudChip T="string" Size=Size.Small Color="@(row.Item.IsFlexiTimeDesc == "Yes" ? Color.Success : Color.Error)">
-                                    @row.Item.IsFlexiTimeDesc
-                                </MudChip>
-                            </CellTemplate>
-                            <EditTemplate>
-                                <MudSwitch @bind-Value="context.Item.IsFlexiTime" Color="Color.Success" UncheckedColor="Color.Error" Label="Is Flexitime?" />
-                            </EditTemplate>
-                        </PropertyColumn> *@
-                        <PropertyColumn Property="x => x.CreatedByFullName" Title="Created By" Class="col-created-by" Editable="false">
-                            <CellTemplate>
-                                @context.Item.CreatedByFullName
-                            </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.CreatedDate" Title="Created Date" Class="col-created-date" Editable="false">
-                            <CellTemplate>
-                                @context.Item.CreatedDate?.ToString("dd-MMM-yyyy hh:mm tt")
-                            </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.LastUpdatedByFullName" Title="Updated By" Class="col-updated-by" Editable="false">
-                            <CellTemplate>
-                                @context.Item.LastUpdatedByFullName
-                            </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.LastUpdateDate" Title="Updated Date" Class="col-updated-date" Editable="false">
-                            <CellTemplate>
-                                @context.Item.LastUpdateDate?.ToString("dd-MMM-yyyy hh:mm tt")
-                            </CellTemplate>
-                        </PropertyColumn>
-                        <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
-                            <CellTemplate Context="row">
-                                <MudIconButton Color="Color.Info" title="View shift roster details" Class="show-btn fa-icon-btn"
-                                               OnClick="() => GetShiftRosterDetail(row.Item)">
-                                    <ChildContent>
-                                        <i class="fas fa-eye fa-1x"></i>
-                                    </ChildContent>
-                                </MudIconButton>
-                                <MudIconButton Color="Color.Error" title="Delete shift roster record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
-                                    <ChildContent>
-                                        <i class="fas fa-trash-alt fa-1x"></i>
-                                    </ChildContent>
-                                </MudIconButton>
-                            </CellTemplate>
-                        </TemplateColumn>
-                    </Columns>
-                    <NoRecordsContent>
-                        <div class="no-data-box">
-                            <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
-                            <span>No data found</span>
-                        </div>
-                    </NoRecordsContent>
-                    <PagerContent>
-                        <MudDataGridPager T="ShiftPatternChangeDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
-                    </PagerContent>
-                </MudDataGrid>
+                             <MudSpacer />
+                             <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                 <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
+                                 <MudPaper Class="ms-3" Elevation="0">
+                                     <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new shift roster" OnClick="AddShiftRoster" />
+                                 </MudPaper>
+                             </MudPaper>
+                         </ToolBarContent>
+                         <Columns>
+                             <PropertyColumn Property="x => x.ShiftPatternChangeId" Hidden Editable="false">
+                                 <EditTemplate>
+                                     @* Empty to prevent rendering *@
+                                 </EditTemplate>
+                             </PropertyColumn>
+                             <PropertyColumn Property="x => x.EmpNo" Title="Employee No." Class="col-employee-no" />
+                             <PropertyColumn Property="x => x.EmpName" Title="Employee Name" Class="col-employee-name" />
+                             @* <PropertyColumn Property="x => x.Position" Class="col-position" /> *@
+                             <PropertyColumn Property="x => x.CostCenterFullName" Class="col-department" />
+                             <PropertyColumn Property="x => x.ShiftPatternCode" Title="Shift Roster Code" Class="col-shift-pattern">
+                                 <CellTemplate Context="row">
+                                     <MudChip T="string" Size=Size.Small Color="Color.Primary" Label="true" Class="fw-bold" Style="font-size: 14px;">
+                                         @row.Item.ShiftPatternCode
+                                    </MudChip>
+                                </CellTemplate>
+                                <EditTemplate Context="row">
+                                    <MudSelect T="string" Value="row.Item.ShiftPatternCode"
+                                               ValueChanged="@((v) => OnShiftRosterChanged(row.Item, v))"
+                                               For="@(() => row.Item.ShiftPatternCode)"
+                                               Variant="Variant.Outlined" Margin="Margin.Dense"
+                                               Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                                              Required RequiredError="Shift Roster is required"
+                                                Immediate="true" Typo="Typo.subtitle2">
+                                         @foreach (var shift in _shiftPatternList)
+                                        {
+                                            <MudSelectItem Value="shift.ShiftPatternCode">@shift.ShiftPatternCode</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                </EditTemplate>
+                            </PropertyColumn>
+                            <PropertyColumn Property="x => x.ShiftPointer" Title="Shift Pointer" Class="col-shift-pointer">
+                                <EditTemplate Context="row">
+                                    <MudSelect @bind-Value="row.Item.ShiftPointer"
+                                               For="@(() => row.Item.ShiftPointer)"
+                                               Variant="Variant.Outlined" Margin="Margin.Dense"
+                                               Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                                              Required RequiredError="Shift Pointer is required"
+                                                Immediate="true" Typo="Typo.subtitle2">
+                                         @foreach (var pointer in _shiftPointerList)
+                                        {
+                                            <MudSelectItem Value="pointer.ShiftPointer">@($"{pointer.ShiftPointer} - {pointer.ShiftDescription}")</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                </EditTemplate>
+                            </PropertyColumn>
+                            <PropertyColumn Property="x => x.ChangeTypeDesc" Title="Change Type" Class="col-change-type">
+                                <EditTemplate Context="row">
+                                    <MudSelect @bind-Value="row.Item.ChangeTypeCode"
+                                               For="@(() => row.Item.ChangeTypeCode)"
+                                               Variant="Variant.Outlined" Margin="Margin.Dense"
+                                               Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                                              Required RequiredError="Change Type is required"
+                                                Immediate="true" Typo="Typo.subtitle2">
+                                         @foreach (var ct in _changeTypeList)
+                                        {
+                                            <MudSelectItem Value="ct.UDCCode">@ct.UDCDesc1</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                </EditTemplate>
+                            </PropertyColumn>
+                            <PropertyColumn Property="x => x.EffectiveDate" Title="Effective Date" Class="col-effective-date">
+                                <CellTemplate>
+                                    @context.Item.CreatedDate?.ToString("dd-MMM-yyyy")
+                                </CellTemplate>
+                                <EditTemplate Context="row">
+                                    <MudDatePicker Color="Color.Info" Editable="true"
+                                                   @bind-Date="row.Item.EffectiveDate"
+                                                   For="@(() => row.Item.EffectiveDate)"
+                                                                      Required RequiredError="Effective Date is required"
+                                                    MinDate="DateTime.Today"
+                                                    Clearable="true"
+                                                    Placeholder="Select Date" />
+                                 </EditTemplate>
+                             </PropertyColumn>
+                             <PropertyColumn Property="x => x.EndingDate" Title="Ending Date" Class="col-ending-date">
+                                 <CellTemplate>
+                                     @context.Item.CreatedDate?.ToString("dd-MMM-yyyy")
+                                </CellTemplate>
+                                <EditTemplate Context="row">
+                                    <MudDatePicker Color="Color.Info" Editable="true"
+                                                   @bind-Date="row.Item.EndingDate"
+                                                   For="@(() => row.Item.EndingDate)"
+                                                   MinDate="DateTime.Today"
+                                                   Clearable="true"
+                                                   Placeholder="Select Date" />
+                                </EditTemplate>
+                            </PropertyColumn>
+                            <PropertyColumn Property="x => x.CreatedByFullName" Title="Created By" Class="col-created-by" Editable="false">
+                                <CellTemplate>
+                                    @context.Item.CreatedByFullName
+                                </CellTemplate>
+                            </PropertyColumn>
+                            <PropertyColumn Property="x => x.CreatedDate" Title="Created Date" Class="col-created-date" Editable="false">
+                                <CellTemplate>
+                                    @context.Item.CreatedDate?.ToString("dd-MMM-yyyy hh:mm tt")
+                                </CellTemplate>
+                            </PropertyColumn>
+                            <PropertyColumn Property="x => x.LastUpdatedByFullName" Title="Updated By" Class="col-updated-by" Editable="false">
+                                <CellTemplate>
+                                    @context.Item.LastUpdatedByFullName
+                                </CellTemplate>
+                            </PropertyColumn>
+                            <PropertyColumn Property="x => x.LastUpdateDate" Title="Updated Date" Class="col-updated-date" Editable="false">
+                                <CellTemplate>
+                                    @context.Item.LastUpdateDate?.ToString("dd-MMM-yyyy hh:mm tt")
+                                </CellTemplate>
+                            </PropertyColumn>
+                            <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                                <CellTemplate Context="row">
+                                    <MudIconButton Color="Color.Info" title="View shift roster details" Class="show-btn fa-icon-btn"
+                                                   OnClick="() => GetShiftRosterDetail(row.Item)">
+                                        <ChildContent>
+                                            <i class="fas fa-eye fa-1x"></i>
+                                        </ChildContent>
+                                    </MudIconButton>
+                                    <MudIconButton Color="Color.Error" title="Delete shift roster record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
+                                        <ChildContent>
+                                            <i class="fas fa-trash-alt fa-1x"></i>
+                                        </ChildContent>
+                                    </MudIconButton>
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                        <NoRecordsContent>
+                            <div class="no-data-box">
+                                <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
+                                <span>No data found</span>
+                            </div>
+                        </NoRecordsContent>
+                        <PagerContent>
+                            <MudDataGridPager T="ShiftPatternChangeDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                        </PagerContent>
+                    </MudDataGrid>
+                </div>                
             </MudPaper>
             <MudScrollToTop TopOffset="100"
                             Selector="#mainPanel"

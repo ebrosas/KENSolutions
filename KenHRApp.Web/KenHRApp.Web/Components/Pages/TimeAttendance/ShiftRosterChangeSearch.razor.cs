@@ -52,6 +52,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             new("Home", href: "/", icon: Icons.Material.Filled.Home),
             new("Shift Roster Change History", href: null, disabled: true, @Icons.Material.Filled.History)
         ];
+
+        private IReadOnlyList<ShiftPatternMasterDTO> _shiftPatternList = new List<ShiftPatternMasterDTO>();
+        private List<ShiftPointerDTO> _shiftPointerList = new List<ShiftPointerDTO>();
+        private IReadOnlyList<UserDefinedCodeDTO> _changeTypeList = new List<UserDefinedCodeDTO>();
         #endregion
 
         #endregion
@@ -154,6 +158,28 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (result != null && !result.Canceled)
             {
                 BeginDeleteShiftRosterChange(shiftRoster);
+            }
+        }
+
+        private void OnShiftRosterChanged(ShiftPatternChangeDTO row, string newValue)
+        {
+            if (row.ShiftPatternCode != newValue)
+            {
+                row.ShiftPatternCode = newValue;
+
+                // Get the associated shift pointers
+                if (_shiftPatternList.Any())
+                {
+                    ShiftPatternMasterDTO? shiftPattern = _shiftPatternList.Where(s => s.ShiftPatternCode.Trim() == newValue).FirstOrDefault();
+                    if (shiftPattern != null)
+                    {
+                        _shiftPointerList = shiftPattern.ShiftPointerList;
+                    }
+                }
+
+                // Reset pointer when roster changes
+                row.ShiftPointer = 0;
+                //row.ShiftPointerId = 0;
             }
         }
 

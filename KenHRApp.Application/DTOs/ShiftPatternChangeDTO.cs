@@ -24,7 +24,7 @@ namespace KenHRApp.Application.DTOs
 
         [Required(ErrorMessage = "Effective Date is required")]
         [Display(Name = "Effective Date")]
-        public DateTime EffectiveDate { get; set; }
+        public DateTime? EffectiveDate { get; set; }
 
         public DateTime? EndingDate { get; set; } = null;
 
