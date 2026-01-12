@@ -145,8 +145,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Initialize the EditContext 
             _editContext = new EditContext(employeeList);
 
-            if (ActionType == ActionTypes.Edit.ToString() ||
-                ActionType == ActionTypes.View.ToString())
+            if (ActionType == ActionTypes.Edit.ToString())
+            {
+                _isDisabled = true;
+            }
+            else if (ActionType == ActionTypes.View.ToString())
             {
                 _isDisabled = true;
             }
@@ -159,11 +162,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             BeginLoadComboboxTask();
 
-            if (LookupCache.IsEmployeeSearch)
-            {
-                LookupCache.IsEmployeeSearch = false;
-                BeginSearchEmployeeTask(ForceLoad);
-            }
+            //if (LookupCache.IsEmployeeSearch)
+            //{
+            //    LookupCache.IsEmployeeSearch = false;
+            //    BeginSearchEmployeeTask(ForceLoad);
+            //}
         }
         #endregion
 

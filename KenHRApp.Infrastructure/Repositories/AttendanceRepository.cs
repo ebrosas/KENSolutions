@@ -527,6 +527,79 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
+        public async Task<Result<List<ShiftPatternChange>?>> GetShiftRosterChangeLogAsync(int? autoID, int? empNo, string? changeType, 
+            string? shiftPatternCode, DateTime? startDate, DateTime? endDate)
+        {
+            List<ShiftPatternChange> rosterChangeList = new List<ShiftPatternChange>();
+
+            try
+            {
+                var model = await (from spc in _db.ShiftPatternChanges
+                                   join emp in _db.Employees on spc.EmpNo equals emp.EmployeeNo        // INNER JOIN
+                                   join dep in _db.DepartmentMasters on emp.DepartmentCode equals dep.DepartmentCode
+                                   join ct in _db.UserDefinedCodes on spc.ChangeType equals ct.UDCCode
+                                   where
+                                   (
+                                        (spc.AutoId == autoID || (autoID == null || autoID == 0)) &&
+                                        (spc.EmpNo == empNo || (empNo == null || empNo == 0)) &&
+                                        (spc.ChangeType == changeType || string.IsNullOrEmpty(changeType)) &&
+                                        (spc.ShiftPatternCode == shiftPatternCode || string.IsNullOrEmpty(shiftPatternCode)) &&
+                                        ((spc.EffectiveDate >= startDate && spc.EffectiveDate <= endDate) || (!startDate.HasValue && !endDate.HasValue))
+                                   )
+                                   select new
+                                   {
+                                       ShiftPatternChange = spc,
+                                       EmpName = $"{emp.FirstName} - {emp.LastName}",
+                                       DepartmentCode = dep.DepartmentCode,
+                                       DepartmentName = dep.DepartmentName,
+                                       ChangeTypeDesc = ct.UDCDesc1
+                                   }).ToListAsync();
+
+                if (model != null)
+                {
+                    #region Initialize entity                     
+                    ShiftPatternChange rosterChange;
+
+                    foreach (var item in model)
+                    {
+                        rosterChange = new ShiftPatternChange()
+                        {
+                            AutoId = item.ShiftPatternChange.AutoId,
+                            EmpNo = item.ShiftPatternChange.EmpNo,
+                            EmpName = item.EmpName,
+                            ShiftPatternCode = item.ShiftPatternChange.ShiftPatternCode,
+                            ShiftPointer = item.ShiftPatternChange.ShiftPointer,
+                            ChangeType = item.ShiftPatternChange.ChangeType,
+                            ChangeTypeDesc = item.ChangeTypeDesc,
+                            EffectiveDate = item.ShiftPatternChange.EffectiveDate,
+                            EndingDate = item.ShiftPatternChange.EndingDate,
+                            DepartmentCode = item.DepartmentCode,
+                            DepartmentName = item.DepartmentName,
+                            CreatedByEmpNo = item.ShiftPatternChange.CreatedByEmpNo,
+                            CreatedByUserID = item.ShiftPatternChange.CreatedByUserID,
+                            CreatedByName = item.ShiftPatternChange.CreatedByName,
+                            CreatedDate = item.ShiftPatternChange.CreatedDate,
+                            LastUpdateEmpNo = item.ShiftPatternChange.LastUpdateEmpNo,
+                            LastUpdateUserID = item.ShiftPatternChange.LastUpdateUserID,
+                            LastUpdatedByName = item.ShiftPatternChange.LastUpdatedByName,
+                            LastUpdateDate = item.ShiftPatternChange.LastUpdateDate
+                        };
+
+                        // Add to the list
+                        rosterChangeList.Add(rosterChange);
+                    }
+                    #endregion
+                }
+
+                return Result<List<ShiftPatternChange>?>.SuccessResult(rosterChangeList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<ShiftPatternChange>?>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
         public async Task<Result<ShiftPatternChange?>> GetShiftPatternChangeAsync(int autoID)
         {
             ShiftPatternChange? rosterChange = null;

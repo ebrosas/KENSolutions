@@ -14,7 +14,7 @@
                         CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
         <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
             <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
-                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">SHIFT ROSTER LIST</MudText>
+                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">SHIFT ROSTER CHANGE LIST</MudText>
                 <MudSpacer />
                 <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add New Shift Roster" OnClick="AddShiftRoster" />
@@ -59,8 +59,7 @@
                              </PropertyColumn>
                              <PropertyColumn Property="x => x.EmpNo" Title="Employee No." Class="col-employee-no" />
                              <PropertyColumn Property="x => x.EmpName" Title="Employee Name" Class="col-employee-name" />
-                             @* <PropertyColumn Property="x => x.Position" Class="col-position" /> *@
-                             <PropertyColumn Property="x => x.CostCenterFullName" Class="col-department" />
+                             <PropertyColumn Property="x => x.DepartmentFullName" Title="Department" Class="col-department" />
                              <PropertyColumn Property="x => x.ShiftPatternCode" Title="Shift Roster Code" Class="col-shift-pattern">
                                  <CellTemplate Context="row">
                                      <MudChip T="string" Size=Size.Small Color="Color.Primary" Label="true" Class="fw-bold" Style="font-size: 14px;">
@@ -161,16 +160,13 @@
                             </PropertyColumn>
                             <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                                 <CellTemplate Context="row">
-                                    <MudIconButton Color="Color.Info" title="View shift roster details" Class="show-btn fa-icon-btn"
-                                                   OnClick="() => GetShiftRosterDetail(row.Item)">
-                                        <ChildContent>
-                                            <i class="fas fa-eye fa-1x"></i>
-                                        </ChildContent>
+                                    <MudIconButton Color="Color.Info" title="Edit shift roster details"
+                                                   Icon="@Icons.Material.Rounded.Edit"
+                                                   OnClick="@(() => EditRosterChangeAsync(row.Item))">
                                     </MudIconButton>
-                                    <MudIconButton Color="Color.Error" title="Delete shift roster record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
-                                        <ChildContent>
-                                            <i class="fas fa-trash-alt fa-1x"></i>
-                                        </ChildContent>
+                                    <MudIconButton Color="Color.Error" title="Delete shift roster"
+                                                   Icon="@Icons.Material.Rounded.DeleteForever"
+                                                   OnClick="() => ConfirmDelete(row.Item)">
                                     </MudIconButton>
                                 </CellTemplate>
                             </TemplateColumn>

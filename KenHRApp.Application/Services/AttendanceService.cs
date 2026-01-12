@@ -378,9 +378,7 @@ namespace KenHRApp.Application.Services
             
             try
             {
-                var repoResult = await _repository.SearchShiftPatternChangeAsync(loadType, autoID, empNo, changeType, 
-                    shiftPatternCode, startDate, endDate);
-
+                var repoResult = await _repository.GetShiftRosterChangeLogAsync(autoID, empNo, changeType, shiftPatternCode, startDate, endDate);
                 if (!repoResult.Success)
                 {
                     return Result<List<ShiftPatternChangeDTO>>.Failure(repoResult.Error ?? "Unknown repository error");

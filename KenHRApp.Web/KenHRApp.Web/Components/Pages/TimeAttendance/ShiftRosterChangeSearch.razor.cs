@@ -69,6 +69,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             Warning,
             Error
         }
+
+        private enum MessageBoxTypes
+        {
+            Info,
+            Confirm,
+            Warning,
+            Error
+        }
         #endregion
 
         #region Page Events
@@ -192,9 +200,139 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             Navigation.NavigateTo($"/TimeAttendance/employeeshiftroster?ActionType=Add");
         }
+
+        private async Task EditRosterChangeAsync(ShiftPatternChangeDTO rosterChange)
+        {
+            try
+            {
+                // Clone the object so the dialog can edit without affecting the grid until Save
+                //var editableCopy = new ShiftPatternChangeDTO
+                //{
+                //    BudgetId = rosterChange.BudgetId,
+                //    DepartmentCode = rosterChange.DepartmentCode,
+                //    DepartmentName = rosterChange.DepartmentName,
+                //    BudgetDescription = rosterChange.BudgetDescription,
+                //    BudgetHeadCount = rosterChange.BudgetHeadCount,
+                //    ActiveCount = rosterChange.ActiveCount,
+                //    ExitCount = rosterChange.ExitCount,
+                //    RequisitionCount = rosterChange.RequisitionCount,
+                //    NetGapCount = rosterChange.NetGapCount,
+                //    NewIndentCount = rosterChange.NewIndentCount,
+                //    OnHold = rosterChange.OnHold,
+                //    Remarks = rosterChange.Remarks,
+                //    CreatedDate = rosterChange.CreatedDate,
+                //    LastUpdateDate = rosterChange.LastUpdateDate
+                //};
+
+                //var parameters = new DialogParameters
+                //{
+                //    ["RecruitmentBudget"] = editableCopy,
+                //    ["DepartmentList"] = _departmentList,
+                //    ["IsClearable"] = true,
+                //    ["IsDisabled"] = false,
+                //    ["IsEditMode"] = true
+                //};
+
+                //var options = new DialogOptions
+                //{
+                //    CloseOnEscapeKey = true,
+                //    BackdropClick = false,
+                //    FullWidth = true,
+                //    MaxWidth = MaxWidth.Medium,
+                //    CloseButton = false
+                //};
+
+                //var dialog = await DialogService.ShowAsync<RecruitmentBudgetDialog>("Edit Shift Roster Details", parameters, options);
+                //var result = await dialog.Result;
+
+                //if (result != null && !result.Canceled)
+                //{
+                //    var updated = (ShiftPatternChangeDTO)result.Data!;
+
+                //    #region Get selected department
+                //    if (!string.IsNullOrEmpty(updated.DepartmentName))
+                //    {
+                //        DepartmentDTO? department = _departmentList.Where(d => d.DepartmentName == updated.DepartmentName).FirstOrDefault();
+                //        if (department != null)
+                //            updated.DepartmentCode = department.DepartmentCode;
+                //    }
+                //    #endregion
+
+                //    // Update in-memory grid item
+                //    var index = _budgetList.FindIndex(x => x.BudgetId == updated.BudgetId);
+                //    if (index >= 0)
+                //    {
+                //        _budgetList[index] = updated;
+                //        await InvokeAsync(StateHasChanged);
+                //    }
+
+                //    #region Persist changes to DB
+                //    // Set flag to display the loading panel
+                //    _isRunning = true;
+
+                //    // Set the overlay message
+                //    overlayMessage = "Saving rosterChange changes, please wait...";
+
+                //    _ = SaveChangeAsync(async () =>
+                //    {
+                //        _isRunning = false;
+
+                //        // Shows the spinner overlay
+                //        await InvokeAsync(StateHasChanged);
+                //    }, updated);
+                //    #endregion
+                //}
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
         #endregion
 
         #region Private Methods
+        private async Task ShowErrorMessage(MessageBoxTypes msgboxType, string title, string content)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", title},
+                { "DialogIcon", msgboxType == MessageBoxTypes.Error ? _iconError
+                        : msgboxType == MessageBoxTypes.Warning ? _iconWarning
+                        : _iconInfo  },
+                { "ContentText", content },
+                {
+                    "Color", msgboxType == MessageBoxTypes.Error ? Color.Error
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
+                },
+                {
+                    "DialogIconColor", msgboxType == MessageBoxTypes.Error ? Color.Error
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
+                },
+                {
+                    "OkBtnColor", msgboxType == MessageBoxTypes.Error ? Color.Error
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
+                }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.Center,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<InfoDialog>(title, parameters, options);
+            var result = await dialog.Result;
+        }
+
         private void ShowNotification(string message, SnackBarTypes type)
         {
             Snackbar.Clear();
@@ -300,9 +438,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 ShowNotification($"Error: {ex.Message}", SnackBarTypes.Error);
             }
         }
-        private void GetShiftRosterDetail(ShiftPatternChangeDTO shiftRoster)
+        private void GetShiftRosterChangeDetail(ShiftPatternChangeDTO shiftRoster)
         {
-            //Navigation.NavigateTo($"/TimeAttendance/mastershiftroster?ShiftPatternId={shiftRoster.ShiftPatternId}&ActionType=View");
+            Navigation.NavigateTo($"/TimeAttendance/employeeshiftroster?AutoId={shiftRoster.ShiftPatternChangeId}&ActionType=Edit");
         }
         #endregion
 

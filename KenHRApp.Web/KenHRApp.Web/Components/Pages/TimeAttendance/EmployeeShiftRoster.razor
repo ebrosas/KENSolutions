@@ -50,7 +50,7 @@
 
         <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">            
             <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
-                <MudPaper Elevation="0" Square="true" Class="w-100">
+                <MudPaper Elevation="0" Square="true" Class="w-100" hidden="@(ActionType == "Edit" ? true : false)">
                     <MudGrid Spacing="5">
                         <MudItem xs="2">
                             <MudPaper Elevation="0" Class="p-0 w-100">

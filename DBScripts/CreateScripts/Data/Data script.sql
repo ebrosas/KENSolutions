@@ -115,6 +115,12 @@
 
 	BEGIN TRAN T1
 
+	UPDATE[kenuser].[ShiftPatternChange]
+	SET CreatedByEmpNo = 10003632,
+		CreatedByName = 'ERVIN OLINAS BROSAS',
+		CreatedByUserID = 'ervin'
+	WHERE AutoId = 4
+
 	DELETE FROM [kenuser].[ShiftPatternChange]
 
 	UPDATE kenuser.Employee
