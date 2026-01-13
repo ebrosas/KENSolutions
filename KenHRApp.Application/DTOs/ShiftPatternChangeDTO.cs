@@ -53,6 +53,7 @@ namespace KenHRApp.Application.DTOs
         public string? LastUpdatedByName { get; set; } = null;
         public string? DepartmentCode { get; set; } = null;
         public string? DepartmentName { get; set; } = null;
+        public List<ShiftPointerDTO> ShiftPointerList = new List<ShiftPointerDTO>();
         #endregion
 
         #region Extended Properties

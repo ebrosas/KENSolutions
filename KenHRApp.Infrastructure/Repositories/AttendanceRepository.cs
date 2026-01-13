@@ -408,7 +408,7 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        public async Task<Result<int>> AddShiftPatternChangeAsync(List<ShiftPatternChange> dto, CancellationToken cancellationToken = default)
+        public async Task<Result<int>> SaveShiftPatternChangeAsync(List<ShiftPatternChange> dto, CancellationToken cancellationToken = default)
         {
             int rowsUpdated = 0;
 
@@ -421,12 +421,13 @@ namespace KenHRApp.Infrastructure.Repositories
                         var existingShiftRoster = await _db.ShiftPatternChanges
                             .FirstOrDefaultAsync(sp => sp.EmpNo == shiftRoster.EmpNo &&
                                 sp.ShiftPatternCode == shiftRoster.ShiftPatternCode && 
-                                sp.ShiftPointer == shiftRoster.ShiftPointer &&
+                                //sp.ShiftPointer == shiftRoster.ShiftPointer &&
                                 sp.EffectiveDate == shiftRoster.EffectiveDate, cancellationToken);
 
                         if (existingShiftRoster != null)
                         {
                             // Update existing shift roster
+                            existingShiftRoster.ShiftPointer = shiftRoster.ShiftPointer;
                             existingShiftRoster.ChangeType = shiftRoster.ChangeType;
                             existingShiftRoster.EffectiveDate = shiftRoster.EffectiveDate;
                             existingShiftRoster.EndingDate = shiftRoster.EndingDate;

@@ -32,7 +32,20 @@
                 </MudItem>
                 <MudItem xs="6">
                     <MudPaper Elevation="0" Class="p-0 w-100">
-                        <MudAutocomplete @bind-Value="ShiftRosterDetail.ChangeTypeCode"
+                        <MudSelect @bind-Value="ShiftRosterDetail.ChangeTypeCode"
+                            For="@(() => ShiftRosterDetail.ChangeTypeCode)" 
+                            Text="ShiftRosterDetail.ChangeTypeDesc"
+                            Variant="Variant.Text" Margin="Margin.Dense"
+                            Label="Change Type"
+                            Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                            Required RequiredError="Shift Pointer is required"
+                            Immediate="true" Typo="Typo.subtitle2">
+                             @foreach (var ct in ChangeTypeList)
+                            {
+                                <MudSelectItem Value="ct.UDCCode">@ct.UDCDesc1</MudSelectItem>
+                            }
+                        </MudSelect>
+                        @* <MudAutocomplete @bind-Value="ShiftRosterDetail.ChangeTypeDesc"
                                          SearchFunc="SearchChangeType!"
                                          Variant="Variant.Text"
                                          Label="Change Type"
@@ -43,26 +56,31 @@
                                          HelperTextOnFocus="true"
                                          Clearable="true" Typo="Typo.subtitle2"
                                          MaxItems="@(ChangeTypeList != null ? ChangeTypeList.Count : 10)"
-                                         Modal="true" />
+                                         Modal="true" /> *@
                     </MudPaper>
                 </MudItem>
             </MudGrid>
              <MudGrid Spacing="7">
                  <MudItem xs="6">
                      <MudPaper Elevation="0" Class="p-0 w-100">
-                        <MudAutocomplete @bind-Value="ShiftRosterDetail.ShiftPatternCode"
-                                SearchFunc="SearchShiftPattern!"
-                                Variant="Variant.Text"
-                                Label="Shift Roster"
-                                Margin="Margin.Normal"
-                                Dense="true" Clearable="true"
-                                Placeholder="Please Select"
-                                         HelperText="Type a key to filter the list"
-                                HelperTextOnFocus="true"
-                                Typo="Typo.subtitle2"
-                                MaxItems="@(ShiftPatternList != null ? ShiftPatternList.Count : 10)"
-                                Required RequiredError="Shift Roster is required"
-                                Modal="true" />
+                        <MudSelect T="string"
+                                   Value="ShiftRosterDetail.ShiftPatternCode"
+                                   ValueChanged="@((v) => OnShiftRosterChanged(v))"
+                                   Label="Shift Roster"
+                                   Variant="Variant.Text"
+                                   Margin="Margin.Dense"
+                                   Placeholder="Please Select"
+                                   AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                   AdornmentColor="Color.Default"
+                                   HelperText="Select job title"
+                                   HelperTextOnFocus="true"
+                                   Immediate="true"
+                                   Typo="Typo.subtitle2">
+                            @foreach (var sp in ShiftPatternList)
+                            {
+                                <MudSelectItem Value="sp.ShiftPatternCode">@sp.ShiftPatternCode</MudSelectItem>
+                            }
+                        </MudSelect>
                      </MudPaper>
                  </MudItem>
                  <MudItem xs="6">
@@ -70,11 +88,11 @@
                         <MudSelect @bind-Value="ShiftRosterDetail.ShiftPointer"
                             For="@(() => ShiftRosterDetail.ShiftPointer)"
                             Variant="Variant.Text" Margin="Margin.Dense"
-                            Label="Shift Pointer" Clearable="true"
+                            Label="Shift Pointer" 
                             Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
                             Required RequiredError="Shift Pointer is required"
                             Immediate="true" Typo="Typo.subtitle2">
-                            @foreach (var pointer in _shiftPointerList)
+                            @foreach (var pointer in ShiftRosterDetail.ShiftPointerList)
                             {
                                 <MudSelectItem Value="pointer.ShiftPointer">@($"{pointer.ShiftPointer} - {pointer.ShiftDescription}")</MudSelectItem>
                             }

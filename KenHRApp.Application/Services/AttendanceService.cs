@@ -354,7 +354,46 @@ namespace KenHRApp.Application.Services
                 }).ToList();
                 #endregion
 
-                var result = await _repository.AddShiftPatternChangeAsync(shiftPatternChangeList, cancellationToken);
+                var result = await _repository.SaveShiftPatternChangeAsync(shiftPatternChangeList, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to save shift roster changes due to error. Please check the data entry then try to save again!");
+                }
+
+                return Result<int>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<int>> UpdateShiftPatternChangeAsync(List<EmployeeRosterDTO> employeeList, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Initialize "ShiftPatternChange" collection
+                List<ShiftPatternChange> shiftPatternChangeList = new List<ShiftPatternChange>();
+
+                shiftPatternChangeList = employeeList.Select(e => new ShiftPatternChange
+                {
+                    EmpNo = e.EmployeeNo,
+                    ShiftPatternCode = e.ShiftPatternCode,
+                    ShiftPointer = e.ShiftPointer,
+                    ChangeType = e.ChangeTypeCode,
+                    EffectiveDate = e.EffectiveDate!.Value,
+                    EndingDate = e.EndingDate,
+                    LastUpdateEmpNo = e.CreatedByEmpNo,
+                    LastUpdatedByName = e.CreatedByName,
+                    LastUpdateUserID = e.CreatedByUserID,
+                    LastUpdateDate = e.LastUpdateDate
+                }).ToList();
+                #endregion
+
+                var result = await _repository.SaveShiftPatternChangeAsync(shiftPatternChangeList, cancellationToken);
                 if (!result.Success)
                 {
                     if (!string.IsNullOrEmpty(result.Error))

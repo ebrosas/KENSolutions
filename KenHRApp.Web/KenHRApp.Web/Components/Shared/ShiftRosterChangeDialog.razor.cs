@@ -91,6 +91,28 @@ namespace KenHRApp.Web.Components.Shared
 
             return _changeTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
+
+        private void OnShiftRosterChanged(string newValue)
+        {
+            if (ShiftRosterDetail.ShiftPatternCode != newValue)
+            {
+                ShiftRosterDetail.ShiftPatternCode = newValue;
+
+                // Get the associated shift pointers
+                if (ShiftPatternList.Any())
+                {
+                    ShiftPatternMasterDTO? shiftPattern = ShiftPatternList.Where(s => s.ShiftPatternCode.Trim() == newValue).FirstOrDefault();
+                    if (shiftPattern != null)
+                    {
+                        _shiftPointerList = shiftPattern.ShiftPointerList;
+                        ShiftRosterDetail.ShiftPointerList = shiftPattern.ShiftPointerList;
+                    }
+                }
+
+                // Reset pointer when roster changes
+                ShiftRosterDetail.ShiftPointer = 0;
+            }
+        }
         #endregion
     }
 }

@@ -593,32 +593,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             bool isSuccess = true;
             string errorMsg = string.Empty;
 
-            //if (isNewRequition)
-            //{
-            //    // Set the user who created the record and the timestamp
-            //    _shiftPattern.CreatedDate = DateTime.Now;
-
             var saveResult = await AttendanceService.AddShiftPatternChangeAsync(employeeList.ToList(), _cts.Token);
             
             isSuccess = saveResult.Success;
             if (!isSuccess)
                 errorMsg = saveResult.Error!;
-            //else
-            //{
-            //    // Set flag to enable reload of _recruitmentRequests when navigating back to the Employe Search page
-            //    _forceLoad = true;
-            //}
-            //}
-            //else
-            //{
-            //    // Set the user who created the record and the timestamp
-            //    _shiftPattern.LastUpdateDate = DateTime.Now;
-
-            //    var saveResult = await AttendanceService.UpdateShiftRosterMasterAsync(_shiftPattern, _cts.Token);
-            //    isSuccess = saveResult.Success;
-            //    if (!isSuccess)
-            //        errorMsg = saveResult.Error!;
-            //}
 
             if (isSuccess)
             {

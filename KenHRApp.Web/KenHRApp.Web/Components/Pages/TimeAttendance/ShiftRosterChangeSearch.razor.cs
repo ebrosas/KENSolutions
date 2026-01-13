@@ -77,6 +77,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             Warning,
             Error
         }
+
+        private enum NotificationType
+        {
+            Normal,
+            Information,
+            Success,
+            Warning,
+            Error
+        }
         #endregion
 
         #region Page Events
@@ -229,6 +238,16 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     LastUpdatedByName = rosterChange.LastUpdatedByName
                 };
 
+                // Get the associated shift pointers
+                if (_shiftPatternList.Any())
+                {
+                    ShiftPatternMasterDTO? shiftPattern = _shiftPatternList.Where(s => s.ShiftPatternCode.Trim() == rosterChange.ShiftPatternCode).FirstOrDefault();
+                    if (shiftPattern != null)
+                    {
+                        editableCopy.ShiftPointerList = shiftPattern.ShiftPointerList;
+                    }
+                }
+
                 var parameters = new DialogParameters
                 {
                     ["ShiftRosterDetail"] = editableCopy,
@@ -277,15 +296,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _isRunning = true;
 
                     // Set the overlay message
-                    overlayMessage = "Saving employee shift roster changes, please wait...";
+                    overlayMessage = "Saving employee shift roster, please wait...";
 
-                    //_ = SaveChangeAsync(async () =>
-                    //{
-                    //    _isRunning = false;
+                    _ = SaveShiftRosterAsync(async () =>
+                    {
+                        _isRunning = false;
 
-                    //    // Shows the spinner overlay
-                    //    await InvokeAsync(StateHasChanged);
-                    //}, updated);
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, updated);
                     #endregion
                 }
             }
@@ -591,6 +610,66 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _errorMessage.AppendLine(errorMsg);
                     ShowHideError(true);
                 }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task SaveShiftRosterAsync(Func<Task> callback, ShiftPatternChangeDTO shiftRoster)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = true;
+            string errorMsg = string.Empty;
+
+            #region Initialize entity
+            List<EmployeeRosterDTO> employeeList = new List<EmployeeRosterDTO>();
+            employeeList.Add(new EmployeeRosterDTO()
+            {
+                EmployeeNo = shiftRoster.EmpNo,
+                ShiftPatternCode = shiftRoster.ShiftPatternCode,
+                ShiftPointer = shiftRoster.ShiftPointer,
+                ChangeTypeCode = shiftRoster.ChangeTypeCode,
+                EffectiveDate = shiftRoster.EffectiveDate,
+                EndingDate = shiftRoster.EndingDate,
+                LastUpdateDate = DateTime.Now
+
+            });
+            #endregion
+
+            var saveResult = await AttendanceService.UpdateShiftPatternChangeAsync(employeeList.ToList(), _cts.Token);
+
+            isSuccess = saveResult.Success;
+            if (!isSuccess)
+                errorMsg = saveResult.Error!;
+
+            if (isSuccess)
+            {
+                // Hide error message if any
+                ShowHideError(false);
+
+                // Show notification
+                ShowNotification("Employee Shift Roster has been saved successfully!", SnackBarTypes.Success);
+
+                // Go back to Shift Roster Master page
+                //Navigation.NavigateTo("/TimeAttendance/shiftrostersearch");
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(errorMsg);
+                ShowHideError(true);
             }
 
             if (callback != null)
