@@ -205,87 +205,141 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             try
             {
-                // Clone the object so the dialog can edit without affecting the grid until Save
-                //var editableCopy = new ShiftPatternChangeDTO
-                //{
-                //    BudgetId = rosterChange.BudgetId,
-                //    DepartmentCode = rosterChange.DepartmentCode,
-                //    DepartmentName = rosterChange.DepartmentName,
-                //    BudgetDescription = rosterChange.BudgetDescription,
-                //    BudgetHeadCount = rosterChange.BudgetHeadCount,
-                //    ActiveCount = rosterChange.ActiveCount,
-                //    ExitCount = rosterChange.ExitCount,
-                //    RequisitionCount = rosterChange.RequisitionCount,
-                //    NetGapCount = rosterChange.NetGapCount,
-                //    NewIndentCount = rosterChange.NewIndentCount,
-                //    OnHold = rosterChange.OnHold,
-                //    Remarks = rosterChange.Remarks,
-                //    CreatedDate = rosterChange.CreatedDate,
-                //    LastUpdateDate = rosterChange.LastUpdateDate
-                //};
+                //Clone the object so the dialog can edit without affecting the grid until Save
+                var editableCopy = new ShiftPatternChangeDTO
+                {
+                    ShiftPatternChangeId = rosterChange.ShiftPatternChangeId,
+                    EmpNo = rosterChange.EmpNo,
+                    EmpName = rosterChange.EmpName,
+                    DepartmentCode = rosterChange.DepartmentCode,
+                    DepartmentName = rosterChange.DepartmentName,
+                    EffectiveDate = rosterChange.EffectiveDate,
+                    EndingDate = rosterChange.EndingDate,
+                    ShiftPatternCode = rosterChange.ShiftPatternCode,
+                    ShiftPointer = rosterChange.ShiftPointer,
+                    ChangeTypeCode = rosterChange.ChangeTypeCode,
+                    ChangeTypeDesc = rosterChange.ChangeTypeDesc,
+                    CreatedByEmpNo = rosterChange.CreatedByEmpNo,
+                    CreatedByName = rosterChange.CreatedByName,
+                    CreatedByUserID = rosterChange.CreatedByUserID,
+                    CreatedDate = rosterChange.CreatedDate,
+                    LastUpdateDate = rosterChange.LastUpdateDate,
+                    LastUpdateEmpNo = rosterChange.LastUpdateEmpNo,
+                    LastUpdateUserID = rosterChange.LastUpdateUserID,
+                    LastUpdatedByName = rosterChange.LastUpdatedByName
+                };
 
-                //var parameters = new DialogParameters
-                //{
-                //    ["RecruitmentBudget"] = editableCopy,
-                //    ["DepartmentList"] = _departmentList,
-                //    ["IsClearable"] = true,
-                //    ["IsDisabled"] = false,
-                //    ["IsEditMode"] = true
-                //};
+                var parameters = new DialogParameters
+                {
+                    ["ShiftRosterDetail"] = editableCopy,
+                    ["ShiftPatternList"] = _shiftPatternList,
+                    ["ChangeTypeList"] = _changeTypeList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = true
+                };
 
-                //var options = new DialogOptions
-                //{
-                //    CloseOnEscapeKey = true,
-                //    BackdropClick = false,
-                //    FullWidth = true,
-                //    MaxWidth = MaxWidth.Medium,
-                //    CloseButton = false
-                //};
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
 
-                //var dialog = await DialogService.ShowAsync<RecruitmentBudgetDialog>("Edit Shift Roster Details", parameters, options);
-                //var result = await dialog.Result;
+                var dialog = await DialogService.ShowAsync<ShiftRosterChangeDialog>("Edit Shift Roster Details", parameters, options);
+                var result = await dialog.Result;
 
-                //if (result != null && !result.Canceled)
-                //{
-                //    var updated = (ShiftPatternChangeDTO)result.Data!;
+                if (result != null && !result.Canceled)
+                {
+                    var updated = (ShiftPatternChangeDTO)result.Data!;
 
-                //    #region Get selected department
-                //    if (!string.IsNullOrEmpty(updated.DepartmentName))
-                //    {
-                //        DepartmentDTO? department = _departmentList.Where(d => d.DepartmentName == updated.DepartmentName).FirstOrDefault();
-                //        if (department != null)
-                //            updated.DepartmentCode = department.DepartmentCode;
-                //    }
-                //    #endregion
+                    #region Get selected department
+                    //if (!string.IsNullOrEmpty(updated.DepartmentName))
+                    //{
+                    //    DepartmentDTO? department = _departmentList.Where(d => d.DepartmentName == updated.DepartmentName).FirstOrDefault();
+                    //    if (department != null)
+                    //        updated.DepartmentCode = department.DepartmentCode;
+                    //}
+                    #endregion
 
-                //    // Update in-memory grid item
-                //    var index = _budgetList.FindIndex(x => x.BudgetId == updated.BudgetId);
-                //    if (index >= 0)
-                //    {
-                //        _budgetList[index] = updated;
-                //        await InvokeAsync(StateHasChanged);
-                //    }
+                    // Update in-memory grid item
+                    //var index = _budgetList.FindIndex(x => x.BudgetId == updated.BudgetId);
+                    //if (index >= 0)
+                    //{
+                    //    _budgetList[index] = updated;
+                    //    await InvokeAsync(StateHasChanged);
+                    //}
 
-                //    #region Persist changes to DB
-                //    // Set flag to display the loading panel
-                //    _isRunning = true;
+                    #region Persist changes to DB
+                    // Set flag to display the loading panel
+                    _isRunning = true;
 
-                //    // Set the overlay message
-                //    overlayMessage = "Saving rosterChange changes, please wait...";
+                    // Set the overlay message
+                    overlayMessage = "Saving employee shift roster changes, please wait...";
 
-                //    _ = SaveChangeAsync(async () =>
-                //    {
-                //        _isRunning = false;
+                    //_ = SaveChangeAsync(async () =>
+                    //{
+                    //    _isRunning = false;
 
-                //        // Shows the spinner overlay
-                //        await InvokeAsync(StateHasChanged);
-                //    }, updated);
-                //    #endregion
-                //}
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, updated);
+                    #endregion
+                }
             }
             catch (Exception ex)
             {
                 await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+        #endregion
+
+        #region Asynchronous Tasks
+        private void BeginLoadComboboxTask()
+        {
+            _isTaskFinished = false;
+            _isRunning = true;
+
+            // Set the overlay message
+            //overlayMessage = "Initializing form, please wait...";
+
+            _ = LoadComboboxAsync(async () =>
+            {
+                _isTaskFinished = true;
+                _isRunning = false;
+
+                if (_errorMessage.Length > 0)
+                    ShowHideError(true);
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            });
+        }
+
+        private async Task LoadComboboxAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(300);
+
+            #region Get Shift Pattern list
+            var shiftPatternResult = await LookupCache.GetShiftPatternAsync(true);
+            if (shiftPatternResult.Success)
+            {
+                _shiftPatternList = shiftPatternResult.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(shiftPatternResult.Error);
+            }
+            #endregion
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
             }
         }
         #endregion
@@ -451,6 +505,32 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             // Reset error messages
             _errorMessage.Clear();
+
+            #region Get Change Type list
+            var changeTypeResult = await LookupCache.GetChangeTypeAsync();
+            if (changeTypeResult.Success)
+            {
+                _changeTypeList = changeTypeResult.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(changeTypeResult.Error);
+            }
+            #endregion
+
+            #region Get Shift Pattern list
+            var shiftPatternResult = await LookupCache.GetShiftPatternAsync(true);
+            if (shiftPatternResult.Success)
+            {
+                _shiftPatternList = shiftPatternResult.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(shiftPatternResult.Error);
+            }
+            #endregion
 
             var repoResult = await AttendanceService.SearchShiftPatternChangeAsync(0, 0, 0, string.Empty, string.Empty, null, null);
             if (repoResult.Success)

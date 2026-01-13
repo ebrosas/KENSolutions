@@ -549,7 +549,7 @@ namespace KenHRApp.Infrastructure.Repositories
                                    select new
                                    {
                                        ShiftPatternChange = spc,
-                                       EmpName = $"{emp.FirstName} - {emp.LastName}",
+                                       EmpName = $"{emp.FirstName} {emp.LastName}",
                                        DepartmentCode = dep.DepartmentCode,
                                        DepartmentName = dep.DepartmentName,
                                        ChangeTypeDesc = ct.UDCDesc1

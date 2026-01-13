@@ -1,0 +1,116 @@
+﻿@using KenHRApp.Web.Components.Common
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@DialogIcon" Class="mr-1 mb-n1" Size="Size.Medium" Color="@DialogIconColor" />
+            @DialogTitle
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudGrid Spacing="7">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudTextField @bind-Value="ShiftRosterDetail.EmpNo" Label="Employee No." Disabled="true"
+                            Variant="Variant.Filled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                     </MudPaper>
+                 </MudItem>
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudTextField @bind-Value="ShiftRosterDetail.EmpName" Label="Employee Name" Disabled="true"
+                                      Variant="Variant.Filled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                     </MudPaper>
+                 </MudItem>
+             </MudGrid>
+            <MudGrid Spacing="7">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudTextField @bind-Value="ShiftRosterDetail.DepartmentName" Label="Department" Disabled="true"
+                                      Variant="Variant.Filled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudAutocomplete @bind-Value="ShiftRosterDetail.ChangeTypeCode"
+                                         SearchFunc="SearchChangeType!"
+                                         Variant="Variant.Text"
+                                         Label="Change Type"
+                                         Margin="Margin.Normal"
+                                         Dense="true"
+                                         Placeholder="Please Select"
+                                         HelperText="Type a key to filter the list"
+                                         HelperTextOnFocus="true"
+                                         Clearable="true" Typo="Typo.subtitle2"
+                                         MaxItems="@(ChangeTypeList != null ? ChangeTypeList.Count : 10)"
+                                         Modal="true" />
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+             <MudGrid Spacing="7">
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudAutocomplete @bind-Value="ShiftRosterDetail.ShiftPatternCode"
+                                SearchFunc="SearchShiftPattern!"
+                                Variant="Variant.Text"
+                                Label="Shift Roster"
+                                Margin="Margin.Normal"
+                                Dense="true" Clearable="true"
+                                Placeholder="Please Select"
+                                         HelperText="Type a key to filter the list"
+                                HelperTextOnFocus="true"
+                                Typo="Typo.subtitle2"
+                                MaxItems="@(ShiftPatternList != null ? ShiftPatternList.Count : 10)"
+                                Required RequiredError="Shift Roster is required"
+                                Modal="true" />
+                     </MudPaper>
+                 </MudItem>
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudSelect @bind-Value="ShiftRosterDetail.ShiftPointer"
+                            For="@(() => ShiftRosterDetail.ShiftPointer)"
+                            Variant="Variant.Text" Margin="Margin.Dense"
+                            Label="Shift Pointer" Clearable="true"
+                            Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                            Required RequiredError="Shift Pointer is required"
+                            Immediate="true" Typo="Typo.subtitle2">
+                            @foreach (var pointer in _shiftPointerList)
+                            {
+                                <MudSelectItem Value="pointer.ShiftPointer">@($"{pointer.ShiftPointer} - {pointer.ShiftDescription}")</MudSelectItem>
+                            }
+                        </MudSelect>
+                     </MudPaper>
+                 </MudItem>
+             </MudGrid>
+             
+             <MudGrid Spacing="7">
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudDatePicker Color="Color.Info" Editable="true"
+                            @bind-Date="ShiftRosterDetail.EffectiveDate"
+                            Label="Effective Date"
+                            For="@(() => ShiftRosterDetail.EffectiveDate)"
+                            Required RequiredError="Effective Date is required"
+                            MinDate="DateTime.Today"
+                            Placeholder="Select Date" />
+                     </MudPaper>
+                 </MudItem>
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudDatePicker Color="Color.Info" Editable="true"
+                            @bind-Date="ShiftRosterDetail.EndingDate"
+                            Label="Ending Date"
+                            For="@(() => ShiftRosterDetail.EndingDate)"
+                            MinDate="DateTime.Today"
+                            Placeholder="Select Date" />
+                     </MudPaper>
+                 </MudItem>
+             </MudGrid>
+         </MudForm>
+     </DialogContent>
+
+     <DialogActions>
+         <MudButton Color="Color.Default" Variant="Variant.Text" Size="Size.Medium" OnClick="Cancel">Cancel</MudButton>
+         <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
+     </DialogActions>
+ </MudDialog>
