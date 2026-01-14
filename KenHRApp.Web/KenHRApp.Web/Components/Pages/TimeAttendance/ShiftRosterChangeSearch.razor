@@ -22,21 +22,21 @@
                  </MudMenu> *@
              </MudAppBar>
              <MudPaper Elevation="5" Square="true" Class="w-100 mb-2">
-                <div class="shift-roster-grid mb-4">
-                     <MudDataGrid T="ShiftPatternChangeDTO" Items="@_shiftRosterChangeList" Hover="true" Striped="true"
-                                  TableClass="fixed-table" Dense="false" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true" Bordered="false"
-                                  Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
-                                  QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
-                                  EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
-                                  EditDialogOptions="new DialogOptions
+                <MudDataGrid T="ShiftPatternChangeDTO" Items="@_shiftRosterChangeList" Hover="true" Striped="true" Class="shift-roster-grid"
+                    ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true" Bordered="false"
+                    Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                    QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                    EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                    EditDialogOptions="new DialogOptions
                     {
                         MaxWidth = MaxWidth.Small,
                         FullWidth = true,
                         BackdropClick = false,
                         CloseOnEscapeKey = false
                     }"
-                    StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges">
-                         <ToolBarContent>
+                    StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
+                    TableLayout="TableLayout.Fixed" Dense="true">
+                    <ToolBarContent>
                              <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
                                  <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
                                                Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"
@@ -68,7 +68,7 @@
                             <PropertyColumn Property="x => x.DepartmentFullName" Title="Department" Class="col-department" />
                             <PropertyColumn Property="x => x.ShiftPatternCode" Title="Shift Roster Code" Class="col-shift-pattern">
                                  <CellTemplate Context="row">
-                                     <MudChip T="string" Size=Size.Small Color="Color.Secondary" Label="true" Class="fw-bold" Style="font-size: 14px;">
+                                     <MudChip T="string" Size=Size.Small Color="Color.Default" Label="true" Class="fw-bold" Style="font-size: 14px;">
                                          @row.Item.ShiftPatternCode
                                     </MudChip>
                                 </CellTemplate>
@@ -166,7 +166,7 @@
                             </PropertyColumn>
                             <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                                 <CellTemplate Context="row">
-                                    <MudIconButton Color="Color.Info" title="Edit shift roster details"
+                                <MudIconButton Color="Color.Tertiary" title="Edit shift roster details"
                                                    Icon="@Icons.Material.Rounded.Edit"
                                                    OnClick="@(() => EditRosterChangeAsync(row.Item))">
                                     </MudIconButton>
@@ -187,7 +187,6 @@
                             <MudDataGridPager T="ShiftPatternChangeDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
                         </PagerContent>
                     </MudDataGrid>
-                </div>                
             </MudPaper>
             <MudScrollToTop TopOffset="100"
                             Selector="#mainPanel"

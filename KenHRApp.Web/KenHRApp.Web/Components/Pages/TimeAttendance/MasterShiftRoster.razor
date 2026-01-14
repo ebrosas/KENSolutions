@@ -236,10 +236,10 @@
                                                      @row.Item.LastUpdateDate?.ToString("dd-MMM-yyyy h:mm tt")
                                                 </CellTemplate>
                                             </PropertyColumn>
-                                            <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                                            <TemplateColumn Hidden="@(!_allowGridEdit)" CellClass="d-flex justify-end">
                                                 <EditTemplate Context="row">
                                                     <MudIconButton Size="@Size.Medium" Icon="@Icons.Material.Outlined.Delete"
-                                                        Color="Color.Error" title="Delete shift timing schedule"
+                                                        Color="Color.Error" title="Delete shift timing schedule" 
                                                         OnClick="@(() => DeleteShiftTiming(row.Item))" />
                                                 </EditTemplate>
                                             </TemplateColumn>
@@ -333,7 +333,7 @@
                                                     </MudSelect>
                                                 </EditTemplate>
                                             </PropertyColumn>
-                                            <TemplateColumn CellClass="d-flex justify-end">
+                                            <TemplateColumn Hidden="@(!_allowGridEdit)" CellClass="d-flex justify-end">
                                                 <EditTemplate Context="row">
                                                     <MudIconButton Size="@Size.Medium" Icon="@Icons.Material.Outlined.Delete"
                                                                    Color="Color.Error" title="Delete shift timing sequence"

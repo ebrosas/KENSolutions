@@ -227,24 +227,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 DurationRamadan = 6
             });
             #endregion
-
-            #region Populate Shift Master Pointer List
-            //_shiftMasterPointerList.Add(new ShiftMasterDTO()
-            //{
-            //    ShiftCode = "D",
-            //    ShiftDescription = "Day",
-            //    ArrivalFrom = new TimeSpan(6, 0, 0),
-            //    ArrivalTo = new TimeSpan(7, 30, 0),
-            //    DepartFrom = new TimeSpan(16, 0, 0),
-            //    DepartTo = new TimeSpan(16, 30, 0),
-            //    DurationNormal = 8,
-            //    RArrivalFrom = new TimeSpan(6, 0, 0),
-            //    RArrivalTo = new TimeSpan(7, 30, 0),
-            //    RDepartFrom = new TimeSpan(13, 30, 0),
-            //    RDepartTo = new TimeSpan(14, 00, 0),
-            //    DurationRamadan = 6
-            //});
-            #endregion
         }
         #endregion
 

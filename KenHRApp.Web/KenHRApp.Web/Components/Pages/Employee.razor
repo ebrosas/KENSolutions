@@ -557,22 +557,6 @@
                                                 <MudSelectItem Value="job.UDCDesc1">@job.UDCDesc1</MudSelectItem>
                                             }
                                         </MudSelect>     
-                                        @* <MudAutocomplete @bind-Value="employee.JobTitleDesc"
-                                            For="@(() => employee.JobTitleDesc)"
-                                            Class="employee-autocomplete"
-                                            SearchFunc="SearchJobTitle!"
-                                            Variant="Variant.Text"
-                                            Label="Job Title"
-                                            Margin="Margin.Dense"
-                                            Dense="true"
-                                            Placeholder="Please Select"
-                                            HelperText="Type a key to search for value"
-                                            HelperTextOnFocus="true"
-                                            Clearable="@_isCboClearable" 
-                                            Typo="Typo.subtitle2"
-                                            Disabled="@_isDisabled"
-                                            MaxItems="@(_jobTitleList != null ? _jobTitleList.Count : 10)"
-                                            Modal="true" /> *@
                                     </MudPaper>
                                     <MudPaper Elevation="0" Class="p-0" Style="width: 300px;">
                                         <MudAutocomplete @bind-Value="employee.PayGradeDesc"

@@ -1880,10 +1880,11 @@ h1:focus {
 
 /* Grid Column widths */
 .shift-roster-grid .col-shift-pattern {
-    width: 100px !important;
+    width: 90px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 20px;
 }
 
 .shift-roster-grid .col-shift-description {
@@ -1978,7 +1979,7 @@ h1:focus {
 }
 
 .shift-roster-grid .col-employee-name {
-    width: 150px !important;
+    width: 250px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1999,7 +2000,7 @@ h1:focus {
 }
 
 .shift-roster-grid .col-department {
-    width: 150px !important;
+    width: 250px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
