@@ -50,6 +50,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/", icon: Icons.Material.Filled.Home),
+            new("Shift Roster Master", href: "/TimeAttendance/shiftrostersearch", icon: @Icons.Material.Filled.CalendarMonth),
             new("Shift Roster Change History", href: null, disabled: true, @Icons.Material.Filled.History)
         ];
 
@@ -155,7 +156,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Delete"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to delete the shift roster changes for the following employee: '{shiftRoster.EmpNo} - {shiftRoster.EmpName}'?" },
+                { "ContentText", $"Are you sure you want to delete the shift roster for the following employee: '{shiftRoster.EmpNo} - {shiftRoster.EmpName}'?" },
                 { "ConfirmText", "Delete" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -274,22 +275,16 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 {
                     var updated = (ShiftPatternChangeDTO)result.Data!;
 
-                    #region Get selected department
-                    //if (!string.IsNullOrEmpty(updated.DepartmentName))
-                    //{
-                    //    DepartmentDTO? department = _departmentList.Where(d => d.DepartmentName == updated.DepartmentName).FirstOrDefault();
-                    //    if (department != null)
-                    //        updated.DepartmentCode = department.DepartmentCode;
-                    //}
-                    #endregion
+                    // Set the update time stamp
+                    updated.LastUpdateDate = DateTime.Now;
 
                     // Update in-memory grid item
-                    //var index = _budgetList.FindIndex(x => x.BudgetId == updated.BudgetId);
-                    //if (index >= 0)
-                    //{
-                    //    _budgetList[index] = updated;
-                    //    await InvokeAsync(StateHasChanged);
-                    //}
+                    var index = _shiftRosterChangeList.FindIndex(x => x.ShiftPatternChangeId == updated.ShiftPatternChangeId);
+                    if (index >= 0)
+                    {
+                        _shiftRosterChangeList[index] = updated;
+                        await InvokeAsync(StateHasChanged);
+                    }
 
                     #region Persist changes to DB
                     // Set flag to display the loading panel
@@ -488,7 +483,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set the overlay message
                 overlayMessage = "Deleting shift roster change, please wait...";
 
-                _ = DeleteShiftRosterChangeAsync(async () =>
+                _ = DeleteShiftRosterAsync(async () =>
                 {
                     _isRunning = false;
 
@@ -571,7 +566,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task DeleteShiftRosterChangeAsync(Func<Task> callback, ShiftPatternChangeDTO shiftRoster)
+        private async Task DeleteShiftRosterAsync(Func<Task> callback, ShiftPatternChangeDTO shiftRoster)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(500);
@@ -585,22 +580,22 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             bool isSuccess = false;
             string errorMsg = string.Empty;
 
-            //if (shiftRoster.ShiftPatternId == 0)
-            //{
-            //    errorMsg = "Shift Pattern ID is not defined.";
-            //}
-            //else
-            //{
-            //    var deleteResult = await AttendanceService.DeleteShiftRosterMasterAsync(shiftRoster.ShiftPatternId, _cts.Token);
-            //    isSuccess = deleteResult.Success;
-            //    if (!isSuccess)
-            //        errorMsg = deleteResult.Error!;
-            //}
+            if (shiftRoster.ShiftPatternChangeId == 0)
+            {
+                errorMsg = "The grid selected row identity is not defined. Please refresh the page and select the row to delete from the grid.";
+            }
+            else
+            {
+                var deleteResult = await AttendanceService.DeleteShiftPatternChangeAsync(shiftRoster.ShiftPatternChangeId, _cts.Token);
+                isSuccess = deleteResult.Success;
+                if (!isSuccess)
+                    errorMsg = deleteResult.Error!;
+            }
 
             if (isSuccess)
             {
                 // Show notification
-                ShowNotification("The selected Shift Roster has been deleted successfully!", SnackBarTypes.Success);
+                ShowNotification("The selected employee roster has been deleted successfully!", SnackBarTypes.Success);
             }
             else
             {
@@ -619,7 +614,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task SaveShiftRosterAsync(Func<Task> callback, ShiftPatternChangeDTO shiftRoster)
+        private async Task SaveShiftRosterAsync(Func<Task> callback, ShiftPatternChangeDTO dto)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(500);
@@ -634,22 +629,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             string errorMsg = string.Empty;
 
             #region Initialize entity
-            List<EmployeeRosterDTO> employeeList = new List<EmployeeRosterDTO>();
-            employeeList.Add(new EmployeeRosterDTO()
+            EmployeeRosterDTO rosterChange = new EmployeeRosterDTO()
             {
-                EmployeeNo = shiftRoster.EmpNo,
-                ShiftPatternCode = shiftRoster.ShiftPatternCode,
-                ShiftPointer = shiftRoster.ShiftPointer,
-                ChangeTypeCode = shiftRoster.ChangeTypeCode,
-                EffectiveDate = shiftRoster.EffectiveDate,
-                EndingDate = shiftRoster.EndingDate,
-                LastUpdateDate = DateTime.Now
+                AutoId = dto.ShiftPatternChangeId,
+                EmployeeNo = dto.EmpNo,
+                ShiftPatternCode = dto.ShiftPatternCode,
+                ShiftPointer = dto.ShiftPointer,
+                ChangeTypeCode = dto.ChangeTypeCode,
+                EffectiveDate = dto.EffectiveDate,
+                EndingDate = dto.EndingDate,
+                LastUpdateDate = dto.LastUpdateDate
 
-            });
+            };
             #endregion
 
-            var saveResult = await AttendanceService.UpdateShiftPatternChangeAsync(employeeList.ToList(), _cts.Token);
-
+            var saveResult = await AttendanceService.UpdateShiftPatternChangeAsync(rosterChange, _cts.Token);
             isSuccess = saveResult.Success;
             if (!isSuccess)
                 errorMsg = saveResult.Error!;
@@ -660,7 +654,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 ShowHideError(false);
 
                 // Show notification
-                ShowNotification("Employee Shift Roster has been saved successfully!", SnackBarTypes.Success);
+                ShowNotification("Employee roster has been saved successfully!", SnackBarTypes.Success);
 
                 // Go back to Shift Roster Master page
                 //Navigation.NavigateTo("/TimeAttendance/shiftrostersearch");

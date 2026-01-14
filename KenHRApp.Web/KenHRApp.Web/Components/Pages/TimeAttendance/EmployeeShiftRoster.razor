@@ -177,13 +177,25 @@
                  <MudPaper Elevation="4" Square="true" Class="w-100">
                      <div class="shift-roster-grid">
                         <MudDataGrid T="EmployeeRosterDTO" Items="@employeeList" Hover="true" Striped="true"
-                            Filterable="_enableGridFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
-                            Hideable="true" PageSize="5"
-                            EditTrigger="DataGridEditTrigger.OnRowClick" ReadOnly="@(!_allowGridEdit)" EditMode="DataGridEditMode.Cell"
+                                      Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                            QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                            EditTrigger="DataGridEditTrigger.OnRowClick" ReadOnly="false" EditMode="DataGridEditMode.Cell"
                             StartedEditingItem="@StartedEditingGridItem"
                             CommittedItemChanges="@CommittedGridItemChanges"
                             TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true"
                             @ref="_rosterGrid">
+                             <ToolBarContent>
+                                 <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                                     <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
+                                                   Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"
+                                                   AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                                     </MudTextField>
+                                 </MudPaper>
+                                 <MudSpacer />
+                                 <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                     <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
+                                 </MudPaper>
+                             </ToolBarContent>
                             <Columns>
                                  <PropertyColumn Property="x => x.EmployeeId" Hidden />
                                  <PropertyColumn Property="x => x.EmployeeNo" Title="Employee No." Class="col-employee-no" Editable="false" />

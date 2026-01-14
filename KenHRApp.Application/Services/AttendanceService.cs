@@ -354,7 +354,7 @@ namespace KenHRApp.Application.Services
                 }).ToList();
                 #endregion
 
-                var result = await _repository.SaveShiftPatternChangeAsync(shiftPatternChangeList, cancellationToken);
+                var result = await _repository.AddShiftPatternChangeAsync(shiftPatternChangeList, cancellationToken);
                 if (!result.Success)
                 {
                     if (!string.IsNullOrEmpty(result.Error))
@@ -371,29 +371,28 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<Result<int>> UpdateShiftPatternChangeAsync(List<EmployeeRosterDTO> employeeList, CancellationToken cancellationToken = default)
+        public async Task<Result<int>> UpdateShiftPatternChangeAsync(EmployeeRosterDTO dto, CancellationToken cancellationToken = default)
         {
             try
             {
-                #region Initialize "ShiftPatternChange" collection
-                List<ShiftPatternChange> shiftPatternChangeList = new List<ShiftPatternChange>();
-
-                shiftPatternChangeList = employeeList.Select(e => new ShiftPatternChange
+                #region Initialize entity
+                ShiftPatternChange rosterChange = new ShiftPatternChange()
                 {
-                    EmpNo = e.EmployeeNo,
-                    ShiftPatternCode = e.ShiftPatternCode,
-                    ShiftPointer = e.ShiftPointer,
-                    ChangeType = e.ChangeTypeCode,
-                    EffectiveDate = e.EffectiveDate!.Value,
-                    EndingDate = e.EndingDate,
-                    LastUpdateEmpNo = e.CreatedByEmpNo,
-                    LastUpdatedByName = e.CreatedByName,
-                    LastUpdateUserID = e.CreatedByUserID,
-                    LastUpdateDate = e.LastUpdateDate
-                }).ToList();
+                    AutoId = dto.AutoId,
+                    EmpNo = dto.EmployeeNo,
+                    ShiftPatternCode = dto.ShiftPatternCode,
+                    ShiftPointer = dto.ShiftPointer,
+                    ChangeType = dto.ChangeTypeCode,
+                    EffectiveDate = dto.EffectiveDate!.Value,
+                    EndingDate = dto.EndingDate,
+                    LastUpdateEmpNo = dto.CreatedByEmpNo,
+                    LastUpdatedByName = dto.CreatedByName,
+                    LastUpdateUserID = dto.CreatedByUserID,
+                    LastUpdateDate = dto.LastUpdateDate
+                };
                 #endregion
 
-                var result = await _repository.SaveShiftPatternChangeAsync(shiftPatternChangeList, cancellationToken);
+                var result = await _repository.UpdateShiftPatternChangeAsync(rosterChange, cancellationToken);
                 if (!result.Success)
                 {
                     if (!string.IsNullOrEmpty(result.Error))
@@ -498,6 +497,27 @@ namespace KenHRApp.Application.Services
             catch (Exception ex)
             {
                 return Result<ShiftPatternChangeDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the shift roster change records in the database.");
+            }
+        }
+
+        public async Task<Result<bool>> DeleteShiftPatternChangeAsync(int autoID, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _repository.DeleteShiftPatternChangeAsync(autoID, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to delete shift roster due to unknown error. Please refresh the page then try to delete again.");
+                }
+
+                return Result<bool>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString());
             }
         }
         #endregion

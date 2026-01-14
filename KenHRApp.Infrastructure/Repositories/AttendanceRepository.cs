@@ -408,7 +408,7 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        public async Task<Result<int>> SaveShiftPatternChangeAsync(List<ShiftPatternChange> dto, CancellationToken cancellationToken = default)
+        public async Task<Result<int>> AddShiftPatternChangeAsync(List<ShiftPatternChange> dto, CancellationToken cancellationToken = default)
         {
             int rowsUpdated = 0;
 
@@ -420,14 +420,13 @@ namespace KenHRApp.Infrastructure.Repositories
                     {
                         var existingShiftRoster = await _db.ShiftPatternChanges
                             .FirstOrDefaultAsync(sp => sp.EmpNo == shiftRoster.EmpNo &&
-                                sp.ShiftPatternCode == shiftRoster.ShiftPatternCode && 
-                                //sp.ShiftPointer == shiftRoster.ShiftPointer &&
+                                sp.ShiftPatternCode == shiftRoster.ShiftPatternCode &&
+                                sp.ShiftPointer == shiftRoster.ShiftPointer &&
                                 sp.EffectiveDate == shiftRoster.EffectiveDate, cancellationToken);
 
                         if (existingShiftRoster != null)
                         {
                             // Update existing shift roster
-                            existingShiftRoster.ShiftPointer = shiftRoster.ShiftPointer;
                             existingShiftRoster.ChangeType = shiftRoster.ChangeType;
                             existingShiftRoster.EffectiveDate = shiftRoster.EffectiveDate;
                             existingShiftRoster.EndingDate = shiftRoster.EndingDate;
@@ -463,6 +462,45 @@ namespace KenHRApp.Infrastructure.Repositories
 
                 // Save to database
                 rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> UpdateShiftPatternChangeAsync(ShiftPatternChange dto, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                // Update existing shift roster
+                var rosterToUpdate = await _db.ShiftPatternChanges
+                    .FirstOrDefaultAsync(sp => sp.AutoId == dto.AutoId, cancellationToken);
+                if (rosterToUpdate != null)
+                {
+                    rosterToUpdate.ShiftPointer = dto.ShiftPointer;
+                    rosterToUpdate.ChangeType = dto.ChangeType;
+                    rosterToUpdate.EffectiveDate = dto.EffectiveDate;
+                    rosterToUpdate.EndingDate = dto.EndingDate;
+                    rosterToUpdate.LastUpdateDate = dto.LastUpdateDate;
+                    rosterToUpdate.LastUpdateEmpNo = dto.LastUpdateEmpNo;
+                    rosterToUpdate.LastUpdatedByName = dto.LastUpdatedByName;
+                    rosterToUpdate.LastUpdateUserID = dto.LastUpdateUserID;
+
+                    // Save to database
+                    _db.ShiftPatternChanges.Update(rosterToUpdate);
+
+                    // Save to database
+                    rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                }
 
                 return Result<int>.SuccessResult(rowsUpdated);
             }
@@ -644,6 +682,34 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 // Log error here if needed (Serilog, NLog, etc.)
                 return Result<ShiftPatternChange?>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<bool>> DeleteShiftPatternChangeAsync(int autoId, CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var shiftRoster = await _db.ShiftPatternChanges.FindAsync(autoId);
+                if (shiftRoster == null)
+                    throw new Exception("Could not delete shift roster because record is not found in the database.");
+
+                _db.ShiftPatternChanges.Remove(shiftRoster);
+
+                int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
+                if (rowsDeleted > 0)
+                    isSuccess = true;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Database error: {ex.Message}");
             }
         }
         #endregion

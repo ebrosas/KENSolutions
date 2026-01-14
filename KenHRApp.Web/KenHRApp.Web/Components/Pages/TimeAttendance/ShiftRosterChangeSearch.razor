@@ -14,12 +14,12 @@
                         CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
         <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
             <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
-                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">SHIFT ROSTER CHANGE LIST</MudText>
+                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">EMPLOYEE ROSTER LIST</MudText>
                 <MudSpacer />
-                <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
+               @*  <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add New Shift Roster" OnClick="AddShiftRoster" />
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Manage Employee Shift Roster" OnClick="OpenEmployeeShiftRoster" />
-                 </MudMenu>
+                 </MudMenu> *@
              </MudAppBar>
              <MudPaper Elevation="5" Square="true" Class="w-100 mb-2">
                 <div class="shift-roster-grid mb-4">
@@ -46,23 +46,29 @@
                              <MudSpacer />
                              <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
                                  <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
-                                 <MudPaper Class="ms-3" Elevation="0">
+                                 <MudPaper Class="ms-3" Elevation="0" hidden>
                                      <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new shift roster" OnClick="AddShiftRoster" />
                                  </MudPaper>
                              </MudPaper>
                          </ToolBarContent>
                          <Columns>
-                             <PropertyColumn Property="x => x.ShiftPatternChangeId" Hidden Editable="false">
+                            <PropertyColumn Property="x => x.ShiftPatternChangeId" Hidden Editable="false">
                                  <EditTemplate>
                                      @* Empty to prevent rendering *@
                                  </EditTemplate>
-                             </PropertyColumn>
-                             <PropertyColumn Property="x => x.EmpNo" Title="Employee No." Class="col-employee-no" />
-                             <PropertyColumn Property="x => x.EmpName" Title="Employee Name" Class="col-employee-name" />
-                             <PropertyColumn Property="x => x.DepartmentFullName" Title="Department" Class="col-department" />
-                             <PropertyColumn Property="x => x.ShiftPatternCode" Title="Shift Roster Code" Class="col-shift-pattern">
+                            </PropertyColumn>
+                             <PropertyColumn Property="x => x.EmpNo" Title="Employee No." Class="col-employee-no" StickyLeft="true">
                                  <CellTemplate Context="row">
                                      <MudChip T="string" Size=Size.Small Color="Color.Primary" Label="true" Class="fw-bold" Style="font-size: 14px;">
+                                         @row.Item.EmpNo
+                                    </MudChip>
+                                </CellTemplate>
+                            </PropertyColumn>
+                            <PropertyColumn Property="x => x.EmpName" Title="Employee Name" Class="col-employee-name" />
+                            <PropertyColumn Property="x => x.DepartmentFullName" Title="Department" Class="col-department" />
+                            <PropertyColumn Property="x => x.ShiftPatternCode" Title="Shift Roster Code" Class="col-shift-pattern">
+                                 <CellTemplate Context="row">
+                                     <MudChip T="string" Size=Size.Small Color="Color.Secondary" Label="true" Class="fw-bold" Style="font-size: 14px;">
                                          @row.Item.ShiftPatternCode
                                     </MudChip>
                                 </CellTemplate>
@@ -113,7 +119,7 @@
                             </PropertyColumn>
                             <PropertyColumn Property="x => x.EffectiveDate" Title="Effective Date" Class="col-effective-date">
                                 <CellTemplate>
-                                    @context.Item.CreatedDate?.ToString("dd-MMM-yyyy")
+                                    @context.Item.EffectiveDate?.ToString("dd-MMM-yyyy")
                                 </CellTemplate>
                                 <EditTemplate Context="row">
                                     <MudDatePicker Color="Color.Info" Editable="true"
@@ -127,7 +133,7 @@
                              </PropertyColumn>
                              <PropertyColumn Property="x => x.EndingDate" Title="Ending Date" Class="col-ending-date">
                                  <CellTemplate>
-                                     @context.Item.CreatedDate?.ToString("dd-MMM-yyyy")
+                                     @context.Item.EndingDate?.ToString("dd-MMM-yyyy")
                                 </CellTemplate>
                                 <EditTemplate Context="row">
                                     <MudDatePicker Color="Color.Info" Editable="true"

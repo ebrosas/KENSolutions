@@ -47,6 +47,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private UserDefinedCodeDTO? _selectedEmploymentType = null;
         private StringBuilder _errorMessage = new StringBuilder();
         private CancellationTokenSource? _cts;
+        private string _searchString = string.Empty;
 
         private string _selectedDepartment = string.Empty;
         private string[]? _departmentArray = null;
@@ -71,12 +72,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _isTaskFinished = false;
         private bool _isRunning = false;
         private bool _showErrorAlert = false;
-        private bool _enableGridFilter = false;
         private bool _allowGridEdit = false;
         private bool _isDisabled = false;
         private bool _saveBtnEnabled = false;
         private bool _hasValidationError = false;
         private bool _isEditMode = false;
+        private bool _enableFilter = false;
         #endregion
 
         #region Enums
@@ -248,6 +249,26 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Grid Events
+        private Func<EmployeeRosterDTO, bool> _quickFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(_searchString))
+                return true;
+
+            if (x.EmployeeNo > 0 && x.EmployeeNo.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.EmployeeName) && x.EmployeeName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.ShiftPatternCode) && x.ShiftPatternCode.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.DepartmentFullName) && x.DepartmentFullName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
+        };
+
         private async Task StartedEditingGridItem(EmployeeRosterDTO item)
         {
             //await EditBudgetAsync(item);
@@ -568,7 +589,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _selectedEmployeeStatus = null;
             _selectedEmploymentType = null;
             _selectedDepartment = string.Empty;
+            _searchString = string.Empty;
             employeeList = new List<EmployeeRosterDTO>();
+            _validationMessages.Clear();
 
             if (callback != null)
             {

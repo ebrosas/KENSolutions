@@ -66,6 +66,8 @@ namespace KenHRApp.Application.DTOs
         #endregion
 
         #region Extended Properties
+        public int AutoId { get; set; }
+
         public string EmployeeName
         {
             get { return $"{FirstName} {LastName}"; }

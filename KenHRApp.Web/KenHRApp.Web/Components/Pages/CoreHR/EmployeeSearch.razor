@@ -162,7 +162,13 @@
                     TableLayout="TableLayout.Fixed" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
                     <Columns>
                         <PropertyColumn Property="x => x.EmployeeId" Hidden />
-                        <PropertyColumn Property="x => x.EmployeeNo" Title="Employee No." Class="col-employee-code" />
+                         <PropertyColumn Property="x => x.EmployeeNo" Title="Employee No." Class="col-employee-code" StickyLeft="true">
+                             <CellTemplate Context="row">
+                                 <MudChip T="string" Size=Size.Small Color="Color.Primary" Label="true" Class="fw-bold" Style="font-size: 14px;">
+                                     @row.Item.EmployeeNo
+                                </MudChip>
+                            </CellTemplate>
+                        </PropertyColumn>
                         <PropertyColumn Property="x => x.FirstName" Title="First Name" Class="col-first-name" />
                         <PropertyColumn Property="x => x.LastName" Title="Last Name" Class="col-last-name" />
                         <PropertyColumn Property="x => x.Gender" Class="col-gender" />
@@ -182,7 +188,7 @@
                                  <MudChip T="string" Size=Size.Small Color="@(row.Item.EmployeeStatusCode == "STATACTIVE" ? Color.Success
                                      : (row.Item.EmployeeStatusCode == "STATRESIGNED" || row.Item.EmployeeStatusCode == "STATRETIRED" || row.Item.EmployeeStatusCode == "STATTERMINATED" || row.Item.EmployeeStatusCode == "STATINACTIVE") ? Color.Error
                                      : (row.Item.EmployeeStatusCode == "STATSUSPENDED" || row.Item.EmployeeStatusCode == "STATHOLD") ? Color.Warning
-                                     : (row.Item.EmployeeStatusCode == "STATNEWJOIN" || row.Item.EmployeeStatusCode == "STATHOLD") ? Color.Primary
+                                     : (row.Item.EmployeeStatusCode == "STATNEWJOIN" || row.Item.EmployeeStatusCode == "STATHOLD") ? Color.Info
                                      : (row.Item.EmployeeStatusCode == "STATPENDING" || row.Item.EmployeeStatusCode == "STATNOTJOIN") ? Color.Secondary
                                      : Color.Default)">
                                      @row.Item.EmployeeStatus
@@ -191,13 +197,14 @@
                         </PropertyColumn>
                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                             <CellTemplate>
-                                 <MudIconButton Color="Color.Info" title="View and edit employee information" Class="show-btn fa-icon-btn"
-                                                OnClick="@(()=>GoToEmployeeDetail(context.Item))">
+                                <MudIconButton Color="Color.Info" title="View and edit employee information" Icon="@Icons.Material.Rounded.Edit"
+                                    OnClick="@(()=>GoToEmployeeDetail(context.Item))">
                                     <ChildContent>
                                         <i class="fas fa-edit fa-1x"></i>
                                     </ChildContent>
                                 </MudIconButton>
-                                 <MudIconButton Color="Color.Error" title="Delete employee record" Class="hide-btn fa-icon-btn" OnClick="@context.Actions.StartEditingItemAsync">
+                                <MudIconButton Color="Color.Error" title="Delete employee record" Icon="@Icons.Material.Rounded.DeleteForever" hidden
+                                    OnClick="@context.Actions.StartEditingItemAsync">
                                     <ChildContent>
                                         <i class="fas fa-trash-alt fa-lg"></i>
                                     </ChildContent>
