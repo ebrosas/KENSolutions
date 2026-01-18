@@ -12,5 +12,31 @@
     <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
         <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
             CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
+        <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
+            <MudGrid Spacing="0">
+                <MudItem xs="4" sm="4" Class="px-4">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Secondary"
+                            Rounded="true" Elevation="1" Date="@(DateTime.Today)" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="4" sm="4" Class="px-4">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Secondary"
+                                       Rounded="true" Elevation="1" Date="@(DateTime.Today)" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="4" sm="4" Class="px-4">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+            <MudScrollToTop TopOffset="100"
+                            Selector="#mainPanel"
+                            VisibleCssClass="visible absolute"
+                            HiddenCssClass="hidden absolute">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+            </MudScrollToTop>
+        </MudStack>
     </div>
 </MudContainer>
