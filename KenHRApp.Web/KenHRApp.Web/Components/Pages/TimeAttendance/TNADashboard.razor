@@ -12,31 +12,55 @@
     <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
         <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
             CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
-        <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
-            <MudGrid Spacing="0">
-                <MudItem xs="4" sm="4" Class="px-4">
-                    <MudPaper Elevation="0" Class="p-0 w-100">
-                        <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Secondary"
-                            Rounded="true" Elevation="1" Date="@(DateTime.Today)" />
-                    </MudPaper>
-                </MudItem>
-                <MudItem xs="4" sm="4" Class="px-4">
+        <MudGrid Spacing="0" Class="mt-2">
+            <MudItem xs="3" Class="ps-0 pe-3">
+                <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
                     <MudPaper Elevation="0" Class="p-0 w-100">
                         <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Secondary"
                                        Rounded="true" Elevation="1" Date="@(DateTime.Today)" />
                     </MudPaper>
-                </MudItem>
-                <MudItem xs="4" sm="4" Class="px-4">
-                    <MudPaper Elevation="0" Class="p-0 w-100">
-                    </MudPaper>
-                </MudItem>
-            </MudGrid>
-            <MudScrollToTop TopOffset="100"
-                            Selector="#mainPanel"
-                            VisibleCssClass="visible absolute"
-                            HiddenCssClass="hidden absolute">
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
-            </MudScrollToTop>
-        </MudStack>
+                </MudStack>
+                <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.Wrap">                    
+                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Error" Size="Size.Small" Color="Color.Transparent">Absent</MudChip>
+                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Success" Size="Size.Small" Color="Color.Transparent">Present</MudChip>
+                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
+                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
+                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
+                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
+                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
+                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
+                </MudStack>
+                <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.Wrap">
+                    <MudChipSet T="string" Class="mt-4" ReadOnly="true">
+                        @foreach (var legend in AttendanceLegends)
+                        {
+                            <MudChip
+                                Icon="@Icons.Material.Filled.Circle"
+                                IconColor="@GetLegendColor(legend.UDCCode)"
+                                Size="Size.Small"
+                                Variant="Variant.Text">
+                                @legend.UDCDesc1
+                            </MudChip>
+                        }
+                    </MudChipSet>
+                </MudStack>
+            </MudItem>
+            <MudItem xs="5" Class="px-3">
+                <MudPaper Elevation="0" Class="p-0 w-100">
+                    <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Secondary"
+                                   Rounded="true" Elevation="1" Date="@(DateTime.Today)" />
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="4" Class="px-3">
+                <MudPaper Elevation="0" Class="p-0 w-100">
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+        <MudScrollToTop TopOffset="100"
+                        Selector="#mainPanel"
+                        VisibleCssClass="visible absolute"
+                        HiddenCssClass="hidden absolute">
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+        </MudScrollToTop>
     </div>
 </MudContainer>

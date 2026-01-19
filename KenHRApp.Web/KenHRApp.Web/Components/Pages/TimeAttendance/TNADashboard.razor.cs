@@ -56,6 +56,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             new("Home", href: "/", icon: Icons.Material.Filled.Home),
             new("Employee Attendance Dashboard", href: null, disabled: true, @Icons.Material.Filled.CalendarMonth)
         ];
+
+        private List<UserDefinedCodeDTO> AttendanceLegends { get; set; } = new List<UserDefinedCodeDTO>();
         #endregion
 
         #endregion
@@ -74,7 +76,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Page Events
         protected override void OnInitialized()
         {
-            //BeginSearchShiftRoster();
+            #region Populate attendance legends
+            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 1, UDCCode = "ALABSENT", UDCDesc1 = "Absent" });
+            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 2, UDCCode = "ALPRESENT", UDCDesc1 = "Present" });
+            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 3, UDCCode = "ALLATE", UDCDesc1 = "Late" });
+            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALLEAVE", UDCDesc1 = "On-leave" });
+            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALSICKLEAVE", UDCDesc1 = "Sick Leave" });
+            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALINJURYLEAVE", UDCDesc1 = "Injury Leave" });
+            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALBUSTRIP", UDCDesc1 = "Business Trip" });
+            #endregion
         }
         #endregion
 
@@ -131,6 +141,19 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Reset error messages
                 _errorMessage.Clear();
             }
+        }
+
+        private Color GetLegendColor(string legendCode)
+        {
+            return legendCode switch
+            {
+                "ALABSENT" => Color.Error,
+                "ALPRESENT" => Color.Success,
+                "ALLATE" => Color.Warning,
+                "ALLEAVE" => Color.Info,
+                "ALBUSTRIP" => Color.Tertiary,
+                _ => Color.Default
+            };
         }
         #endregion
     }
