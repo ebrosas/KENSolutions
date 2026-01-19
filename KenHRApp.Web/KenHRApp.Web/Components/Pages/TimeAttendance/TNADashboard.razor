@@ -20,7 +20,7 @@
                                        Rounded="true" Elevation="1" Date="@(DateTime.Today)" />
                     </MudPaper>
                 </MudStack>
-                <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.Wrap">                    
+                @* <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.Wrap">                    
                     <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Error" Size="Size.Small" Color="Color.Transparent">Absent</MudChip>
                     <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Success" Size="Size.Small" Color="Color.Transparent">Present</MudChip>
                     <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
@@ -29,7 +29,7 @@
                     <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
                     <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
                     <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
-                </MudStack>
+                </MudStack> *@
                 <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.Wrap">
                     <MudChipSet T="string" Class="mt-4" ReadOnly="true">
                         @foreach (var legend in AttendanceLegends)
@@ -46,10 +46,35 @@
                 </MudStack>
             </MudItem>
             <MudItem xs="5" Class="px-3">
-                <MudPaper Elevation="0" Class="p-0 w-100">
-                    <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Secondary"
-                                   Rounded="true" Elevation="1" Date="@(DateTime.Today)" />
-                </MudPaper>
+                <MudStack>
+                    <MudPaper Class="pa-4" Elevation="4" Square="true">
+                        <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexStart" StretchItems="StretchItems.Start">
+                            <MudStack>
+                                <MudStack Row="true">
+                                    <MudAvatar Size="Size.Large" Color="Color.Success" Variant="Variant.Outlined">
+                                        <MudIcon Icon="@Icons.Material.Filled.HourglassTop" Size="Size.Large" />
+                                    </MudAvatar>
+                                    <MudStack Justify="Justify.Center" Spacing="0">
+                                        <MudText Typo="Typo.h6">0:00 hrs</MudText>
+                                        <MudText Typo="Typo.caption">Spent Today</MudText>
+                                    </MudStack>
+                                </MudStack>
+                                <MudStack AlignItems="AlignItems.Start">
+                                    <MudText Typo="Typo.body2">0 Absences in this month</MudText>
+                                    <MudText Typo="Typo.body2">36.5 Annual Leave available</MudText>
+                                </MudStack>
+                                <MudPaper Elevation="0">
+                                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" DropShadow="true">Extra Time</MudButton>
+                                </MudPaper>
+                            </MudStack>
+                            <MudStack Justify="Justify.Center" Spacing="2">
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" DropShadow="true">Apply Leave</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" DropShadow="true">Regularize</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" DropShadow="true">Apply Outdoor</MudButton>
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
+                </MudStack>
             </MudItem>
             <MudItem xs="4" Class="px-3">
                 <MudPaper Elevation="0" Class="p-0 w-100">
