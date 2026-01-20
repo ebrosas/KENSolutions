@@ -13,23 +13,13 @@
         <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
             CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
         <MudGrid Spacing="0" Class="mt-2">
-            <MudItem xs="3" Class="ps-0 pe-3">
+            <MudItem xs="3" Class="ps-0 pe-4">
                 <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
                     <MudPaper Elevation="0" Class="p-0 w-100">
-                        <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Secondary"
+                        <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Default"
                                        Rounded="true" Elevation="1" Date="@(DateTime.Today)" />
                     </MudPaper>
                 </MudStack>
-                @* <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.Wrap">                    
-                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Error" Size="Size.Small" Color="Color.Transparent">Absent</MudChip>
-                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Success" Size="Size.Small" Color="Color.Transparent">Present</MudChip>
-                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
-                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
-                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
-                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
-                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
-                    <MudChip T="string" Icon="@Icons.Material.Filled.Circle" IconColor="Color.Tertiary" Size="Size.Small" Color="Color.Transparent">Leave Applied</MudChip>
-                </MudStack> *@
                 <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.Wrap">
                     <MudChipSet T="string" Class="mt-4" ReadOnly="true">
                         @foreach (var legend in AttendanceLegends)
@@ -45,7 +35,7 @@
                     </MudChipSet>
                 </MudStack>
             </MudItem>
-            <MudItem xs="5" Class="px-3">
+            <MudItem xs="5" Class="px-4">
                 <MudStack>
                     <MudPaper Class="pa-4" Elevation="4" Square="true">
                         <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexStart" StretchItems="StretchItems.Start">
@@ -59,7 +49,7 @@
                                         <MudText Typo="Typo.caption">Spent Today</MudText>
                                     </MudStack>
                                 </MudStack>
-                                <MudStack AlignItems="AlignItems.Start">
+                                <MudStack AlignItems="AlignItems.Start" Spacing="0" Class="pa-1">
                                     <MudText Typo="Typo.body2">0 Absences in this month</MudText>
                                     <MudText Typo="Typo.body2">36.5 Annual Leave available</MudText>
                                 </MudStack>
@@ -68,17 +58,47 @@
                                 </MudPaper>
                             </MudStack>
                             <MudStack Justify="Justify.Center" Spacing="2">
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" DropShadow="true">Apply Leave</MudButton>
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" DropShadow="true">Regularize</MudButton>
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" DropShadow="true">Apply Outdoor</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" DropShadow="true">Apply Leave</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" DropShadow="true">Regularize</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" DropShadow="true">Apply Outdoor</MudButton>
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
+                    <MudPaper Elevation="4" Class="p-4 w-100" Square="true">
+                        <MudStack>
+                            <MudStack Spacing="0" Class="pa-0">
+                                <MudText Typo="Typo.h6">Leave Balance</MudText>
+                                <MudText Typo="Typo.caption">Tap on Leave Type Balance to apply for leave</MudText>
+                            </MudStack>
+                            <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.Center" StretchItems="StretchItems.All">
+                                <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" StretchItems="StretchItems.All" Spacing="2">
+                                    <MudButton Variant="Variant.Filled" Color="Color.Success" FullWidth="true"
+                                        Size="Size.Large" DropShadow="true">
+                                        36.00
+                                    </MudButton>
+                                    <MudText Typo="Typo.caption">Annual Leave</MudText>
+                                </MudStack>
+                                <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" StretchItems="StretchItems.All" Spacing="2">
+                                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" FullWidth="true"
+                                        Size="Size.Large" DropShadow="true">
+                                        3.00
+                                    </MudButton>
+                                    <MudText Typo="Typo.caption">Sick Leave</MudText>
+                                </MudStack>
+                                <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" StretchItems="StretchItems.All" Spacing="2">
+                                    <MudButton Variant="Variant.Filled" Color="Color.Warning" FullWidth="true"
+                                        Size="Size.Large" DropShadow="true">
+                                        1.00
+                                    </MudButton>
+                                    <MudText Typo="Typo.caption">Day In Lieu</MudText>
+                                </MudStack>
                             </MudStack>
                         </MudStack>
                     </MudPaper>
                 </MudStack>
             </MudItem>
             <MudItem xs="4" Class="px-3">
-                <MudPaper Elevation="0" Class="p-0 w-100">
-                </MudPaper>
+                
             </MudItem>
         </MudGrid>
         <MudScrollToTop TopOffset="100"
