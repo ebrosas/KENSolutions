@@ -31,6 +31,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string _searchString = string.Empty;
         private StringBuilder _errorMessage = new StringBuilder();
         private List<string> _events = new();
+        private int currentPage = 1;
+        private int pageSize = 5;
+        private int pageCount => (int)Math.Ceiling((double)HolidayList.Count / pageSize);
         #endregion
 
         #region Flags
@@ -57,7 +60,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             new("Employee Attendance Dashboard", href: null, disabled: true, @Icons.Material.Filled.CalendarMonth)
         ];
 
-        private List<UserDefinedCodeDTO> AttendanceLegends { get; set; } = new List<UserDefinedCodeDTO>();
+        private List<UserDefinedCodeDTO> AttendanceLegends { get; set; } = new();
+        private List<HolidayDTO> HolidayList { get; set; } = new();
+
+        private IEnumerable<HolidayDTO> PagedHolidays =>
+            HolidayList
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize);
         #endregion
 
         #endregion
@@ -84,6 +93,18 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALSICKLEAVE", UDCDesc1 = "Sick Leave" });
             AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALINJURYLEAVE", UDCDesc1 = "Injury Leave" });
             AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALBUSTRIP", UDCDesc1 = "Business Trip" });
+            #endregion
+
+            #region Populate holiday list
+            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "New Year Day", HolidayDate = new DateTime(2026, 1, 1) });
+            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Fitr", HolidayDate = new DateTime(2026, 3, 18) });
+            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Fitr", HolidayDate = new DateTime(2026, 3, 19) });
+            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Labour Day", HolidayDate = new DateTime(2026, 5, 3) });
+            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Adha", HolidayDate = new DateTime(2026, 5, 26) });
+            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Adha", HolidayDate = new DateTime(2026, 5, 27) });
+            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Adha", HolidayDate = new DateTime(2026, 5, 28) });
+            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Ashura", HolidayDate = new DateTime(2026, 6, 24) });
+            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "National Day", HolidayDate = new DateTime(2026, 12, 16) });
             #endregion
         }
         #endregion
@@ -154,6 +175,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 "ALBUSTRIP" => Color.Tertiary,
                 _ => Color.Default
             };
+        }
+
+        private void OnPageChanged(int page)
+        {
+            currentPage = page;
         }
         #endregion
     }
