@@ -190,23 +190,40 @@
                             </MudStack>
                         </MudStack>
                     </MudPaper>
-                    <MudPaper Class="pa-4" Elevation="4" Square="true">
+                    <MudPaper Class="pa-4 mud-background-surface" Elevation="4" Square="true">
                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart">
-                            <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexStart" StretchItems="StretchItems.End" Spacing="3" Class="pa-0">
+                            <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" StretchItems="StretchItems.Start" Spacing="5" Class="pa-0">
                                 <!-- Pagination -->
-                                <MudPagination Class="mt-4"
+                                <MudPagination Class="pa-0"
                                                Variant="Variant.Filled"
                                                Rectangular="false"
-                                               Color="Color.Default"
+                                               Color="Color.Surface"
                                                Size="Size.Medium"
                                                ShowFirstButton="true" ShowLastButton="true"
                                                Count="@pageCount"
                                                SelectedChanged="OnPageChanged" />
-                                <MudSelect T="int" @bind-Value="pageSize" Dense="true" Label="Items per page">
-                                    <MudSelectItem Value="5">5</MudSelectItem>
-                                    <MudSelectItem Value="10">10</MudSelectItem>
-                                    <MudSelectItem Value="20">20</MudSelectItem>
-                                </MudSelect>
+
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexEnd" StretchItems="StretchItems.Start" Class="mb-2">
+                                    <MudText Typo="Typo.caption">
+                                        Page Size
+                                    </MudText>
+                                    <MudSelect T="int"
+                                               Dense="true"
+                                               @bind-Value="pageSize"
+                                               Style="width:50px">
+                                        <MudSelectItem Value="5">5</MudSelectItem>
+                                        <MudSelectItem Value="10">10</MudSelectItem>
+                                        <MudSelectItem Value="20">20</MudSelectItem>
+                                        <MudSelectItem Value="50">50</MudSelectItem>
+                                    </MudSelect>
+                                </MudStack>
+                                @* <MudSelect T="int"
+                                           Dense="true"
+                                           Style="width:100px">
+                                    <MudSelectItem Value="2024">2024</MudSelectItem>
+                                    <MudSelectItem Value="2025">2025</MudSelectItem>
+                                    <MudSelectItem Value="2026">2026</MudSelectItem>
+                                </MudSelect> *@
                             </MudStack>                            
                             <MudList T="HolidayDTO" Dense="true">
                                 @if (!HolidayList.Any())
@@ -217,24 +234,35 @@
                                 }
                                 @foreach (var holiday in PagedHolidays)
                                 {
-                                    <MudListItem Icon="@Icons.Material.Filled.Event" Color="@(holiday.HolidayDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday ? Color.Error: Color.Primary)">
-                                        <MudStack Spacing="1">
-                                            <!-- Holiday Date -->
-                                            <MudText Typo="Typo.subtitle2">
-                                                @holiday.HolidayDate.ToString("dd MMM yyyy")
-                                            </MudText>
+                                    @* <MudListItem Icon="@Icons.Material.Filled.Event" IconColor="@(holiday.HolidayDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday ? Color.Error: Color.Primary)"> *@
+                                    <MudListItem>
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexStart" StretchItems="StretchItems.End">
+                                            <MudStack Spacing="0" AlignItems="AlignItems.Center" Justify="Justify.Center">
+                                                <MudAvatar Color="Color.Info" Variant="Variant.Outlined" Size="Size.Medium">
+                                                    @holiday.HolidayDate.ToString("dd")
+                                                </MudAvatar>
+                                                <MudText Typo="Typo.caption">
+                                                    @holiday.HolidayDate.ToString("MMM")
+                                                </MudText>
+                                            </MudStack>
+                                            <MudStack Spacing="1">
+                                                <!-- Holiday Date -->
+                                                @* <MudText Typo="Typo.subtitle2">
+                                                    @holiday.HolidayDate.ToString("dd MMM yyyy")
+                                                </MudText> *@
 
-                                            <!-- Holiday Description -->
-                                            <MudText Typo="Typo.body1" Class="fw-600">
-                                                @holiday.HolidayDesc
-                                            </MudText>
+                                                <!-- Holiday Description -->
+                                                <MudText Typo="Typo.button" Class="fw-600">
+                                                    @holiday.HolidayDesc
+                                                </MudText>
 
-                                            <!-- Day of Week -->
-                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                                @holiday.HolidayDate.ToString("dddd")
-                                            </MudText>
+                                                <!-- Day of Week -->
+                                                <MudText Typo="Typo.caption" Color="Color.Surface">
+                                                    @holiday.HolidayDate.ToString("dddd")
+                                                </MudText>
 
-                                        </MudStack>
+                                            </MudStack>
+                                        </MudStack>                                        
                                     </MudListItem>
                                 }
                             </MudList>
