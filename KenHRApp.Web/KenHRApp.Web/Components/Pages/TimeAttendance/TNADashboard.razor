@@ -20,8 +20,8 @@
                                        Rounded="true" Elevation="1" Date="@(DateTime.Today)" />
                     </MudPaper>
                 </MudStack>
-                <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.Wrap">
-                    <MudChipSet T="string" Class="mt-4" ReadOnly="true">
+                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0" Wrap="Wrap.Wrap">
+                    <MudChipSet T="string" Class="mt-4" ReadOnly="true" Size="Size.Small">
                         @foreach (var legend in AttendanceLegends)
                         {
                             <MudChip
@@ -104,12 +104,12 @@
                             <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" StretchItems="StretchItems.All" Spacing="3">
                                 <MudStack Justify="Justify.Center" Spacing="0">
                                     <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceEvenly" Spacing="1">
-                                        <MudAvatar Size="Size.Medium" Color="Color.Error" Variant="Variant.Filled">
+                                        <MudAvatar Size="Size.Small" Color="Color.Error" Variant="Variant.Filled">
                                             <MudIcon Icon="@Icons.Material.Filled.WorkOff" />
                                         </MudAvatar>
                                         <MudText Typo="Typo.h6" Color="Color.Error">0</MudText>
                                     </MudStack>
-                                    <MudText Typo="Typo.caption" Align="Align.Center">Absents</MudText>
+                                    <MudText Typo="Typo.caption" Align="Align.Center">Absent</MudText>
                                 </MudStack>
                                 <MudStack Justify="Justify.Center" Spacing="0">
                                     <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceEvenly" Spacing="1">
@@ -133,7 +133,7 @@
                             <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" StretchItems="StretchItems.All" Spacing="3">
                                 <MudStack Justify="Justify.Center" Spacing="0">
                                     <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceEvenly" Spacing="1">
-                                        <MudAvatar Size="Size.Medium" Color="Color.Success" Variant="Variant.Filled">
+                                        <MudAvatar Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
                                             <MudIcon Icon="@Icons.Material.Filled.TimeToLeave" />
                                         </MudAvatar>
                                         <MudText Typo="Typo.h6" Color="Color.Success">0</MudText>
@@ -162,10 +162,10 @@
                             <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" StretchItems="StretchItems.All" Spacing="3">
                                 <MudStack Justify="Justify.Center" Spacing="0">
                                     <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceEvenly" Spacing="1">
-                                        <MudAvatar Size="Size.Medium" Color="Color.Tertiary" Variant="Variant.Filled">
+                                        <MudAvatar Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
                                             <MudIcon Icon="@Icons.Material.Filled.ViewDay" />
                                         </MudAvatar>
-                                        <MudText Typo="Typo.h6" Color="Color.Tertiary">0</MudText>
+                                        <MudText Typo="Typo.h6" Color="Color.Info">0</MudText>
                                     </MudStack>
                                     <MudText Typo="Typo.caption" Align="Align.Center">Half Days</MudText>
                                 </MudStack>
