@@ -14,13 +14,13 @@
             CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
         <MudGrid Spacing="0" Class="mt-2">
             <MudItem xs="4" Class="ps-0 pe-4">
-                <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" StretchItems="StretchItems.Start" Spacing="0">
+                <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" StretchItems="StretchItems.Start" Spacing="0">
                     <MudPaper Elevation="0" Class="pa-0 w-100">
                         <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Surface"
                             Rounded="true" Elevation="0" Date="@(DateTime.Today)" />
                     </MudPaper>
                     <MudPaper Elevation="0" Class="pa-0 w-100">
-                        <MudStack Justify="Justify.Center" Spacing="2">
+                        <MudStack Justify="Justify.Center" Spacing="0" Class="rounded-r-xl">
                             <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Info">Punch In</MudButton>
                         </MudStack>
                     </MudPaper>
@@ -39,6 +39,73 @@
                         }
                     </MudChipSet>
                 </MudStack>
+                <MudPaper Elevation="4" Square="true" Class="pa-2">
+                    <MudGrid Spacing="0" Class="mt-1">
+                        <MudItem xs="6" Class="px-2">
+                            <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.subtitle2" Class="fw-bold">Shift:</MudText>
+                                <MudText Typo="Typo.body2">07:00 AM to 04:30 PM</MudText>
+                            </MudStack>
+                        </MudItem>
+                        <MudItem xs="6" Class="px-2">
+                            <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.subtitle2" Class="fw-bold">Actual:</MudText>
+                                <MudText Typo="Typo.body2">08:15 AM to 05:35 PM</MudText>
+                            </MudStack>
+                        </MudItem>
+                    </MudGrid>
+                    <MudGrid Spacing="0" Class="mt-1">
+                        <MudItem xs="6" Class="px-2">
+                            <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.subtitle2" Class="fw-bold">Regularized:</MudText>
+                                <MudText Typo="Typo.body2">None</MudText>
+                            </MudStack>
+                        </MudItem>
+                        <MudItem xs="6" Class="px-2">
+                            <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.subtitle2" Class="fw-bold">Work Duration:</MudText>
+                                <MudText Typo="Typo.body2">8 hrs. 35 mins.</MudText>
+                            </MudStack>
+                        </MudItem>
+                    </MudGrid>
+                    <MudGrid Spacing="0" Class="mt-1">
+                        <MudItem xs="6" Class="px-2">
+                            <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.subtitle2" Class="fw-bold">Reason:</MudText>
+                                <MudText Typo="Typo.body2">None</MudText>
+                            </MudStack>
+                        </MudItem>
+                        <MudItem xs="6" Class="px-2">
+                            <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.subtitle2" Class="fw-bold">Deficit:</MudText>
+                                <MudText Typo="Typo.body2">00:00</MudText>
+                            </MudStack>
+                        </MudItem>
+                    </MudGrid>
+                    <MudGrid Spacing="0" Class="mt-1">
+                        <MudItem xs="6" Class="px-2">
+                            <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.subtitle2" Class="fw-bold">Leave Status:</MudText>
+                                <MudText Typo="Typo.body2">None</MudText>
+                            </MudStack>
+                        </MudItem>
+                        <MudItem xs="6" Class="px-2">
+                            <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.subtitle2" Class="fw-bold">Application:</MudText>
+                                <MudText Typo="Typo.body2">None</MudText>
+                            </MudStack>
+                        </MudItem>
+                    </MudGrid>
+                    <MudGrid Spacing="0" Class="mt-1">
+                        <MudItem xs="12" Class="px-2">
+                            <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="fw-bold">Raw Swipes:</MudText>
+                                <MudText Typo="Typo.body2">08:15 AM, 9:30 AM, 4:30 PM </MudText>
+                            </MudStack>
+                        </MudItem>
+                    </MudGrid>
+                    <MudButton Variant="Variant.Text" FullWidth="true" EndIcon="@Icons.Material.Filled.Send" Color="Color.Surface">View Less</MudButton>
+                </MudPaper>
             </MudItem>
             <MudItem xs="4" Class="px-4">
                 <MudStack>
@@ -167,10 +234,10 @@
                             <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" StretchItems="StretchItems.All" Spacing="3">
                                 <MudStack Justify="Justify.Center" Spacing="0">
                                     <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceEvenly" Spacing="1">
-                                        <MudAvatar Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
+                                        <MudAvatar Size="Size.Small" Color="Color.Warning" Variant="Variant.Filled">
                                             <MudIcon Icon="@Icons.Material.Filled.ViewDay" />
                                         </MudAvatar>
-                                        <MudText Typo="Typo.h6" Color="Color.Info">0</MudText>
+                                        <MudText Typo="Typo.h6" Color="Color.Warning">0</MudText>
                                     </MudStack>
                                     <MudText Typo="Typo.caption" Align="Align.Center">Half Days</MudText>
                                 </MudStack>
