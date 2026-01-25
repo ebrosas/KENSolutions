@@ -13,11 +13,16 @@
         <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
             CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
         <MudGrid Spacing="0" Class="mt-2">
-            <MudItem xs="3" Class="ps-0 pe-4">
-                <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
-                    <MudPaper Elevation="0" Class="p-0 w-100">
-                        <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Default"
-                                       Rounded="true" Elevation="1" Date="@(DateTime.Today)" />
+            <MudItem xs="4" Class="ps-0 pe-4">
+                <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" StretchItems="StretchItems.Start" Spacing="0">
+                    <MudPaper Elevation="0" Class="pa-0 w-100">
+                        <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Surface"
+                            Rounded="true" Elevation="0" Date="@(DateTime.Today)" />
+                    </MudPaper>
+                    <MudPaper Elevation="0" Class="pa-0 w-100">
+                        <MudStack Justify="Justify.Center" Spacing="2">
+                            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Info">Punch In</MudButton>
+                        </MudStack>
                     </MudPaper>
                 </MudStack>
                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0" Wrap="Wrap.Wrap">
@@ -97,7 +102,7 @@
                     </MudPaper>
                 </MudStack>
             </MudItem>
-            <MudItem xs="5" Class="px-3">
+            <MudItem xs="4" Class="px-4">
                 <MudStack>
                     <MudPaper Class="pa-4" Elevation="4" Square="true">
                         <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.Center" StretchItems="StretchItems.All" Spacing="3">
