@@ -60,6 +60,14 @@ namespace KenHRApp.Infrastructure.Data
             modelBuilder.Entity<EmployeeMaster>().HasNoKey();
             #endregion
 
+            #region Configure Keyless and Non-Migrated models
+            modelBuilder.Entity<AttendanceSummaryResult>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView(null); // prevents migration
+            });
+            #endregion
+
             #region Configure models
             modelBuilder.Entity<EmergencyContact>(
                entity =>

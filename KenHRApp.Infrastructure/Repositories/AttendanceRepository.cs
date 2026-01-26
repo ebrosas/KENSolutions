@@ -798,6 +798,46 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<List<UserDefinedCode>>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<AttendanceSummaryResult>> GetAttendanceSummaryAsync(int empNo, DateTime? startDate, DateTime? endDate)
+        {
+            AttendanceSummaryResult attendanceSummary = new AttendanceSummaryResult();
+
+            try
+            {
+                var model = await _db.Set<AttendanceSummaryResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetAttendanceSummary @empNo = {0}, @startDate = {1}, @endDate = {2}",
+                    empNo, startDate!, endDate!)
+                    .AsNoTracking()
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    attendanceSummary.EmployeeNo = model[0].EmployeeNo;
+                    attendanceSummary.EmployeeName = model[0].EmployeeName;
+                    attendanceSummary.ShiftRoster = model[0].ShiftRoster;
+                    attendanceSummary.ShiftTiming = model[0].ShiftTiming;
+                    attendanceSummary.TotalAbsent = model[0].TotalAbsent;
+                    attendanceSummary.TotalHalfDay = model[0].TotalHalfDay;
+                    attendanceSummary.TotalLeave = model[0].TotalLeave;
+                    attendanceSummary.TotalLate = model[0].TotalLate;
+                    attendanceSummary.TotalEarlyOut = model[0].TotalEarlyOut;
+                    attendanceSummary.TotalDeficitHour = model[0].TotalDeficitHour;
+                    attendanceSummary.TotalWorkHour = model[0].TotalWorkHour;
+                    attendanceSummary.TotalDaysWorked = model[0].TotalDaysWorked;
+                    attendanceSummary.AverageWorkHour = model[0].AverageWorkHour;
+                    attendanceSummary.TotalLeaveBalance = model[0].TotalLeaveBalance;
+                    attendanceSummary.TotalSLBalance = model[0].TotalSLBalance;
+                    attendanceSummary.TotalDILBalance = model[0].TotalDILBalance;
+                }
+
+                return Result<AttendanceSummaryResult>.SuccessResult(attendanceSummary);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<AttendanceSummaryResult>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

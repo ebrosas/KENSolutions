@@ -24,6 +24,7 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<int>> UpdateShiftPatternChangeAsync(ShiftPatternChange dto, CancellationToken cancellationToken = default);
         Task<Result<List<Holiday>>> GetPublicHolidaysAsync(int? year, byte? holidayType);
         Task<Result<List<UserDefinedCode>>> GetUserDefinedCodeAsync(string? udcCode);
+        Task<Result<AttendanceSummaryResult>> GetAttendanceSummaryAsync(int empNo, DateTime? startDate, DateTime? endDate);
         #endregion
     }
 }

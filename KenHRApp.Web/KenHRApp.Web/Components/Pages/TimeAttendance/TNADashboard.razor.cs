@@ -34,7 +34,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private int currentPage = 1;
         private int pageSize = 5;
         private int pageCount => (int)Math.Ceiling((double)_holidayList.Count / pageSize);
-        private DateTime? _selectedDate = DateTime.Now;  
+        private DateTime? _selectedDate = DateTime.Now;
+        private int _currentEmpNo = 10003632;
+        private DateTime _payrollStartDate = new DateTime(2026, 1, 16);
+        private DateTime _payrollEndDate = new DateTime(2026, 2, 15);
+        private AttendanceSummaryDTO _attendanceSummary = new AttendanceSummaryDTO();
         #endregion
 
         #region Flags
@@ -92,29 +96,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Page Events
         protected override void OnInitialized()
         {
-            #region Populate attendance legends
-            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 1, UDCCode = "ALABSENT", UDCDesc1 = "Absent" });
-            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 2, UDCCode = "ALPRESENT", UDCDesc1 = "Present" });
-            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 3, UDCCode = "ALLATE", UDCDesc1 = "Late" });
-            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALLEAVE", UDCDesc1 = "On-leave" });
-            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALSICKLEAVE", UDCDesc1 = "Sick Leave" });
-            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALINJURYLEAVE", UDCDesc1 = "Injury Leave" });
-            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALBUSTRIP", UDCDesc1 = "Business Trip" });
-            #endregion
-
-            #region Populate holiday list
-            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "New Year Day", HolidayDate = new DateTime(2026, 1, 1) });
-            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Fitr", HolidayDate = new DateTime(2026, 3, 18) });
-            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Fitr", HolidayDate = new DateTime(2026, 3, 19) });
-            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Labour Day", HolidayDate = new DateTime(2026, 5, 3) });
-            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Adha", HolidayDate = new DateTime(2026, 5, 26) });
-            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Adha", HolidayDate = new DateTime(2026, 5, 27) });
-            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Adha", HolidayDate = new DateTime(2026, 5, 28) });
-            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Ashura", HolidayDate = new DateTime(2026, 6, 24) });
-            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "National Day", HolidayDate = new DateTime(2026, 12, 16) });
-            #endregion
-
-            BeginLoadComboboxTask();
+            //BeginLoadComboboxTask();
+            BeginGetAttendanceSummary();
         }
         #endregion
 
@@ -254,6 +237,56 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _attendanceLegends = udcResult!.Value;
             else
                 _errorMessage.Append(udcResult.Error);
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private void BeginGetAttendanceSummary()
+        {
+            _isRunning = true;
+
+            // Set the overlay message
+            overlayMessage = "Loading attendance summary, please wait...";
+
+            _ = GetAttendanceSummaryAsync(async () =>
+            {
+                _isRunning = false;
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            }, _currentEmpNo, _payrollStartDate, _payrollEndDate);
+        }
+
+        private async Task GetAttendanceSummaryAsync(Func<Task> callback, int empNo, DateTime? startDate, DateTime? endDate)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(300);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Clear shift timing items in the "Shift Timing Sequence" grid
+            //_shiftMasterPointerList.Clear();
+
+            var result = await AttendanceService.GetAttendanceSummaryAsync(empNo, startDate, endDate);
+            if (result.Success)
+            {
+                _attendanceSummary = result.Value!;
+
+                // Recreate the EditContext with the loaded _shiftPattern
+                //_editContext = new EditContext(_shiftPattern);
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.Append(result.Error);
+
+                ShowHideError(true);
+            }
 
             if (callback != null)
             {

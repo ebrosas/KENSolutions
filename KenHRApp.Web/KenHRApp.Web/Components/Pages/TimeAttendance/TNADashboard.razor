@@ -53,8 +53,8 @@
                             <MudGrid Spacing="0" Class="mt-1">
                                 <MudItem xs="6" Class="px-2">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                        <MudText Typo="Typo.subtitle2" Class="fw-bold">Shift:</MudText>
-                                        <MudText Typo="Typo.caption">07:00 AM to 04:30 PM</MudText>
+                                        <MudText Typo="Typo.subtitle2" Class="fw-bold">Shift Timing:</MudText>
+                                        <MudText Typo="Typo.caption">@_attendanceSummary.ShiftTiming</MudText>
                                     </MudStack>
                                 </MudItem>
                                 <MudItem xs="6" Class="px-2">
@@ -162,21 +162,21 @@
                                 <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" StretchItems="StretchItems.All" Spacing="2">
                                     <MudButton Variant="Variant.Filled" Color="Color.Success" FullWidth="true"
                                         Size="Size.Large" DropShadow="true">
-                                        36.00
+                                        @_attendanceSummary.TotalLeaveBalance.ToString("F2")
                                     </MudButton>
                                     <MudText Typo="Typo.caption">Annual Leave</MudText>
                                 </MudStack>
                                 <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" StretchItems="StretchItems.All" Spacing="2">
                                     <MudButton Variant="Variant.Filled" Color="Color.Secondary" FullWidth="true"
                                         Size="Size.Large" DropShadow="true">
-                                        3.00
+                                        @_attendanceSummary.TotalSLBalance.ToString("F2")
                                     </MudButton>
                                     <MudText Typo="Typo.caption">Sick Leave</MudText>
                                 </MudStack>
                                 <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" StretchItems="StretchItems.All" Spacing="2">
                                     <MudButton Variant="Variant.Filled" Color="Color.Warning" FullWidth="true"
                                         Size="Size.Large" DropShadow="true">
-                                        1.00
+                                        @_attendanceSummary.TotalDILBalance.ToString("F2")
                                     </MudButton>
                                     <MudText Typo="Typo.caption">Day In Lieu</MudText>
                                 </MudStack>

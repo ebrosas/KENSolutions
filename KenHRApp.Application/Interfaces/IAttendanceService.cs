@@ -23,6 +23,7 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<bool>> DeleteShiftPatternChangeAsync(int autoID, CancellationToken cancellationToken = default);
         Task<Result<List<HolidayDTO>>> GetPublicHolidaysAsync(int? year, byte? holidayType);
         Task<Result<List<UserDefinedCodeDTO>>> GetUserDefinedCodeAsync(string? udcCode);
+        Task<Result<AttendanceSummaryDTO>> GetAttendanceSummaryAsync(int empNo, DateTime? startDate, DateTime? endDate);
         #endregion
     }
 }

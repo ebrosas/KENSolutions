@@ -265,10 +265,13 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 
 /*	Debug:
 
+	SELECT * FROM [kenuser].[UserDefinedCodeGroup]
+	WHERE UDCGroupId = 2031
+
 	BEGIN TRAN T1
 
 	DELETE FROM [kenuser].[UserDefinedCodeGroup]
-	WHERE UDCGroupId = 21
+	WHERE UDCGroupId = 2031
 
 	COMMIT TRAN T1
 

@@ -591,6 +591,47 @@ namespace KenHRApp.Application.Services
                 return Result<List<UserDefinedCodeDTO>>.Failure(ex.Message.ToString() ?? "Unknown error in GetUserDefinedCodeAllAsync() method.");
             }
         }
+
+        public async Task<Result<AttendanceSummaryDTO>> GetAttendanceSummaryAsync(int empNo, DateTime? startDate, DateTime? endDate)
+        {
+            AttendanceSummaryDTO attendanceSummary = new AttendanceSummaryDTO();
+
+            try
+            {
+                var repoResult = await _repository.GetAttendanceSummaryAsync(empNo, startDate, endDate);
+                if (!repoResult.Success)
+                {
+                    return Result<AttendanceSummaryDTO>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null)
+                {
+                    attendanceSummary.EmployeeNo = model.EmployeeNo;
+                    attendanceSummary.EmployeeName = model.EmployeeName;
+                    attendanceSummary.ShiftRoster = model.ShiftRoster;
+                    attendanceSummary.ShiftTiming = model.ShiftTiming;
+                    attendanceSummary.TotalAbsent = model.TotalAbsent;
+                    attendanceSummary.TotalHalfDay = model.TotalHalfDay;
+                    attendanceSummary.TotalLeave = model.TotalLeave;
+                    attendanceSummary.TotalLate = model.TotalLate;
+                    attendanceSummary.TotalEarlyOut = model.TotalEarlyOut;
+                    attendanceSummary.TotalDeficitHour = model.TotalDeficitHour;
+                    attendanceSummary.TotalWorkHour = model.TotalWorkHour;
+                    attendanceSummary.TotalDaysWorked = model.TotalDaysWorked;
+                    attendanceSummary.AverageWorkHour = model.AverageWorkHour;
+                    attendanceSummary.TotalLeaveBalance = model.TotalLeaveBalance;
+                    attendanceSummary.TotalSLBalance = model.TotalSLBalance;
+                    attendanceSummary.TotalDILBalance = model.TotalDILBalance;
+                }
+
+                return Result<AttendanceSummaryDTO>.SuccessResult(attendanceSummary);
+            }
+            catch (Exception ex)
+            {
+                return Result<AttendanceSummaryDTO>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the attendance summary information from the database.");
+            }
+        }
         #endregion
     }
 }

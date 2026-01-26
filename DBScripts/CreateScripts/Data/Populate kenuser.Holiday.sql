@@ -99,9 +99,11 @@
             'ervin' AS CreatedByUserID, 
             GETDATE() AS CreatedDate
 
+    SELECT * FROM [kenuser].[Holiday] a
+
 	ROLLBACK TRAN T1
 	--COMMIT TRAN T1
 
-	SELECT * FROM [kenuser].[Holiday] a
+	
 
 
