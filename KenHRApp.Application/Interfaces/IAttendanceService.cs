@@ -21,6 +21,8 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<List<ShiftPatternChangeDTO>>> SearchShiftPatternChangeAsync(byte loadType, int? autoID, int? empNo, string? changeType, string? shiftPatternCode, DateTime? startDate, DateTime? endDate);
         Task<Result<ShiftPatternChangeDTO?>> GetShiftPatternChangeAsync(int autoID);
         Task<Result<bool>> DeleteShiftPatternChangeAsync(int autoID, CancellationToken cancellationToken = default);
+        Task<Result<List<HolidayDTO>>> GetPublicHolidaysAsync(int? year, byte? holidayType);
+        Task<Result<List<UserDefinedCodeDTO>>> GetUserDefinedCodeAsync(string? udcCode);
         #endregion
     }
 }

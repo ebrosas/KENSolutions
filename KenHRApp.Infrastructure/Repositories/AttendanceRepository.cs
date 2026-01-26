@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Intrinsics.Arm;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -710,6 +711,91 @@ namespace KenHRApp.Infrastructure.Repositories
             catch (Exception ex)
             {
                 return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<List<Holiday>>> GetPublicHolidaysAsync(int? year, byte? holidayType)
+        {
+            List<Holiday> holidayList = new();
+
+            try
+            {
+                var model = await (from hol in _db.Holidays
+                                   where
+                                   (
+                                        (hol.HolidayDate.Year == year || (year == null || year == 0)) &&
+                                        (hol.HolidayType == holidayType || (holidayType == null || holidayType == 0))
+                                   )
+                                   select hol).ToListAsync();
+                                   
+                if (model != null)
+                {
+                    holidayList = model.Select(e => new Holiday
+                    {
+                        HolidayId = e.HolidayId,
+                        HolidayDesc = e.HolidayDesc,
+                        HolidayDate = e.HolidayDate,
+                        HolidayType = e.HolidayType,
+                        HolidayTypeDesc = e.HolidayType == 1 ? "Public Holiday" : e.HolidayType == 2 ? "Ramadan" : "Other",
+                        CreatedByEmpNo = e.CreatedByEmpNo,
+                        CreatedByName = e.CreatedByName,
+                        CreatedByUserID = e.CreatedByUserID,
+                        CreatedDate = e.CreatedDate,
+                        LastUpdateDate = e.LastUpdateDate,
+                        LastUpdateEmpNo = e.LastUpdateEmpNo,
+                        LastUpdateUserID = e.LastUpdateUserID,
+                        LastUpdatedByName = e.LastUpdatedByName                        
+                    }).ToList();
+                }
+
+                return Result<List<Holiday>>.SuccessResult(holidayList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<Holiday>>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<List<UserDefinedCode>>> GetUserDefinedCodeAsync(string? udcCode)
+        {
+            List<UserDefinedCode> udcList = new();  
+            try
+            {
+                var model = await (from grp in _db.UserDefinedCodeGroups
+                                   join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID 
+                                   where
+                                   (
+                                        (grp.UDCGCode == udcCode || string.IsNullOrEmpty(udcCode))
+                                   )
+                                   select new
+                                   {
+                                       UDCItem = udc,
+                                       UDCGDesc1 = grp.UDCGDesc1,
+                                       UDCGSpecialHandlingCode = grp.UDCGSpecialHandlingCode
+                                   }).ToListAsync();
+
+                if (model != null)
+                {
+                    udcList = model.Select(e => new UserDefinedCode
+                    {
+                        UDCId = e.UDCItem.UDCId,
+                        UDCCode = e.UDCItem.UDCCode,
+                        UDCDesc1 = e.UDCItem.UDCDesc1,
+                        UDCDesc2 = e.UDCItem.UDCDesc2,
+                        UDCSpecialHandlingCode = e.UDCItem.UDCSpecialHandlingCode,
+                        SequenceNo = e.UDCItem.SequenceNo,
+                        IsActive = e.UDCItem.IsActive,
+                        Amount = e.UDCItem.Amount
+                    }).ToList();
+                }
+
+                return Result<List<UserDefinedCode>>.SuccessResult(udcList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<UserDefinedCode>>.Failure($"Database error: {ex.Message}");
             }
         }
         #endregion

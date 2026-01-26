@@ -221,6 +221,12 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	--		@UDCGDesc2					= NULL,
 	--		@UDCGSpecialHandlingCode	= NULL
 
+	--Add Attendance Legends
+	--SELECT	@UDCGCode					= 'ATTENDLEGEND',
+	--		@UDCGDesc1					= 'Attendance Legends',
+	--		@UDCGDesc2					= NULL,
+	--		@UDCGSpecialHandlingCode	= NULL
+
 	IF @actionType = 0
 	BEGIN
 

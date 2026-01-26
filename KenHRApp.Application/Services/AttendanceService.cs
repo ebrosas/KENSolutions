@@ -520,6 +520,77 @@ namespace KenHRApp.Application.Services
                 return Result<bool>.Failure(ex.Message.ToString());
             }
         }
+
+        public async Task<Result<List<HolidayDTO>>> GetPublicHolidaysAsync(int? year, byte? holidayType)
+        {
+            List<HolidayDTO> holidayList = new();
+
+            try
+            {
+                var repoResult = await _repository.GetPublicHolidaysAsync(year, holidayType);
+                if (!repoResult.Success)
+                {
+                    return Result<List<HolidayDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                holidayList = repoResult.Value!.Select(e => new HolidayDTO
+                {
+                    HolidayId = e.HolidayId,
+                    HolidayDesc = e.HolidayDesc,
+                    HolidayDate = e.HolidayDate,
+                    HolidayType = e.HolidayType,
+                    CreatedByEmpNo = e.CreatedByEmpNo,
+                    CreatedByName = e.CreatedByName,
+                    CreatedByUserID = e.CreatedByUserID,
+                    CreatedDate = e.CreatedDate,
+                    LastUpdateDate = e.LastUpdateDate,
+                    LastUpdateEmpNo = e.LastUpdateEmpNo,
+                    LastUpdateUserID = e.LastUpdateUserID,
+                    LastUpdatedByName = e.LastUpdatedByName
+                }).ToList();
+
+                return Result<List<HolidayDTO>>.SuccessResult(holidayList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<HolidayDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the public holidays from the database.");
+            }
+        }
+
+        public async Task<Result<List<UserDefinedCodeDTO>>> GetUserDefinedCodeAsync(string? udcCode)
+        {
+            List<UserDefinedCodeDTO> udcList = new List<UserDefinedCodeDTO>();
+
+            try
+            {
+                var repoResult = await _repository.GetUserDefinedCodeAsync(udcCode);
+
+                if (!repoResult.Success)
+                {
+                    return Result<List<UserDefinedCodeDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                udcList = repoResult.Value!.Select(e => new UserDefinedCodeDTO
+                {
+                    GroupID = e.GroupID,
+                    UDCId = e.UDCId,
+                    UDCCode = e.UDCCode,
+                    UDCDesc1 = e.UDCDesc1,
+                    UDCDesc2 = e.UDCDesc2,
+                    UDCSpecialHandlingCode = e.UDCSpecialHandlingCode,
+                    SequenceNo = e.SequenceNo,
+                    IsActive = e.IsActive,
+                    Amount = e.Amount
+                }).ToList();
+
+                return Result<List<UserDefinedCodeDTO>>.SuccessResult(udcList);
+
+            }
+            catch (Exception ex)
+            {
+                return Result<List<UserDefinedCodeDTO>>.Failure(ex.Message.ToString() ?? "Unknown error in GetUserDefinedCodeAllAsync() method.");
+            }
+        }
         #endregion
     }
 }

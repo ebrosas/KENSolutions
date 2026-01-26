@@ -33,7 +33,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<string> _events = new();
         private int currentPage = 1;
         private int pageSize = 5;
-        private int pageCount => (int)Math.Ceiling((double)HolidayList.Count / pageSize);
+        private int pageCount => (int)Math.Ceiling((double)_holidayList.Count / pageSize);
+        private DateTime? _selectedDate = DateTime.Now;  
         #endregion
 
         #region Flags
@@ -42,6 +43,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _isRunning = false;
         private bool _enableFilter = false;
         private bool _isTaskFinished = false;
+        private bool _showAttendanceDetail = true;
         #endregion
 
         #region Dialog Box Button Icons
@@ -60,11 +62,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             new("Employee Attendance Dashboard", href: null, disabled: true, @Icons.Material.Filled.CalendarMonth)
         ];
 
-        private List<UserDefinedCodeDTO> AttendanceLegends { get; set; } = new();
-        private List<HolidayDTO> HolidayList { get; set; } = new();
+        private List<UserDefinedCodeDTO> _attendanceLegends { get; set; } = new();
+        private List<HolidayDTO> _holidayList { get; set; } = new();
 
         private IEnumerable<HolidayDTO> PagedHolidays =>
-            HolidayList
+            _holidayList
                 .Skip((currentPage - 1) * pageSize)
                 .Take(pageSize);
         #endregion
@@ -80,32 +82,39 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             Warning,
             Error
         }
+
+        private enum UDCKeys
+        {
+            ATTENDLEGEND             // Attendance Legend
+        }
         #endregion
 
         #region Page Events
         protected override void OnInitialized()
         {
             #region Populate attendance legends
-            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 1, UDCCode = "ALABSENT", UDCDesc1 = "Absent" });
-            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 2, UDCCode = "ALPRESENT", UDCDesc1 = "Present" });
-            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 3, UDCCode = "ALLATE", UDCDesc1 = "Late" });
-            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALLEAVE", UDCDesc1 = "On-leave" });
-            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALSICKLEAVE", UDCDesc1 = "Sick Leave" });
-            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALINJURYLEAVE", UDCDesc1 = "Injury Leave" });
-            AttendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALBUSTRIP", UDCDesc1 = "Business Trip" });
+            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 1, UDCCode = "ALABSENT", UDCDesc1 = "Absent" });
+            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 2, UDCCode = "ALPRESENT", UDCDesc1 = "Present" });
+            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 3, UDCCode = "ALLATE", UDCDesc1 = "Late" });
+            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALLEAVE", UDCDesc1 = "On-leave" });
+            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALSICKLEAVE", UDCDesc1 = "Sick Leave" });
+            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALINJURYLEAVE", UDCDesc1 = "Injury Leave" });
+            //_attendanceLegends.Add(new UserDefinedCodeDTO() { UDCId = 4, UDCCode = "ALBUSTRIP", UDCDesc1 = "Business Trip" });
             #endregion
 
             #region Populate holiday list
-            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "New Year Day", HolidayDate = new DateTime(2026, 1, 1) });
-            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Fitr", HolidayDate = new DateTime(2026, 3, 18) });
-            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Fitr", HolidayDate = new DateTime(2026, 3, 19) });
-            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Labour Day", HolidayDate = new DateTime(2026, 5, 3) });
-            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Adha", HolidayDate = new DateTime(2026, 5, 26) });
-            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Adha", HolidayDate = new DateTime(2026, 5, 27) });
-            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Adha", HolidayDate = new DateTime(2026, 5, 28) });
-            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Ashura", HolidayDate = new DateTime(2026, 6, 24) });
-            HolidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "National Day", HolidayDate = new DateTime(2026, 12, 16) });
+            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "New Year Day", HolidayDate = new DateTime(2026, 1, 1) });
+            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Fitr", HolidayDate = new DateTime(2026, 3, 18) });
+            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Fitr", HolidayDate = new DateTime(2026, 3, 19) });
+            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Labour Day", HolidayDate = new DateTime(2026, 5, 3) });
+            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Adha", HolidayDate = new DateTime(2026, 5, 26) });
+            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Adha", HolidayDate = new DateTime(2026, 5, 27) });
+            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Eid Al-Adha", HolidayDate = new DateTime(2026, 5, 28) });
+            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "Ashura", HolidayDate = new DateTime(2026, 6, 24) });
+            //_holidayList.Add(new HolidayDTO() { HolidayId = 1, HolidayDesc = "National Day", HolidayDate = new DateTime(2026, 12, 16) });
             #endregion
+
+            BeginLoadComboboxTask();
         }
         #endregion
 
@@ -180,6 +189,77 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private void OnPageChanged(int page)
         {
             currentPage = page;
+        }
+
+        private void ShowAttendanceDetailToggle()
+        {
+            _showAttendanceDetail = !_showAttendanceDetail;
+        }
+
+        private string GetOrdinal(int day)
+        {
+            if (day >= 11 && day <= 13)
+                return "th";
+
+            return (day % 10) switch
+            {
+                1 => "st",
+                2 => "nd",
+                3 => "rd",
+                _ => "th"
+            };
+        }
+        #endregion
+
+        #region Database Methods
+        private void BeginLoadComboboxTask()
+        {
+            _isRunning = true;
+
+            // Set the overlay message
+            overlayMessage = "Initializing form, please wait...";
+
+            _ = LoadComboboxAsync(async () =>
+            {
+                _isRunning = false;
+
+                if (_errorMessage.Length > 0)
+                    ShowHideError(true);
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            });
+        }
+
+        private async Task LoadComboboxAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(300);
+
+            #region Get Public Holidays
+            int yearNum = DateTime.Now.Year;
+
+            var repoResult = await AttendanceService.GetPublicHolidaysAsync(yearNum, null);
+            if (repoResult.Success)
+            {
+                _holidayList = repoResult!.Value;
+            }
+            else
+                _errorMessage.Append(repoResult.Error);
+            #endregion
+
+            //Get UDC dataset
+            var udcResult = await AttendanceService.GetUserDefinedCodeAsync(UDCKeys.ATTENDLEGEND.ToString());
+            if (udcResult.Success)
+                _attendanceLegends = udcResult!.Value;
+            else
+                _errorMessage.Append(udcResult.Error);
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
         }
         #endregion
     }

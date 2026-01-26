@@ -2045,6 +2045,94 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@Amount						= NULL 
 		
 	*/
+
+	/*	Populate Attendance Legends
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'ATTENDLEGEND'
+
+		SELECT	@UDCCode					= 'ALABSENT',
+				@UDCDesc1					= 'Absent',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ALPRESENT',
+				@UDCDesc1					= 'Present',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ALLATE',
+				@UDCDesc1					= 'Late',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 3,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ALLEFTEARLY',
+				@UDCDesc1					= 'Left Early',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 4,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ALLEAVE',
+				@UDCDesc1					= 'On-leave',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 5,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ALSICK',
+				@UDCDesc1					= 'Sick Leave',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 6,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ALINJURY',
+				@UDCDesc1					= 'Injury Leave',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 7,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ALBUSTRIP',
+				@UDCDesc1					= 'Business Trip',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 8,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ALEXCUSE',
+				@UDCDesc1					= 'Excused',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 9,
+				@IsActive					= 1,
+				@Amount						= NULL
+
+		SELECT	@UDCCode					= 'ALOTHERS',
+				@UDCDesc1					= 'Others',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 10,
+				@IsActive					= 1,
+				@Amount						= NULL
+		
+	*/
 	
 
 	IF @actionType = 0
@@ -2105,7 +2193,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	BEGIN TRAN T1
 
 	DELETE FROM kenuser.UserDefinedCode
-	WHERE UDCId = 1120
+	WHERE UDCId = 3384
 
 	COMMIT TRAN T1
 
