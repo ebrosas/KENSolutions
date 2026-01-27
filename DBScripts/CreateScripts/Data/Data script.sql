@@ -90,7 +90,7 @@
 	SELECT * FROM [kenuser].[RecruitmentRequest] a
 	WHERE a.DepartmentCode = '7600'
 
-	select * from [kenuser].[JobQualification] a
+	SELECT * FROM [kenuser].[JobQualification] a
 
 	SELECT * FROM kenuser.MasterShiftPatternTitle a 
 	WHERE a.ShiftPatternId = 2
