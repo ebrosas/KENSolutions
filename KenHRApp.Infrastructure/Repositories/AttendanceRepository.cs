@@ -838,6 +838,41 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<AttendanceSummaryResult>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<AttendanceDetailResult>> GetAttendanceDetailAsync(int empNo, DateTime attendanceDate)
+        {
+            AttendanceDetailResult attendanceDetail = new AttendanceDetailResult();
+
+            try
+            {
+                var model = await _db.Set<AttendanceDetailResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetAttendanceDetail @empNo = {0}, @attendanceDate = {1}",
+                    empNo, attendanceDate)
+                    .AsNoTracking()
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    attendanceDetail.EmployeeNo = model[0].EmployeeNo;
+                    attendanceDetail.AttendanceDate = model[0].AttendanceDate;
+                    attendanceDetail.FirstTimeIn = model[0].FirstTimeIn;
+                    attendanceDetail.LastTimeOut = model[0].LastTimeOut;
+                    attendanceDetail.WorkDurationDesc = model[0].WorkDurationDesc;
+                    attendanceDetail.DeficitHoursDesc = model[0].DeficitHoursDesc;
+                    attendanceDetail.RegularizedType = model[0].RegularizedType;
+                    attendanceDetail.RegularizedReason = model[0].RegularizedReason;
+                    attendanceDetail.LeaveStatus = model[0].LeaveStatus;
+                    attendanceDetail.LeaveDetails = model[0].LeaveDetails;
+                    attendanceDetail.RawSwipes = model[0].RawSwipes;
+                }
+
+                return Result<AttendanceDetailResult>.SuccessResult(attendanceDetail);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<AttendanceDetailResult>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

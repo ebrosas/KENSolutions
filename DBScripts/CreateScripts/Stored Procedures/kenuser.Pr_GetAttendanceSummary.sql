@@ -25,6 +25,7 @@ BEGIN
 			'ERVIN OLINAS BROSAS' AS EmployeeName,
 			'D5' AS ShiftRoster,
 			'08:00 AM - 04:30 PM' AS ShiftTiming,
+			FORMAT(GETDATE(), 'dd-MMM-yyyy hh:mm tt')  AS ActualTiming,
 			5 AS TotalAbsent,
 			3 AS TotalHalfDay,
 			10 AS TotalLeave,

@@ -632,6 +632,42 @@ namespace KenHRApp.Application.Services
                 return Result<AttendanceSummaryDTO>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the attendance summary information from the database.");
             }
         }
+
+        public async Task<Result<AttendanceDetailDTO>> GetAttendanceDetailAsync(int empNo, DateTime attendanceDate)
+        {
+            AttendanceDetailDTO attendanceDetail = new AttendanceDetailDTO();
+
+            try
+            {
+                var repoResult = await _repository.GetAttendanceDetailAsync(empNo, attendanceDate);
+                if (!repoResult.Success)
+                {
+                    return Result<AttendanceDetailDTO>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null)
+                {
+                    attendanceDetail.EmployeeNo = model.EmployeeNo;
+                    attendanceDetail.AttendanceDate = model.AttendanceDate;
+                    attendanceDetail.FirstTimeIn = model.FirstTimeIn;
+                    attendanceDetail.LastTimeOut = model.LastTimeOut;
+                    attendanceDetail.WorkDurationDesc = model.WorkDurationDesc;
+                    attendanceDetail.DeficitHoursDesc = model.DeficitHoursDesc;
+                    attendanceDetail.RegularizedType = model.RegularizedType;
+                    attendanceDetail.RegularizedReason = model.RegularizedReason;
+                    attendanceDetail.LeaveStatus = model.LeaveStatus;
+                    attendanceDetail.LeaveDetails = model.LeaveDetails;
+                    attendanceDetail.RawSwipes = model.RawSwipes;
+                }
+
+                return Result<AttendanceDetailDTO>.SuccessResult(attendanceDetail);
+            }
+            catch (Exception ex)
+            {
+                return Result<AttendanceDetailDTO>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the attendance details from the database.");
+            }
+        }
         #endregion
     }
 }

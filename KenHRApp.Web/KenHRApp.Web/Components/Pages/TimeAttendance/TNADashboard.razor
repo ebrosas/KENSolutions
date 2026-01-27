@@ -41,7 +41,7 @@
                 <MudPaper Elevation="0">
                     @if (_showAttendanceDetail)
                     {
-                        <MudPaper Elevation="0" Square="true" Class="mt-0 pa-4">
+                        <MudPaper Elevation="0" Square="true" Class="ma-0 pa-4">
                             <MudGrid Spacing="0">
                                 <MudItem xs="12" Class="px-2">
                                     @* <MudText Typo="Typo.subtitle1" Color="Color.Info" Class="fw-bold">@($"{_selectedDate!.Value.ToString("dd MMMM yyyy")} - Attendance Details:")</MudText> *@
@@ -60,7 +60,7 @@
                                 <MudItem xs="6" Class="px-2">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                         <MudText Typo="Typo.subtitle2" Class="fw-bold">Actual:</MudText>
-                                        <MudText Typo="Typo.caption">08:15 AM to 05:35 PM</MudText>
+                                        <MudText Typo="Typo.caption">@_attendanceDetail.ActualTiming</MudText>
                                     </MudStack>
                                 </MudItem>
                             </MudGrid>
@@ -68,13 +68,13 @@
                                 <MudItem xs="6" Class="px-2">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                         <MudText Typo="Typo.subtitle2" Class="fw-bold">Regularized:</MudText>
-                                        <MudText Typo="Typo.caption">None</MudText>
+                                            <MudText Typo="Typo.caption">@_attendanceDetail.RegularizedType</MudText>
                                     </MudStack>
                                 </MudItem>
                                 <MudItem xs="6" Class="px-2">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                         <MudText Typo="Typo.subtitle2" Class="fw-bold">Work Duration:</MudText>
-                                        <MudText Typo="Typo.caption">8 hrs. 35 mins.</MudText>
+                                        <MudText Typo="Typo.caption">@_attendanceDetail.WorkDurationDesc</MudText>
                                     </MudStack>
                                 </MudItem>
                             </MudGrid>
@@ -82,13 +82,13 @@
                                 <MudItem xs="6" Class="px-2">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                         <MudText Typo="Typo.subtitle2" Class="fw-bold">Reason:</MudText>
-                                        <MudText Typo="Typo.caption">None</MudText>
+                                        <MudText Typo="Typo.caption">@_attendanceDetail.RegularizedReason</MudText>
                                     </MudStack>
                                 </MudItem>
                                 <MudItem xs="6" Class="px-2">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                         <MudText Typo="Typo.subtitle2" Class="fw-bold">Deficit:</MudText>
-                                        <MudText Typo="Typo.caption">00:00</MudText>
+                                        <MudText Typo="Typo.caption">@_attendanceDetail.DeficitHoursDesc</MudText>
                                     </MudStack>
                                 </MudItem>
                             </MudGrid>
@@ -96,27 +96,27 @@
                                 <MudItem xs="6" Class="px-2">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                         <MudText Typo="Typo.subtitle2" Class="fw-bold">Leave Status:</MudText>
-                                        <MudText Typo="Typo.caption">None</MudText>
+                                        <MudText Typo="Typo.caption">@_attendanceDetail.LeaveStatus</MudText>
                                     </MudStack>
                                 </MudItem>
                                 <MudItem xs="6" Class="px-2">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                         <MudText Typo="Typo.subtitle2" Class="fw-bold">Application:</MudText>
-                                        <MudText Typo="Typo.caption">None</MudText>
+                                            <MudText Typo="Typo.caption">@_attendanceDetail.LeaveDetails</MudText>
                                     </MudStack>
                                 </MudItem>
                             </MudGrid>
                             <MudGrid Spacing="0" Class="mt-1">
                                 <MudItem xs="12" Class="px-2">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="fw-bold">Raw Swipes:</MudText>
-                                        <MudText Typo="Typo.caption" Color="Color.Secondary">08:15 AM, 9:30 AM, 4:30 PM </MudText>
+                                        <MudText Typo="Typo.subtitle2" Color="Color.Default" Class="fw-bold">Raw Swipes:</MudText>
+                                            <MudText Typo="Typo.caption">@_attendanceDetail.RawSwipes</MudText>
                                     </MudStack>
                                 </MudItem>
                             </MudGrid>
                         </MudPaper>
                     }
-                    <MudPaper Class="mt-1" Elevation="0">
+                    <MudPaper Class="mt-0" Elevation="0">
                         <MudButton Variant="Variant.Text" FullWidth="true" EndIcon="@(_showAttendanceDetail ? "fas fa-chevron-up" : "fas fa-chevron-down")" Color="Color.Surface" OnClick="ShowAttendanceDetailToggle">
                             @(_showAttendanceDetail ? "View Less" : "View More")
                         </MudButton>
@@ -195,7 +195,7 @@
                                         <MudAvatar Size="Size.Small" Color="Color.Error" Variant="Variant.Filled">
                                             <MudIcon Icon="@Icons.Material.Filled.WorkOff" />
                                         </MudAvatar>
-                                        <MudText Typo="Typo.h6" Color="Color.Error">0</MudText>
+                                        <MudText Typo="Typo.h6" Color="Color.Error">@_attendanceSummary.TotalAbsent</MudText>
                                     </MudStack>
                                     <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Error">Absent</MudText>
                                 </MudStack>
@@ -204,7 +204,7 @@
                                         <MudAvatar Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">
                                             <MudIcon Icon="@Icons.Material.Filled.WatchLater" />
                                         </MudAvatar>
-                                        <MudText Typo="Typo.h6">0</MudText>
+                                        <MudText Typo="Typo.h6">@_attendanceSummary.TotalLate</MudText>
                                     </MudStack>
                                     <MudText Typo="Typo.caption" Align="Align.Center">Late</MudText>
                                 </MudStack>
@@ -213,7 +213,7 @@
                                         <MudAvatar Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">
                                             <MudIcon Icon="@Icons.Material.Filled.NetworkCheck" />
                                         </MudAvatar>
-                                        <MudText Typo="Typo.h6">0</MudText>
+                                            <MudText Typo="Typo.h6">@_attendanceSummary.TotalWorkHour.ToString("F2")</MudText>
                                     </MudStack>
                                     <MudText Typo="Typo.caption" Align="Align.Center">Total WH</MudText>
                                 </MudStack>
@@ -224,7 +224,7 @@
                                         <MudAvatar Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
                                             <MudIcon Icon="@Icons.Material.Filled.TimeToLeave" />
                                         </MudAvatar>
-                                        <MudText Typo="Typo.h6" Color="Color.Success">0</MudText>
+                                        <MudText Typo="Typo.h6" Color="Color.Success">@_attendanceSummary.TotalLeave.ToString("F2")</MudText>
                                     </MudStack>
                                     <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Success">On Leave</MudText>
                                 </MudStack>
@@ -233,7 +233,7 @@
                                         <MudAvatar Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">
                                             <MudIcon Icon="@Icons.Material.Filled.Logout" />
                                         </MudAvatar>
-                                        <MudText Typo="Typo.h6">0</MudText>
+                                            <MudText Typo="Typo.h6">@_attendanceSummary.TotalEarlyOut</MudText>
                                     </MudStack>
                                     <MudText Typo="Typo.caption" Align="Align.Center">Early Out</MudText>
                                 </MudStack>
@@ -242,7 +242,7 @@
                                         <MudAvatar Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">
                                             <MudIcon Icon="@Icons.Material.Filled.Today" />
                                         </MudAvatar>
-                                        <MudText Typo="Typo.h6">0</MudText>
+                                        <MudText Typo="Typo.h6">@_attendanceSummary.TotalDaysWorked</MudText>
                                     </MudStack>
                                     <MudText Typo="Typo.caption" Align="Align.Center">Days Worked</MudText>
                                 </MudStack>
@@ -253,7 +253,7 @@
                                         <MudAvatar Size="Size.Small" Color="Color.Warning" Variant="Variant.Filled">
                                             <MudIcon Icon="@Icons.Material.Filled.ViewDay" />
                                         </MudAvatar>
-                                        <MudText Typo="Typo.h6" Color="Color.Warning">0</MudText>
+                                            <MudText Typo="Typo.h6" Color="Color.Warning">@_attendanceSummary.TotalHalfDay.ToString("F2")</MudText>
                                     </MudStack>
                                     <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Warning">Half Days</MudText>
                                 </MudStack>
@@ -262,18 +262,18 @@
                                         <MudAvatar Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">
                                             <MudIcon Icon="@Icons.Material.Filled.IncompleteCircle" />
                                         </MudAvatar>
-                                        <MudText Typo="Typo.h6">0</MudText>
+                                        <MudText Typo="Typo.h6">@_attendanceSummary.TotalDeficitHour.ToString("F2")</MudText>
                                     </MudStack>
                                     <MudText Typo="Typo.caption" Align="Align.Center">Deficit Hours</MudText>
                                 </MudStack>
                                 <MudStack Justify="Justify.Center" Spacing="0">
                                     <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceEvenly" Spacing="1">
-                                        <MudAvatar Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">
+                                        <MudAvatar Size="Size.Small" Color="Color.Surface" Variant="Variant.Outlined">
                                             <MudIcon Icon="@Icons.Material.Filled.BarChart" />
                                         </MudAvatar>
-                                        <MudText Typo="Typo.h6">0</MudText>
+                                            <MudText Typo="Typo.h6">@_attendanceSummary.AverageWorkHour.ToString("F2")</MudText>
                                     </MudStack>
-                                    <MudText Typo="Typo.caption" Align="Align.Center">Avg. WH</MudText>
+                                        <MudText Typo="Typo.caption" Align="Align.Center">Avg. WH</MudText>
                                 </MudStack>
                             </MudStack>
                         </MudStack>
@@ -282,7 +282,8 @@
                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart">
                             <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" StretchItems="StretchItems.Start" Spacing="5" Class="pa-0">
                                 <!-- Pagination -->
-                                <MudPagination Class="pa-0"
+                                    <MudPaper Class="w-100 d-flex justify-content-start" Elevation="0">
+                                        <MudPagination Class="pa-0"
                                                Variant="Variant.Filled"
                                                Rectangular="false"
                                                Color="Color.Surface"
@@ -290,28 +291,39 @@
                                                ShowFirstButton="true" ShowLastButton="true"
                                                Count="@pageCount"
                                                SelectedChanged="OnPageChanged" />
-
-                                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexEnd" StretchItems="StretchItems.Start" Class="mb-2">
-                                    <MudText Typo="Typo.caption">
-                                        Page Size
-                                    </MudText>
-                                    <MudSelect T="int"
-                                               Dense="true"
-                                               @bind-Value="pageSize"
-                                               Style="width:50px">
-                                        <MudSelectItem Value="5">5</MudSelectItem>
-                                        <MudSelectItem Value="10">10</MudSelectItem>
-                                        <MudSelectItem Value="20">20</MudSelectItem>
-                                        <MudSelectItem Value="50">50</MudSelectItem>
-                                    </MudSelect>
-                                </MudStack>
-                                @* <MudSelect T="int"
-                                           Dense="true"
-                                           Style="width:100px">
-                                    <MudSelectItem Value="2024">2024</MudSelectItem>
-                                    <MudSelectItem Value="2025">2025</MudSelectItem>
-                                    <MudSelectItem Value="2026">2026</MudSelectItem>
-                                </MudSelect> *@
+                                    </MudPaper>  
+                                    <MudStack Row="true" AlignItems="AlignItems.End" Justify="Justify.SpaceBetween" Spacing="3" Class="pa-0">
+                                        <MudSelect T="int"
+                                                    @bind-Value="pageSize"
+                                                    Dense="true"
+                                                    Variant="Variant.Text"
+                                                    Label="Page Size"
+                                                    Placeholder="Select size"
+                                                    AdornmentIcon="@Icons.Material.Outlined.RestorePage"
+                                                    AdornmentColor="Color.Surface"
+                                                    Style="width:80px;"
+                                                    Typo="Typo.body2">
+                                            <MudSelectItem Value="5">5</MudSelectItem>
+                                            <MudSelectItem Value="10">10</MudSelectItem>
+                                            <MudSelectItem Value="20">20</MudSelectItem>
+                                            <MudSelectItem Value="50">50</MudSelectItem>
+                                        </MudSelect>
+                                        <MudSelect T="int"
+                                                    @bind-Value="_fiscalYear"
+                                                    Dense="true"
+                                                    Variant="Variant.Text"
+                                                    Label="Fiscal Year"
+                                                    Placeholder="Select year"
+                                                    AdornmentIcon="@Icons.Material.Filled.CalendarMonth"
+                                                    AdornmentColor="Color.Surface"
+                                                    Style="width:80px;"
+                                                    Typo="Typo.body2"
+                                                    SelectedValuesChanged="RefreshHolidays">
+                                            <MudSelectItem Value="2024">2024</MudSelectItem>
+                                            <MudSelectItem Value="2025">2025</MudSelectItem>
+                                            <MudSelectItem Value="2026">2026</MudSelectItem>
+                                        </MudSelect>
+                                    </MudStack>
                             </MudStack>                            
                             <MudList T="HolidayDTO" Dense="true">
                                 @if (!_holidayList.Any())

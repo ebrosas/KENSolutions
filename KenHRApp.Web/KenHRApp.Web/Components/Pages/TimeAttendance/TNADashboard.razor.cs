@@ -37,8 +37,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private DateTime? _selectedDate = DateTime.Now;
         private int _currentEmpNo = 10003632;
         private DateTime _payrollStartDate = new DateTime(2026, 1, 16);
-        private DateTime _payrollEndDate = new DateTime(2026, 2, 15);
+        private DateTime _payrollEndDate = new DateTime(2026, 2, 15);        
+        private int _fiscalYear = DateTime.Now.Year;
+
         private AttendanceSummaryDTO _attendanceSummary = new AttendanceSummaryDTO();
+        private AttendanceDetailDTO _attendanceDetail = new AttendanceDetailDTO();  
         #endregion
 
         #region Flags
@@ -96,7 +99,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Page Events
         protected override void OnInitialized()
         {
-            //BeginLoadComboboxTask();
+            //RefreshHolidays();
             BeginGetAttendanceSummary();
         }
         #endregion
@@ -195,23 +198,19 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Database Methods
-        private void BeginLoadComboboxTask()
+        private async Task RefreshHolidays()
         {
-            _isRunning = true;
 
-            // Set the overlay message
-            overlayMessage = "Initializing form, please wait...";
-
-            _ = LoadComboboxAsync(async () =>
+            var repoResult = await AttendanceService.GetPublicHolidaysAsync(_fiscalYear, null);
+            if (repoResult.Success)
             {
-                _isRunning = false;
+                _holidayList = repoResult!.Value;
+            }
+            else
+                _errorMessage.Append(repoResult.Error);
 
-                if (_errorMessage.Length > 0)
-                    ShowHideError(true);
-
-                // Shows the spinner overlay
-                await InvokeAsync(StateHasChanged);
-            });
+            if (_errorMessage.Length > 0)
+                ShowHideError(true);
         }
 
         private async Task LoadComboboxAsync(Func<Task> callback)
@@ -219,24 +218,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(300);
 
-            #region Get Public Holidays
-            int yearNum = DateTime.Now.Year;
-
-            var repoResult = await AttendanceService.GetPublicHolidaysAsync(yearNum, null);
+            var repoResult = await AttendanceService.GetPublicHolidaysAsync(_fiscalYear, null);
             if (repoResult.Success)
             {
                 _holidayList = repoResult!.Value;
             }
             else
                 _errorMessage.Append(repoResult.Error);
-            #endregion
-
-            //Get UDC dataset
-            var udcResult = await AttendanceService.GetUserDefinedCodeAsync(UDCKeys.ATTENDLEGEND.ToString());
-            if (udcResult.Success)
-                _attendanceLegends = udcResult!.Value;
-            else
-                _errorMessage.Append(udcResult.Error);
 
             if (callback != null)
             {
@@ -264,7 +252,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private async Task GetAttendanceSummaryAsync(Func<Task> callback, int empNo, DateTime? startDate, DateTime? endDate)
         {
             // Wait for 1 second then gives control back to the runtime
-            await Task.Delay(300);
+            await Task.Delay(500);
 
             // Reset error messages
             _errorMessage.Clear();
@@ -276,9 +264,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (result.Success)
             {
                 _attendanceSummary = result.Value!;
-
-                // Recreate the EditContext with the loaded _shiftPattern
-                //_editContext = new EditContext(_shiftPattern);
             }
             else
             {
@@ -287,6 +272,26 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 ShowHideError(true);
             }
+
+            #region Get public holidays and attendance legends
+            
+            //Get Public Holidays
+            var repoResult = await AttendanceService.GetPublicHolidaysAsync(_fiscalYear, null);
+            if (repoResult.Success)
+            {
+                _holidayList = repoResult!.Value;
+            }
+            else
+                _errorMessage.Append(repoResult.Error);
+
+            // Get Attendance Legends
+            var udcResult = await AttendanceService.GetUserDefinedCodeAsync(UDCKeys.ATTENDLEGEND.ToString());
+            if (udcResult.Success)
+                _attendanceLegends = udcResult!.Value;
+            else
+                _errorMessage.Append(udcResult.Error);
+
+            #endregion
 
             if (callback != null)
             {

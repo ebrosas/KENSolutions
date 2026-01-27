@@ -58,15 +58,19 @@ namespace KenHRApp.Infrastructure.Data
 
             #region Configure keyless models that are mapped to views or stored procedures
             modelBuilder.Entity<EmployeeMaster>().HasNoKey();
-            #endregion
 
-            #region Configure Keyless and Non-Migrated models
             modelBuilder.Entity<AttendanceSummaryResult>(entity =>
             {
                 entity.HasNoKey();
                 entity.ToView(null); // prevents migration
             });
-            #endregion
+
+            modelBuilder.Entity<AttendanceDetailResult>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView(null); // prevents migration
+            });
+            #endregion                        
 
             #region Configure models
             modelBuilder.Entity<EmergencyContact>(
