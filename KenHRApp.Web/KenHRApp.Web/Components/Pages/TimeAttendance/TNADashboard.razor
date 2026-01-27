@@ -18,30 +18,25 @@
                     <MudPaper Elevation="0" Class="pa-0 w-100">
                         <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Surface" Rounded="true" Date="@_selectedDate" />
                     </MudPaper>
-                    <MudPaper Elevation="0" Class="pa-0 w-100">
-                        <MudStack Justify="Justify.Center" Spacing="0" Class="rounded-r-xl">
-                            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Info">Punch In</MudButton>
-                        </MudStack>
-                    </MudPaper>
-                </MudStack>
-                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0" Wrap="Wrap.Wrap">
-                    <MudChipSet T="string" Class="mt-4" ReadOnly="true" Size="Size.Small">
-                        @foreach (var legend in _attendanceLegends)
-                        {
-                            <MudChip
-                                Icon="@Icons.Material.Filled.Circle"
-                                IconColor="@GetLegendColor(legend.UDCCode)"
-                                Size="Size.Small"
-                                Variant="Variant.Text">
-                                @legend.UDCDesc1
-                            </MudChip>
-                        }
-                    </MudChipSet>
-                </MudStack>
+                    <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0" Wrap="Wrap.Wrap">
+                        <MudChipSet T="string" Class="mt-0" ReadOnly="true" Size="Size.Small">
+                            @foreach (var legend in _attendanceLegends)
+                            {
+                                <MudChip
+                                    Icon="@Icons.Material.Filled.Circle"
+                                    IconColor="@GetLegendColor(legend.UDCCode)"
+                                    Size="Size.Small"
+                                    Variant="Variant.Text">
+                                    @legend.UDCDesc1
+                                </MudChip>
+                            }
+                        </MudChipSet>
+                    </MudStack>                    
+                </MudStack>                
                 <MudPaper Elevation="0">
                     @if (_showAttendanceDetail)
                     {
-                        <MudPaper Elevation="0" Square="true" Class="ma-0 pa-4">
+                        <MudPaper Elevation="0" Square="true" Class="px-2 mt-2">
                             <MudGrid Spacing="0">
                                 <MudItem xs="12" Class="px-2">
                                     @* <MudText Typo="Typo.subtitle1" Color="Color.Info" Class="fw-bold">@($"{_selectedDate!.Value.ToString("dd MMMM yyyy")} - Attendance Details:")</MudText> *@
@@ -124,7 +119,7 @@
                 </MudPaper>
             </MudItem>
             <MudItem xs="4" Class="px-4">
-                <MudStack>
+                <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart">
                     <MudPaper Class="pa-4" Elevation="4" Square="true">
                         <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexStart" StretchItems="StretchItems.Start">
                             <MudStack>
@@ -181,6 +176,24 @@
                                     <MudText Typo="Typo.caption">Day In Lieu</MudText>
                                 </MudStack>
                             </MudStack>
+                        </MudStack>
+                    </MudPaper>
+                    <MudPaper Elevation="4" Class="p-4 w-100" Square="true">
+                        <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="3">
+                            <MudText Typo="Typo.h6">Raw Swipes</MudText>
+                            <MudStack Row="true">
+                                <MudAvatar Size="Size.Medium" Color="Color.Surface" Variant="Variant.Outlined">
+                                    <MudIcon Icon="fas fa-clock" Size="Size.Medium" />
+                                </MudAvatar>
+                                <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0">
+                                    <MudText Typo="Typo.caption">First Swipe: @_firstTimeIn</MudText>
+                                    <MudText Typo="Typo.caption">Last Swipe: @_lastTimeOut</MudText>
+                                </MudStack>                                
+                            </MudStack>    
+                            <MudButton Variant="Variant.Filled" EndIcon="@(!_isPunchedIn ? "fas fa-angle-double-down" : "fas fa-angle-double-up")"
+                                FullWidth="true" Color="Color.Info" OnClick="PunchInOrOut">
+                                @(!_isPunchedIn ? "Punch In" : "Punch Out")
+                            </MudButton>
                         </MudStack>
                     </MudPaper>
                 </MudStack>
@@ -299,9 +312,7 @@
                                                     Variant="Variant.Text"
                                                     Label="Page Size"
                                                     Placeholder="Select size"
-                                                    AdornmentIcon="@Icons.Material.Outlined.RestorePage"
-                                                    AdornmentColor="Color.Surface"
-                                                    Style="width:80px;"
+                                                    Style="width:75px;"
                                                     Typo="Typo.body2">
                                             <MudSelectItem Value="5">5</MudSelectItem>
                                             <MudSelectItem Value="10">10</MudSelectItem>
@@ -312,12 +323,12 @@
                                                     @bind-Value="_fiscalYear"
                                                     Dense="true"
                                                     Variant="Variant.Text"
-                                                    Label="Fiscal Year"
+                                                    Label="Year"
                                                     Placeholder="Select year"
                                                     AdornmentIcon="@Icons.Material.Filled.CalendarMonth"
                                                     AdornmentColor="Color.Surface"
-                                                    Style="width:80px;"
                                                     Typo="Typo.body2"
+                                                   Style="width:70px;"
                                                     SelectedValuesChanged="RefreshHolidays">
                                             <MudSelectItem Value="2024">2024</MudSelectItem>
                                             <MudSelectItem Value="2025">2025</MudSelectItem>

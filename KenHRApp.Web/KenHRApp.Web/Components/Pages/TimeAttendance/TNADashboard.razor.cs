@@ -39,6 +39,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private DateTime _payrollStartDate = new DateTime(2026, 1, 16);
         private DateTime _payrollEndDate = new DateTime(2026, 2, 15);        
         private int _fiscalYear = DateTime.Now.Year;
+        private string _firstTimeIn = "-";
+        private string _lastTimeOut = "-";
 
         private AttendanceSummaryDTO _attendanceSummary = new AttendanceSummaryDTO();
         private AttendanceDetailDTO _attendanceDetail = new AttendanceDetailDTO();  
@@ -51,6 +53,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _enableFilter = false;
         private bool _isTaskFinished = false;
         private bool _showAttendanceDetail = true;
+        private bool _isPunchedIn = false;
         #endregion
 
         #region Dialog Box Button Icons
@@ -194,6 +197,19 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 3 => "rd",
                 _ => "th"
             };
+        }
+
+        private void PunchInOrOut()
+        {
+            DateTime now = DateTime.Now;
+
+            if (!_isPunchedIn)
+                _firstTimeIn = $"{now.Day}{GetOrdinal(now.Day)} {now:MMM yyyy hh:mm tt}";
+            else
+                _lastTimeOut = $"{now.Day}{GetOrdinal(now.Day)} {now:MMMM yyyy hh:mm tt}";
+
+            if (!_isPunchedIn)
+                _isPunchedIn = true;
         }
         #endregion
 
