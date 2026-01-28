@@ -633,39 +633,42 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<Result<AttendanceDetailDTO>> GetAttendanceDetailAsync(int empNo, DateTime attendanceDate)
+        public async Task<Result<AttendanceDetailDTO?>> GetAttendanceDetailAsync(int empNo, DateTime attendanceDate)
         {
-            AttendanceDetailDTO attendanceDetail = new AttendanceDetailDTO();
+            AttendanceDetailDTO? attendanceDetail = null;
 
             try
             {
                 var repoResult = await _repository.GetAttendanceDetailAsync(empNo, attendanceDate);
                 if (!repoResult.Success)
                 {
-                    return Result<AttendanceDetailDTO>.Failure(repoResult.Error ?? "Unknown repository error");
+                    return Result<AttendanceDetailDTO?>.Failure(repoResult.Error ?? "Unknown repository error");
                 }
 
                 var model = repoResult.Value;
                 if (model != null)
                 {
-                    attendanceDetail.EmployeeNo = model.EmployeeNo;
-                    attendanceDetail.AttendanceDate = model.AttendanceDate;
-                    attendanceDetail.FirstTimeIn = model.FirstTimeIn;
-                    attendanceDetail.LastTimeOut = model.LastTimeOut;
-                    attendanceDetail.WorkDurationDesc = model.WorkDurationDesc;
-                    attendanceDetail.DeficitHoursDesc = model.DeficitHoursDesc;
-                    attendanceDetail.RegularizedType = model.RegularizedType;
-                    attendanceDetail.RegularizedReason = model.RegularizedReason;
-                    attendanceDetail.LeaveStatus = model.LeaveStatus;
-                    attendanceDetail.LeaveDetails = model.LeaveDetails;
-                    attendanceDetail.RawSwipes = model.RawSwipes;
+                    attendanceDetail = new AttendanceDetailDTO()
+                    {
+                        EmployeeNo = model.EmployeeNo,
+                        AttendanceDate = model.AttendanceDate,
+                        FirstTimeIn = model.FirstTimeIn,
+                        LastTimeOut = model.LastTimeOut,
+                        WorkDurationDesc = model.WorkDurationDesc,
+                        DeficitHoursDesc = model.DeficitHoursDesc,
+                        RegularizedType = model.RegularizedType,
+                        RegularizedReason = model.RegularizedReason,
+                        LeaveStatus = model.LeaveStatus,
+                        LeaveDetails = model.LeaveDetails,
+                        RawSwipes = model.RawSwipes
+                    };
                 }
 
-                return Result<AttendanceDetailDTO>.SuccessResult(attendanceDetail);
+                return Result<AttendanceDetailDTO?>.SuccessResult(attendanceDetail);
             }
             catch (Exception ex)
             {
-                return Result<AttendanceDetailDTO>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the attendance details from the database.");
+                return Result<AttendanceDetailDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the attendance records from the database.");
             }
         }
         #endregion

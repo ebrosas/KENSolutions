@@ -839,9 +839,9 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        public async Task<Result<AttendanceDetailResult>> GetAttendanceDetailAsync(int empNo, DateTime attendanceDate)
+        public async Task<Result<AttendanceDetailResult?>> GetAttendanceDetailAsync(int empNo, DateTime attendanceDate)
         {
-            AttendanceDetailResult attendanceDetail = new AttendanceDetailResult();
+            AttendanceDetailResult? attendanceDetail = null;
 
             try
             {
@@ -852,25 +852,28 @@ namespace KenHRApp.Infrastructure.Repositories
                     .ToListAsync();
                 if (model != null && model.Any())
                 {
-                    attendanceDetail.EmployeeNo = model[0].EmployeeNo;
-                    attendanceDetail.AttendanceDate = model[0].AttendanceDate;
-                    attendanceDetail.FirstTimeIn = model[0].FirstTimeIn;
-                    attendanceDetail.LastTimeOut = model[0].LastTimeOut;
-                    attendanceDetail.WorkDurationDesc = model[0].WorkDurationDesc;
-                    attendanceDetail.DeficitHoursDesc = model[0].DeficitHoursDesc;
-                    attendanceDetail.RegularizedType = model[0].RegularizedType;
-                    attendanceDetail.RegularizedReason = model[0].RegularizedReason;
-                    attendanceDetail.LeaveStatus = model[0].LeaveStatus;
-                    attendanceDetail.LeaveDetails = model[0].LeaveDetails;
-                    attendanceDetail.RawSwipes = model[0].RawSwipes;
+                    attendanceDetail = new AttendanceDetailResult()
+                    {
+                        EmployeeNo = model[0].EmployeeNo,
+                        AttendanceDate = model[0].AttendanceDate,
+                        FirstTimeIn = model[0].FirstTimeIn,
+                        LastTimeOut = model[0].LastTimeOut,
+                        WorkDurationDesc = model[0].WorkDurationDesc,
+                        DeficitHoursDesc = model[0].DeficitHoursDesc,
+                        RegularizedType = model[0].RegularizedType,
+                        RegularizedReason = model[0].RegularizedReason,
+                        LeaveStatus = model[0].LeaveStatus,
+                        LeaveDetails = model[0].LeaveDetails,
+                        RawSwipes = model[0].RawSwipes
+                    };
                 }
 
-                return Result<AttendanceDetailResult>.SuccessResult(attendanceDetail);
+                return Result<AttendanceDetailResult?>.SuccessResult(attendanceDetail);
             }
             catch (Exception ex)
             {
                 // Log error here if needed (Serilog, NLog, etc.)
-                return Result<AttendanceDetailResult>.Failure($"Database error: {ex.Message}");
+                return Result<AttendanceDetailResult?>.Failure($"Database error: {ex.Message}");
             }
         }
         #endregion

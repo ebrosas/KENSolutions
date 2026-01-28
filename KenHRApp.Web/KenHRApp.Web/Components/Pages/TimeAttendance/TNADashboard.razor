@@ -189,7 +189,21 @@
                                     <MudText Typo="Typo.caption">First Swipe: @_firstTimeIn</MudText>
                                     <MudText Typo="Typo.caption">Last Swipe: @_lastTimeOut</MudText>
                                 </MudStack>                                
-                            </MudStack>    
+                            </MudStack>   
+                             <MudStack Justify="@Justify.Center" Class="mud-width-full">
+                                        <MudChipSet T="string" SelectedColor="Color.Default" Disabled="true"
+                                            AllClosable="false"
+                                            CheckMark="true" Size="Size.Small"
+                                            SelectionMode="SelectionMode.SingleSelection">
+                                        @for (var i = 0; i < _attendanceChips.Count; i++)
+                                        {
+                                            var localIndex = i;
+                                            <MudChip Value="@_attendanceChips[localIndex].PunchTime!.Value.ToString("hh:mm:ss tt")" 
+                                                Variant="Variant.Filled"
+                                                Color="Color.Default" />
+                                        }
+                                    </MudChipSet>
+                                </MudStack>
                             <MudButton Variant="Variant.Filled" EndIcon="@(!_isPunchedIn ? "fas fa-angle-double-down" : "fas fa-angle-double-up")"
                                 FullWidth="true" Color="Color.Info" OnClick="PunchInOrOut">
                                 @(!_isPunchedIn ? "Punch In" : "Punch Out")

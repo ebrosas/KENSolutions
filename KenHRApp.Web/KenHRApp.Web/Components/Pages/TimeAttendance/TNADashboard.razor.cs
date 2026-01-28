@@ -74,6 +74,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private List<UserDefinedCodeDTO> _attendanceLegends { get; set; } = new();
         private List<HolidayDTO> _holidayList { get; set; } = new();
+        private List<AttendanceSwipeDTO> _attendanceChips { get; set; } = new();
 
         private IEnumerable<HolidayDTO> PagedHolidays =>
             _holidayList
@@ -204,13 +205,30 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             DateTime now = DateTime.Now;
 
             if (!_isPunchedIn)
-                _firstTimeIn = $"{now.Day}{GetOrdinal(now.Day)} {now:MMM yyyy hh:mm tt}";
+                _firstTimeIn = $"{now.Day}{GetOrdinal(now.Day)} {now:MMM yyyy hh:mm:ss tt}";
             else
-                _lastTimeOut = $"{now.Day}{GetOrdinal(now.Day)} {now:MMMM yyyy hh:mm tt}";
+                _lastTimeOut = $"{now.Day}{GetOrdinal(now.Day)} {now:MMMM yyyy hh:mm:ss tt}";
 
             if (!_isPunchedIn)
                 _isPunchedIn = true;
+
+            AddChip();
         }
+
+        private void AddChip()
+        {
+            AttendanceSwipeDTO punchSwipe = new AttendanceSwipeDTO()
+            {
+                EmpNo = _currentEmpNo,
+                AttendanceDate = DateTime.Now.Date,
+                PunchTime = DateTime.Now,
+                CreatedDate = DateTime.Now
+            };
+
+            _attendanceChips.Add(punchSwipe);
+        }
+
+        private void OnChipClosed(MudChip<AttendanceSwipeDTO> chip) => _attendanceChips.Remove(chip!.Value);
         #endregion
 
         #region Database Methods
@@ -289,9 +307,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 ShowHideError(true);
             }
 
-            #region Get public holidays and attendance legends
-            
-            //Get Public Holidays
+            #region Get Public Holidays
             var repoResult = await AttendanceService.GetPublicHolidaysAsync(_fiscalYear, null);
             if (repoResult.Success)
             {
@@ -299,14 +315,22 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
             else
                 _errorMessage.Append(repoResult.Error);
+            #endregion
 
-            // Get Attendance Legends
+            #region Get Attendance Legends
             var udcResult = await AttendanceService.GetUserDefinedCodeAsync(UDCKeys.ATTENDLEGEND.ToString());
             if (udcResult.Success)
                 _attendanceLegends = udcResult!.Value;
             else
                 _errorMessage.Append(udcResult.Error);
+            #endregion
 
+            #region Get Attendance Details
+            var attendanceResult = await AttendanceService.GetAttendanceDetailAsync(_currentEmpNo, _selectedDate!.Value);
+            if (attendanceResult.Success)
+                _attendanceDetail = attendanceResult!.Value;
+            else
+                _errorMessage.Append(attendanceResult.Error);
             #endregion
 
             if (callback != null)

@@ -24,6 +24,7 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<List<HolidayDTO>>> GetPublicHolidaysAsync(int? year, byte? holidayType);
         Task<Result<List<UserDefinedCodeDTO>>> GetUserDefinedCodeAsync(string? udcCode);
         Task<Result<AttendanceSummaryDTO>> GetAttendanceSummaryAsync(int empNo, DateTime? startDate, DateTime? endDate);
+        Task<Result<AttendanceDetailDTO?>> GetAttendanceDetailAsync(int empNo, DateTime attendanceDate);
         #endregion
     }
 }
