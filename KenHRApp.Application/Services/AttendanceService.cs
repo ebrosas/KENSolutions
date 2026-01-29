@@ -671,6 +671,41 @@ namespace KenHRApp.Application.Services
                 return Result<AttendanceDetailDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the attendance records from the database.");
             }
         }
+
+        public async Task<Result<int>> SaveSwipeDataAsync(AttendanceSwipeDTO swipeData, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Initialize "AttendanceSwipeLog" entity
+                AttendanceSwipeLog swipeLog = new AttendanceSwipeLog()
+                {
+                    EmpNo = swipeData.EmpNo,
+                    SwipeDate = swipeData.SwipeDate,
+                    SwipeTime = swipeData.SwipeTime,
+                    SwipeCode = swipeData.SwipeCode,
+                    LocationCode = swipeData.LocationCode,
+                    ReaderCode = swipeData.ReaderCode,
+                    StatusCode = swipeData.StatusCode,
+                    SwipeLogDate = DateTime.Now
+                };
+                #endregion
+
+                var result = await _repository.AddAttendanceSwipeLogAsync(swipeLog, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to save swipe data into the database due to an unknown error. Please refresh the page then try again!");
+                }
+
+                return Result<int>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
         #endregion
     }
 }

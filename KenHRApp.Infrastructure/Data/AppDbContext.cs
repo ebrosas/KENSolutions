@@ -39,6 +39,7 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<MasterShiftPattern> MasterShiftPatterns => Set<MasterShiftPattern>();
         public DbSet<ShiftPatternChange> ShiftPatternChanges => Set<ShiftPatternChange>();
         public DbSet<Holiday> Holidays => Set<Holiday>();
+        public DbSet<AttendanceSwipeLog> AttendanceSwipeLogs => Set<AttendanceSwipeLog>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -378,6 +379,19 @@ namespace KenHRApp.Infrastructure.Data
                       .HasDefaultValue(DateTime.Now);
                 entity.HasIndex(e => new { e.HolidayDesc, e.HolidayDate, e.HolidayType })
                      .HasDatabaseName("IX_Holiday_CompoKeys")
+                     .IsUnique();
+            });
+
+            modelBuilder.Entity<AttendanceSwipeLog>(
+            entity =>
+            {
+                entity.ToTable("AttendanceSwipeLog");
+                entity.HasKey(a => a.SwipeID)
+                    .HasName("PK_AttendanceSwipeLog_SwipeID");
+                entity.Property(a => a.SwipeLogDate)
+                      .HasDefaultValue(DateTime.Now);
+                entity.HasIndex(e => new { e.EmpNo, e.SwipeDate, e.SwipeTime })
+                     .HasDatabaseName("IX_AttendanceSwipeLog_CompoKeys")
                      .IsUnique();
             });
             #endregion

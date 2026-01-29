@@ -26,6 +26,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Fields
 
         #region Private Fields
+        private EditForm _editForm;
+        private EditContext? _editContext;
+        private List<string> _validationMessages = new();
         private string overlayMessage = "Please wait...";
         private CancellationTokenSource? _cts;
         private string _searchString = string.Empty;
@@ -44,6 +47,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private AttendanceSummaryDTO _attendanceSummary = new AttendanceSummaryDTO();
         private AttendanceDetailDTO _attendanceDetail = new AttendanceDetailDTO();  
+        private AttendanceSwipeLog _swipeLog = new AttendanceSwipeLog();    
         #endregion
 
         #region Flags
@@ -98,13 +102,79 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             ATTENDLEGEND             // Attendance Legend
         }
+
+        private enum MessageBoxTypes
+        {
+            Info,
+            Confirm,
+            Warning,
+            Error
+        }
         #endregion
 
         #region Page Events
         protected override void OnInitialized()
         {
-            //RefreshHolidays();
+            // Initialize the EditContext 
+            _editContext = new EditContext(_swipeLog);
+
             BeginGetAttendanceSummary();
+        }
+        #endregion
+
+        #region Validation Methods
+        private void HandleInvalidSubmit(EditContext context)
+        {
+            _hasValidationError = true;
+            _validationMessages = context.GetValidationMessages().ToList();
+        }
+
+        private void HandleValidSubmit(EditContext context)
+        {
+            try
+            {
+                //#region Check for Shift Timing Schedule
+                //if (_shiftPattern.ShiftTimingList.Any() == false)
+                //{
+                //    ShowNotification("At least one (1) Shift timing must be added to the Shift Timing Schedule.", NotificationType.Error);
+                //    return;
+                //}
+                //#endregion
+
+                //#region Check for Shift Timing Sequence
+                //if (_shiftPattern.ShiftPointerList.Any() == false)
+                //{
+                //    ShowNotification("At least one (1) Shift pointer must be added to the Shift Timing Sequence.", NotificationType.Error);
+                //    return;
+                //}
+                //#endregion
+
+                // If we got here, model is valid
+                _hasValidationError = false;
+                _validationMessages.Clear();
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Saving changes, please wait...";
+
+                //_ = SaveShiftRosterAsync(async () =>
+                //{
+                //    _isRunning = false;
+
+                //    // Shows the spinner overlay
+                //    await InvokeAsync(StateHasChanged);
+                //});
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Save cancelled (navigated away).", SnackBarTypes.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", SnackBarTypes.Error);
+            }
         }
         #endregion
 
@@ -220,9 +290,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             AttendanceSwipeDTO punchSwipe = new AttendanceSwipeDTO()
             {
                 EmpNo = _currentEmpNo,
-                AttendanceDate = DateTime.Now.Date,
-                PunchTime = DateTime.Now,
-                CreatedDate = DateTime.Now
+                SwipeDate = DateTime.Now.Date,
+                SwipeTime = DateTime.Now,
+                SwipeLogDate = DateTime.Now
             };
 
             _attendanceChips.Add(punchSwipe);

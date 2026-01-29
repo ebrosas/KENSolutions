@@ -26,6 +26,7 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<List<UserDefinedCode>>> GetUserDefinedCodeAsync(string? udcCode);
         Task<Result<AttendanceSummaryResult>> GetAttendanceSummaryAsync(int empNo, DateTime? startDate, DateTime? endDate);
         Task<Result<AttendanceDetailResult?>> GetAttendanceDetailAsync(int empNo, DateTime attendanceDate);
+        Task<Result<int>> AddAttendanceSwipeLogAsync(AttendanceSwipeLog dto, CancellationToken cancellationToken = default);
         #endregion
     }
 }

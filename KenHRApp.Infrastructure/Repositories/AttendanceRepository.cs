@@ -876,6 +876,32 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<AttendanceDetailResult?>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<int>> AddAttendanceSwipeLogAsync(AttendanceSwipeLog dto, CancellationToken cancellationToken = default)
+        {
+            int rowsInserted = 0;
+
+            try
+            {
+                if (dto != null)
+                {
+                    await _db.AttendanceSwipeLogs.AddAsync(dto, cancellationToken);
+
+                    // Save to database
+                    rowsInserted = await _db.SaveChangesAsync(cancellationToken);
+                }
+
+                return Result<int>.SuccessResult(rowsInserted);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

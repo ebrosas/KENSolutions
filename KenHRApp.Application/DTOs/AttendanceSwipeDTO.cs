@@ -16,15 +16,21 @@ namespace KenHRApp.Application.DTOs
         [Display(Name = "Employee No.")]
         public int EmpNo { get; set; }
 
-        [Required(ErrorMessage = "Attendance Date is required")]
-        [Display(Name = "Attendance Date")]
-        public DateTime AttendanceDate { get; set; }
+        [Required(ErrorMessage = "Swipe Date is required")]
+        [Display(Name = "Swipe Date")]
+        public DateTime SwipeDate { get; set; }
 
-        [Required(ErrorMessage = "Punch Time is required")]
-        [Display(Name = "Punch Time")]
-        public DateTime? PunchTime { get; set; }
+        [Required(ErrorMessage = "Swipe Time is required")]
+        [Display(Name = "Swipe Time")]
+        public DateTime? SwipeTime { get; set; }
 
-        public DateTime? CreatedDate { get; set; } = null;
+        public string? SwipeCode { get; set; }        
+        public string? LocationCode { get; set; } = null;
+        public string? LocationName { get; set; } = null;
+        public string? ReaderCode { get; set; } = null;
+        public string? ReaderName { get; set; } = null;
+        public string? StatusCode { get; set; } = null;
+        public DateTime? SwipeLogDate { get; set; } 
         #endregion
     }
 }
