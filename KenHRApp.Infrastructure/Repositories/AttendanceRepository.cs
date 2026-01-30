@@ -899,7 +899,37 @@ namespace KenHRApp.Infrastructure.Repositories
             }
             catch (Exception ex)
             {
-                return Result<int>.Failure($"Database error: {ex.Message}");
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<AttendanceDurationResult>> GetAttendanceDurationAsync(int empNo, DateTime attendanceDate)
+        {
+            AttendanceDurationResult attendanceDuration = new AttendanceDurationResult();
+
+            try
+            {
+                var model = await _db.Set<AttendanceDurationResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_CalculateWorkDuration @empNo = {0}, @attendanceDate = {1}",
+                    empNo, attendanceDate)
+                    .AsNoTracking()
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    attendanceDuration.EmpNo = model[0].EmpNo;
+                    attendanceDuration.SwipeDate = model[0].SwipeDate;
+                    attendanceDuration.TotalWorkDuration = model[0].TotalWorkDuration;
+                }
+
+                return Result<AttendanceDurationResult>.SuccessResult(attendanceDuration);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<AttendanceDurationResult>.Failure($"Database error: {ex.Message}");
             }
         }
         #endregion

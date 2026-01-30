@@ -42,12 +42,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private DateTime _payrollStartDate = new DateTime(2026, 1, 16);
         private DateTime _payrollEndDate = new DateTime(2026, 2, 15);        
         private int _fiscalYear = DateTime.Now.Year;
-        private string _firstTimeIn = "-";
-        private string _lastTimeOut = "-";
+        private string? _firstTimeIn = null;
+        private string? _lastTimeOut = null;
 
         private AttendanceSummaryDTO _attendanceSummary = new AttendanceSummaryDTO();
         private AttendanceDetailDTO _attendanceDetail = new AttendanceDetailDTO();  
-        private AttendanceSwipeLog _swipeLog = new AttendanceSwipeLog();    
+        private AttendanceSwipeDTO _swipeLog = new AttendanceSwipeDTO();
+        private AttendanceDurationDTO _attendanceDuration = new AttendanceDurationDTO();
         #endregion
 
         #region Flags
@@ -58,6 +59,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _isTaskFinished = false;
         private bool _showAttendanceDetail = true;
         private bool _isPunchedIn = false;
+        private bool _forceLoad = false;
+        private bool _btnProcessing = false;
         #endregion
 
         #region Dialog Box Button Icons
@@ -133,39 +136,24 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             try
             {
-                //#region Check for Shift Timing Schedule
-                //if (_shiftPattern.ShiftTimingList.Any() == false)
-                //{
-                //    ShowNotification("At least one (1) Shift timing must be added to the Shift Timing Schedule.", NotificationType.Error);
-                //    return;
-                //}
-                //#endregion
-
-                //#region Check for Shift Timing Sequence
-                //if (_shiftPattern.ShiftPointerList.Any() == false)
-                //{
-                //    ShowNotification("At least one (1) Shift pointer must be added to the Shift Timing Sequence.", NotificationType.Error);
-                //    return;
-                //}
-                //#endregion
-
                 // If we got here, model is valid
                 _hasValidationError = false;
                 _validationMessages.Clear();
 
-                // Set flag to display the loading panel
-                _isRunning = true;
+                // Set flag to display the loading button
+                _btnProcessing = true;
 
                 // Set the overlay message
                 overlayMessage = "Saving changes, please wait...";
 
-                //_ = SaveShiftRosterAsync(async () =>
-                //{
-                //    _isRunning = false;
+                _ = SaveSwipeDataAsync(async () =>
+                {
+                    // Set flag to hide the loading button
+                    _btnProcessing = false;
 
-                //    // Shows the spinner overlay
-                //    await InvokeAsync(StateHasChanged);
-                //});
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+                });
             }
             catch (OperationCanceledException)
             {
@@ -179,11 +167,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Private Methods
-        private void ShowNotification(string message, SnackBarTypes type)
+        private void ShowNotification(string message, SnackBarTypes type, string position = Defaults.Classes.Position.TopCenter)
         {
             Snackbar.Clear();
 
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Configuration.PositionClass = position;
             Snackbar.Configuration.PreventDuplicates = false;
             Snackbar.Configuration.NewestOnTop = false;
             Snackbar.Configuration.ShowCloseIcon = true;
@@ -274,24 +262,31 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             DateTime now = DateTime.Now;
 
-            if (!_isPunchedIn)
+            if (!_isPunchedIn && string.IsNullOrEmpty(_firstTimeIn))
                 _firstTimeIn = $"{now.Day}{GetOrdinal(now.Day)} {now:MMM yyyy hh:mm:ss tt}";
             else
                 _lastTimeOut = $"{now.Day}{GetOrdinal(now.Day)} {now:MMMM yyyy hh:mm:ss tt}";
 
-            if (!_isPunchedIn)
-                _isPunchedIn = true;
+            #region Initialize DTO
+            _swipeLog.EmpNo = _currentEmpNo;
+            _swipeLog.SwipeDate = now.Date;
+            _swipeLog.SwipeTime = now;
+            _swipeLog.SwipeType = !_isPunchedIn ? "IN" : "OUT";
+            #endregion
 
-            AddChip();
+            // Toggle flag
+            //_isPunchedIn = !_isPunchedIn;
+
+            AddChip(now);
         }
 
-        private void AddChip()
+        private void AddChip(DateTime punchTime)
         {
             AttendanceSwipeDTO punchSwipe = new AttendanceSwipeDTO()
             {
                 EmpNo = _currentEmpNo,
-                SwipeDate = DateTime.Now.Date,
-                SwipeTime = DateTime.Now,
+                SwipeDate = punchTime.Date,
+                SwipeTime = punchTime,
                 SwipeLogDate = DateTime.Now
             };
 
@@ -402,6 +397,66 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             else
                 _errorMessage.Append(attendanceResult.Error);
             #endregion
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task SaveSwipeDataAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = true;
+            string errorMsg = string.Empty;
+
+            var addResult = await AttendanceService.SaveSwipeDataAsync(_swipeLog, _cts.Token);
+            isSuccess = addResult.Success;
+            if (!isSuccess)
+                errorMsg = addResult.Error!;
+            else
+            {
+                // Set flag to enable reload of _recruitmentRequests when navigating back to the Employe Search page
+                _forceLoad = true;
+            }
+
+            if (isSuccess)
+            {
+                #region Get Attendance Duration
+                var attendanceResult = await AttendanceService.GetAttendanceDurationAsync(_currentEmpNo, _selectedDate!.Value.Date);
+                if (attendanceResult.Success)
+                    _attendanceDuration = attendanceResult!.Value;
+                else
+                    _errorMessage.Append(attendanceResult.Error);
+                #endregion
+
+                // Hide error message if any
+                ShowHideError(false);
+
+                // Show notification
+                if (!_isPunchedIn)
+                    ShowNotification("Punched In successfully!", SnackBarTypes.Success);
+                else
+                    ShowNotification("Punched Out successfully!", SnackBarTypes.Success);
+
+                // Toggle flag
+                _isPunchedIn = !_isPunchedIn;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(errorMsg);
+                ShowHideError(true);
+            }
 
             if (callback != null)
             {

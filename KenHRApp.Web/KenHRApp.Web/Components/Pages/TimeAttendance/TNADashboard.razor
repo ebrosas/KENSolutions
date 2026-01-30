@@ -146,8 +146,8 @@
                                         <MudAvatar Size="Size.Large" Color="Color.Success" Variant="Variant.Outlined">
                                             <MudIcon Icon="@Icons.Material.Filled.HourglassTop" Size="Size.Large" />
                                         </MudAvatar>
-                                        <MudStack Justify="Justify.Center" Spacing="0">
-                                            <MudText Typo="Typo.h6">0:00 hrs</MudText>
+                                        <MudStack Justify="Justify.Center" Spacing="0" title="Work duration in hh:mm:ss format">
+                                            <MudText Typo="Typo.h6">@(!string.IsNullOrEmpty(_attendanceDuration.TotalWorkDuration) ? _attendanceDuration.TotalWorkDuration : "0:00" + " hrs")</MudText>
                                             <MudText Typo="Typo.caption">Spent Today</MudText>
                                         </MudStack>
                                     </MudStack>
@@ -223,9 +223,21 @@
                                             }
                                         </MudChipSet>
                                     </MudStack>
-                                <MudButton Variant="Variant.Filled" EndIcon="@(!_isPunchedIn ? "fas fa-angle-double-down" : "fas fa-angle-double-up")"
-                                    FullWidth="true" Color="Color.Info" OnClick="PunchInOrOut">
-                                    @(!_isPunchedIn ? "Punch In" : "Punch Out")
+                                <MudButton Variant="Variant.Filled" 
+                                    Disabled="@_btnProcessing"
+                                    EndIcon="@(!_isPunchedIn ? "fas fa-angle-double-down" : "fas fa-angle-double-up")"
+                                    FullWidth="true" Color="Color.Info"
+                                    ButtonType="ButtonType.Submit"
+                                    OnClick="PunchInOrOut">
+                                    @if (_btnProcessing)
+                                    {
+                                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                                        <MudText Class="ms-2">Processing</MudText>                                        
+                                    }
+                                    else
+                                    {
+                                        <MudText>@(!_isPunchedIn ? "Punch In" : "Punch Out")</MudText>
+                                    }
                                 </MudButton>
                             </MudStack>
                         </MudPaper>

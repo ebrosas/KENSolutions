@@ -11,7 +11,7 @@ namespace KenHRApp.Domain.Entities
     public class AttendanceSwipeLog
     {
         #region Properties
-        public double SwipeID { get; set; }        
+        public long SwipeID { get; set; }       // Identity column   
         public int EmpNo { get; set; }
 
         [Column(TypeName = "datetime")]
@@ -21,7 +21,7 @@ namespace KenHRApp.Domain.Entities
         public DateTime? SwipeTime { get; set; }
 
         [Column(TypeName = "varchar(20)")]
-        public string? SwipeCode { get; set; }
+        public string? SwipeType { get; set; }
 
         [Column(TypeName = "varchar(20)")]
         public string? LocationCode { get; set; } = null;

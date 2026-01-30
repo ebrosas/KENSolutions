@@ -111,6 +111,8 @@
 
 	SELECT * FROM [kenuser].[ShiftPatternChange] a
 
+	SELECT * FROM [kenuser].[AttendanceSwipeLog] a
+
 /*	Data updates:
 
 	BEGIN TRAN T1
@@ -170,6 +172,6 @@
 
 /*	Data deletion
 
-	TRUNCATE TABLE [kenuser].[IdentityProof]
+	TRUNCATE TABLE kenuser.AttendanceSwipeLog
 
 */

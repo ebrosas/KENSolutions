@@ -682,7 +682,7 @@ namespace KenHRApp.Application.Services
                     EmpNo = swipeData.EmpNo,
                     SwipeDate = swipeData.SwipeDate,
                     SwipeTime = swipeData.SwipeTime,
-                    SwipeCode = swipeData.SwipeCode,
+                    SwipeType = swipeData.SwipeType,
                     LocationCode = swipeData.LocationCode,
                     ReaderCode = swipeData.ReaderCode,
                     StatusCode = swipeData.StatusCode,
@@ -704,6 +704,37 @@ namespace KenHRApp.Application.Services
             catch (Exception ex)
             {
                 return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<AttendanceDurationDTO>> GetAttendanceDurationAsync(int empNo, DateTime attendanceDate)
+        {
+            AttendanceDurationDTO attendanceDetail = null;
+
+            try
+            {
+                var repoResult = await _repository.GetAttendanceDurationAsync(empNo, attendanceDate);
+                if (!repoResult.Success)
+                {
+                    return Result<AttendanceDurationDTO>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null)
+                {
+                    attendanceDetail = new AttendanceDurationDTO()
+                    {
+                        EmpNo = model.EmpNo,
+                        SwipeDate = model.SwipeDate,
+                        TotalWorkDuration = model.TotalWorkDuration
+                    };
+                }
+
+                return Result<AttendanceDurationDTO>.SuccessResult(attendanceDetail);
+            }
+            catch (Exception ex)
+            {
+                return Result<AttendanceDurationDTO>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the attendance duration from the database.");
             }
         }
         #endregion

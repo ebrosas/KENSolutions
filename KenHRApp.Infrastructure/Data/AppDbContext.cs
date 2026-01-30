@@ -40,6 +40,7 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<ShiftPatternChange> ShiftPatternChanges => Set<ShiftPatternChange>();
         public DbSet<Holiday> Holidays => Set<Holiday>();
         public DbSet<AttendanceSwipeLog> AttendanceSwipeLogs => Set<AttendanceSwipeLog>();
+        public DbSet<AttendanceTimesheet> AttendanceTimesheets => Set<AttendanceTimesheet>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -67,6 +68,12 @@ namespace KenHRApp.Infrastructure.Data
             });
 
             modelBuilder.Entity<AttendanceDetailResult>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView(null); // prevents migration
+            });
+
+            modelBuilder.Entity<AttendanceDurationResult>(entity =>
             {
                 entity.HasNoKey();
                 entity.ToView(null); // prevents migration
@@ -388,11 +395,24 @@ namespace KenHRApp.Infrastructure.Data
                 entity.ToTable("AttendanceSwipeLog");
                 entity.HasKey(a => a.SwipeID)
                     .HasName("PK_AttendanceSwipeLog_SwipeID");
+                entity.Property(a => a.SwipeID)
+                     .ValueGeneratedOnAdd()
+                     .UseIdentityColumn(1, 1); // seed = 1, increment = 1
                 entity.Property(a => a.SwipeLogDate)
                       .HasDefaultValue(DateTime.Now);
                 entity.HasIndex(e => new { e.EmpNo, e.SwipeDate, e.SwipeTime })
                      .HasDatabaseName("IX_AttendanceSwipeLog_CompoKeys")
                      .IsUnique();
+            });
+
+            modelBuilder.Entity<AttendanceTimesheet>(
+            entity =>
+            {
+                entity.ToTable("AttendanceTimesheet");
+                entity.HasKey(a => a.TimesheetId)
+                    .HasName("PK_AttendanceTimesheet_TimesheetId");
+                entity.Property(a => a.CreatedDate)
+                      .HasDefaultValue(DateTime.Now);
             });
             #endregion
 

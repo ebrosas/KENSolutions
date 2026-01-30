@@ -10,7 +10,7 @@ namespace KenHRApp.Application.DTOs
     public class AttendanceSwipeDTO
     {
         #region Properties
-        public double SwipeID { get; set; }
+        public long SwipeID { get; set; }
 
         [Required(ErrorMessage = "Employee No. is required")]
         [Display(Name = "Employee No.")]
@@ -24,7 +24,7 @@ namespace KenHRApp.Application.DTOs
         [Display(Name = "Swipe Time")]
         public DateTime? SwipeTime { get; set; }
 
-        public string? SwipeCode { get; set; }        
+        public string? SwipeType { get; set; }        
         public string? LocationCode { get; set; } = null;
         public string? LocationName { get; set; } = null;
         public string? ReaderCode { get; set; } = null;

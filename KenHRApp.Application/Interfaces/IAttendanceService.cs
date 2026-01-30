@@ -26,6 +26,7 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<AttendanceSummaryDTO>> GetAttendanceSummaryAsync(int empNo, DateTime? startDate, DateTime? endDate);
         Task<Result<AttendanceDetailDTO?>> GetAttendanceDetailAsync(int empNo, DateTime attendanceDate);
         Task<Result<int>> SaveSwipeDataAsync(AttendanceSwipeDTO swipeData, CancellationToken cancellationToken = default);
+        Task<Result<AttendanceDurationDTO>> GetAttendanceDurationAsync(int empNo, DateTime attendanceDate);
         #endregion
     }
 }
