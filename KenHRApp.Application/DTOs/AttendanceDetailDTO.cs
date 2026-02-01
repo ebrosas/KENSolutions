@@ -13,7 +13,6 @@ namespace KenHRApp.Application.DTOs
         public DateTime AttendanceDate { get; set; }
         public DateTime? FirstTimeIn { get; set; }
         public DateTime? LastTimeOut { get; set; }
-        public string? ActualTiming { get; set; } = null;
         public string? WorkDurationDesc { get; set; } = null;
         public string? DeficitHoursDesc { get; set; } = null;
         public string? RegularizedType { get; set; } = null;
@@ -21,6 +20,19 @@ namespace KenHRApp.Application.DTOs
         public string? LeaveStatus { get; set; } = null;
         public string? LeaveDetails { get; set; } = null;
         public string? RawSwipes { get; set; } = null;
+        #endregion
+
+        #region Extended Properties
+        public string ActualTiming 
+        { 
+            get
+            {
+                if (FirstTimeIn.HasValue && LastTimeOut.HasValue)
+                    return $"{FirstTimeIn:hh:mm tt} - {LastTimeOut:hh:mm tt}";
+                else
+                    return "-";
+            }
+        }
         #endregion
     }
 }

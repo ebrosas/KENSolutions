@@ -33,11 +33,13 @@
                 CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
             <MudGrid Spacing="0" Class="mt-2">
                 <MudItem xs="4" Class="ps-0 pe-4">
-                    <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" StretchItems="StretchItems.Start" Spacing="0">
-                        <MudPaper Elevation="0" Class="pa-0 w-100">
-                            <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Surface" Rounded="true" Date="@_selectedDate" />
-                        </MudPaper>
-                        <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0" Wrap="Wrap.Wrap">
+                    <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" StretchItems="StretchItems.Start" Spacing="0">
+                        <MudStack AlignItems="AlignItems.Baseline">
+                            <MudPaper Elevation="0" Class="pa-0 w-100">
+                                <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Surface" Rounded="true" Date="@_selectedDate" />
+                            </MudPaper>
+                        </MudStack>
+                        <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0" Wrap="Wrap.Wrap" Class="pa-0 ma-0">
                             <MudChipSet T="string" Class="mt-0" ReadOnly="true" Size="Size.Small">
                                 @foreach (var legend in _attendanceLegends)
                                 {
@@ -51,16 +53,15 @@
                                 }
                             </MudChipSet>
                         </MudStack>                    
-                    </MudStack>                
+                    </MudStack>                           
                     <MudPaper Elevation="0">
                         @if (_showAttendanceDetail)
                         {
-                            <MudPaper Elevation="0" Square="true" Class="px-2 mt-2">
+                            <MudPaper Elevation="0" Square="true" Class="px-2 mt-3">
                                 <MudGrid Spacing="0">
                                     <MudItem xs="12" Class="px-2">
-                                        @* <MudText Typo="Typo.subtitle1" Color="Color.Info" Class="fw-bold">@($"{_selectedDate!.Value.ToString("dd MMMM yyyy")} - Attendance Details:")</MudText> *@
                                         <MudText Typo="Typo.subtitle1" Color="Color.Info" Class="fw-bold">
-                                            @($"{_selectedDate!.Value.Day}{GetOrdinal(_selectedDate!.Value.Day)} {_selectedDate!.Value:MMMM yyyy}")
+                                            Attendance Details - @($"{_selectedDate!.Value.Day}{GetOrdinal(_selectedDate!.Value.Day)} {_selectedDate!.Value:MMMM yyyy}")
                                         </MudText>
                                     </MudItem>
                                 </MudGrid>
@@ -74,7 +75,7 @@
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                             <MudText Typo="Typo.subtitle2" Class="fw-bold">Actual:</MudText>
-                                            <MudText Typo="Typo.caption">@_attendanceDetail.ActualTiming</MudText>
+                                                <MudText Typo="Typo.caption">@_attendanceDetail.ActualTiming</MudText>
                                         </MudStack>
                                     </MudItem>
                                 </MudGrid>
@@ -136,10 +137,10 @@
                             </MudButton>
                         </MudPaper>
                     </MudPaper>
-                </MudItem>
+                </MudItem>                
                 <MudItem xs="4" Class="px-4">
                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart">
-                        <MudPaper Class="pa-4" Elevation="4" Square="true">
+                        <MudPaper Elevation="4" Class="p-4 w-100" Square="true">
                             <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexStart" StretchItems="StretchItems.Start">
                                 <MudStack>
                                     <MudStack Row="true">

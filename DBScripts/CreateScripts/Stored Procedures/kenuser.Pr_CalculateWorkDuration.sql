@@ -9,7 +9,7 @@
 *	
 *****************************************************************************************************************************************/
 
-ALTER PROCEDURE kenuser.Pr_CalculateWorkDuration
+CREATE PROCEDURE kenuser.Pr_CalculateWorkDuration
 (   		
 	@empNo				INT,
 	@attendanceDate		DATETIME

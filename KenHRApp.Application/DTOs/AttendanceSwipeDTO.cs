@@ -30,7 +30,7 @@ namespace KenHRApp.Application.DTOs
         public string? ReaderCode { get; set; } = null;
         public string? ReaderName { get; set; } = null;
         public string? StatusCode { get; set; } = null;
-        public DateTime? SwipeLogDate { get; set; } 
-        #endregion
+        public DateTime? SwipeLogDate { get; set; }
+        #endregion                
     }
 }

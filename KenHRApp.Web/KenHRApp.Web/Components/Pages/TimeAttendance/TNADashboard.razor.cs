@@ -274,9 +274,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _swipeLog.SwipeType = !_isPunchedIn ? "IN" : "OUT";
             #endregion
 
-            // Toggle flag
-            //_isPunchedIn = !_isPunchedIn;
-
             AddChip(now);
         }
 
@@ -391,11 +388,39 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             #endregion
 
             #region Get Attendance Details
-            var attendanceResult = await AttendanceService.GetAttendanceDetailAsync(_currentEmpNo, _selectedDate!.Value);
-            if (attendanceResult.Success)
-                _attendanceDetail = attendanceResult!.Value;
-            else
-                _errorMessage.Append(attendanceResult.Error);
+            if (_selectedDate.HasValue)
+            {
+                var attendanceResult = await AttendanceService.GetAttendanceDetailAsync(_currentEmpNo, _selectedDate!.Value.Date);
+                if (attendanceResult.Success)
+                {
+                    _attendanceDetail = attendanceResult!.Value;
+
+                    if (_attendanceDetail != null)
+                    {
+                        #region Get the First Time In and Last Time Out
+                        if (_attendanceDetail.FirstTimeIn.HasValue)
+                            _firstTimeIn = $"{_attendanceDetail.FirstTimeIn:dd}{GetOrdinal(_attendanceDetail.FirstTimeIn.Value.Day)} {_attendanceDetail.FirstTimeIn:MMM yyyy hh:mm:ss tt}";
+
+                        if (_attendanceDetail.LastTimeOut.HasValue)
+                            _lastTimeOut = $"{_attendanceDetail.LastTimeOut:dd}{GetOrdinal(_attendanceDetail.LastTimeOut.Value.Day)} {_attendanceDetail.LastTimeOut:MMM yyyy hh:mm:ss tt}";
+                        #endregion
+
+                        #region Populate the raw swipe chips
+                        //AttendanceSwipeDTO punchSwipe = new AttendanceSwipeDTO()
+                        //{
+                        //    EmpNo = _currentEmpNo,
+                        //    SwipeDate = punchTime.Date,
+                        //    SwipeTime = punchTime,
+                        //    SwipeLogDate = DateTime.Now
+                        //};
+
+                        //_attendanceChips.Add(punchSwipe);
+                        #endregion
+                    }
+                }
+                else
+                    _errorMessage.Append(attendanceResult.Error);
+            }
             #endregion
 
             if (callback != null)
