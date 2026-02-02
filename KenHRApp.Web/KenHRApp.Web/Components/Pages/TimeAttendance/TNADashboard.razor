@@ -36,7 +36,18 @@
                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" StretchItems="StretchItems.Start" Spacing="0">
                         <MudStack AlignItems="AlignItems.Baseline">
                             <MudPaper Elevation="0" Class="pa-0 w-100">
-                                <MudDatePicker PickerVariant="PickerVariant.Static" Color="Color.Surface" Rounded="true" Date="@_selectedDate" />
+                                <MudDatePicker PickerVariant="PickerVariant.Static"
+                                    @ref="_picker"
+                                    Color="Color.Info" Rounded="true" 
+                                    Elevation="0"
+                                    Orientation="Orientation.Landscape" 
+                                    @bind-Date="@_selectedDate">
+                                    <PickerActions Context="dateContext">
+                                        <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.ClearAsync())">Clear</MudButton>
+                                        @* <MudButton OnClick="@(() => _picker.CloseAsync(false))">Cancel</MudButton> *@
+                                        <MudButton Color="Color.Primary" OnClick="GetAttendanceDetail">OK</MudButton>
+                                    </PickerActions>
+                                </MudDatePicker>
                             </MudPaper>
                         </MudStack>
                         <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0" Wrap="Wrap.Wrap" Class="pa-0 ma-0">

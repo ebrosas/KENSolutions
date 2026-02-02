@@ -36,14 +36,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<string> _events = new();
         private int currentPage = 1;
         private int pageSize = 5;
-        private int pageCount => (int)Math.Ceiling((double)_holidayList.Count / pageSize);
-        private DateTime? _selectedDate = DateTime.Now;
+        private int pageCount => (int)Math.Ceiling((double)_holidayList.Count / pageSize);        
         private int _currentEmpNo = 10003632;
         private DateTime _payrollStartDate = new DateTime(2026, 1, 16);
         private DateTime _payrollEndDate = new DateTime(2026, 2, 15);        
         private int _fiscalYear = DateTime.Now.Year;
         private string? _firstTimeIn = null;
         private string? _lastTimeOut = null;
+        private MudDatePicker _picker;
+        private DateTime? _selectedDate = DateTime.Today;
 
         private AttendanceSummaryDTO _attendanceSummary = new AttendanceSummaryDTO();
         private AttendanceDetailDTO _attendanceDetail = new AttendanceDetailDTO();  
@@ -121,7 +122,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Initialize the EditContext 
             _editContext = new EditContext(_swipeLog);
 
-            BeginGetAttendanceSummary();
+            BeginGetAttendanceSummary();                        
         }
         #endregion
 
@@ -342,6 +343,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
+
+                // Set calandar to today's date
+                //_selectedDate = DateTime.Now;
+
             }, _currentEmpNo, _payrollStartDate, _payrollEndDate);
         }
 
@@ -387,41 +392,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _errorMessage.Append(udcResult.Error);
             #endregion
 
-            #region Get Attendance Details
-            if (_selectedDate.HasValue)
-            {
-                var attendanceResult = await AttendanceService.GetAttendanceDetailAsync(_currentEmpNo, _selectedDate!.Value.Date);
-                if (attendanceResult.Success)
-                {
-                    _attendanceDetail = attendanceResult!.Value;
-
-                    if (_attendanceDetail != null)
-                    {
-                        #region Get the First Time In and Last Time Out
-                        if (_attendanceDetail.FirstTimeIn.HasValue)
-                            _firstTimeIn = $"{_attendanceDetail.FirstTimeIn:dd}{GetOrdinal(_attendanceDetail.FirstTimeIn.Value.Day)} {_attendanceDetail.FirstTimeIn:MMM yyyy hh:mm:ss tt}";
-
-                        if (_attendanceDetail.LastTimeOut.HasValue)
-                            _lastTimeOut = $"{_attendanceDetail.LastTimeOut:dd}{GetOrdinal(_attendanceDetail.LastTimeOut.Value.Day)} {_attendanceDetail.LastTimeOut:MMM yyyy hh:mm:ss tt}";
-                        #endregion
-
-                        #region Populate the raw swipe chips
-                        //AttendanceSwipeDTO punchSwipe = new AttendanceSwipeDTO()
-                        //{
-                        //    EmpNo = _currentEmpNo,
-                        //    SwipeDate = punchTime.Date,
-                        //    SwipeTime = punchTime,
-                        //    SwipeLogDate = DateTime.Now
-                        //};
-
-                        //_attendanceChips.Add(punchSwipe);
-                        #endregion
-                    }
-                }
-                else
-                    _errorMessage.Append(attendanceResult.Error);
-            }
-            #endregion
+            await GetAttendanceDetail();
 
             if (callback != null)
             {
@@ -487,6 +458,59 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 // Hide the spinner overlay
                 await callback.Invoke();
+            }
+        }
+
+        private async Task GetAttendanceDetail()
+        {
+            try
+            {
+                //_picker.CloseAsync();
+
+                if (_selectedDate == null)
+                    return;
+
+                var attendanceResult = await AttendanceService.GetAttendanceDetailAsync(_currentEmpNo, _selectedDate!.Value.Date);
+                if (attendanceResult.Success)
+                {
+                    _attendanceDetail = attendanceResult!.Value;
+
+                    if (_attendanceDetail != null)
+                    {
+                        #region Get the First Time In and Last Time Out
+                        if (_attendanceDetail.FirstTimeIn.HasValue)
+                            _firstTimeIn = $"{_attendanceDetail.FirstTimeIn:dd}{GetOrdinal(_attendanceDetail.FirstTimeIn.Value.Day)} {_attendanceDetail.FirstTimeIn:MMM yyyy hh:mm:ss tt}";
+                        else
+                            _firstTimeIn = string.Empty;
+
+                        if (_attendanceDetail.LastTimeOut.HasValue)
+                            _lastTimeOut = $"{_attendanceDetail.LastTimeOut:dd}{GetOrdinal(_attendanceDetail.LastTimeOut.Value.Day)} {_attendanceDetail.LastTimeOut:MMM yyyy hh:mm:ss tt}";
+                        else
+                            _lastTimeOut = string.Empty;
+                        #endregion
+
+                            #region Populate the raw swipe chips
+                            //AttendanceSwipeDTO punchSwipe = new AttendanceSwipeDTO()
+                            //{
+                            //    EmpNo = _currentEmpNo,
+                            //    SwipeDate = punchTime.Date,
+                            //    SwipeTime = punchTime,
+                            //    SwipeLogDate = DateTime.Now
+                            //};
+
+                            //_attendanceChips.Add(punchSwipe);
+                            #endregion
+                    }
+                }
+                else
+                    _errorMessage.Append(attendanceResult.Error);
+            }
+            catch (Exception ex)
+            {
+                // Set the error message
+                _errorMessage.Append(ex.Message.ToString());
+
+                ShowHideError(true);
             }
         }
         #endregion
