@@ -27,8 +27,8 @@ BEGIN
 			'0' AS DeficitHoursDesc,
 			'None' AS RegularizedType,
 			'None'  AS RegularizedReason,
-			'' AS LeaveStatus,
-			'' AS LeaveDetails,
+			'None' AS LeaveStatus,
+			'None' AS LeaveDetails,
 			d.RawSwipes
 	FROM kenuser.AttendanceSwipeLog a WITH (NOLOCK)
 		OUTER APPLY 

@@ -47,6 +47,6 @@ END
 
 /*  Debug:
 
-    EXEC kenuser.Pr_CalculateWorkDuration 10003632, '01/31/2026'
+    EXEC kenuser.Pr_CalculateWorkDuration 10003632, '02/01/2026'
 
 */
