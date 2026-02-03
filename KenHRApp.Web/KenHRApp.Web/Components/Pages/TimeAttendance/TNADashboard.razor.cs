@@ -292,6 +292,23 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         }
 
         private void OnChipClosed(MudChip<AttendanceSwipeDTO> chip) => _attendanceChips.Remove(chip!.Value);
+
+        private void OnDateChanged(DateTime? date)
+        {
+            //_isRunning = true;
+
+            // Set the overlay message
+            overlayMessage = "Loading attendance details, please wait...";
+            
+            _ = GetAttendanceDetail(async () =>
+            {
+                //_isRunning = false;
+                
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+
+            }, date);
+        }
         #endregion
 
         #region Database Methods
@@ -345,7 +362,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 await InvokeAsync(StateHasChanged);
 
                 // Set calandar to today's date
-                //_selectedDate = DateTime.Now;
+                _selectedDate = DateTime.Now;
 
             }, _currentEmpNo, _payrollStartDate, _payrollEndDate);
         }
@@ -392,7 +409,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _errorMessage.Append(udcResult.Error);
             #endregion
 
-            await GetAttendanceDetail();
+            //await GetAttendanceDetail();
 
             if (callback != null)
             {
@@ -461,16 +478,19 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task GetAttendanceDetail()
+        private async Task GetAttendanceDetail(Func<Task> callback, DateTime? selectedDate)
         {
             try
             {
-                //_picker.CloseAsync();
+                _selectedDate = selectedDate;
 
-                if (_selectedDate == null)
-                    return;
+                // Wait for 1 second then gives control back to the runtime
+                //await Task.Delay(500);
 
-                var attendanceResult = await AttendanceService.GetAttendanceDetailAsync(_currentEmpNo, _selectedDate!.Value.Date);
+                // Reset error messages
+                _errorMessage.Clear();
+
+                var attendanceResult = await AttendanceService.GetAttendanceDetailAsync(_currentEmpNo, selectedDate!.Value.Date);
                 if (attendanceResult.Success)
                 {
                     _attendanceDetail = attendanceResult!.Value;
@@ -489,21 +509,27 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             _lastTimeOut = string.Empty;
                         #endregion
 
-                            #region Populate the raw swipe chips
-                            //AttendanceSwipeDTO punchSwipe = new AttendanceSwipeDTO()
-                            //{
-                            //    EmpNo = _currentEmpNo,
-                            //    SwipeDate = punchTime.Date,
-                            //    SwipeTime = punchTime,
-                            //    SwipeLogDate = DateTime.Now
-                            //};
+                        #region Populate the raw swipe chips
+                        //AttendanceSwipeDTO punchSwipe = new AttendanceSwipeDTO()
+                        //{
+                        //    EmpNo = _currentEmpNo,
+                        //    SwipeDate = punchTime.Date,
+                        //    SwipeTime = punchTime,
+                        //    SwipeLogDate = DateTime.Now
+                        //};
 
-                            //_attendanceChips.Add(punchSwipe);
-                            #endregion
+                        //_attendanceChips.Add(punchSwipe);
+                        #endregion
                     }
                 }
                 else
                     _errorMessage.Append(attendanceResult.Error);
+
+                if (callback != null)
+                {
+                    // Hide the spinner overlay
+                    await callback.Invoke();
+                }
             }
             catch (Exception ex)
             {

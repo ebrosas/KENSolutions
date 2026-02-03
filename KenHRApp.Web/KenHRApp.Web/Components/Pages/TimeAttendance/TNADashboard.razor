@@ -38,19 +38,16 @@
                             <MudPaper Elevation="0" Class="pa-0 w-100">
                                 <MudDatePicker PickerVariant="PickerVariant.Static"
                                     @ref="_picker"
-                                    Color="Color.Info" Rounded="true" 
+                                    Color="Color.Dark" 
+                                    Rounded="true"
                                     Elevation="0"
                                     Orientation="Orientation.Landscape" 
-                                    @bind-Date="@_selectedDate">
-                                    <PickerActions Context="dateContext">
-                                        <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.ClearAsync())">Clear</MudButton>
-                                        @* <MudButton OnClick="@(() => _picker.CloseAsync(false))">Cancel</MudButton> *@
-                                        <MudButton Color="Color.Primary" OnClick="GetAttendanceDetail">OK</MudButton>
-                                    </PickerActions>
+                                    Date="@_selectedDate"
+                                    DateChanged="OnDateChanged">
                                 </MudDatePicker>
                             </MudPaper>
                         </MudStack>
-                        <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0" Wrap="Wrap.Wrap" Class="pa-0 ma-0">
+                        <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0" Wrap="Wrap.Wrap" Class="pa-0 mt-2">
                             <MudChipSet T="string" Class="mt-0" ReadOnly="true" Size="Size.Small">
                                 @foreach (var legend in _attendanceLegends)
                                 {
@@ -72,7 +69,7 @@
                                 <MudGrid Spacing="0">
                                     <MudItem xs="12" Class="px-2">
                                         <MudText Typo="Typo.subtitle1" Color="Color.Info" Class="fw-bold">
-                                            Attendance Details - @($"{_selectedDate!.Value.Day}{GetOrdinal(_selectedDate!.Value.Day)} {_selectedDate!.Value:MMMM yyyy}")
+                                            Attendance Details on @($"{_selectedDate!.Value.Day}{GetOrdinal(_selectedDate!.Value.Day)} {_selectedDate!.Value:MMMM yyyy}"):
                                         </MudText>
                                     </MudItem>
                                 </MudGrid>
