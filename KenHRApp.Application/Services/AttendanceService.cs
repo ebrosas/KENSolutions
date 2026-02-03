@@ -659,6 +659,19 @@ namespace KenHRApp.Application.Services
                     attendanceDetail.LeaveStatus = model.LeaveStatus;
                     attendanceDetail.LeaveDetails = model.LeaveDetails;
                     attendanceDetail.RawSwipes = model.RawSwipes;
+
+                    if (model.SwipeLogList != null && model.SwipeLogList.Any())
+                    {
+                        attendanceDetail.SwipeLogList = model.SwipeLogList!.Select(e => new AttendanceSwipeDTO
+                        {
+                            SwipeID = e.SwipeID,
+                            EmpNo = e.EmpNo,
+                            SwipeDate = e.SwipeDate,
+                            SwipeTime = e.SwipeTime,
+                            SwipeType = e.SwipeType,
+                            SwipeLogDate = e.SwipeLogDate
+                        }).ToList();
+                    }
                 }
 
                 return Result<AttendanceDetailDTO>.SuccessResult(attendanceDetail);

@@ -863,6 +863,27 @@ namespace KenHRApp.Infrastructure.Repositories
                     attendanceDetail.LeaveStatus = model[0].LeaveStatus;
                     attendanceDetail.LeaveDetails = model[0].LeaveDetails;
                     attendanceDetail.RawSwipes = model[0].RawSwipes;
+
+                    #region Get the swipe logs
+                    List<AttendanceSwipeLog> swipeLogs = new List<AttendanceSwipeLog>();
+
+                    var swipeModel = await (from log in _db.AttendanceSwipeLogs
+                                            where log.EmpNo == attendanceDetail.EmployeeNo &&
+                                                log.SwipeDate == attendanceDetail.AttendanceDate
+                                            select log).ToListAsync();
+                    if (swipeModel != null)
+                    {
+                        attendanceDetail.SwipeLogList = swipeModel.Select(e => new AttendanceSwipeLog
+                        {
+                            SwipeID = e.SwipeID,
+                            EmpNo = e.EmpNo,
+                            SwipeDate = e.SwipeDate,
+                            SwipeTime = e.SwipeTime,
+                            SwipeType = e.SwipeType,
+                            SwipeLogDate = e.SwipeLogDate
+                        }).ToList();
+                    }
+                    #endregion
                 }
 
                 return Result<AttendanceDetailResult>.SuccessResult(attendanceDetail);

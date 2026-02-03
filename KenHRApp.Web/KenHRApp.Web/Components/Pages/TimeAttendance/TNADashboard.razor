@@ -69,20 +69,20 @@
                                 <MudGrid Spacing="0">
                                     <MudItem xs="12" Class="px-2">
                                         <MudText Typo="Typo.subtitle1" Color="Color.Info" Class="fw-bold">
-                                            Attendance Details on @($"{_selectedDate!.Value.Day}{GetOrdinal(_selectedDate!.Value.Day)} {_selectedDate!.Value:MMMM yyyy}"):
+                                            Attendance Details on @($"{_selectedDate!.Value.Day}{GetOrdinal(_selectedDate!.Value.Day)} {_selectedDate!.Value:MMMM yyyy}")
                                         </MudText>
                                     </MudItem>
                                 </MudGrid>
                                 <MudGrid Spacing="0" Class="mt-1">
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                            <MudText Typo="Typo.subtitle2" Class="fw-bold">Shift Timing:</MudText>
+                                            <MudText Typo="Typo.body2" Class="fw-bold">Shift Timing:</MudText>
                                             <MudText Typo="Typo.caption">@_attendanceSummary.ShiftTiming</MudText>
                                         </MudStack>
                                     </MudItem>
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                            <MudText Typo="Typo.subtitle2" Class="fw-bold">Actual:</MudText>
+                                            <MudText Typo="Typo.body2" Class="fw-bold">Actual:</MudText>
                                                 <MudText Typo="Typo.caption">@_attendanceDetail.ActualTiming</MudText>
                                         </MudStack>
                                     </MudItem>
@@ -90,13 +90,13 @@
                                 <MudGrid Spacing="0" Class="mt-1">
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                            <MudText Typo="Typo.subtitle2" Class="fw-bold">Regularized:</MudText>
+                                            <MudText Typo="Typo.body2" Class="fw-bold">Regularized:</MudText>
                                                 <MudText Typo="Typo.caption">@_attendanceDetail.RegularizedType</MudText>
                                         </MudStack>
                                     </MudItem>
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                            <MudText Typo="Typo.subtitle2" Class="fw-bold">Work Duration:</MudText>
+                                            <MudText Typo="Typo.body2" Class="fw-bold">Work Duration:</MudText>
                                             <MudText Typo="Typo.caption">@_attendanceDetail.WorkDurationDesc</MudText>
                                         </MudStack>
                                     </MudItem>
@@ -104,13 +104,13 @@
                                 <MudGrid Spacing="0" Class="mt-1">
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                            <MudText Typo="Typo.subtitle2" Class="fw-bold">Reason:</MudText>
+                                            <MudText Typo="Typo.body2" Class="fw-bold">Reason:</MudText>
                                             <MudText Typo="Typo.caption">@_attendanceDetail.RegularizedReason</MudText>
                                         </MudStack>
                                     </MudItem>
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                            <MudText Typo="Typo.subtitle2" Class="fw-bold">Deficit:</MudText>
+                                            <MudText Typo="Typo.body2" Class="fw-bold">Deficit:</MudText>
                                             <MudText Typo="Typo.caption">@_attendanceDetail.DeficitHoursDesc</MudText>
                                         </MudStack>
                                     </MudItem>
@@ -118,13 +118,13 @@
                                 <MudGrid Spacing="0" Class="mt-1">
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                            <MudText Typo="Typo.subtitle2" Class="fw-bold">Leave Status:</MudText>
+                                            <MudText Typo="Typo.body2" Class="fw-bold">Leave Status:</MudText>
                                             <MudText Typo="Typo.caption">@_attendanceDetail.LeaveStatus</MudText>
                                         </MudStack>
                                     </MudItem>
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                            <MudText Typo="Typo.subtitle2" Class="fw-bold">Application:</MudText>
+                                                <MudText Typo="Typo.body2" Class="fw-bold">Application:</MudText>
                                                 <MudText Typo="Typo.caption">@_attendanceDetail.LeaveDetails</MudText>
                                         </MudStack>
                                     </MudItem>
@@ -132,7 +132,7 @@
                                 <MudGrid Spacing="0" Class="mt-1">
                                     <MudItem xs="12" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                            <MudText Typo="Typo.subtitle2" Color="Color.Default" Class="fw-bold">Raw Swipes:</MudText>
+                                                <MudText Typo="Typo.body2" Color="Color.Default" Class="fw-bold">Raw Swipes:</MudText>
                                                 <MudText Typo="Typo.caption">@_attendanceDetail.RawSwipes</MudText>
                                         </MudStack>
                                     </MudItem>
@@ -157,7 +157,7 @@
                                         </MudAvatar>
                                         <MudStack Justify="Justify.Center" Spacing="0" title="Work duration in hh:mm:ss format">
                                             <MudText Typo="Typo.h6">@(!string.IsNullOrEmpty(_attendanceDuration.TotalWorkDuration) ? _attendanceDuration.TotalWorkDuration : "0:00" + " hrs")</MudText>
-                                            <MudText Typo="Typo.caption">Spent Today</MudText>
+                                            <MudText Typo="Typo.caption">Total Work Duration</MudText>
                                         </MudStack>
                                     </MudStack>
                                     <MudStack AlignItems="AlignItems.Start" Spacing="0" Class="pa-1">

@@ -20,6 +20,7 @@ namespace KenHRApp.Domain.Entities
         public string? LeaveStatus { get; set; } = null;
         public string? LeaveDetails { get; set; } = null;
         public string? RawSwipes { get; set; } = null;
+        public List<AttendanceSwipeLog>? SwipeLogList { get; set; }
         #endregion
     }
 }

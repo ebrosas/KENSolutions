@@ -407,9 +407,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _attendanceLegends = udcResult!.Value;
             else
                 _errorMessage.Append(udcResult.Error);
-            #endregion
-
-            //await GetAttendanceDetail();
+            #endregion                        
 
             if (callback != null)
             {
@@ -487,8 +485,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Wait for 1 second then gives control back to the runtime
                 //await Task.Delay(500);
 
-                // Reset error messages
+                // Reset collections
                 _errorMessage.Clear();
+                _attendanceChips.Clear();
 
                 var attendanceResult = await AttendanceService.GetAttendanceDetailAsync(_currentEmpNo, selectedDate!.Value.Date);
                 if (attendanceResult.Success)
@@ -509,16 +508,17 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             _lastTimeOut = string.Empty;
                         #endregion
 
-                        #region Populate the raw swipe chips
-                        //AttendanceSwipeDTO punchSwipe = new AttendanceSwipeDTO()
-                        //{
-                        //    EmpNo = _currentEmpNo,
-                        //    SwipeDate = punchTime.Date,
-                        //    SwipeTime = punchTime,
-                        //    SwipeLogDate = DateTime.Now
-                        //};
+                        #region Get Attendance Duration
+                        var durationResult = await AttendanceService.GetAttendanceDurationAsync(_currentEmpNo, selectedDate!.Value.Date);
+                        if (durationResult.Success)
+                            _attendanceDuration = durationResult!.Value;
+                        else
+                            _errorMessage.Append(durationResult.Error);
+                        #endregion
 
-                        //_attendanceChips.Add(punchSwipe);
+                        #region Populate the raw swipe chips
+                        if (_attendanceDetail.SwipeLogList != null && _attendanceDetail.SwipeLogList.Any())
+                            _attendanceChips.AddRange(_attendanceDetail.SwipeLogList.ToList());
                         #endregion
                     }
                 }
