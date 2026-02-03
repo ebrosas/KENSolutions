@@ -27,9 +27,3 @@ SQL Server Name: BHICT15\GRMSQLLOCAL
 Instance ID: MSSQLSERVER
 SA password: Garmco#1017
 
-Web Server IP Address: 34.251.205.172
-Web Server Name: GRBHAPPS01
-SQL Server Name: GRBHAPPS01\GRMSQLEXPRESSS
-Instance ID: GRMSQLEXPRESSS
-SA password: Garmco#1017
-

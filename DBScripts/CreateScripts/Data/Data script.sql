@@ -112,7 +112,6 @@
 	SELECT * FROM [kenuser].[ShiftPatternChange] a
 
 	SELECT * FROM [kenuser].[AttendanceSwipeLog] a
-	ORDER BY a.EmpNo, a.SwipeTime
 
 /*	Data updates:
 
