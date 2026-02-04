@@ -50,6 +50,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private AttendanceDetailDTO _attendanceDetail = new AttendanceDetailDTO();  
         private AttendanceSwipeDTO _swipeLog = new AttendanceSwipeDTO();
         private AttendanceDurationDTO _attendanceDuration = new AttendanceDurationDTO();
+
+        private Orientation _calOrientation = Orientation.Landscape;
+        private string _pickerStyle = "width: 420px;";
         #endregion
 
         #region Flags
@@ -168,6 +171,20 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Private Methods
+        private void OnBreakpointChanged(Breakpoint breakpoint)
+        {
+            if (breakpoint <= Breakpoint.Md)
+            {
+                _calOrientation = Orientation.Portrait;
+                _pickerStyle = "width: 100%;";
+            }
+            else
+            {
+                _calOrientation = Orientation.Landscape;
+                _pickerStyle = "width: 420px;";
+            }
+        }
+
         private void ShowNotification(string message, SnackBarTypes type, string position = Defaults.Classes.Position.TopCenter)
         {
             Snackbar.Clear();
