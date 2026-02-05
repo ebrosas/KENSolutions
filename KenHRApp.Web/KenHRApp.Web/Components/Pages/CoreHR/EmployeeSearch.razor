@@ -185,7 +185,7 @@
                         <PropertyColumn Property="x => x.EmployeeStatusCode" Hidden />
                         <PropertyColumn Property="x => x.EmployeeStatus" Title="Employee Status" Class="col-employee-status">
                              <CellTemplate Context="row">
-                                 <MudChip T="string" Size=Size.Small Color="@(row.Item.EmployeeStatusCode == "STATACTIVE" ? Color.Success
+                                 <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" Color="@(row.Item.EmployeeStatusCode == "STATACTIVE" ? Color.Success
                                      : (row.Item.EmployeeStatusCode == "STATRESIGNED" || row.Item.EmployeeStatusCode == "STATRETIRED" || row.Item.EmployeeStatusCode == "STATTERMINATED" || row.Item.EmployeeStatusCode == "STATINACTIVE") ? Color.Error
                                      : (row.Item.EmployeeStatusCode == "STATSUSPENDED" || row.Item.EmployeeStatusCode == "STATHOLD") ? Color.Warning
                                      : (row.Item.EmployeeStatusCode == "STATNEWJOIN" || row.Item.EmployeeStatusCode == "STATHOLD") ? Color.Info
@@ -197,7 +197,7 @@
                         </PropertyColumn>
                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                             <CellTemplate>
-                                <MudIconButton Color="Color.Tertiary" title="View and edit employee information" Icon="@Icons.Material.Rounded.Edit"
+                                <MudIconButton Color="Color.Info" title="View and edit employee information" Icon="@Icons.Material.Rounded.Edit"
                                     OnClick="@(()=>GoToEmployeeDetail(context.Item))">
                                     <ChildContent>
                                         <i class="fas fa-edit fa-1x"></i>
