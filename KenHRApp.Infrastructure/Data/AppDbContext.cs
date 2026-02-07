@@ -41,6 +41,8 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<Holiday> Holidays => Set<Holiday>();
         public DbSet<AttendanceSwipeLog> AttendanceSwipeLogs => Set<AttendanceSwipeLog>();
         public DbSet<AttendanceTimesheet> AttendanceTimesheets => Set<AttendanceTimesheet>();
+        public DbSet<LeaveRequisitionWF> LeaveRequisitionWFs => Set<LeaveRequisitionWF>();
+        public DbSet<LeaveEntitlement> LeaveEntitlements => Set<LeaveEntitlement>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -414,6 +416,38 @@ namespace KenHRApp.Infrastructure.Data
                 entity.Property(a => a.CreatedDate)
                       .HasDefaultValue(DateTime.Now);
             });
+
+            modelBuilder.Entity<LeaveRequisitionWF>(
+            entity =>
+            {
+                entity.ToTable("LeaveRequisitionWF");
+                entity.HasKey(a => a.LeaveRequestId)
+                    .HasName("PK_LeaveRequisitionWF_LeaveRequestId");
+                entity.Property(a => a.LeaveRequestId)
+                     .ValueGeneratedOnAdd()
+                     .UseIdentityColumn(1, 1); // seed = 1, increment = 1
+                entity.Property(a => a.LeaveCreatedDate)
+                        .HasDefaultValue(DateTime.Now);
+                entity.HasIndex(e => new { e.LeaveEmpNo, e.LeaveType, e.LeaveStartDate, e.LeaveEndDate, e.LeaveStatusCode })
+                     .HasDatabaseName("IX_LeaveRequisitionWF_CompoKeys")
+                     .IsUnique();
+            });
+
+            modelBuilder.Entity<LeaveEntitlement>(
+            entity =>
+            {
+                entity.ToTable("LeaveEntitlement");
+                entity.HasKey(a => a.LeaveEntitlementId)
+                    .HasName("LeaveEntitlementId");
+                entity.Property(a => a.LeaveEntitlementId)
+                     .ValueGeneratedOnAdd()
+                     .UseIdentityColumn(1, 1); // seed = 1, increment = 1
+                entity.Property(a => a.CreatedDate)
+                        .HasDefaultValue(DateTime.Now);
+                entity.HasIndex(e => new { e.EmployeeNo, e.LeaveEntitlemnt })
+                     .HasDatabaseName("IX_LeaveEntitlement_CompoKeys")
+                     .IsUnique();
+            });
             #endregion
 
             #region Set Employee navigation                         
@@ -523,6 +557,13 @@ namespace KenHRApp.Infrastructure.Data
                        .HasForeignKey(c => c.EmployeeNo)
                        .IsRequired()
                        .OnDelete(DeleteBehavior.Cascade);
+
+                    entity.HasOne(e => e.LeaveEntitlement)
+                        .WithOne(e => e.Employee)
+                        .HasPrincipalKey<Employee>(e => e.EmployeeNo)       // Map to EmployeeNo alternate key of Employee principal
+                        .HasForeignKey<LeaveEntitlement>(e => e.EmployeeNo)    // Assuming EmployeeNo is the foreign key in LeaveEntitlement
+                        .IsRequired()
+                        .OnDelete(DeleteBehavior.Cascade);
                     #endregion
                 });
             #endregion

@@ -12,10 +12,11 @@ namespace KenHRApp.Domain.Entities
         public int EmployeeNo { get; set; }
         public string EmployeeName { get; set; } = null!;
         public string? ShiftRoster { get; set; } = null;
+        public string? ShiftRosterDesc { get; set; } = null;
         public string? ShiftTiming { get; set; } = null;
         public int TotalAbsent { get; set; }
         public int TotalHalfDay { get; set; }
-        public int TotalLeave { get; set; }
+        public decimal TotalLeave { get; set; }
         public int TotalLate { get; set; }
         public int TotalEarlyOut { get; set; }
         public decimal TotalDeficitHour { get; set; }

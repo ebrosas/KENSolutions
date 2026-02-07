@@ -20,6 +20,7 @@ namespace KenHRApp.Application.DTOs
         public string? LeaveStatus { get; set; } = null;
         public string? LeaveDetails { get; set; } = null;
         public string? RawSwipes { get; set; } = null;
+        public string? SwipeType { get; set; } = null;
         public List<AttendanceSwipeDTO>? SwipeLogList { get; set; }
         #endregion
 

@@ -315,6 +315,7 @@ namespace KenHRApp.Domain.Entities
         public ICollection<EmploymentHistory> EmploymentHistories { get; set; } = new List<EmploymentHistory>();
         public ICollection<OtherDocument> OtherDocuments { get; set; } = new List<OtherDocument>();
         public ICollection<EmployeeTransaction> EmployeeTransactions { get; set; } = new List<EmployeeTransaction>();
+        public LeaveEntitlement? LeaveEntitlement { get; set; } = null;
         #endregion
     }
 }

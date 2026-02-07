@@ -4,6 +4,7 @@ using KenHRApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KenHRApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260207101746_CreateLeaveRequisitionWF")]
+    partial class CreateLeaveRequisitionWF
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -162,7 +165,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("SwipeLogDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 7, 14, 45, 8, 930, DateTimeKind.Local).AddTicks(5063));
+                        .HasDefaultValue(new DateTime(2026, 2, 7, 13, 17, 45, 509, DateTimeKind.Local).AddTicks(1457));
 
                     b.Property<DateTime?>("SwipeTime")
                         .HasColumnType("datetime");
@@ -214,7 +217,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 7, 14, 45, 8, 930, DateTimeKind.Local).AddTicks(8738));
+                        .HasDefaultValue(new DateTime(2026, 2, 7, 13, 17, 45, 509, DateTimeKind.Local).AddTicks(4155));
 
                     b.Property<string>("DIL_Entitlement")
                         .HasColumnType("varchar(10)");
@@ -338,7 +341,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 7, 11, 45, 8, 921, DateTimeKind.Utc).AddTicks(696));
+                        .HasDefaultValue(new DateTime(2026, 2, 7, 10, 17, 45, 503, DateTimeKind.Utc).AddTicks(7362));
 
                     b.Property<string>("DepartmentCode")
                         .IsRequired()
@@ -1120,7 +1123,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 7, 14, 45, 8, 930, DateTimeKind.Local).AddTicks(2093));
+                        .HasDefaultValue(new DateTime(2026, 2, 7, 13, 17, 45, 508, DateTimeKind.Local).AddTicks(8564));
 
                     b.Property<DateTime>("HolidayDate")
                         .HasColumnType("datetime");
@@ -1358,63 +1361,6 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.ToTable("LanguageSkill", "kenuser");
                 });
 
-            modelBuilder.Entity("KenHRApp.Domain.Entities.LeaveEntitlement", b =>
-                {
-                    b.Property<int>("LeaveEntitlementId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeaveEntitlementId"));
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 7, 14, 45, 8, 931, DateTimeKind.Local).AddTicks(4268));
-
-                    b.Property<string>("CreatedUserID")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<int>("EmployeeNo")
-                        .HasColumnType("int")
-                        .HasComment("Foreign key that references alternate key: Employee.EmployeeNo");
-
-                    b.Property<int?>("LastUpdatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("LastUpdatedDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("LastUpdatedUserID")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<int?>("LeaveCreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<double>("LeaveEntitlemnt")
-                        .HasColumnType("float")
-                        .HasComment("Part of composite unique key index");
-
-                    b.Property<string>("LeaveUOM")
-                        .IsRequired()
-                        .HasColumnType("char(1)")
-                        .HasComment("Part of composite unique key index");
-
-                    b.Property<double>("SickLeaveEntitlemnt")
-                        .HasColumnType("float");
-
-                    b.HasKey("LeaveEntitlementId")
-                        .HasName("LeaveEntitlementId");
-
-                    b.HasIndex("EmployeeNo")
-                        .IsUnique();
-
-                    b.HasIndex("EmployeeNo", "LeaveEntitlemnt")
-                        .IsUnique()
-                        .HasDatabaseName("IX_LeaveEntitlement_CompoKeys");
-
-                    b.ToTable("LeaveEntitlement", "kenuser");
-                });
-
             modelBuilder.Entity("KenHRApp.Domain.Entities.LeaveRequisitionWF", b =>
                 {
                     b.Property<long>("LeaveRequestId")
@@ -1424,10 +1370,10 @@ namespace KenHRApp.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("LeaveRequestId"));
 
                     b.Property<string>("HalfDayLeaveFlag")
-                        .HasColumnType("char(1)");
+                        .HasColumnType("nvarchar(1)");
 
                     b.Property<string>("LeaveApprovalFlag")
-                        .HasColumnType("char(1)");
+                        .HasColumnType("nvarchar(1)");
 
                     b.Property<double?>("LeaveBalance")
                         .HasColumnType("float");
@@ -1441,7 +1387,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("LeaveCreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 7, 14, 45, 8, 931, DateTimeKind.Local).AddTicks(1356));
+                        .HasDefaultValue(new DateTime(2026, 2, 7, 13, 17, 45, 509, DateTimeKind.Local).AddTicks(5869));
 
                     b.Property<string>("LeaveCreatedEmail")
                         .HasColumnType("varchar(50)");
@@ -1518,7 +1464,7 @@ namespace KenHRApp.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PlannedLeave")
-                        .HasColumnType("char(1)");
+                        .HasColumnType("nvarchar(1)");
 
                     b.HasKey("LeaveRequestId")
                         .HasName("PK_LeaveRequisitionWF_LeaveRequestId");
@@ -1583,7 +1529,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 7, 14, 45, 8, 924, DateTimeKind.Local).AddTicks(4718));
+                        .HasDefaultValue(new DateTime(2026, 2, 7, 13, 17, 45, 506, DateTimeKind.Local).AddTicks(8014));
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -1857,7 +1803,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 7, 14, 45, 8, 921, DateTimeKind.Local).AddTicks(3046));
+                        .HasDefaultValue(new DateTime(2026, 2, 7, 13, 17, 45, 504, DateTimeKind.Local).AddTicks(241));
 
                     b.Property<string>("DepartmentCode")
                         .IsRequired()
@@ -1928,7 +1874,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 7, 14, 45, 8, 922, DateTimeKind.Local).AddTicks(3554));
+                        .HasDefaultValue(new DateTime(2026, 2, 7, 13, 17, 45, 504, DateTimeKind.Local).AddTicks(9150));
 
                     b.Property<int?>("DailySalaryRange")
                         .HasColumnType("int");
@@ -2352,18 +2298,6 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("KenHRApp.Domain.Entities.LeaveEntitlement", b =>
-                {
-                    b.HasOne("KenHRApp.Domain.Entities.Employee", "Employee")
-                        .WithOne("LeaveEntitlement")
-                        .HasForeignKey("KenHRApp.Domain.Entities.LeaveEntitlement", "EmployeeNo")
-                        .HasPrincipalKey("KenHRApp.Domain.Entities.Employee", "EmployeeNo")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-                });
-
             modelBuilder.Entity("KenHRApp.Domain.Entities.MasterShiftPattern", b =>
                 {
                     b.HasOne("KenHRApp.Domain.Entities.MasterShiftPatternTitle", "MasterShiftPatternTitle")
@@ -2442,8 +2376,6 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Navigation("IdentityProof");
 
                     b.Navigation("LanguageSkills");
-
-                    b.Navigation("LeaveEntitlement");
 
                     b.Navigation("OtherDocuments");
 

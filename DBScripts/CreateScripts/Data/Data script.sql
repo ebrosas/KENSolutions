@@ -150,7 +150,7 @@
 	WHERE EmployeeNo = 10003633
 
 	DELETE FROM [dbo].[__EFMigrationsHistory]
-	WHERE MigrationID = '20250913143228_UpdateFamilyMember'
+	WHERE MigrationID = '20260207114509_CreateLeaveEntitlement'
 
 	UPDATE kenuser.MasterShiftPatternTitle
 	SET CreatedByEmpNo = 10003632,
@@ -173,5 +173,7 @@
 /*	Data deletion
 
 	TRUNCATE TABLE kenuser.AttendanceSwipeLog
+
+	DROP TABLE kenuser.LeaveEntitlement
 
 */

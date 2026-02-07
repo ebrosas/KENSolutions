@@ -815,6 +815,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     attendanceSummary.EmployeeNo = model[0].EmployeeNo;
                     attendanceSummary.EmployeeName = model[0].EmployeeName;
                     attendanceSummary.ShiftRoster = model[0].ShiftRoster;
+                    attendanceSummary.ShiftRosterDesc = model[0].ShiftRosterDesc;
                     attendanceSummary.ShiftTiming = model[0].ShiftTiming;
                     attendanceSummary.TotalAbsent = model[0].TotalAbsent;
                     attendanceSummary.TotalHalfDay = model[0].TotalHalfDay;
@@ -863,6 +864,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     attendanceDetail.LeaveStatus = model[0].LeaveStatus;
                     attendanceDetail.LeaveDetails = model[0].LeaveDetails;
                     attendanceDetail.RawSwipes = model[0].RawSwipes;
+                    attendanceDetail.SwipeType = model[0].SwipeType;
 
                     #region Get the swipe logs
                     List<AttendanceSwipeLog> swipeLogs = new List<AttendanceSwipeLog>();
@@ -884,6 +886,16 @@ namespace KenHRApp.Infrastructure.Repositories
                         }).ToList();
                     }
                     #endregion
+                }
+                else
+                {
+                    attendanceDetail.WorkDurationDesc = "-";
+                    attendanceDetail.DeficitHoursDesc = "-";
+                    attendanceDetail.RegularizedType = "-";
+                    attendanceDetail.RegularizedReason = "-";
+                    attendanceDetail.LeaveStatus = "-";
+                    attendanceDetail.LeaveDetails = "-";
+                    attendanceDetail.RawSwipes = "-";
                 }
 
                 return Result<AttendanceDetailResult>.SuccessResult(attendanceDetail);

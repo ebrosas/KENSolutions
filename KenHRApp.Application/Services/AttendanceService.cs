@@ -610,6 +610,7 @@ namespace KenHRApp.Application.Services
                     attendanceSummary.EmployeeNo = model.EmployeeNo;
                     attendanceSummary.EmployeeName = model.EmployeeName;
                     attendanceSummary.ShiftRoster = model.ShiftRoster;
+                    attendanceSummary.ShiftRosterDesc = model.ShiftRosterDesc;
                     attendanceSummary.ShiftTiming = model.ShiftTiming;
                     attendanceSummary.TotalAbsent = model.TotalAbsent;
                     attendanceSummary.TotalHalfDay = model.TotalHalfDay;
@@ -659,6 +660,7 @@ namespace KenHRApp.Application.Services
                     attendanceDetail.LeaveStatus = model.LeaveStatus;
                     attendanceDetail.LeaveDetails = model.LeaveDetails;
                     attendanceDetail.RawSwipes = model.RawSwipes;
+                    attendanceDetail.SwipeType = model.SwipeType;
 
                     if (model.SwipeLogList != null && model.SwipeLogList.Any())
                     {

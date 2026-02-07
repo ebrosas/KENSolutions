@@ -29,7 +29,8 @@ BEGIN
 			'None'  AS RegularizedReason,
 			'None' AS LeaveStatus,
 			'None' AS LeaveDetails,
-			d.RawSwipes
+			d.RawSwipes,
+			e.SwipeType
 	FROM kenuser.AttendanceSwipeLog a WITH (NOLOCK)
 		OUTER APPLY 
 		(
@@ -60,6 +61,13 @@ BEGIN
 			WHERE x.EmpNo = a.EmpNo
 			  AND x.SwipeDate = a.SwipeDate
 		) d
+		OUTER APPLY
+		(
+			SELECT TOP 1 x.SwipeType FROM kenuser.AttendanceSwipeLog x WITH (NOLOCK)
+			WHERE x.EmpNo = @empNo
+				AND x.SwipeDate = @attendanceDate
+			ORDER BY x.SwipeID DESC
+		) e
 	WHERE a.EmpNo = @empNo
 		AND a.SwipeDate = @attendanceDate
 	
@@ -73,5 +81,7 @@ PARAMETERS:
 	@attendanceDate		DATETIME
 
 	EXEC kenuser.Pr_GetAttendanceDetail 10003632, '01/31/2026'
+	EXEC kenuser.Pr_GetAttendanceDetail 10003632, '02/01/2026'
+	EXEC kenuser.Pr_GetAttendanceDetail 10003632, '02/07/2026'
 
 */

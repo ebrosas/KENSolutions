@@ -79,6 +79,20 @@
                                 <MudGrid Spacing="0" Class="mt-1">
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                            <MudText Typo="Typo.body2" Class="fw-bold">Shift Roster:</MudText>
+                                            <MudText Typo="Typo.caption">@_attendanceSummary.ShiftRoster</MudText>
+                                        </MudStack>
+                                    </MudItem>
+                                    <MudItem xs="6" Class="px-2">
+                                        <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                            <MudText Typo="Typo.body2" Class="fw-bold">Shift Description:</MudText>
+                                                <MudText Typo="Typo.caption">@_attendanceSummary.ShiftRosterDesc</MudText>
+                                        </MudStack>
+                                    </MudItem>
+                                </MudGrid>
+                                <MudGrid Spacing="0" Class="mt-1">
+                                    <MudItem xs="6" Class="px-2">
+                                        <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                             <MudText Typo="Typo.body2" Class="fw-bold">Shift Timing:</MudText>
                                             <MudText Typo="Typo.caption">@_attendanceSummary.ShiftTiming</MudText>
                                         </MudStack>
@@ -86,7 +100,7 @@
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                             <MudText Typo="Typo.body2" Class="fw-bold">Actual:</MudText>
-                                                <MudText Typo="Typo.caption">@_attendanceDetail.ActualTiming</MudText>
+                                                <MudText Typo="Typo.caption">@_attendanceDetail!.ActualTiming</MudText>
                                         </MudStack>
                                     </MudItem>
                                 </MudGrid>
@@ -94,13 +108,13 @@
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                             <MudText Typo="Typo.body2" Class="fw-bold">Regularized:</MudText>
-                                                <MudText Typo="Typo.caption">@_attendanceDetail.RegularizedType</MudText>
+                                                <MudText Typo="Typo.caption">@_attendanceDetail!.RegularizedType</MudText>
                                         </MudStack>
                                     </MudItem>
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                             <MudText Typo="Typo.body2" Class="fw-bold">Work Duration:</MudText>
-                                            <MudText Typo="Typo.caption">@_attendanceDetail.WorkDurationDesc</MudText>
+                                            <MudText Typo="Typo.caption">@_attendanceDetail!.WorkDurationDesc</MudText>
                                         </MudStack>
                                     </MudItem>
                                 </MudGrid>
@@ -108,13 +122,13 @@
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                             <MudText Typo="Typo.body2" Class="fw-bold">Reason:</MudText>
-                                            <MudText Typo="Typo.caption">@_attendanceDetail.RegularizedReason</MudText>
+                                                <MudText Typo="Typo.caption">@_attendanceDetail!.RegularizedReason</MudText>
                                         </MudStack>
                                     </MudItem>
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                             <MudText Typo="Typo.body2" Class="fw-bold">Deficit:</MudText>
-                                            <MudText Typo="Typo.caption">@_attendanceDetail.DeficitHoursDesc</MudText>
+                                                <MudText Typo="Typo.caption">@_attendanceDetail!.DeficitHoursDesc</MudText>
                                         </MudStack>
                                     </MudItem>
                                 </MudGrid>
@@ -122,13 +136,13 @@
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                             <MudText Typo="Typo.body2" Class="fw-bold">Leave Status:</MudText>
-                                            <MudText Typo="Typo.caption">@_attendanceDetail.LeaveStatus</MudText>
+                                            <MudText Typo="Typo.caption">@_attendanceDetail!.LeaveStatus</MudText>
                                         </MudStack>
                                     </MudItem>
                                     <MudItem xs="6" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                                 <MudText Typo="Typo.body2" Class="fw-bold">Application:</MudText>
-                                                <MudText Typo="Typo.caption">@_attendanceDetail.LeaveDetails</MudText>
+                                                <MudText Typo="Typo.caption">@_attendanceDetail!.LeaveDetails</MudText>
                                         </MudStack>
                                     </MudItem>
                                 </MudGrid>
@@ -136,7 +150,7 @@
                                     <MudItem xs="12" Class="px-2">
                                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                                 <MudText Typo="Typo.body2" Color="Color.Default" Class="fw-bold">Raw Swipes:</MudText>
-                                                <MudText Typo="Typo.caption">@_attendanceDetail.RawSwipes</MudText>
+                                                <MudText Typo="Typo.caption">@_attendanceDetail!.RawSwipes</MudText>
                                         </MudStack>
                                     </MudItem>
                                 </MudGrid>

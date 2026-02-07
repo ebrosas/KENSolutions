@@ -47,7 +47,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private DateTime? _selectedDate = DateTime.Today;
 
         private AttendanceSummaryDTO _attendanceSummary = new AttendanceSummaryDTO();
-        private AttendanceDetailDTO _attendanceDetail = new AttendanceDetailDTO();  
+        private AttendanceDetailDTO? _attendanceDetail = new AttendanceDetailDTO();  
         private AttendanceSwipeDTO _swipeLog = new AttendanceSwipeDTO();
         private AttendanceDurationDTO _attendanceDuration = new AttendanceDurationDTO();
 
@@ -381,6 +381,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set calandar to today's date
                 _selectedDate = DateTime.Now;
 
+                // Invoke the event handler to get the attendance detail for today's date
+                OnDateChanged(_selectedDate);
+
             }, _currentEmpNo, _payrollStartDate, _payrollEndDate);
         }
 
@@ -509,6 +512,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 var attendanceResult = await AttendanceService.GetAttendanceDetailAsync(_currentEmpNo, selectedDate!.Value.Date);
                 if (attendanceResult.Success)
                 {
+                    _attendanceDetail = new AttendanceDetailDTO();
                     _attendanceDetail = attendanceResult!.Value;
 
                     if (_attendanceDetail != null)
@@ -523,6 +527,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             _lastTimeOut = $"{_attendanceDetail.LastTimeOut:dd}{GetOrdinal(_attendanceDetail.LastTimeOut.Value.Day)} {_attendanceDetail.LastTimeOut:MMM yyyy hh:mm:ss tt}";
                         else
                             _lastTimeOut = string.Empty;
+
+                        _isPunchedIn = _attendanceDetail.SwipeType == "IN" ? true : false;
                         #endregion
 
                         #region Get Attendance Duration
