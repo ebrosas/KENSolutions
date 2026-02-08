@@ -46,16 +46,16 @@ BEGIN
 			FORMAT(CAST(b.SchedTimeIn AS DATETIME), 'hh:mm tt') + ' - ' + FORMAT(CAST(b.SchedTimeOut AS DATETIME), 'hh:mm tt') AS ShiftTiming,
 			5 AS TotalAbsent,
 			3 AS TotalHalfDay,
-			ISNULL(CAST(c.LeaveEntitlemnt AS DECIMAL), 0) AS TotalLeave,
+			ISNULL(CAST(d.TotalLeave AS DECIMAL), 0) AS TotalLeave,
 			6 AS TotalLate,
 			2 AS TotalEarlyOut,
 			3.5 AS TotalDeficitHour,
 			150.75 AS TotalWorkHour,
 			26.0 AS TotalDaysWorked,
 			8.0 AS AverageWorkHour,
-			56.0 AS TotalLeaveBalance,
-			30.0 AS TotalSLBalance,
-			4.0 AS TotalDILBalance
+			ISNULL(CAST(c.LeaveBalance AS DECIMAL), 0) AS TotalLeaveBalance,
+			ISNULL(CAST(c.SLBalance AS DECIMAL), 0) AS TotalSLBalance,
+			ISNULL(CAST(c.DILBalance AS DECIMAL), 0) AS TotalDILBalance
 	FROM kenuser.Employee a WITH (NOLOCK)
 		OUTER APPLY 
 		(
@@ -67,6 +67,13 @@ BEGIN
 			WHERE x.EmpNo = a.EmployeeNo
 		) b
 		LEFT JOIN kenuser.LeaveEntitlement c WITH (NOLOCK) ON a.EmployeeNo = c.EmployeeNo
+		OUTER APPLY
+		(
+			SELECT SUM(x.LeaveDuration) AS TotalLeave 
+			FROM kenuser.LeaveRequisitionWF x WITH (NOLOCK)
+			WHERE RTRIM(x.LeaveApprovalFlag) NOT IN ('C', 'R', 'D')
+				AND x.LeaveEmpNo = a.EmployeeNo
+		) d
 	WHERE a.EmployeeNo = @empNo
 	
 	

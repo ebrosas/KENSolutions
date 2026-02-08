@@ -113,6 +113,11 @@
 
 	SELECT * FROM [kenuser].[AttendanceSwipeLog] a
 
+	SELECT * FROM [kenuser].[LeaveEntitlement] a
+
+	SELECT * FROM [kenuser].[LeaveRequisitionWF] a
+	WHERE RTRIM(a.LeaveApprovalFlag) NOT IN ('C', 'R', 'D')
+
 /*	Data updates:
 
 	BEGIN TRAN T1
@@ -150,7 +155,7 @@
 	WHERE EmployeeNo = 10003633
 
 	DELETE FROM [dbo].[__EFMigrationsHistory]
-	WHERE MigrationID = '20260207114509_CreateLeaveEntitlement'
+	WHERE MigrationID IN ('20260208125828_AddFieldsToLeaveEntitlement', '20260207114509_CreateLeaveEntitlement')
 
 	UPDATE kenuser.MasterShiftPatternTitle
 	SET CreatedByEmpNo = 10003632,

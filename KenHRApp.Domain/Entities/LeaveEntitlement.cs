@@ -21,6 +21,10 @@ namespace KenHRApp.Domain.Entities
         [Column(TypeName = "char(1)"), Comment("Part of composite unique key index")]
         public char LeaveUOM { get; set; }
 
+        public double? LeaveBalance { get; set; }
+        public double? SLBalance { get; set; }
+        public double? DILBalance { get; set; }
+
         [Column(TypeName = "datetime")]
         public DateTime? CreatedDate { get; set; }
 

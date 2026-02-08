@@ -15,8 +15,15 @@ namespace KenHRApp.Web.Components.Pages
         #region Page Events
         protected override void OnInitialized()
         {
-            //Navigation.NavigateTo("/TimeAttendance/tnadashboard", replace: true);   //(Notes: replace: true prevents back-button loop)
-            Navigation.NavigateTo("/TimeAttendance/tnadashboard", true);
+            try
+            {
+                //Navigation.NavigateTo("/TimeAttendance/tnadashboard", replace: true);   //(Notes: replace: true prevents back-button loop)
+                //Navigation.NavigateTo("/TimeAttendance/tnadashboard", true);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
         #endregion
     }
