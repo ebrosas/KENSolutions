@@ -17,7 +17,7 @@ namespace KenHRApp.Web.Components.Pages
         {
             try
             {
-                //Navigation.NavigateTo("/TimeAttendance/tnadashboard", replace: true);   //(Notes: replace: true prevents back-button loop)
+                Navigation.NavigateTo("/TimeAttendance/tnadashboard", replace: true);   //(Notes: replace: true prevents back-button loop)
                 //Navigation.NavigateTo("/TimeAttendance/tnadashboard", true);
             }
             catch (Exception ex)

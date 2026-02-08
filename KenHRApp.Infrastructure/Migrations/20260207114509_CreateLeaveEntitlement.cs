@@ -163,7 +163,7 @@ namespace KenHRApp.Infrastructure.Migrations
                         principalSchema: "kenuser",
                         principalTable: "Employee",
                         principalColumn: "EmployeeNo",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
