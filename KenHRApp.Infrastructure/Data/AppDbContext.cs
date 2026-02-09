@@ -413,6 +413,9 @@ namespace KenHRApp.Infrastructure.Data
                 entity.ToTable("AttendanceTimesheet");
                 entity.HasKey(a => a.TimesheetId)
                     .HasName("PK_AttendanceTimesheet_TimesheetId");
+                entity.Property(a => a.TimesheetId)
+                     .ValueGeneratedOnAdd()
+                     .UseIdentityColumn(1, 1); // seed = 1, increment = 1
                 entity.Property(a => a.CreatedDate)
                       .HasDefaultValue(DateTime.Now);
             });
