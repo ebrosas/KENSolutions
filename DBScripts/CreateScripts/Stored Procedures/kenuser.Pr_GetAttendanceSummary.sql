@@ -43,6 +43,7 @@ BEGIN
 			RTRIM(a.FirstName) + RTRIM(a.MiddleName) + ' ' + RTRIM(a.LastName) AS EmployeeName,
 			RTRIM(b.ShiftPatternCode) AS ShiftRoster,
 			b.ShiftPatternDescription AS ShiftRosterDesc,
+			--CASE WHEN RTRIM(b.ShiftCode) = 'O' THEN 'Day-off' ELSE FORMAT(CAST(b.SchedTimeIn AS DATETIME), 'hh:mm tt') + ' - ' + FORMAT(CAST(b.SchedTimeOut AS DATETIME), 'hh:mm tt') END AS ShiftTiming,
 			FORMAT(CAST(b.SchedTimeIn AS DATETIME), 'hh:mm tt') + ' - ' + FORMAT(CAST(b.SchedTimeOut AS DATETIME), 'hh:mm tt') AS ShiftTiming,
 			5 AS TotalAbsent,
 			3 AS TotalHalfDay,
@@ -62,7 +63,7 @@ BEGIN
 			SELECT x.ShiftPatternCode, spt.ShiftPatternDescription, y.ShiftCode, y.ShiftDescription, z.ArrivalTo AS SchedTimeIn, z.DepartFrom AS SchedTimeOut 
 			FROM kenuser.ShiftPatternChange x WITH (NOLOCK) 
 				INNER JOIN kenuser.MasterShiftPattern y WITH (NOLOCK) ON RTRIM(x.ShiftPatternCode) = RTRIM(y.ShiftPatternCode) AND x.ShiftPointer = y.ShiftPointer
-				INNER JOIN kenuser.MasterShiftTime z WITH (NOLOCK) ON RTRIM(y.ShiftPatternCode) = RTRIM(z.ShiftPatternCode) AND RTRIM(y.ShiftCode) = RTRIM(z.ShiftCode)
+				INNER JOIN kenuser.MasterShiftTime z WITH (NOLOCK) ON RTRIM(y.ShiftPatternCode) = RTRIM(z.ShiftPatternCode) --AND RTRIM(y.ShiftCode) = RTRIM(z.ShiftCode)
 				INNER JOIN kenuser.MasterShiftPatternTitle spt WITH (NOLOCK) ON RTRIM(x.ShiftPatternCode) = RTRIM(spt.ShiftPatternCode)
 			WHERE x.EmpNo = a.EmployeeNo
 		) b
@@ -86,6 +87,6 @@ PARAMETERS:
 	@startDate			DATETIME,
 	@endDate			DATETIME
 
-	EXEC kenuser.Pr_GetAttendanceSummary 10003632, '01/16/2026', '02/15/2026'
+	EXEC kenuser.Pr_GetAttendanceSummary 10003632, '01/31/2026', '02/15/2026'
 
 */

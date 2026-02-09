@@ -93,25 +93,27 @@
 	SELECT * FROM [kenuser].[JobQualification] a
 
 	SELECT * FROM kenuser.MasterShiftPatternTitle a 
-	WHERE a.ShiftPatternId = 2
+	WHERE a.ShiftPatternId = 1
 
 	SELECT * FROM kenuser.MasterShiftTime a
 	WHERE a.ShiftPatternCode = 
 	(
 		SELECT x.ShiftPatternCode FROM kenuser.MasterShiftPatternTitle x 
-		WHERE x.ShiftPatternId = 2
+		WHERE x.ShiftPatternId = 1
 	)
 
 	SELECT * FROM kenuser.MasterShiftPattern a
 	WHERE a.ShiftPatternCode = 
 	(
 		SELECT x.ShiftPatternCode FROM kenuser.MasterShiftPatternTitle x 
-		WHERE x.ShiftPatternId = 2
+		WHERE x.ShiftPatternId = 1
 	)
 
 	SELECT * FROM [kenuser].[ShiftPatternChange] a
 
 	SELECT * FROM [kenuser].[AttendanceSwipeLog] a
+
+	SELECT * FROM [kenuser].[AttendanceTimesheet] a
 
 	SELECT * FROM [kenuser].[LeaveEntitlement] a
 
@@ -127,6 +129,10 @@
 		CreatedByName = 'ERVIN OLINAS BROSAS',
 		CreatedByUserID = 'ervin'
 	WHERE AutoId = 4
+
+	UPDATE[kenuser].[ShiftPatternChange]
+	SET EffectiveDate = '01/31/2026'
+	WHERE AutoId = 1006
 
 	DELETE FROM [kenuser].[ShiftPatternChange]
 

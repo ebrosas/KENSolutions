@@ -411,9 +411,9 @@ namespace KenHRApp.Infrastructure.Data
             entity =>
             {
                 entity.ToTable("AttendanceTimesheet");
-                entity.HasKey(a => a.TimesheetId)
-                    .HasName("PK_AttendanceTimesheet_TimesheetId");
-                entity.Property(a => a.TimesheetId)
+                entity.HasKey(a => a.AutoId)
+                    .HasName("PK_AttendanceTimesheet_AutoId");
+                entity.Property(a => a.AutoId)
                      .ValueGeneratedOnAdd()
                      .UseIdentityColumn(1, 1); // seed = 1, increment = 1
                 entity.Property(a => a.CreatedDate)

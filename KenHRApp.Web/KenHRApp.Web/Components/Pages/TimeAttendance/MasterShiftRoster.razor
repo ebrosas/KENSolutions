@@ -177,11 +177,11 @@
                                                 </EditTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.ArrivalTo" Title="Arrival To" Class="col-shift-time">                                                
-                                                <CellTemplate Context="row">
+                                                @* <CellTemplate Context="row">
                                                     <MudTextField T="string" InputType="InputType.Text" AdornmentColor="Color.Error" >
                                                         @row.Item.ArrivalTo
                                                     </MudTextField>
-                                                </CellTemplate>
+                                                </CellTemplate> *@
                                                 <EditTemplate Context="row">
                                                     <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.ArrivalTo" />
                                                 </EditTemplate>

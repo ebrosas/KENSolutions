@@ -11,7 +11,7 @@ namespace KenHRApp.Domain.Entities
     public class AttendanceTimesheet
     {
         #region Properties
-        public long TimesheetId { get; set; }       // Identity column   
+        public long AutoId { get; set; }       // Identity column   
 
         [Required(ErrorMessage = "Employee No. is required")]
         [Display(Name = "Employee No.")]
