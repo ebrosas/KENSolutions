@@ -1,0 +1,37 @@
+
+Leave Approval Flags:
+
+LRY58VCAFG char(1) => @leaveApprovalFlag (leave approval flag)
+Values:	 A	Approved / Paid               
+         C	Canceled                      
+         D	Draft                         
+         N	Approved / Not Paid          
+         P	Waiting for advance           
+         R	Rejected                      
+         W	Waiting for Approval    
+
+Half-day Leave Flags:
+
+LREV02 char(1):  
+- Flag that will identify whether the value of the "LRY58VCOFT" and "LRY58VCOTT" fields contain the time part of the Leave Start Date and Leave Resume Date
+- Available values are: 
+ 'S' => Half day on Leave Start Date 
+ 'E' => Half day on Leave Resume Date
+ 'B' => Half day on both Leave Start Date and Leave Resume Date
+
+- Stores value of @halfDayLeaveFlag (tinyint) parameter. 
+  Available Values: 
+  0 => No Half Day 
+  1 => Half Day on Leave Start Date 
+  2 => Half Day on Leave Resume Date    
+  3 => Half Day on both Leave Start Date and Leave Resume date  
+
+Populate Annual Leave Entry Types:
+	LVRESMEFD	Full day
+	LVRESMEHD1	First half of the day
+	LVRESMEHD2	Second half of the day
+	LVSTARTFD	Full day
+	LVSTARTHD1	First half of the day
+	LVSTARTHD2	Second half of the day
+
+74 - Safety & Security Bldg.

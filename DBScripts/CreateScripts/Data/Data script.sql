@@ -120,6 +120,10 @@
 	SELECT * FROM [kenuser].[LeaveRequisitionWF] a
 	WHERE RTRIM(a.LeaveApprovalFlag) NOT IN ('C', 'R', 'D')
 
+	SELECT * FROM [kenuser].[LeaveRequisitionWF] a
+	WHERE RTRIM(a.LeaveApprovalFlag) NOT IN ('C', 'R')
+		AND ISNULL(a.HalfDayLeaveFlag, 0) > 0
+
 /*	Data updates:
 
 	BEGIN TRAN T1

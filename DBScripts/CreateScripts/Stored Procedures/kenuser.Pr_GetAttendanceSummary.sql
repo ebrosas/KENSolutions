@@ -21,39 +21,22 @@ BEGIN
 	--Tell SQL Engine not to return the row-count information
 	SET NOCOUNT ON 
 
-	--SELECT	@empNo AS EmployeeNo,
-	--		'ERVIN OLINAS BROSAS' AS EmployeeName,
-	--		'D5' AS ShiftRoster,
-	--		'08:00 AM - 04:30 PM' AS ShiftTiming,
-	--		FORMAT(GETDATE(), 'dd-MMM-yyyy hh:mm tt')  AS ActualTiming,
-	--		5 AS TotalAbsent,
-	--		3 AS TotalHalfDay,
-	--		10 AS TotalLeave,
-	--		6 AS TotalLate,
-	--		2 AS TotalEarlyOut,
-	--		3.5 AS TotalDeficitHour,
-	--		150.75 AS TotalWorkHour,
-	--		26.0 AS TotalDaysWorked,
-	--		8.0 AS AverageWorkHour,
-	--		56.0 AS TotalLeaveBalance,
-	--		30.0 AS TotalSLBalance,
-	--		4.0 AS TotalDILBalance
+	DECLARE @fiscalYear	INT = YEAR(GETDATE())
 
 	SELECT	a.EmployeeNo,
 			RTRIM(a.FirstName) + RTRIM(a.MiddleName) + ' ' + RTRIM(a.LastName) AS EmployeeName,
 			RTRIM(b.ShiftPatternCode) AS ShiftRoster,
-			b.ShiftPatternDescription AS ShiftRosterDesc,
-			--CASE WHEN RTRIM(b.ShiftCode) = 'O' THEN 'Day-off' ELSE FORMAT(CAST(b.SchedTimeIn AS DATETIME), 'hh:mm tt') + ' - ' + FORMAT(CAST(b.SchedTimeOut AS DATETIME), 'hh:mm tt') END AS ShiftTiming,
+			b.ShiftPatternDescription AS ShiftRosterDesc,			
 			FORMAT(CAST(b.SchedTimeIn AS DATETIME), 'hh:mm tt') + ' - ' + FORMAT(CAST(b.SchedTimeOut AS DATETIME), 'hh:mm tt') AS ShiftTiming,
 			5 AS TotalAbsent,
-			3 AS TotalHalfDay,
+			e.TotalHalfDay,
 			ISNULL(CAST(d.TotalLeave AS DECIMAL), 0) AS TotalLeave,
-			6 AS TotalLate,
-			2 AS TotalEarlyOut,
-			3.5 AS TotalDeficitHour,
-			150.75 AS TotalWorkHour,
-			26.0 AS TotalDaysWorked,
-			8.0 AS AverageWorkHour,
+			kenuser.fnGetLateCount(a.EmployeeNo, @startDate, @endDate, f.ArrivalTo) AS TotalLate,
+			kenuser.fnGetEarlyOutCount(a.EmployeeNo, @startDate, @endDate, f.DepartFrom) AS TotalEarlyOut,
+			CAST(g.TotalDeficitHour AS FLOAT) AS TotalDeficitHour,
+			CAST(g.TotalWorkHour AS FLOAT) AS TotalWorkHour,
+			CAST(g.TotalDaysWorked AS FLOAT) AS TotalDaysWorked,
+			CAST(ROUND(g.AverageWorkHour, 2) AS FLOAT) AS AverageWorkHour,
 			ISNULL(CAST(c.LeaveBalance AS DECIMAL), 0) AS TotalLeaveBalance,
 			ISNULL(CAST(c.SLBalance AS DECIMAL), 0) AS TotalSLBalance,
 			ISNULL(CAST(c.DILBalance AS DECIMAL), 0) AS TotalDILBalance
@@ -74,7 +57,40 @@ BEGIN
 			FROM kenuser.LeaveRequisitionWF x WITH (NOLOCK)
 			WHERE RTRIM(x.LeaveApprovalFlag) NOT IN ('C', 'R', 'D')
 				AND x.LeaveEmpNo = a.EmployeeNo
+				AND YEAR(x.LeaveStartDate) = @fiscalYear
 		) d
+		OUTER APPLY
+		(
+			SELECT COUNT(x.LeaveRequestId) AS TotalHalfDay
+			FROM kenuser.LeaveRequisitionWF x WITH (NOLOCK)
+			WHERE RTRIM(x.LeaveApprovalFlag) NOT IN ('C', 'R', 'D')
+				AND ISNULL(x.HalfDayLeaveFlag, 0) > 0
+				AND x.LeaveEmpNo = a.EmployeeNo
+				AND YEAR(x.LeaveStartDate) = @fiscalYear
+		) e
+		OUTER APPLY	
+		(
+			SELECT DISTINCT mst.ArrivalTo, mst.DepartFrom
+			FROM kenuser.AttendanceTimesheet ats WITH (NOLOCK)
+				INNER JOIN kenuser.MasterShiftTime mst WITH (NOLOCK) ON RTRIM(ats.ShiftPatCode) = RTRIM(mst.ShiftPatternCode) AND RTRIM(ats.SchedShiftCode) = RTRIM(mst.ShiftCode)
+			WHERE ats.EmpNo = a.EmployeeNo
+		) f
+		OUTER APPLY	
+		(
+			SELECT
+				SUM(ISNULL(NoPayHours, 0)) AS TotalDeficitHour,
+				SUM(ISNULL(DurationWorkedCumulative, 0)) AS TotalWorkHour,
+				COUNT(DISTINCT CAST(AttendanceDate AS DATE)) AS TotalDaysWorked,
+				CASE 
+					WHEN COUNT(DISTINCT CAST(AttendanceDate AS DATE)) = 0 THEN 0
+					ELSE 
+						CAST(SUM(ISNULL(DurationWorkedCumulative, 0)) AS DECIMAL(10,2))
+						/ COUNT(DISTINCT CAST(AttendanceDate AS DATE))
+				END AS AverageWorkHour
+			FROM kenuser.AttendanceTimesheet x WITH (NOLOCK)
+			WHERE x.EmpNo = a.EmployeeNo
+			  AND x.AttendanceDate BETWEEN @startDate AND @endDate
+		) g
 	WHERE a.EmployeeNo = @empNo
 	
 	
