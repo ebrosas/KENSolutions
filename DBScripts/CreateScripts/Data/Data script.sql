@@ -45,12 +45,18 @@
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'SHIFTCHANGETYPE')	
 	
 
-	SELECT a.EmployeeId, a.EmployeeNo, 
+	SELECT a.EmployeeId, a.EmployeeNo, a.HireDate, a.TerminationDate,
+		a.DepartmentCode, a.PayGrade,
 		a.EmploymentTypeCode, a.RoleCode, a.JobTitleCode, a.FirstAttendanceModeCode, a.SecondAttendanceModeCode, a.ThirdAttendanceModeCode,
 		a.SecondReportingManagerCode,
 		a.* 
 	FROM kenuser.Employee a
 	WHERE a.EmployeeNo = 10003633
+
+	SELECT * FROM [kenuser].[AttendanceTimesheet] a
+
+	SELECT * FROM [kenuser].[AttendanceSwipeLog] a
+
 
 	SELECT * FROM kenuser.UserDefinedCode a
 	ORDER BY a.UDCDesc1

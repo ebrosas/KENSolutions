@@ -21,7 +21,7 @@ namespace KenHRApp.Application.DTOs
         public int TotalEarlyOut { get; set; }
         public decimal TotalDeficitHour { get; set; }
         public decimal TotalWorkHour { get; set; }
-        public decimal TotalDaysWorked { get; set; }
+        public double TotalDaysWorked { get; set; }
         public decimal AverageWorkHour { get; set; }
         public decimal TotalLeaveBalance { get; set; }
         public decimal TotalSLBalance { get; set; }

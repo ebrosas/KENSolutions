@@ -28,15 +28,15 @@ BEGIN
 			RTRIM(b.ShiftPatternCode) AS ShiftRoster,
 			b.ShiftPatternDescription AS ShiftRosterDesc,			
 			FORMAT(CAST(b.SchedTimeIn AS DATETIME), 'hh:mm tt') + ' - ' + FORMAT(CAST(b.SchedTimeOut AS DATETIME), 'hh:mm tt') AS ShiftTiming,
-			5 AS TotalAbsent,
+			g.TotalAbsent,
 			e.TotalHalfDay,
 			ISNULL(CAST(d.TotalLeave AS DECIMAL), 0) AS TotalLeave,
 			kenuser.fnGetLateCount(a.EmployeeNo, @startDate, @endDate, f.ArrivalTo) AS TotalLate,
 			kenuser.fnGetEarlyOutCount(a.EmployeeNo, @startDate, @endDate, f.DepartFrom) AS TotalEarlyOut,
-			CAST(g.TotalDeficitHour AS FLOAT) AS TotalDeficitHour,
-			CAST(g.TotalWorkHour AS FLOAT) AS TotalWorkHour,
-			CAST(g.TotalDaysWorked AS FLOAT) AS TotalDaysWorked,
-			CAST(ROUND(g.AverageWorkHour, 2) AS FLOAT) AS AverageWorkHour,
+			g.TotalDeficitHour,
+			g.TotalWorkHour,
+			g.TotalDaysWorked,
+			g.AverageWorkHour,
 			ISNULL(CAST(c.LeaveBalance AS DECIMAL), 0) AS TotalLeaveBalance,
 			ISNULL(CAST(c.SLBalance AS DECIMAL), 0) AS TotalSLBalance,
 			ISNULL(CAST(c.DILBalance AS DECIMAL), 0) AS TotalDILBalance
@@ -78,15 +78,30 @@ BEGIN
 		OUTER APPLY	
 		(
 			SELECT
-				SUM(ISNULL(NoPayHours, 0)) AS TotalDeficitHour,
-				SUM(ISNULL(DurationWorkedCumulative, 0)) AS TotalWorkHour,
+				-- Total deficit hours
+				CAST(SUM(ISNULL(NoPayHours, 0)) AS DECIMAL) / 60 AS TotalDeficitHour,
+
+				-- Total work hours
+				CAST(SUM(ISNULL(DurationWorkedCumulative, 0)) AS DECIMAL) / 60 AS TotalWorkHour,
+
+				-- Total days worked (distinct attendance dates)
 				COUNT(DISTINCT CAST(AttendanceDate AS DATE)) AS TotalDaysWorked,
+
+				-- Average hours worked per day
 				CASE 
 					WHEN COUNT(DISTINCT CAST(AttendanceDate AS DATE)) = 0 THEN 0
 					ELSE 
 						CAST(SUM(ISNULL(DurationWorkedCumulative, 0)) AS DECIMAL(10,2))
 						/ COUNT(DISTINCT CAST(AttendanceDate AS DATE))
-				END AS AverageWorkHour
+				END AS AverageWorkHour,
+
+				-- Total absent days (RemarkCode = 'A')
+				COUNT(DISTINCT
+					CASE 
+						WHEN RemarkCode = 'A' 
+						THEN CAST(AttendanceDate AS DATE)
+					END
+				) AS TotalAbsent
 			FROM kenuser.AttendanceTimesheet x WITH (NOLOCK)
 			WHERE x.EmpNo = a.EmployeeNo
 			  AND x.AttendanceDate BETWEEN @startDate AND @endDate
@@ -103,6 +118,6 @@ PARAMETERS:
 	@startDate			DATETIME,
 	@endDate			DATETIME
 
-	EXEC kenuser.Pr_GetAttendanceSummary 10003632, '01/31/2026', '02/15/2026'
+	EXEC kenuser.Pr_GetAttendanceSummary 10003632, '02/01/2026', '02/28/2026'
 
 */
