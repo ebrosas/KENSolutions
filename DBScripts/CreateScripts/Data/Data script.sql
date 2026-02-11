@@ -8,7 +8,7 @@
 	--General
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
-	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'GENDER')
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'PAYGRADE')
 
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)

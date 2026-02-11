@@ -34,4 +34,13 @@ Populate Annual Leave Entry Types:
 	LVSTARTHD1	First half of the day
 	LVSTARTHD2	Second half of the day
 
-74 - Safety & Security Bldg.
+Table 1: [kenuser].[Employee]
+Table 2: [kenuser].[ShiftPatternChange]
+Table 3: [kenuser].[MasterShiftPattern]
+Table 4: [kenuser].[MasterShiftTime]
+Table 5: [kenuser].[AttendanceSwipeLog]
+Table 6: [kenuser].[AttendanceTimesheet]
+Table 7: [kenuser].[UserDefinedCode]
+Table 8: [kenuser].[UserDefinedCodeGroup]
+
+
