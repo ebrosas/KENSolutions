@@ -28,15 +28,15 @@ BEGIN
 			RTRIM(b.ShiftPatternCode) AS ShiftRoster,
 			b.ShiftPatternDescription AS ShiftRosterDesc,			
 			FORMAT(CAST(b.SchedTimeIn AS DATETIME), 'hh:mm tt') + ' - ' + FORMAT(CAST(b.SchedTimeOut AS DATETIME), 'hh:mm tt') AS ShiftTiming,
-			g.TotalAbsent,
-			e.TotalHalfDay,
+			ISNULL(g.TotalAbsent, 0) AS TotalAbsent,
+			ISNULL(e.TotalHalfDay, 0) AS TotalHalfDay,
 			ISNULL(CAST(d.TotalLeave AS DECIMAL), 0) AS TotalLeave,
 			kenuser.fnGetLateCount(a.EmployeeNo, @startDate, @endDate, f.ArrivalTo) AS TotalLate,
 			kenuser.fnGetEarlyOutCount(a.EmployeeNo, @startDate, @endDate, f.DepartFrom) AS TotalEarlyOut,
-			g.TotalDeficitHour,
-			g.TotalWorkHour,
-			g.TotalDaysWorked,
-			g.AverageWorkHour,
+			ISNULL(g.TotalDeficitHour, 0) AS TotalDeficitHour,
+			ISNULL(g.TotalWorkHour, 0) AS TotalWorkHour,
+			ISNULL(g.TotalDaysWorked, 0) AS TotalDaysWorked,
+			ISNULL(g.AverageWorkHour, 0) AS AverageWorkHour,
 			ISNULL(CAST(c.LeaveBalance AS DECIMAL), 0) AS TotalLeaveBalance,
 			ISNULL(CAST(c.SLBalance AS DECIMAL), 0) AS TotalSLBalance,
 			ISNULL(CAST(c.DILBalance AS DECIMAL), 0) AS TotalDILBalance
@@ -57,7 +57,7 @@ BEGIN
 			FROM kenuser.LeaveRequisitionWF x WITH (NOLOCK)
 			WHERE RTRIM(x.LeaveApprovalFlag) NOT IN ('C', 'R', 'D')
 				AND x.LeaveEmpNo = a.EmployeeNo
-				AND YEAR(x.LeaveStartDate) = @fiscalYear
+				AND x.LeaveStartDate BETWEEN @startDate AND @endDate
 		) d
 		OUTER APPLY
 		(
@@ -66,7 +66,7 @@ BEGIN
 			WHERE RTRIM(x.LeaveApprovalFlag) NOT IN ('C', 'R', 'D')
 				AND ISNULL(x.HalfDayLeaveFlag, 0) > 0
 				AND x.LeaveEmpNo = a.EmployeeNo
-				AND YEAR(x.LeaveStartDate) = @fiscalYear
+				AND x.LeaveStartDate BETWEEN @startDate AND @endDate
 		) e
 		OUTER APPLY	
 		(
@@ -119,5 +119,7 @@ PARAMETERS:
 	@endDate			DATETIME
 
 	EXEC kenuser.Pr_GetAttendanceSummary 10003632, '02/01/2026', '02/28/2026'
+	EXEC kenuser.Pr_GetAttendanceSummary 10003632, '01/16/2026', '02/15/2026'
+	EXEC kenuser.Pr_GetAttendanceSummary 10003632, '02/16/2026', '03/15/2026'
 
 */

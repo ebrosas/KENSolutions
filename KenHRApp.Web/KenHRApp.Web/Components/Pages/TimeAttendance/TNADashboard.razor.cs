@@ -3,6 +3,7 @@ using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Application.Services;
 using KenHRApp.Domain.Entities;
+using KenHRApp.Domain.Models.Common;
 using KenHRApp.Web.Components.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -39,20 +40,16 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private int pageCount => (int)Math.Ceiling((double)_holidayList.Count / pageSize);        
         private int _currentEmpNo = 10003632;
         private DateTime _payrollStartDate = new DateTime(2026, 1, 16);
-        private DateTime _payrollEndDate = new DateTime(2026, 2, 15);        
+        private DateTime _payrollEndDate = new DateTime(2026, 2, 15);
         private int _fiscalYear = DateTime.Now.Year;
         private string? _firstTimeIn = null;
         private string? _lastTimeOut = null;
         private MudDatePicker _picker;
-        private DateTime? _selectedDate = DateTime.Today;
-
-        private AttendanceSummaryDTO _attendanceSummary = new AttendanceSummaryDTO();
-        private AttendanceDetailDTO? _attendanceDetail = new AttendanceDetailDTO();  
-        private AttendanceSwipeDTO _swipeLog = new AttendanceSwipeDTO();
-        private AttendanceDurationDTO _attendanceDuration = new AttendanceDurationDTO();
-
+        private DateTime? _selectedDate = DateTime.Today;        
         private Orientation _calOrientation = Orientation.Landscape;
         private string _pickerStyle = "width: 420px;";
+        private string _payrollPeriodKey = null!;
+        private int _selectedFiscalYear;
         #endregion
 
         #region Flags
@@ -75,7 +72,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private readonly string _iconWarning = "fas fa-exclamation-circle";
         #endregion
 
-        #region Collections        
+        #region Objects and Collections      
+        private AttendanceSummaryDTO _attendanceSummary = new AttendanceSummaryDTO();
+        private AttendanceDetailDTO? _attendanceDetail = new AttendanceDetailDTO();
+        private AttendanceSwipeDTO _swipeLog = new AttendanceSwipeDTO();
+        private AttendanceDurationDTO _attendanceDuration = new AttendanceDurationDTO();
         private List<ShiftPatternMasterDTO> _shiftRosterList = new List<ShiftPatternMasterDTO>();
         private List<BreadcrumbItem> _breadcrumbItems =
         [
@@ -85,6 +86,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private List<UserDefinedCodeDTO> _attendanceLegends { get; set; } = new();
         private List<HolidayDTO> _holidayList { get; set; } = new();
+        private List<PayrollPeriodResultDTO> _payrollPeriodList { get; set; } = new();
+        private List<int> _fiscalYearList = new();
         private List<AttendanceSwipeDTO> _attendanceChips { get; set; } = new();
 
         private IEnumerable<HolidayDTO> PagedHolidays =>
@@ -120,11 +123,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Page Events
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
             // Initialize the EditContext 
             _editContext = new EditContext(_swipeLog);
 
+            PopulateFiscalYears();
+            _selectedFiscalYear = DateTime.Now.Year;
+
+            await LoadPayrollPeriodsAsync(_selectedFiscalYear);
             BeginGetAttendanceSummary();                        
         }
         #endregion
@@ -171,6 +178,22 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Private Methods
+        private void PopulateFiscalYears()
+        {
+            int currentYear = DateTime.Now.Year;
+
+            _fiscalYearList = Enumerable.Range(currentYear - 4, 5)
+                                        .OrderByDescending(y => y)
+                                        .ToList();
+        }
+
+        private async Task OnFiscalYearChanged()
+        {
+            //_selectedFiscalYear = fiscalYear;
+            await RefreshHolidays();
+            await LoadPayrollPeriodsAsync(_selectedFiscalYear);
+        }
+
         private void OnBreakpointChanged(Breakpoint breakpoint)
         {
             if (breakpoint <= Breakpoint.Md)
@@ -332,7 +355,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private async Task RefreshHolidays()
         {
 
-            var repoResult = await AttendanceService.GetPublicHolidaysAsync(_fiscalYear, null);
+            var repoResult = await AttendanceService.GetPublicHolidaysAsync(_selectedFiscalYear, null);
             if (repoResult.Success)
             {
                 _holidayList = repoResult!.Value;
@@ -344,18 +367,64 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 ShowHideError(true);
         }
 
+        private async Task BeginRefreshAttendanceSummary()
+        {            
+            try
+            {
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Loading attendance summary, please wait...";
+
+                _payrollStartDate = _payrollPeriodList.Where(x => x.PayrollPeriodKey == _payrollPeriodKey).Select(x => x.PayrollStartDate).FirstOrDefault();
+                _payrollEndDate = _payrollPeriodList.Where(x => x.PayrollPeriodKey == _payrollPeriodKey).Select(x => x.PayrollEndDate).FirstOrDefault();
+
+                _ = RefreshAttendanceSummaryAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    // Hide errors
+                    //_errorMessage.Clear();
+                    //ShowHideError(false);
+
+                }, _currentEmpNo, _payrollStartDate, _payrollEndDate);
+            }
+            catch (Exception ex)
+            {
+                // Set the error message
+                _errorMessage.Append(ex.Message.ToString());
+
+                ShowHideError(true);
+            }
+        }
+
         private async Task LoadComboboxAsync(Func<Task> callback)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(300);
 
-            var repoResult = await AttendanceService.GetPublicHolidaysAsync(_fiscalYear, null);
+            #region Get public holidays
+            var repoResult = await AttendanceService.GetPublicHolidaysAsync(_selectedFiscalYear, null);
             if (repoResult.Success)
             {
                 _holidayList = repoResult!.Value;
             }
             else
                 _errorMessage.Append(repoResult.Error);
+            #endregion
+
+            #region Get Payroll periods
+            var periodResult = await AttendanceService.GetPayrollPeriodAsync(_selectedFiscalYear);
+            if (repoResult.Success)
+            {
+                _payrollPeriodList = periodResult!.Value;
+            }
+            else
+                _errorMessage.Append(periodResult.Error);
+            #endregion
 
             if (callback != null)
             {
@@ -412,13 +481,35 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
 
             #region Get Public Holidays
-            var repoResult = await AttendanceService.GetPublicHolidaysAsync(_fiscalYear, null);
+            var repoResult = await AttendanceService.GetPublicHolidaysAsync(_selectedFiscalYear, null);
             if (repoResult.Success)
             {
                 _holidayList = repoResult!.Value;
             }
             else
                 _errorMessage.Append(repoResult.Error);
+            #endregion
+
+            #region Get Payroll periods
+            //var periodResult = await AttendanceService.GetPayrollPeriodAsync(_selectedFiscalYear);
+            //if (repoResult.Success)
+            //{
+            //    _payrollPeriodList = periodResult!.Value;
+
+            //    // Get the active payroll period and set the default selected value in the combobox to the active period
+            //    if (_payrollPeriodList != null && _payrollPeriodList.Any())
+            //    {
+            //        var activePeriod = _payrollPeriodList
+            //        .FirstOrDefault(p => p.IsActive);
+
+            //        if (activePeriod != null)
+            //        {
+            //            _payrollPeriodKey = activePeriod.PayrollPeriodKey;
+            //        }
+            //    }
+            //}
+            //else
+            //    _errorMessage.Append(periodResult.Error);
             #endregion
 
             #region Get Attendance Legends
@@ -428,6 +519,63 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             else
                 _errorMessage.Append(udcResult.Error);
             #endregion                        
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task LoadPayrollPeriodsAsync(int fiscalYear)
+        {
+            _payrollPeriodKey = string.Empty;
+
+            var periodResult = await AttendanceService.GetPayrollPeriodAsync(fiscalYear);
+            if (periodResult.Success)
+            {
+                _payrollPeriodList = periodResult!.Value;
+
+                // Get the active payroll period and set the default selected value in the combobox to the active period
+                if (_payrollPeriodList != null && _payrollPeriodList.Any())
+                {
+                    var activePeriod = _payrollPeriodList
+                    .FirstOrDefault(p => p.IsActive);
+
+                    if (activePeriod != null)
+                    {
+                        _payrollPeriodKey = activePeriod.PayrollPeriodKey;
+                    }
+                }
+            }
+            else
+                _errorMessage.Append(periodResult.Error);
+        }
+
+        private async Task RefreshAttendanceSummaryAsync(Func<Task> callback, int empNo, DateTime? startDate, DateTime? endDate)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            var result = await AttendanceService.GetAttendanceSummaryAsync(empNo, startDate, endDate);
+            if (result.Success)
+            {
+                _attendanceSummary = result.Value!;
+
+                // Hide errors
+                _errorMessage.Clear();
+                ShowHideError(false);
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.Append(result.Error);
+
+                ShowHideError(true);
+            }
 
             if (callback != null)
             {

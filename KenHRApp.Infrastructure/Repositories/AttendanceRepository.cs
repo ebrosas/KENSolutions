@@ -1,4 +1,5 @@
 ﻿using KenHRApp.Domain.Entities;
+using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -960,6 +961,38 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 // Log error here if needed (Serilog, NLog, etc.)
                 return Result<AttendanceDurationResult>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<List<PayrollPeriodResult>>> GetPayrollPeriodAsync(int fiscalYear = 0)
+        {
+            List<PayrollPeriodResult> payrollPeriodList = new();
+
+            try
+            {
+                var model = await _db.Set<PayrollPeriodResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetPayrollPeriod @fiscalYear = {0}", fiscalYear)
+                    .AsNoTracking()
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    payrollPeriodList = model.Select(e => new PayrollPeriodResult
+                    {
+                        PayrollPeriodId = e.PayrollPeriodId,    
+                        FiscalYear = e.FiscalYear,
+                        FiscalMonth = e.FiscalMonth,
+                        PayrollStartDate = e.PayrollStartDate,
+                        PayrollEndDate = e.PayrollEndDate,
+                        IsActive = e.IsActive
+                    }).ToList();
+                }
+
+                return Result<List<PayrollPeriodResult>>.SuccessResult(payrollPeriodList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<PayrollPeriodResult>>.Failure($"Database error: {ex.Message}");
             }
         }
         #endregion

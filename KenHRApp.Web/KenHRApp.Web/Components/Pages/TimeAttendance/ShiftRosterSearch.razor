@@ -79,7 +79,7 @@
                          </PropertyColumn>
                          <PropertyColumn Property="x => x.IsActiveDesc" Title="Is Active?" Class="col-active" Required="false">
                              <CellTemplate Context="row">
-                                 <MudChip T="string" Size=Size.Small Color="@(row.Item.IsActiveDesc == "Yes" ? Color.Success : Color.Error)">
+                                 <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" Color="@(row.Item.IsActiveDesc == "Yes" ? Color.Success : Color.Error)">
                                      @row.Item.IsActiveDesc
                                 </MudChip>
                             </CellTemplate>
@@ -89,7 +89,7 @@
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.IsFlexiTimeDesc" Title="Is Flexitime?" Class="col-flexitime" Required="false">
                             <CellTemplate Context="row">
-                                <MudChip T="string" Size=Size.Small Color="@(row.Item.IsFlexiTimeDesc == "Yes" ? Color.Success : Color.Error)">
+                                <MudChip T="string" Size=Size.Small Variant="Variant.Text" Color="@(row.Item.IsFlexiTimeDesc == "Yes" ? Color.Success : Color.Error)">
                                     @row.Item.IsFlexiTimeDesc
                                 </MudChip>
                             </CellTemplate>
@@ -119,10 +119,10 @@
                         </PropertyColumn>      
                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                             <CellTemplate Context="row">
-                                <MudIconButton Color="Color.Default" title="View shift roster details" Class="show-btn fa-icon-btn"
+                                <MudIconButton Color="Color.Info" title="View shift roster details" Class="show-btn fa-icon-btn"
                                                OnClick="() => GetShiftRosterDetail(row.Item)">
                                     <ChildContent>
-                                        <i class="fas fa-eye fa-1x"></i>
+                                        <i class="fas fa-edit fa-1x"></i>
                                     </ChildContent>
                                 </MudIconButton>
                                 <MudIconButton Color="Color.Error" title="Delete shift roster record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">

@@ -130,6 +130,8 @@
 	WHERE RTRIM(a.LeaveApprovalFlag) NOT IN ('C', 'R')
 		AND ISNULL(a.HalfDayLeaveFlag, 0) > 0
 
+	SELECT * FROM kenuser.PayrollPeriod a
+
 /*	Data updates:
 
 	BEGIN TRAN T1

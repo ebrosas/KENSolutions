@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/TimeAttendance/tnadashboard"
 
 <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Employee Attendance Dashboard</MudText>
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
@@ -29,8 +29,69 @@
             </MudAlert>
         }
         <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
-            <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
-                CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
+            <MudPaper class="paper-header w-100 px-4" Elevation="0">
+                <MudGrid Spacing="5">
+                    <MudItem xs="12" sm="4">
+                        <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
+                            CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs">                    
+                        </MudBreadcrumbs>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudPaper Class="px-1" Elevation="0">
+                            <MudSelect T="int"
+                                Label="Fiscal Year"
+                                Variant="Variant.Outlined"
+                                Margin="Margin.Dense"
+                                Dense="true"
+                                Immediate="true"
+                                Placeholder="Select year"
+                                AdornmentIcon="@Icons.Material.Filled.CalendarMonth"
+                                AdornmentColor="Color.Surface"
+                                Typo="Typo.subtitle2"
+                                @bind-Value="_selectedFiscalYear"
+                                SelectedValuesChanged="OnFiscalYearChanged">
+
+                                @foreach (var year in _fiscalYearList)
+                                {
+                                    <MudSelectItem Value="@year">@year</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudPaper Class="px-1" Elevation="0">
+                            <MudSelect T="string"
+                                   @bind-Value="_payrollPeriodKey"
+                                   Label="Payroll Period"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Placeholder="Please Select"
+                                   AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                   AdornmentColor="Color.Surface"
+                                   Immediate="true"
+                                   Dense="true"
+                                   Typo="Typo.subtitle2"
+                                   SelectedValuesChanged="BeginRefreshAttendanceSummary">
+                                @foreach (var period in _payrollPeriodList)
+                                {
+                                    <MudSelectItem Value="@period.PayrollPeriodKey">
+                                        @if (period.IsActive)
+                                        {
+                                            <span style="font-weight:500; color:#1976d2;">
+                                                @period.PeriodDescription (Active)
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            @period.PeriodDescription
+                                        }
+                                    </MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudPaper>                        
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
             <MudGrid Spacing="0" Class="mt-2">
                 <MudItem xs="12" sm="6" md="6" lg="4" Class="ps-0 pe-4">
                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" StretchItems="StretchItems.Start" Spacing="0">

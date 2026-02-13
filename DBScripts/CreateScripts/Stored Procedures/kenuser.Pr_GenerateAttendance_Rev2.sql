@@ -1,3 +1,14 @@
+/*****************************************************************************************************************************************************************************
+*	Revision History
+*
+*	Name: kenuser.Pr_GenerateAttendance
+*	Description: This stored procedure is used to automate the Timesheet Process
+*
+*	Date			Author		Rev. #		Comments:
+*	11/02/2026		Ervin		1.0			Created
+*	
+******************************************************************************************************************************************************************************/
+
 ALTER PROCEDURE kenuser.Pr_GenerateAttendance
 (
     @AttendanceDate DATE
@@ -33,7 +44,7 @@ BEGIN
 
 
         -------------------------------------------------------
-        -- 3) Resolve Dynamic Shift Based On Cycle Logic
+        -- 3) Resolve Latest Shift (Supports Day-Off)
         -------------------------------------------------------
         IF OBJECT_ID('tempdb..#ShiftResolved') IS NOT NULL DROP TABLE #ShiftResolved;
 
@@ -48,48 +59,20 @@ BEGIN
                 WHERE EffectiveDate <= @AttendanceDate
             ) x
             WHERE rn = 1
-        ),
-        PatternMax AS
-        (
-            SELECT 
-                ShiftPatternCode,
-                MAX(ShiftPointer) AS MaxPointer
-            FROM kenuser.MasterShiftPattern
-            GROUP BY ShiftPatternCode
         )
-        SELECT
+        SELECT 
             ls.EmpNo,
             ls.ShiftPatternCode,
-
-            -- Calculate Dynamic Pointer
-            (
-                ((ls.ShiftPointer - 1 +
-                  DATEDIFF(DAY, ls.EffectiveDate, @AttendanceDate)
-                 ) % pm.MaxPointer) + 1
-            ) AS CalculatedPointer
-
-        INTO #ShiftPointerCalc
-        FROM LatestShift ls
-        INNER JOIN PatternMax pm
-            ON ls.ShiftPatternCode = pm.ShiftPatternCode;
-
-
-        -- Now fetch actual ShiftCode
-        SELECT
-            spc.EmpNo,
-            spc.ShiftPatternCode,
             msp.ShiftCode,
             ISNULL(mst.DurationNormal, 0) AS DurationNormal
         INTO #ShiftResolved
-        FROM #ShiftPointerCalc spc
+        FROM LatestShift ls
         INNER JOIN kenuser.MasterShiftPattern msp
-            ON spc.ShiftPatternCode = msp.ShiftPatternCode
-           AND spc.CalculatedPointer = msp.ShiftPointer
+            ON ls.ShiftPatternCode = msp.ShiftPatternCode
+           AND ls.ShiftPointer = msp.ShiftPointer
         LEFT JOIN kenuser.MasterShiftTime mst
             ON msp.ShiftPatternCode = mst.ShiftPatternCode
            AND msp.ShiftCode = mst.ShiftCode;
-
-        DROP TABLE #ShiftPointerCalc;
 
 
         -------------------------------------------------------
@@ -140,10 +123,8 @@ BEGIN
 
 
         /* =====================================================
-           INSERT LOGIC (unchanged except now ShiftCode is correct)
+           5) NORMAL SHIFT – PRESENT
         ====================================================== */
-
-        -- NORMAL PRESENT
         INSERT INTO kenuser.AttendanceTimesheet
         (
             EmpNo, CostCenter, PayGrade, AttendanceDate,
@@ -179,7 +160,9 @@ BEGIN
         WHERE sr.ShiftCode <> 'O';
 
 
-        -- NORMAL ABSENT
+        /* =====================================================
+           6) NORMAL SHIFT – ABSENT
+        ====================================================== */
         INSERT INTO kenuser.AttendanceTimesheet
         (
             EmpNo, CostCenter, PayGrade, AttendanceDate,
@@ -209,7 +192,9 @@ BEGIN
           AND ps.EmpNo IS NULL;
 
 
-        -- DAY-OFF NO SWIPE
+        /* =====================================================
+           7) DAY-OFF – NO SWIPE
+        ====================================================== */
         INSERT INTO kenuser.AttendanceTimesheet
         (
             EmpNo, CostCenter, PayGrade, AttendanceDate,
@@ -240,7 +225,9 @@ BEGIN
           AND ps.EmpNo IS NULL;
 
 
-        -- DAY-OFF WORKED
+        /* =====================================================
+           8) DAY-OFF – WORKED
+        ====================================================== */
         INSERT INTO kenuser.AttendanceTimesheet
         (
             EmpNo, CostCenter, PayGrade, AttendanceDate,
@@ -277,6 +264,9 @@ BEGIN
         WHERE sr.ShiftCode = 'O';
 
 
+        -------------------------------------------------------
+        -- Cleanup
+        -------------------------------------------------------
         DROP TABLE #ActiveEmployees;
         DROP TABLE #ShiftResolved;
         DROP TABLE #PairedSwipe;
@@ -295,7 +285,5 @@ END
 	EXEC kenuser.Pr_GenerateAttendance '01/15/2026'
 	EXEC kenuser.Pr_GenerateAttendance '01/16/2026'
 	EXEC kenuser.Pr_GenerateAttendance '01/17/2026'
-	EXEC kenuser.Pr_GenerateAttendance '02/01/2026'
-	EXEC kenuser.Pr_GenerateAttendance '02/02/2026'
 
 */

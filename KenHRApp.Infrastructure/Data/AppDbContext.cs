@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using KenHRApp.Domain.Entities;
 using System.Reflection.Metadata;
 using KenHRApp.Infrastructure.EntityConfiguration;
+using KenHRApp.Domain.Entities.KeylessModels;
 
 namespace KenHRApp.Infrastructure.Data
 {
@@ -43,6 +44,7 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<AttendanceTimesheet> AttendanceTimesheets => Set<AttendanceTimesheet>();
         public DbSet<LeaveRequisitionWF> LeaveRequisitionWFs => Set<LeaveRequisitionWF>();
         public DbSet<LeaveEntitlement> LeaveEntitlements => Set<LeaveEntitlement>();
+        public DbSet<PayrollPeriod> PayrollPeriods => Set<PayrollPeriod>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -76,6 +78,12 @@ namespace KenHRApp.Infrastructure.Data
             });
 
             modelBuilder.Entity<AttendanceDurationResult>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView(null); // prevents migration
+            });
+
+            modelBuilder.Entity<PayrollPeriodResult>(entity =>
             {
                 entity.HasNoKey();
                 entity.ToView(null); // prevents migration
@@ -451,6 +459,22 @@ namespace KenHRApp.Infrastructure.Data
                      .HasDatabaseName("IX_LeaveEntitlement_CompoKeys")
                      .IsUnique();
             });
+
+            modelBuilder.Entity<PayrollPeriod>(
+           entity =>
+           {
+               entity.ToTable("PayrollPeriod");
+               entity.HasKey(a => a.PayrollPeriodId)
+                   .HasName("PK_PayrollPeriod_PayrollPeriodId");
+               entity.Property(a => a.PayrollPeriodId)
+                    .ValueGeneratedOnAdd()
+                    .UseIdentityColumn(1, 1); // seed = 1, increment = 1
+               entity.Property(a => a.CreatedDate)
+                       .HasDefaultValue(DateTime.Now);
+               entity.HasIndex(e => new { e.FiscalYear, e.FiscalMonth, e.PayrollStartDate, e.PayrollEndDate })
+                    .HasDatabaseName("IX_PayrollPeriod_CompoKeys")
+                    .IsUnique();
+           });
             #endregion
 
             #region Set Employee navigation                         

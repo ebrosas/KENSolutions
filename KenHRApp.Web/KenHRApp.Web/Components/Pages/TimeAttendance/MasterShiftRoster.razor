@@ -37,7 +37,7 @@
                     ActionType == ActionTypes.View.ToString())
                 {
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit"
-                               Size="Size.Small" Color="Color.Info" Disabled="@(_isEditMode)" OnClick="HandleEditButton">
+                               Size="Size.Small" Color="Color.Surface" Disabled="@(_isEditMode)" OnClick="HandleEditButton">
                         Edit
                     </MudButton>
                 }
@@ -55,7 +55,7 @@
                         Undo
                     </MudButton>
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" Class="ml-1" ButtonType="ButtonType.Reset"
-                           Size="Size.Small" Color="Color.Tertiary" Disabled="@(_isEditMode)" OnClick="HandleRefreshButton">
+                               Size="Size.Small" Color="Color.Surface" Disabled="@(_isEditMode)" OnClick="HandleRefreshButton">
                         Refresh
                     </MudButton>
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Class="ml-1"
@@ -67,7 +67,7 @@
                 @if (ActionType == ActionTypes.Add.ToString())
                 {
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Class="ml-1" OnClick="ShowCancelDialog"
-                               Size="Size.Small" Color="Color.Default">
+                               Size="Size.Small" Color="Color.Surface">
                         Cancel
                     </MudButton>
                 }
@@ -166,7 +166,7 @@
                                              </PropertyColumn>
                                             <PropertyColumn Property="x => x.ShiftDescription" Title="Shift Timing" Class="col-shift-timing" Editable="false">
                                                  <CellTemplate Context="row">
-                                                     <MudChip T="string" Size=Size.Small Variant="Variant.Filled" Color="Color.Secondary">
+                                                     <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" Color="Color.Secondary">
                                                          @row.Item.ShiftDescription
                                                     </MudChip>
                                                 </CellTemplate>
@@ -318,7 +318,7 @@
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.ShiftPointer" Title="Shift Pointer" Class="col-shift-pointer" Editable="false">
                                                  <CellTemplate Context="row">
-                                                    <MudAvatar Size="Size.Small" Color="Color.Tertiary">@row.Item.ShiftPointer.ToString("N0")</MudAvatar>
+                                                    <MudAvatar Size="Size.Small" Color="Color.Info">@row.Item.ShiftPointer.ToString("N0")</MudAvatar>
                                                 </CellTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.ShiftDescription" Title="Shift Timing" Class="col-shift-timing">
