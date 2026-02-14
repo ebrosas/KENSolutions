@@ -8,7 +8,7 @@
 	--General
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
-	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'GENDER')
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'PAYGRADE')
 
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
@@ -129,6 +129,8 @@
 	SELECT * FROM [kenuser].[LeaveRequisitionWF] a
 	WHERE RTRIM(a.LeaveApprovalFlag) NOT IN ('C', 'R')
 		AND ISNULL(a.HalfDayLeaveFlag, 0) > 0
+
+	SELECT * FROM kenuser.PayrollPeriod a
 
 /*	Data updates:
 

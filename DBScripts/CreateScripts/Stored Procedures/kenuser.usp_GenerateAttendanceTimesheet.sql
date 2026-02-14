@@ -30,14 +30,6 @@ BEGIN
         FROM kenuser.ShiftPatternChange
         WHERE EffectiveDate <= @AttendanceDate
     )
-    --EmployeeShift AS (
-    --    SELECT
-    --        EmpNo,
-    --        ShiftPatternCode,
-    --        ShiftPointer
-    --    FROM LatestShift
-    --    WHERE rn = 1
-    --),
     INSERT INTO #EmployeeShift (EmpNo, ShiftPatternCode, ShiftPointer)
     SELECT
         EmpNo,
@@ -49,7 +41,7 @@ BEGIN
     ---------------------------------------------------------
     -- 3. Swipe Pairing (IN → OUT)
     ---------------------------------------------------------
-    SwipePairs AS (
+    ;WITH SwipePairs AS (
         SELECT
             EmpNo,
             CAST(SwipeDate AS DATE) AS AttendanceDate,
@@ -172,7 +164,6 @@ BEGIN
         END
 
     FROM kenuser.Employee e
-    --LEFT JOIN EmployeeShift es ON es.EmpNo = e.EmployeeNo
     LEFT JOIN #EmployeeShift es ON es.EmpNo = e.EmployeeNo
     LEFT JOIN kenuser.MasterShiftPattern m
         ON m.ShiftPatternCode = es.ShiftPatternCode
@@ -209,7 +200,7 @@ BEGIN
         'A',
         1
     FROM kenuser.Employee e
-    LEFT JOIN EmployeeShift es
+    LEFT JOIN #EmployeeShift es
         ON es.EmpNo = e.EmployeeNo
     LEFT JOIN kenuser.MasterShiftPattern m
         ON m.ShiftPatternCode = es.ShiftPatternCode
@@ -230,6 +221,6 @@ GO
 
 /*  TESTING:
 
-    EXEC kenuser.usp_GenerateAttendanceTimesheet '01/31/2026'
+    EXEC kenuser.usp_GenerateAttendanceTimesheet '02/07/2026'
 
 */

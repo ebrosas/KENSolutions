@@ -1,4 +1,5 @@
 ﻿using KenHRApp.Domain.Entities;
+using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Domain.Models.Common;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,7 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<AttendanceDetailResult>> GetAttendanceDetailAsync(int empNo, DateTime attendanceDate);
         Task<Result<int>> AddAttendanceSwipeLogAsync(AttendanceSwipeLog dto, CancellationToken cancellationToken = default);
         Task<Result<AttendanceDurationResult>> GetAttendanceDurationAsync(int empNo, DateTime attendanceDate);
+        Task<Result<List<PayrollPeriodResult>>> GetPayrollPeriodAsync(int fiscalYear = 0);
         #endregion
     }
 }

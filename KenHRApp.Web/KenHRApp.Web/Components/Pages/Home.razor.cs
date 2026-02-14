@@ -12,17 +12,23 @@ namespace KenHRApp.Web.Components.Pages
         [Inject] private IAppState AppState { get; set; } = default!;
         #endregion
 
+        #region Fields
+        private bool _redirected;
+        #endregion
+
         #region Page Events
         protected override void OnInitialized()
         {
-            try
-            {
                 //Navigation.NavigateTo("/TimeAttendance/tnadashboard", replace: true);   //(Notes: replace: true prevents back-button loop)
                 //Navigation.NavigateTo("/TimeAttendance/tnadashboard", true);
-            }
-            catch (Exception ex)
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender && !_redirected)
             {
-                throw;
+                _redirected = true;
+                Navigation.NavigateTo("/TimeAttendance/tnadashboard", replace: true);
             }
         }
         #endregion

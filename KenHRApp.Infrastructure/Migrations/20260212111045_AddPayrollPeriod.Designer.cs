@@ -4,6 +4,7 @@ using KenHRApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KenHRApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260212111045_AddPayrollPeriod")]
+    partial class AddPayrollPeriod
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,7 +171,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("SwipeLogDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 22, 7, 493, DateTimeKind.Local).AddTicks(887));
+                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 10, 44, 356, DateTimeKind.Local).AddTicks(582));
 
                     b.Property<DateTime?>("SwipeTime")
                         .HasColumnType("datetime");
@@ -223,7 +226,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 22, 7, 494, DateTimeKind.Local).AddTicks(969));
+                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 10, 44, 356, DateTimeKind.Local).AddTicks(5031));
 
                     b.Property<string>("DIL_Entitlement")
                         .HasColumnType("varchar(10)");
@@ -347,7 +350,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 12, 11, 22, 7, 480, DateTimeKind.Utc).AddTicks(8799));
+                        .HasDefaultValue(new DateTime(2026, 2, 12, 11, 10, 44, 345, DateTimeKind.Utc).AddTicks(7702));
 
                     b.Property<string>("DepartmentCode")
                         .IsRequired()
@@ -1129,7 +1132,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 22, 7, 491, DateTimeKind.Local).AddTicks(9172));
+                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 10, 44, 355, DateTimeKind.Local).AddTicks(5222));
 
                     b.Property<DateTime>("HolidayDate")
                         .HasColumnType("datetime");
@@ -1378,7 +1381,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 22, 7, 495, DateTimeKind.Local).AddTicks(2868));
+                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 10, 44, 357, DateTimeKind.Local).AddTicks(2392));
 
                     b.Property<string>("CreatedUserID")
                         .HasColumnType("varchar(50)");
@@ -1459,7 +1462,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("LeaveCreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 22, 7, 494, DateTimeKind.Local).AddTicks(5090));
+                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 10, 44, 356, DateTimeKind.Local).AddTicks(7881));
 
                     b.Property<string>("LeaveCreatedEmail")
                         .HasColumnType("varchar(50)");
@@ -1601,7 +1604,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 22, 7, 487, DateTimeKind.Local).AddTicks(7017));
+                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 10, 44, 351, DateTimeKind.Local).AddTicks(9836));
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -1794,10 +1797,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 22, 7, 495, DateTimeKind.Local).AddTicks(9125));
-
-                    b.Property<int>("FiscalMonth")
-                        .HasColumnType("int");
+                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 10, 44, 357, DateTimeKind.Local).AddTicks(5830));
 
                     b.Property<int>("FiscalYear")
                         .HasColumnType("int");
@@ -1823,7 +1823,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.HasKey("PayrollPeriodId")
                         .HasName("PK_PayrollPeriod_PayrollPeriodId");
 
-                    b.HasIndex("FiscalYear", "FiscalMonth", "PayrollStartDate", "PayrollEndDate")
+                    b.HasIndex("FiscalYear", "PayrollStartDate", "PayrollEndDate")
                         .IsUnique()
                         .HasDatabaseName("IX_PayrollPeriod_CompoKeys");
 
@@ -1928,7 +1928,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 22, 7, 481, DateTimeKind.Local).AddTicks(4767));
+                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 10, 44, 346, DateTimeKind.Local).AddTicks(1096));
 
                     b.Property<string>("DepartmentCode")
                         .IsRequired()
@@ -1999,7 +1999,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 22, 7, 483, DateTimeKind.Local).AddTicks(3795));
+                        .HasDefaultValue(new DateTime(2026, 2, 12, 14, 10, 44, 347, DateTimeKind.Local).AddTicks(3747));
 
                     b.Property<int?>("DailySalaryRange")
                         .HasColumnType("int");

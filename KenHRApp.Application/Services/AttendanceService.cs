@@ -1,6 +1,7 @@
 ﻿using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Domain.Entities;
+using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Repositories;
 using System;
@@ -747,6 +748,40 @@ namespace KenHRApp.Application.Services
             catch (Exception ex)
             {
                 return Result<AttendanceDurationDTO>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the attendance duration from the database.");
+            }
+        }
+
+        public async Task<Result<List<PayrollPeriodResultDTO>>> GetPayrollPeriodAsync(int fiscalYear = 0)
+        {
+            List<PayrollPeriodResultDTO> payrollPeriodList = new();
+
+            try
+            {
+                var repoResult = await _repository.GetPayrollPeriodAsync(fiscalYear);
+                if (!repoResult.Success)
+                {
+                    return Result<List<PayrollPeriodResultDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null && model.Any())
+                {
+                    payrollPeriodList = model.Select(e => new PayrollPeriodResultDTO
+                    {
+                        PayrollPeriodId = e.PayrollPeriodId,
+                        FiscalYear = e.FiscalYear,
+                        FiscalMonth = e.FiscalMonth,
+                        PayrollStartDate = e.PayrollStartDate,
+                        PayrollEndDate = e.PayrollEndDate,
+                        IsActive = e.IsActive
+                    }).ToList();
+                }
+
+                return Result<List<PayrollPeriodResultDTO>>.SuccessResult(payrollPeriodList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<PayrollPeriodResultDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the attendance duration from the database.");
             }
         }
         #endregion

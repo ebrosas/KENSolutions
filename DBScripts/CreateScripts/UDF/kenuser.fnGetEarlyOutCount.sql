@@ -8,7 +8,7 @@
 *	10/02/2026		Ervin		1.0			Created
 **************************************************************************************************************************************************************************/
 
-CREATE FUNCTION kenuser.fnGetEarlyOutCount
+ALTER FUNCTION kenuser.fnGetEarlyOutCount
 (
     @empNo			INT,
     @startDate		DATETIME,
