@@ -1,0 +1,52 @@
+﻿@page "/login"
+@inherits LoginBase
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-12">
+    <MudPaper Elevation="6" Class="pa-6">
+
+        <MudText Typo="Typo.h5" Align="Align.Center">
+            Login
+        </MudText>
+
+        <MudForm @ref="_form">
+            <MudTextField @bind-Value="Model.EmployeeCode"
+                          Label="Employee Code / Email"
+                          Required="true"
+                          FullWidth="true" />
+
+            <MudTextField @bind-Value="Model.Password"
+                          Label="Password"
+                          InputType="@PasswordInputType"
+                          Adornment="Adornment.End"
+                          AdornmentIcon="@PasswordIcon"
+                          OnAdornmentClick="TogglePassword"
+                          Required="true"
+                          FullWidth="true" />
+
+            <MudCheckBox T="bool" @bind-Checked="Model.RememberMe">
+                Remember Me
+            </MudCheckBox>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       OnClick="HandleLogin">
+                Login
+            </MudButton>
+
+            <MudText Color="Color.Error">@ErrorMessage</MudText>
+
+            <MudStack Row="true" Justify="Justify.SpaceBetween" Class="mt-4">
+                <MudLink OnClick="ShowUnlockDialog">Unlock Account</MudLink>
+                <MudLink OnClick="ForgotPassword">Forgot Password?</MudLink>
+            </MudStack>
+
+            <MudDivider Class="my-4"/>
+
+            <MudLink OnClick="GoToSupport">
+                Need Support?
+            </MudLink>
+
+        </MudForm>
+    </MudPaper>
+</MudContainer>
