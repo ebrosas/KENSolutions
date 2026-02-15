@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.9" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\KenHRApp.Domain\KenHRApp.Domain.csproj" />
     <ProjectReference Include="..\KenHRApp.Infrastructure\KenHRApp.Infrastructure.csproj" />
   </ItemGroup>

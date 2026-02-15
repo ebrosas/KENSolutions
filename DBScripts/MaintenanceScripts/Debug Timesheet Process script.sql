@@ -10,11 +10,17 @@
 	--WHERE a.EmpNo = 10003632
 
 	SELECT * FROM [kenuser].[AttendanceTimesheet] a
-	--WHERE a.AttendanceDate = '02/07/2026'
+	WHERE a.AttendanceDate = '01/17/2026'
+		AND a.EmpNo = 10003633
+	ORDER BY a.EmpNo, a.AttendanceDate
+
+	SELECT * FROM [kenuser].[AttendanceTimesheet] a
+	WHERE a.EmpNo = 10003633
 	ORDER BY a.EmpNo, a.AttendanceDate
 
 	SELECT * FROM [kenuser].[AttendanceSwipeLog] a
 	--WHERE a.SwipeDate = '02/07/2026'
+	WHERE a.EmpNo = 10003633
 	ORDER BY a.EmpNo, a.SwipeDate, a.SwipeTime
 
 /*

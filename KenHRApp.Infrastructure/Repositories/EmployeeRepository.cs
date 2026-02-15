@@ -1800,6 +1800,52 @@ namespace KenHRApp.Infrastructure.Repositories
                     return Result<int>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Retrieves an employee by EmployeeCode OR Email.
+        /// Case-insensitive comparison.
+        /// </summary>
+        public async Task<Employee?> GetByEmployeeCodeOrEmailAsync(
+            string employeeCodeOrEmail,
+            CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(employeeCodeOrEmail))
+                throw new ArgumentException(
+                    "Employee code or email must be provided.",
+                    nameof(employeeCodeOrEmail));
+
+            var normalizedInput = employeeCodeOrEmail.Trim().ToLower();
+
+            return await _db.Employees
+                .FirstOrDefaultAsync(e =>
+                    e.UserID!.ToLower() == normalizedInput ||
+                    e.OfficialEmail.ToLower() == normalizedInput,
+                    cancellationToken);
+        }
+
+        /// <summary>
+        /// Updates employee entity safely.
+        /// </summary>
+        public async Task UpdateAsync(
+            Employee employee,
+            CancellationToken cancellationToken = default)
+        {
+            if (employee == null)
+                throw new ArgumentNullException(nameof(employee));
+
+            var existing = await _db.Employees
+                .FirstOrDefaultAsync(e => e.EmployeeNo == employee.EmployeeNo,
+                    cancellationToken);
+
+            if (existing == null)
+                throw new KeyNotFoundException(
+                    $"Employee with User ID {employee.UserID} not found.");
+
+            // Apply changes manually to avoid unintended overwrites
+            _db.Entry(existing).CurrentValues.SetValues(employee);
+
+            await _db.SaveChangesAsync(cancellationToken);
+        }
         #endregion
     }
 }

@@ -323,6 +323,43 @@ namespace KenHRApp.Application.DTOs
         public string? PermanentMobileNo { get; set; } = null;
         #endregion
 
+        #region Authentication Detail
+        [Display(Name = "User ID")]
+        [StringLength(40, ErrorMessage = "User ID can't be more than 40 characters.")]
+        public string? UserID { get; set; } = null;
+
+        [Display(Name = "Password Hash")]
+        [StringLength(200, ErrorMessage = "Password Hash can't be more than 200 characters.")]
+        public string? PasswordHash { get; set; } = null;
+
+        public int FailedLoginAttempts { get; set; } 
+        public bool IsLocked { get; set; } 
+
+        public void IncrementFailedAttempts()
+        {
+            FailedLoginAttempts++;
+
+            if (FailedLoginAttempts >= 3)
+                IsLocked = true;
+        }
+
+        public void ResetFailedAttempts()
+        {
+            FailedLoginAttempts = 0;
+        }
+
+        public void UnlockAccount()
+        {
+            FailedLoginAttempts = 0;
+            IsLocked = false;
+        }
+
+        public void ChangePassword(string newHash)
+        {
+            PasswordHash = newHash;
+        }
+        #endregion
+
         #endregion
 
         #region Reference Navigations

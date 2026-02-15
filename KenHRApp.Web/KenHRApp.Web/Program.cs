@@ -45,6 +45,9 @@ builder.Services.AddScoped<IAppCacheService, AppCacheService>();
 builder.Services.AddScoped<IAppState, AppState>();
 builder.Services.AddScoped<ISharedAction, SharedAction>();
 builder.Services.AddScoped<ILookupCacheService, LookupCacheService>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasherService>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 #endregion
 
 builder.Services.AddAuthentication(options =>

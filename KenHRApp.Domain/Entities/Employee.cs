@@ -11,7 +11,7 @@ using System.Diagnostics.SymbolStore;
 
 namespace KenHRApp.Domain.Entities
 {
-    public class Employee : IContactDetail, IEmploymentDetail, IAttributeDetail, IBankDetail, ISocialConnect, IPrimaryLocation
+    public class Employee : IContactDetail, IEmploymentDetail, IAttributeDetail, IBankDetail, ISocialConnect, IPrimaryLocation, IAuthenticationDetail
     {
         #region Personal Detail         
         [Comment("Primary key for Employee entity")]
@@ -290,6 +290,19 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "varchar(20)")]
         public string? PermanentMobileNo { get; set; } = null;
+        #endregion
+
+        #region Authentication Detail Implementation
+        [Column(TypeName = "varchar(40)")]
+        public string? UserID { get; set; } = null;
+
+        [Column(TypeName = "varchar(200)")]
+        public string? PasswordHash { get; set; } = null;
+
+        public int FailedLoginAttempts { get; set; } 
+
+        [Column(TypeName = "bit")]
+        public bool IsLocked { get; set; }
         #endregion
 
         #region Extended Properties
