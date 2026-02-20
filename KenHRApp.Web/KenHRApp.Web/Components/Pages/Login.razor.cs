@@ -76,7 +76,7 @@ namespace KenHRApp.Web.Components.Pages
 
         protected void GoToSupport()
         {
-            Nav.NavigateTo("/support/ticket");
+            Nav.NavigateTo("/support/ticket", true);
         }
     }
 }
