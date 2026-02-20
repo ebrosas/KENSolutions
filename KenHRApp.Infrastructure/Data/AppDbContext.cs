@@ -45,6 +45,8 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<LeaveRequisitionWF> LeaveRequisitionWFs => Set<LeaveRequisitionWF>();
         public DbSet<LeaveEntitlement> LeaveEntitlements => Set<LeaveEntitlement>();
         public DbSet<PayrollPeriod> PayrollPeriods => Set<PayrollPeriod>();
+        public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
+        public DbSet<SupportTicketAttachment> SupportTicketAttachments => Set<SupportTicketAttachment>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -493,6 +495,12 @@ namespace KenHRApp.Infrastructure.Data
 
                     entity.Property(e => e.PayGrade)
                         .HasDefaultValue(0);
+
+                    entity.Property(e => e.FailedLoginAttempts)
+                        .HasDefaultValue(0);
+
+                    entity.Property(e => e.IsLocked)
+                        .HasDefaultValue(false);
                     #endregion
 
                     #region Set indexes

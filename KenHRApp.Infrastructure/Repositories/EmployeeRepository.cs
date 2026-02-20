@@ -1805,46 +1805,78 @@ namespace KenHRApp.Infrastructure.Repositories
         /// Retrieves an employee by EmployeeCode OR Email.
         /// Case-insensitive comparison.
         /// </summary>
-        public async Task<Employee?> GetByEmployeeCodeOrEmailAsync(
-            string employeeCodeOrEmail,
+        public async Task<Result<Employee?>> GetByUserIDOrEmailAsync(
+            string userIdOrEmail,
             CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(employeeCodeOrEmail))
-                throw new ArgumentException(
-                    "Employee code or email must be provided.",
-                    nameof(employeeCodeOrEmail));
+            try
+            {
+                if (string.IsNullOrWhiteSpace(userIdOrEmail))
+                    throw new ArgumentException(
+                        "User Id or Email must be provided.",
+                        nameof(userIdOrEmail));
 
-            var normalizedInput = employeeCodeOrEmail.Trim().ToLower();
+                var normalizedInput = userIdOrEmail.Trim().ToLower();
 
-            return await _db.Employees
-                .FirstOrDefaultAsync(e =>
-                    e.UserID!.ToLower() == normalizedInput ||
-                    e.OfficialEmail.ToLower() == normalizedInput,
-                    cancellationToken);
+                Employee? employee = await _db.Employees
+                    .FirstOrDefaultAsync(e =>
+                        e.UserID!.ToLower() == normalizedInput ||
+                        e.OfficialEmail.ToLower() == normalizedInput,
+                        cancellationToken);
+
+                return Result<Employee?>.SuccessResult(employee);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<Employee?>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<Employee?>.Failure($"Database error: {ex.Message}");
+            }
         }
 
         /// <summary>
         /// Updates employee entity safely.
         /// </summary>
-        public async Task UpdateAsync(
-            Employee employee,
-            CancellationToken cancellationToken = default)
+        public async Task<Result<int>> UpdateAsync(Employee employee, CancellationToken cancellationToken = default)
         {
-            if (employee == null)
-                throw new ArgumentNullException(nameof(employee));
+            int rowsUpdated = 0;
 
-            var existing = await _db.Employees
-                .FirstOrDefaultAsync(e => e.EmployeeNo == employee.EmployeeNo,
-                    cancellationToken);
+            try
+            {
+                if (employee == null)
+                    throw new ArgumentNullException(nameof(employee));
 
-            if (existing == null)
-                throw new KeyNotFoundException(
-                    $"Employee with User ID {employee.UserID} not found.");
+                var existing = await _db.Employees
+                    .FirstOrDefaultAsync(e => e.EmployeeNo == employee.EmployeeNo,
+                        cancellationToken);
 
-            // Apply changes manually to avoid unintended overwrites
-            _db.Entry(existing).CurrentValues.SetValues(employee);
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        $"Employee with User ID {employee.UserID} not found.");
 
-            await _db.SaveChangesAsync(cancellationToken);
+                // Apply changes manually to avoid unintended overwrites
+                _db.Entry(existing).CurrentValues.SetValues(employee);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
         }
         #endregion
     }

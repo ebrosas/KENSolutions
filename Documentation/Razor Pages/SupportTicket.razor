@@ -1,0 +1,52 @@
+@using KenHRApp.Application.DTOs
+@page "/support/ticket"
+@inherits SubmitTicketBase
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudPaper Class="pa-6">
+
+        <MudText Typo="Typo.h5" Class="mb-4">Submit a Support Ticket</MudText>
+
+        <MudForm @ref="Form" Model="Ticket" OnValidSubmit="SubmitTicketAsync">
+
+            <MudTextField Label="Subject"
+                          For="@(() => Ticket.Subject)"
+                          Required="true"
+                          Immediate="true" />
+
+            <MudTextField Label="Requester"
+                          For="@(() => Ticket.Requester)"
+                          Required="true"
+                          Immediate="true" />
+
+            <MudTextField Label="Description"
+                          For="@(() => Ticket.Description)"
+                          Lines="4"
+                          Required="true"
+                          Immediate="true" />
+
+            <MudFileUpload T="IBrowserFile"
+                           @bind-Value="UploadedFiles"
+                           Accept=".doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.pdf,.png,.jpg"
+                           Class="mt-4" />
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       ButtonType="ButtonType.Submit"
+                       Disabled="@IsSubmitting"
+                       Class="mt-4">
+                @if (IsSubmitting)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+                    <span>Submitting...</span>
+                }
+                else
+                {
+                    <span>Submit</span>
+                }
+            </MudButton>
+
+        </MudForm>
+
+    </MudPaper>
+</MudContainer>

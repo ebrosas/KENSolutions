@@ -1,5 +1,6 @@
 ﻿using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
+using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Repositories;
 using System;
 using System.Collections.Generic;
@@ -30,109 +31,139 @@ namespace KenHRApp.Application.Services
         #endregion
 
         #region Public Methods
-        public async Task<LoginResponseDTO> LoginAsync(LoginRequestDTO request)
+        public async Task<Result<LoginResponseDTO>> LoginAsync(LoginRequestDTO request)
         {
-            var employee = await _repository
-                .GetByEmployeeCodeOrEmailAsync(request.EmployeeCode);
-
-            if (employee == null)
+            try
             {
-                return new LoginResponseDTO
+                var repoResult = await _repository.GetByUserIDOrEmailAsync(request.EmployeeCode);
+                if (!repoResult.Success)
                 {
-                    IsSuccess = false,
-                    ErrorMessage = "Invalid credentials."
-                };
-            }
+                    return Result<LoginResponseDTO>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
 
-            bool isLocked = false;
-            if (bool.TryParse(employee.IsLocked.ToString(), out var locked) && locked)
-            {
-                isLocked = true;
-            }
-
-            if (isLocked)
-            {
-                return new LoginResponseDTO
+                var employee = repoResult.Value;
+                if (employee == null)
                 {
-                    IsSuccess = false,
-                    ErrorMessage = "Account is locked."
-                };
-            }
+                    return Result<LoginResponseDTO>.Failure("Invalid credentials.");
+                }
 
-            var isValid = _passwordHasher.Verify(
-                employee.PasswordHash!,
-                request.Password);
+                bool isLocked = false;
+                if (bool.TryParse(employee.IsLocked.ToString(), out var locked) && locked)
+                {
+                    isLocked = true;
+                }
 
-            if (!isValid)
-            {
-                //employee.IncrementFailedAttempts();
+                if (isLocked)
+                {
+                    return Result<LoginResponseDTO>.Failure("Account is locked.");
+                }
+
+                //string testHashPwd = _passwordHasher.Hash("Garmco#1017");
+
+                //var isValid = _passwordHasher.Verify(
+                //    testHashPwd,
+                //    request.Password);
+
+                var isValid = _passwordHasher.Verify(
+                    employee.PasswordHash!,
+                    request.Password);
+
+                if (!isValid)
+                {
+                    employee.IncrementFailedAttempts();
+                    await _repository.UpdateAsync(employee);
+                    return Result<LoginResponseDTO>.Failure($"Invalid credentials. Attempt {employee.FailedLoginAttempts}/3");
+                }
+
+                employee.ResetFailedAttempts();
                 await _repository.UpdateAsync(employee);
 
-                return new LoginResponseDTO
+                return Result<LoginResponseDTO>.SuccessResult(new LoginResponseDTO
                 {
-                    IsSuccess = false,
-                    FailedAttempts = employee.FailedLoginAttempts,
-                    ErrorMessage =
-                        $"Invalid credentials. Attempt {employee.FailedLoginAttempts}/3"
-                };
+                    IsSuccess = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return Result<LoginResponseDTO>.Failure(ex.Message.ToString() ?? "Unknown error in LoginAsync() method.");
+            }
+        }
+
+        public async Task<Result<bool>> UnlockAccountAsync(UnlockAccountDTO dto)
+        {
+            try
+            {
+                var repoResult = await _repository.GetByUserIDOrEmailAsync(dto.EmployeeCode);
+                if (!repoResult.Success)
+                {
+                    return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var employee = repoResult.Value;
+                if (employee == null)
+                {
+                    throw new Exception("Unable to find a matching employee in the database with the specified Date of Birth and Joining Date.");
+                }
+
+                if (employee.DOB!.Value.Date != dto.DateOfBirth.Date ||
+                    employee.HireDate.Date != dto.DateOfJoining.Date)
+                {
+                    throw new Exception("Either the specified Date of Birth or Joining Date does not matched with the record in the database.");
+                }
+
+                employee.UnlockAccount();
+                await _repository.UpdateAsync(employee);
+
+                await _emailService.SendAsync(
+                    employee.OfficialEmail,
+                    "Security Code",
+                    "<p>Your security code is: <b>123456</b></p>",
+                    true);
+
+                return Result<bool>.SuccessResult(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in LoginAsync() method.");
             }
 
-            //employee.ResetFailedAttempts();
-            await _repository.UpdateAsync(employee);
+        }
 
-            return new LoginResponseDTO
+        public async Task<Result<bool>> ForgotPasswordAsync(ForgotPasswordDTO dto)
+        {
+            try
             {
-                IsSuccess = true
-            };
-        }
+                var repoResult = await _repository.GetByUserIDOrEmailAsync(dto.EmployeeCode);
+                if (!repoResult.Success)
+                {
+                    return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
 
-        public async Task<bool> UnlockAccountAsync(UnlockAccountDTO dto)
-        {
-            var employee = await _repository
-                .GetByEmployeeCodeOrEmailAsync(dto.EmployeeCode);
+                var employee = repoResult.Value;
+                if (employee == null)
+                {
+                    throw new Exception("Employee not found.");
+                }
 
-            if (employee == null)
-                return false;
+                var tempPassword = Guid.NewGuid()
+                                       .ToString("N")[..8];
 
-            if (employee.DOB!.Value.Date != dto.DateOfBirth.Date ||
-                employee.HireDate.Date != dto.DateOfJoining.Date)
-                return false;
+                employee.ChangePassword(_passwordHasher.Hash(tempPassword));
 
-            //employee.UnlockAccount();
-            await _repository.UpdateAsync(employee);
+                await _repository.UpdateAsync(employee);
 
-            await _emailService.SendAsync(
-                employee.OfficialEmail,
-                "Security Code",
-                "<p>Your security code is: <b>123456</b></p>",
-                true);
+                await _emailService.SendAsync(
+                    employee.OfficialEmail,
+                    "Temporary Password",
+                    $"<p>Your temporary password is: <b>{tempPassword}</b></p>",
+                    true);
 
-            return true;
-        }
-
-        public async Task<bool> ForgotPasswordAsync(ForgotPasswordDTO dto)
-        {
-            var employee = await _repository
-                .GetByEmployeeCodeOrEmailAsync(dto.EmployeeCode);
-
-            if (employee == null)
-                return false;
-
-            var tempPassword = Guid.NewGuid()
-                                   .ToString("N")[..8];
-
-            //employee.ChangePassword(
-            //    _passwordHasher.Hash(tempPassword));
-
-            await _repository.UpdateAsync(employee);
-
-            await _emailService.SendAsync(
-                employee.OfficialEmail,
-                "Temporary Password",
-                $"<p>Your temporary password is: <b>{tempPassword}</b></p>",
-                true);
-
-            return true;
+                return Result<bool>.SuccessResult(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in LoginAsync() method.");
+            }
         }
         #endregion
     }

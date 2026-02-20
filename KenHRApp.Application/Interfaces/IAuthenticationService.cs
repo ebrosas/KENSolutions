@@ -1,4 +1,5 @@
 ﻿using KenHRApp.Application.DTOs;
+using KenHRApp.Domain.Models.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,9 @@ namespace KenHRApp.Application.Interfaces
     public interface IAuthenticationService
     {
         #region Web Methods
-        Task<LoginResponseDTO> LoginAsync(LoginRequestDTO request);
-        Task<bool> UnlockAccountAsync(UnlockAccountDTO dto);
-        Task<bool> ForgotPasswordAsync(ForgotPasswordDTO dto);
+        Task<Result<LoginResponseDTO>> LoginAsync(LoginRequestDTO request);
+        Task<Result<bool>> UnlockAccountAsync(UnlockAccountDTO dto);
+        Task<Result<bool>> ForgotPasswordAsync(ForgotPasswordDTO dto);
         #endregion
     }
 }

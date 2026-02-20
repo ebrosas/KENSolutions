@@ -303,6 +303,30 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "bit")]
         public bool IsLocked { get; set; }
+
+        public void IncrementFailedAttempts()
+        {
+            FailedLoginAttempts++;
+
+            if (FailedLoginAttempts >= 3)
+                IsLocked = true;
+        }
+
+        public void ResetFailedAttempts()
+        {
+            FailedLoginAttempts = 0;
+        }
+
+        public void UnlockAccount()
+        {
+            FailedLoginAttempts = 0;
+            IsLocked = false;
+        }
+
+        public void ChangePassword(string newHash)
+        {
+            PasswordHash = newHash;
+        }
         #endregion
 
         #region Extended Properties

@@ -37,9 +37,14 @@ namespace KenHRApp.Web.Components.Pages
         {
             await _form.Validate();
 
-            var result = await AuthService.LoginAsync(Model);
+            var serviceResult = await AuthService.LoginAsync(Model);
+            if (!serviceResult.Success)
+            {
+                return;
+            }
 
-            if (result.IsSuccess)
+            var result = serviceResult.Value;
+            if (result!.IsSuccess)
             {
                 if (Model.RememberMe)
                 {
@@ -47,11 +52,12 @@ namespace KenHRApp.Web.Components.Pages
                     //    "login", JsonSerializer.Serialize(Model));
                 }
 
-                Nav.NavigateTo("/home");
+                Nav.NavigateTo("/TimeAttendance/tnadashboard");
             }
             else
             {
                 ErrorMessage = result.ErrorMessage;
+                //Snackbar.Add(result.ErrorMessage, Severity.Error);
             }
         }
 

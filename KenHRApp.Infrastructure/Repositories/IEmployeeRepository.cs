@@ -33,14 +33,8 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<bool>> DeleteEmergencyContactAsync(int autoID, CancellationToken cancellationToken = default);
         Task<Result<int>> UpdateEmergencyContactAsync(EmergencyContact dto, CancellationToken cancellationToken = default);
         Task<Result<int>> AddEmergencyContactAsync(EmergencyContact contact, CancellationToken cancellationToken = default);
-
-        Task<Employee?> GetByEmployeeCodeOrEmailAsync(
-            string employeeCodeOrEmail,
-            CancellationToken cancellationToken = default);
-
-        Task UpdateAsync(
-            Employee employee,
-            CancellationToken cancellationToken = default);
+        Task<Result<Employee?>> GetByUserIDOrEmailAsync(string userIdOrEmail, CancellationToken cancellationToken = default);
+        Task<Result<int>> UpdateAsync(Employee employee, CancellationToken cancellationToken = default);
         #endregion
     }
 }
