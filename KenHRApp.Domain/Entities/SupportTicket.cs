@@ -21,8 +21,10 @@ namespace KenHRApp.Domain.Entities
         [Column(TypeName = "datetime")]
         public DateTime CreatedAtUtc { get; private set; } = DateTime.UtcNow;
 
-        public ICollection<SupportTicketAttachment> Attachments { get; private set; }
-            = new List<SupportTicketAttachment>();
+        //public ICollection<SupportTicketAttachment> Attachments { get; private set; }
+        //    = new List<SupportTicketAttachment>();
+
+        public List<SupportTicketAttachment> Attachments { get; set; } = new();
         #endregion
 
         #region Constructor

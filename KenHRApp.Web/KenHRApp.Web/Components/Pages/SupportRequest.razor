@@ -1,50 +1,117 @@
 ﻿@page "/support/ticket"
 
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <MudPaper Class="pa-6">
+    <EditForm EditContext="@_editContext" @ref="_editForm"
+        OnValidSubmit="HandleValidSubmit" 
+        OnInvalidSubmit="HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        @if (_hasValidationError && _validationMessages.Any())
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
+                <ul style="margin:0; padding-left:20px;">
+                    @foreach (var msg in _validationMessages)
+                    {
+                        <li>
+                            <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
+                            </li>
+                    }
+                </ul>
+            </MudAlert>
+        }
 
-        <MudText Typo="Typo.h5" Class="mb-4">Submit a Support Ticket</MudText>
+        @if (_showErrorAlert)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
+                      ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
+                @_errorMessage
+            </MudAlert>
+        }
+        <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
+            <MudPaper Class="pa-6">
+                <MudText Typo="Typo.h6" Class="mb-4">Submit a Support Ticket</MudText>
 
-        <MudForm @ref="Form" Model="Ticket" OnValidSubmit="SubmitTicketAsync">
+                <MudTextField @bind-Value="Ticket.Subject"
+                    Label="Subject"
+                    Required="true"
+                    Immediate="true" />
 
-            <MudTextField Label="Subject"
-                          For="@(() => Ticket.Subject)"
-                          Required="true"
-                          Immediate="true" />
+                <MudTextField @bind-Value="Ticket.Requester"
+                    Label="Requester"
+                    Required="true"
+                    Immediate="true" />
+               
+                <MudTextField @bind-Value="Ticket.Description"
+                    Label="Description"
+                    Lines="4"
+                    Required="true"
+                    Immediate="true" />
 
-            <MudTextField Label="Requester"
-                          For="@(() => Ticket.Requester)"
-                          Required="true"
-                          Immediate="true" />
 
-            <MudTextField Label="Description"
-                          For="@(() => Ticket.Description)"
-                          Lines="4"
-                          Required="true"
-                          Immediate="true" />
+                <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Class="mud-width-full">
+                    <MudFileUpload @bind-Files="_files"
+                                   Class="mt-3"
+                                   Accept=".doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.pdf,.png,.jpg"
+                                   MaxFileSize="10485760">
 
-           @*  <MudFileUpload T="IBrowserFile"
-                           @bind-Value="UploadedFiles"
-                           Accept=".doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.pdf,.png,.jpg"
-                           Class="mt-4" /> *@
+                        <ActivatorContent>
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Secondary">
+                                Choose Files
+                            </MudButton>
+                        </ActivatorContent>
 
-            <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       ButtonType="ButtonType.Submit"
-                       Disabled="@IsSubmitting"
-                       Class="mt-4">
-                @if (IsSubmitting)
-                {
-                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
-                    <span>Submitting...</span>
-                }
-                else
-                {
-                    <span>Submit</span>
-                }
-            </MudButton>
+                    </MudFileUpload>
+                   
+                    @if (_files?.Any() == true)
+                    {
+                        <MudChipSet T="IBrowserFile" Class="mt-2">
+                            @foreach (var file in _files)
+                            {
+                                <MudChip T="IBrowserFile"
+                                         Color="Color.Primary"
+                                         Variant="Variant.Outlined"
+                                         Closeable="true"
+                                         OnClose="@(() => RemoveFile(file))">
+                                    @file.Name (@(file.Size / 1024) KB)
+                                </MudChip>
+                            }
+                        </MudChipSet>
+                    }
+                </MudStack>
 
-        </MudForm>
-
-    </MudPaper>
+                <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full">
+                     <MudButton Variant="Variant.Filled"
+                                Color="Color.Primary"
+                                ButtonType="ButtonType.Submit"
+                                FullWidth="false"
+                                Disabled="@_btnProcessing"
+                                Class="mt-4">
+                         @if (_btnProcessing)
+                        {
+                            <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+                            <span>Submitting...</span>
+                        }
+                        else
+                        {
+                            <span>Submit</span>
+                        }
+                    </MudButton>
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Surface"
+                               FullWidth="false"
+                               Class="mt-4"
+                               OnClick="GoToLogin">
+                        Cancel
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+            <MudScrollToTop TopOffset="100"
+                            Selector="#mainPanel"
+                            VisibleCssClass="visible absolute"
+                            HiddenCssClass="hidden absolute">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+            </MudScrollToTop>
+        </div>
+    </EditForm>
 </MudContainer>

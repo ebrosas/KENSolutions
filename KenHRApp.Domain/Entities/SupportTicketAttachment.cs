@@ -15,19 +15,19 @@ namespace KenHRApp.Domain.Entities
         public Guid SupportTicketId { get; private set; }
 
         [Column(TypeName = "varchar(100)")]
-        public string FileName { get; private set; } = null!;
+        public string FileName { get; set; } = null!;
 
         [Column(TypeName = "varchar(250)")]
-        public string StoredFileName { get; private set; } = null!;
+        public string StoredFileName { get; set; } = null!;
 
         [Column(TypeName = "varchar(50)")]
-        public string ContentType { get; private set; } = null!;
+        public string ContentType { get; set; } = null!;
 
-        public long FileSize { get; private set; }
+        public long FileSize { get; set; }
         #endregion
 
         #region Constructors
-        private SupportTicketAttachment() { }
+        public SupportTicketAttachment() { }
 
         public SupportTicketAttachment(
             Guid supportTicketId,

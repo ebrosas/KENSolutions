@@ -132,6 +132,9 @@
 
 	SELECT * FROM kenuser.PayrollPeriod a
 
+	SELECT * FROM [kenuser].[SupportTickets] a
+	SELECT * FROM [kenuser].[SupportTicketAttachments] a
+
 /*	Data updates:
 
 	BEGIN TRAN T1
@@ -173,7 +176,7 @@
 	WHERE EmployeeNo = 10003633
 
 	DELETE FROM [dbo].[__EFMigrationsHistory]
-	WHERE MigrationID IN ('20260208125828_AddFieldsToLeaveEntitlement', '20260207114509_CreateLeaveEntitlement')
+	WHERE MigrationID IN ('20260219123954_AddAuthFieldsToEmployee')
 
 	UPDATE kenuser.MasterShiftPatternTitle
 	SET CreatedByEmpNo = 10003632,
@@ -198,5 +201,25 @@
 	TRUNCATE TABLE kenuser.AttendanceSwipeLog
 
 	DROP TABLE kenuser.LeaveEntitlement
+
+*/
+
+/*	DML queries:
+
+	BEGIN TRAN T1
+
+	ALTER TABLE [kenuser].[Employee]
+	DROP COLUMN FailedLoginAttempts
+
+	ALTER TABLE [kenuser].[Employee]
+	DROP COLUMN IsLocked
+
+	ALTER TABLE [kenuser].[Employee]
+	DROP COLUMN PasswordHash
+
+	ALTER TABLE [kenuser].[Employee]
+	DROP COLUMN UserID
+
+	COMMIT TRAN T1
 
 */

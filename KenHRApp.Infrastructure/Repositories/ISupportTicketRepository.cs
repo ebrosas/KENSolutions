@@ -1,4 +1,5 @@
 ﻿using KenHRApp.Domain.Entities;
+using KenHRApp.Domain.Models.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,6 @@ namespace KenHRApp.Infrastructure.Repositories
 {
     public interface ISupportTicketRepository
     {
-        Task CreateTicketAsync(
-            SupportTicket dto,
-            List<SupportTicketAttachment> files);
+        Task<Result<int>> CreateTicketAsync(SupportTicket dto, CancellationToken cancellationToken = default);
     }
 }

@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using KenHRApp.Domain.Models.Common;
+using System.Net.Mail;
 
 namespace KenHRApp.Infrastructure.Repositories
 {
@@ -14,86 +16,62 @@ namespace KenHRApp.Infrastructure.Repositories
     {
         #region Fields
         private readonly AppDbContext _context;
-        //private readonly IWebHostEnvironment _environment;
         private const long MaxFileSize = 10 * 1024 * 1024; // 10MB
         #endregion
 
-        //public SupportTicketRepository(
-        //    AppDbContext context,
-        //    IWebHostEnvironment environment)
-        //{
-        //    _context = context ?? throw new ArgumentNullException(nameof(context));
-        //    _environment = environment ?? throw new ArgumentNullException(nameof(environment));
-        //}
-
+        #region Constructor
         public SupportTicketRepository(
             AppDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
+        #endregion
 
-        public async Task CreateTicketAsync(
-         SupportTicket dto,
-         List<SupportTicketAttachment> files)
+        #region Public Methods
+        public async Task<Result<int>> CreateTicketAsync(SupportTicket dto, CancellationToken cancellationToken = default)
         {
-            if (dto is null)
-                throw new ArgumentNullException(nameof(dto));
+            int rowsInserted = 0;
 
-            var ticket = new SupportTicket(
-                dto.Subject.Trim(),
-                dto.Requester.Trim(),
-                dto.Description.Trim());
+            try
+            {
+                if (dto is null)
+                    throw new ArgumentNullException(nameof(dto));
 
-            //string uploadPath = Path.Combine(
-            //    webRootPath,
-            //    "uploads",
-            //    "support");
+                var ticket = new SupportTicket(
+                    dto.Subject.Trim(),
+                    dto.Requester.Trim(),
+                    dto.Description.Trim());
 
-            //if (!Directory.Exists(uploadPath))
-            //    Directory.CreateDirectory(uploadPath);
+                if (dto.Attachments != null && dto.Attachments.Any())
+                {
+                    ticket.Attachments = dto.Attachments.Select(e => new SupportTicketAttachment
+                    {
+                        FileName = e.FileName,
+                        StoredFileName = e.StoredFileName,
+                        ContentType = e.ContentType,
+                        FileSize = e.FileSize
+                    }).ToList();
+                }
 
-            //if (files is not null && files.Any())
-            //{
-            //    foreach (var file in files)
-            //    {
-            //        if (file.Size > MaxFileSize)
-            //            throw new InvalidOperationException(
-            //                $"File {file.FileName} exceeds 10MB limit.");
+                await _context.SupportTickets.AddAsync(ticket);
 
-            //        if (file.Content is null)
-            //            throw new InvalidOperationException(
-            //                $"File stream for {file.FileName} is null.");
+                // Save to database
+                rowsInserted = await _context.SaveChangesAsync();
 
-            //        string storedFileName =
-            //            $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-
-            //        string fullPath =
-            //            Path.Combine(uploadPath, storedFileName);
-
-            //        await using (var fileStream = new FileStream(
-            //            fullPath,
-            //            FileMode.Create,
-            //            FileAccess.Write,
-            //            FileShare.None,
-            //            81920,
-            //            useAsync: true))
-            //        {
-            //            await file.Content.CopyToAsync(fileStream);
-            //        }
-
-            //        var attachment = new SupportTicketAttachment(
-            //            ticket.Id,
-            //            file.FileName,
-            //            storedFileName,
-            //            file.ContentType,
-            //            file.Size);
-
-            //        ticket.AddAttachment(attachment);
-            //    }
-            //}
-
-            await _context.SupportTickets.AddAsync(ticket);
-            await _context.SaveChangesAsync();
+                return Result<int>.SuccessResult(rowsInserted);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
         }
+        #endregion
     }
 }
