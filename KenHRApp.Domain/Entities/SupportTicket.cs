@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,10 +13,14 @@ namespace KenHRApp.Domain.Entities
         public Guid Id { get; private set; } = Guid.NewGuid();
 
         public string Subject { get; private set; } = null!;
+
         public string Requester { get; private set; } = null!;
+
         public string Description { get; private set; } = null!;
 
+        [Column(TypeName = "datetime")]
         public DateTime CreatedAtUtc { get; private set; } = DateTime.UtcNow;
+
         public ICollection<SupportTicketAttachment> Attachments { get; private set; }
             = new List<SupportTicketAttachment>();
         #endregion
