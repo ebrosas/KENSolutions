@@ -135,7 +135,7 @@ namespace KenHRApp.Application.Services
                 if (dto is null)
                     throw new ArgumentNullException(nameof(dto));
 
-                var result = await _repository.UnlockUserAccountAsync(dto.EmployeeCode);
+                var result = await _repository.UnlockUserAccountAsync(dto.EmployeeCode, cancellationToken);
                 if (!result.Success)
                 {
                     if (!string.IsNullOrEmpty(result.Error))
@@ -181,11 +181,12 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<Result<bool>> ForgotPasswordAsync(ForgotPasswordDTO dto)
+        public async Task<Result<bool>> ForgotPasswordAsync(ForgotPasswordDTO dto, CancellationToken cancellationToken = default)
         {
             try
             {
-                var repoResult = await _repository.GetByUserIDOrEmailAsync(dto.EmployeeCode);
+                var repoResult = await _repository.GetByEmployeeCodeAndHireDateAsync(dto.EmployeeCode, 
+                    dto.DateOfJoining!.Value, cancellationToken);
                 if (!repoResult.Success)
                 {
                     return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
@@ -204,11 +205,18 @@ namespace KenHRApp.Application.Services
 
                 await _repository.UpdateAsync(employee);
 
-                await _emailService.SendAsync(
+                try
+                {
+                    await _emailService.SendAsync(
                     employee.OfficialEmail,
                     "Temporary Password",
                     $"<p>Your temporary password is: <b>{tempPassword}</b></p>",
                     true);
+                }
+                catch (Exception emailErr)
+                {
+                    
+                }
 
                 return Result<bool>.SuccessResult(true);
             }

@@ -1923,7 +1923,46 @@ namespace KenHRApp.Infrastructure.Repositories
                 else
                     return Result<int>.Failure($"Database error: {ex.Message}");
             }
-        }                
+        }
+
+        /// <summary>
+        /// Retrieves an employee by EmployeeCode and Joining Date
+        /// Case-insensitive comparison.
+        /// </summary>
+        public async Task<Result<Employee?>> GetByEmployeeCodeAndHireDateAsync(
+            string employeeCode, DateTime joiningDate,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(employeeCode))
+                    throw new ArgumentException(
+                        "User Id or Email must be provided.",
+                        nameof(employeeCode));
+
+                var normalizedInput = employeeCode.Trim().ToLower();
+
+                Employee? employee = await _db.Employees
+                    .FirstOrDefaultAsync(e =>
+                        (e.UserID!.ToLower() == normalizedInput ||
+                        e.OfficialEmail.ToLower() == normalizedInput) &&
+                        e.HireDate == joiningDate,
+                        cancellationToken);
+
+                return Result<Employee?>.SuccessResult(employee);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<Employee?>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<Employee?>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

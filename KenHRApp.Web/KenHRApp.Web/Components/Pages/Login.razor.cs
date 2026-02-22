@@ -215,12 +215,13 @@ namespace KenHRApp.Web.Components.Pages
             Nav.NavigateTo("/unlock", true);
         }
 
-        protected async Task ForgotPassword()
+        protected void ForgotPassword()
         {
-            await AuthService.ForgotPasswordAsync(
-                new ForgotPasswordDTO { EmployeeCode = Model.EmployeeCode });
+            Nav.NavigateTo("/UserAccount/ForgotPassword", true);
+            //await AuthService.ForgotPasswordAsync(
+            //    new ForgotPasswordDTO { EmployeeCode = Model.EmployeeCode });
 
-            ErrorMessage = "Temporary password sent to email.";
+            //ErrorMessage = "Temporary password sent to email.";
         }
 
         protected void GoToSupport()
