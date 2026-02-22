@@ -10,6 +10,7 @@ namespace KenHRApp.Application.Interfaces
     public interface IAppState
     {
         bool ShowAppDrawer { get; set; }
+        bool IsAuthenticated { get; set; }
         RecruitmentRequestDTO? RecruitmentRequest { get; set; }
     }
 }

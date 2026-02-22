@@ -12,6 +12,7 @@ namespace KenHRApp.Application.Services
     {
         #region Properties
         public bool ShowAppDrawer { get; set; } = false;
+        public bool IsAuthenticated { get; set; } = false;
         public RecruitmentRequestDTO? RecruitmentRequest { get; set; }
         #endregion
     }

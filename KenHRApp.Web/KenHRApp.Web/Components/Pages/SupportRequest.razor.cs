@@ -193,64 +193,74 @@ namespace KenHRApp.Web.Components.Pages
         #region Database Methods
         private async Task SubmitTicketAsync(Func<Task> callback)
         {
-            // Wait for 1 second then gives control back to the runtime
-            await Task.Delay(500);
-
-            // Reset error messages
-            _errorMessage.Clear();
-
-            // Initialize the cancellation token
-            _cts = new CancellationTokenSource();
-
-            //await Form!.Validate();
-
-            //if (!Form.IsValid)
-            //    return;
-
-            bool isSuccess = true;
-            string errorMsg = string.Empty;
-
-            #region Initialize DTO
-            var fileDtos = new List<FileUploadDTO>();
-
-            foreach (var file in _files)
+            try
             {
-                var stream = file.OpenReadStream(10 * 1024 * 1024);
+                // Wait for 1 second then gives control back to the runtime
+                await Task.Delay(500);
 
-                fileDtos.Add(new FileUploadDTO
+                // Reset error messages
+                _errorMessage.Clear();
+
+                // Initialize the cancellation token
+                _cts = new CancellationTokenSource();
+
+                //await Form!.Validate();
+
+                //if (!Form.IsValid)
+                //    return;
+
+                bool isSuccess = true;
+                string errorMsg = string.Empty;
+
+                #region Initialize DTO
+                var fileDtos = new List<FileUploadDTO>();
+
+                foreach (var file in _files)
                 {
-                    FileName = file.Name,
-                    ContentType = file.ContentType,
-                    Size = file.Size,
-                    Content = stream
-                });
+                    var stream = file.OpenReadStream(10 * 1024 * 1024);
+
+                    fileDtos.Add(new FileUploadDTO
+                    {
+                        FileName = file.Name,
+                        ContentType = file.ContentType,
+                        Size = file.Size,
+                        Content = stream
+                    });
+                }
+                #endregion
+
+                var repoResult = await SupportTicketService.CreateTicketAsync(Ticket, fileDtos, Environment.WebRootPath, _cts.Token);
+                isSuccess = repoResult.Success;
+                if (!isSuccess)
+                    errorMsg = repoResult.Error!;
+
+                if (isSuccess)
+                {
+                    // Hide error message if any
+                    ShowHideError(false);
+
+                    // Show notification
+                    ShowNotification("Support ticket has been submitted successfully!", SnackBarTypes.Success);
+                }
+                else
+                {
+                    // Set the error message
+                    _errorMessage.AppendLine(errorMsg);
+                    ShowHideError(true);
+                }
+
+                if (callback != null)
+                {
+                    // Hide the spinner overlay
+                    await callback.Invoke();
+                }
             }
-            #endregion
-
-            var repoResult = await SupportTicketService.CreateTicketAsync(Ticket, fileDtos, Environment.WebRootPath, _cts.Token);
-            isSuccess = repoResult.Success;
-            if (!isSuccess)
-                errorMsg = repoResult.Error!;
-
-            if (isSuccess)
-            {
-                // Hide error message if any
-                ShowHideError(false);
-
-                // Show notification
-                ShowNotification("Support ticket has been submitted successfully!", SnackBarTypes.Success);
-            }
-            else
+            catch (Exception ex)
             {
                 // Set the error message
-                _errorMessage.AppendLine(errorMsg);
-                ShowHideError(true);
-            }
+                _errorMessage.Append(ex.Message.ToString());
 
-            if (callback != null)
-            {
-                // Hide the spinner overlay
-                await callback.Invoke();
+                ShowHideError(true);
             }
         }
 
