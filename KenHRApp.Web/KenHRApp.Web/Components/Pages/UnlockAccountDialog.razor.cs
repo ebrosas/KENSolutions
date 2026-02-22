@@ -1,15 +1,13 @@
 ﻿using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
-using KenHRApp.Application.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using System.Text;
-using System.Text.Json;
 
 namespace KenHRApp.Web.Components.Pages
 {
-    public partial class Login
+    public partial class UnlockAccountDialog
     {
         #region Parameters and Injections
         [Inject] public IAuthenticationService AuthService { get; set; } = default!;
@@ -38,7 +36,7 @@ namespace KenHRApp.Web.Components.Pages
         #endregion
 
         #region Objects and Collections
-        protected LoginRequestDTO Model = new();
+        protected UnlockAccountDTO Model = new();
         #endregion
 
         #endregion
@@ -91,7 +89,7 @@ namespace KenHRApp.Web.Components.Pages
                 // Set the overlay message
                 overlayMessage = "Saving changes, please wait...";
 
-                _ = LoginAsync(async () =>
+                _ = UnlockAccountAsync(async () =>
                 {
                     // Set flag to hide the loading button
                     _btnProcessing = false;
@@ -110,34 +108,6 @@ namespace KenHRApp.Web.Components.Pages
             catch (Exception ex)
             {
                 ShowNotification($"Error: {ex.Message}", SnackBarTypes.Error);
-            }
-        }
-
-        protected async Task HandleLogin()
-        {
-            await _form.Validate();
-
-            var serviceResult = await AuthService.LoginAsync(Model);
-            if (!serviceResult.Success)
-            {
-                return;
-            }
-
-            var result = serviceResult.Value;
-            if (result!.IsSuccess)
-            {
-                if (Model.RememberMe)
-                {
-                    //await JS.InvokeVoidAsync("localStorage.setItem",
-                    //    "login", JsonSerializer.Serialize(Model));
-                }
-
-                Nav.NavigateTo("/TimeAttendance/tnadashboard");
-            }
-            else
-            {
-                ErrorMessage = result.ErrorMessage;
-                //Snackbar.Add(result.ErrorMessage, Severity.Error);
             }
         }
         #endregion
@@ -194,43 +164,10 @@ namespace KenHRApp.Web.Components.Pages
                 _errorMessage.Clear();
             }
         }
-
-        protected void TogglePassword()
-        {
-            if (PasswordInputType == InputType.Password)
-            {
-                PasswordInputType = InputType.Text;
-                PasswordIcon = Icons.Material.Filled.Visibility;
-            }
-            else
-            {
-                PasswordInputType = InputType.Password;
-                PasswordIcon = Icons.Material.Filled.VisibilityOff;
-            }
-        }
-        
-        protected void ShowUnlockDialog()
-        {
-            // Open MudDialog for unlock
-            Nav.NavigateTo("/unlock", true);
-        }
-
-        protected async Task ForgotPassword()
-        {
-            await AuthService.ForgotPasswordAsync(
-                new ForgotPasswordDTO { EmployeeCode = Model.EmployeeCode });
-
-            ErrorMessage = "Temporary password sent to email.";
-        }
-
-        protected void GoToSupport()
-        {
-            Nav.NavigateTo("/support/ticket", true);
-        }
         #endregion
 
         #region Service Methods
-        private async Task LoginAsync(Func<Task> callback)
+        private async Task UnlockAccountAsync(Func<Task> callback)
         {
             try
             {
@@ -243,13 +180,11 @@ namespace KenHRApp.Web.Components.Pages
                 // Initialize the cancellation token
                 _cts = new CancellationTokenSource();
 
-                // Reset autherntication state
-                State.IsAuthenticated = false;
 
                 bool isSuccess = true;
                 string errorMsg = string.Empty;
 
-                var repoResult = await AuthService.LoginAsync(Model);
+                var repoResult = await AuthService.UnlockAccountAsync(Model);
                 isSuccess = repoResult.Success;
                 if (!isSuccess)
                     errorMsg = repoResult.Error!;
@@ -260,10 +195,10 @@ namespace KenHRApp.Web.Components.Pages
                     ShowHideError(false);
 
                     // Show notification
-                    //ShowNotification("Support ticket has been submitted successfully!", SnackBarTypes.Success);
+                    ShowNotification("User Account has been unlocked successfully!", SnackBarTypes.Success);
 
                     // Set authentication state
-                    State.IsAuthenticated = true;
+                    //State.IsAuthenticated = true;
                 }
                 else
                 {

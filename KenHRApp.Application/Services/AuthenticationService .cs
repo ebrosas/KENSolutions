@@ -89,7 +89,7 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<Result<bool>> UnlockAccountAsync(UnlockAccountDTO dto)
+        private async Task<Result<bool>> UnlockAccountAsyncOld(UnlockAccountDTO dto)
         {
             try
             {
@@ -126,7 +126,59 @@ namespace KenHRApp.Application.Services
             {
                 return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in LoginAsync() method.");
             }
+        }
 
+        public async Task<Result<int>> UnlockAccountAsync(UnlockAccountDTO dto, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                if (dto is null)
+                    throw new ArgumentNullException(nameof(dto));
+
+                var result = await _repository.UnlockUserAccountAsync(dto.EmployeeCode);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to unlock user account due to an unknown error. Please refresh the page then try again!");
+                }
+
+                //if (!repoResult.Success)
+                //{
+                //    return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
+                //}
+
+                //var employee = repoResult.Value;
+                //if (employee == null)
+                //{
+                //    throw new Exception("Unable to find a matching employee in the database with the specified Date of Birth and Joining Date.");
+                //}
+
+                //if (employee.DOB!.Value.Date != dto.DateOfBirth.Date ||
+                //    employee.HireDate.Date != dto.DateOfJoining.Date)
+                //{
+                //    throw new Exception("Either the specified Date of Birth or Joining Date does not matched with the record in the database.");
+                //}
+
+                //employee.UnlockAccount();
+                //await _repository.UpdateAsync(employee);
+
+                //await _emailService.SendAsync(
+                //    employee.OfficialEmail,
+                //    "Security Code",
+                //    "<p>Your security code is: <b>123456</b></p>",
+                //    true);
+
+                //return Result<bool>.SuccessResult(true);
+
+
+                return Result<int>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString() ?? "Unknown error in UnlockAccountAsync() method.");
+            }
         }
 
         public async Task<Result<bool>> ForgotPasswordAsync(ForgotPasswordDTO dto)

@@ -1840,6 +1840,52 @@ namespace KenHRApp.Infrastructure.Repositories
         }
 
         /// <summary>
+        /// Unlock user account
+        /// </summary>
+        public async Task<Result<int>> UnlockUserAccountAsync(string userIdOrEmail, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(userIdOrEmail))
+                    throw new ArgumentException(
+                        "User Id or Email must be provided.",
+                        nameof(userIdOrEmail));
+
+                var normalizedInput = userIdOrEmail.Trim().ToLower();
+
+                var user = await _db.Employees
+                    .FirstOrDefaultAsync(e =>
+                        e.UserID!.ToLower() == normalizedInput ||
+                        e.OfficialEmail.ToLower() == normalizedInput,
+                        cancellationToken);
+
+                if (user == null)
+                    return Result<int>.Failure("User not found.");
+
+                if (!user.IsLocked)
+                    return Result<int>.Failure("Account is not locked.");
+
+                user.UnlockAccount();
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Updates employee entity safely.
         /// </summary>
         public async Task<Result<int>> UpdateAsync(Employee employee, CancellationToken cancellationToken = default)
@@ -1877,7 +1923,7 @@ namespace KenHRApp.Infrastructure.Repositories
                 else
                     return Result<int>.Failure($"Database error: {ex.Message}");
             }
-        }
+        }                
         #endregion
     }
 }

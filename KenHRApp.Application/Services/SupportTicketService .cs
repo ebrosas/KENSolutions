@@ -23,49 +23,6 @@ namespace KenHRApp.Application.Services
         }
         #endregion
 
-        //public SupportTicketService(
-        //    AppDbContext context)
-        //{
-        //    _context = context;
-        //}
-
-        //public async Task CreateTicketAsync(SubmitTicketDTO dto, List<FileUploadDTO> files)
-        //{
-        //    var ticket = new SupportTicket(
-        //        dto.Subject.Trim(),
-        //        dto.Requester.Trim(),
-        //        dto.Description.Trim());
-
-        //    string uploadPath = Path.Combine(_environment.WebRootPath, "uploads", "support");
-
-        //    if (!Directory.Exists(uploadPath))
-        //        Directory.CreateDirectory(uploadPath);
-
-        //    foreach (var file in files)
-        //    {
-        //        if (file.Size > MaxFileSize)
-        //            throw new Exception($"File {file.FileName} exceeds 10MB limit.");
-
-        //        string storedFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-        //        string fullPath = Path.Combine(uploadPath, storedFileName);
-
-        //        await using var stream = new FileStream(fullPath, FileMode.Create);
-        //        await file.OpenReadStream(MaxFileSize).CopyToAsync(stream);
-
-        //        var attachment = new SupportTicketAttachment(
-        //            ticket.Id,
-        //            file.Name,
-        //            storedFileName,
-        //            file.ContentType,
-        //            file.Size);
-
-        //        ticket.AddAttachment(attachment);
-        //    }
-
-        //    _context.SupportTickets.Add(ticket);
-        //    await _context.SaveChangesAsync();
-        //}
-
         public async Task<Result<int>> CreateTicketAsync(SubmitTicketDTO dto, List<FileUploadDTO> files, string webRootPath, CancellationToken cancellationToken = default)
         {
             try

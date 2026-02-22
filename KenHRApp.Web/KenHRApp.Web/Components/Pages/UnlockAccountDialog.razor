@@ -1,0 +1,71 @@
+﻿@page "/unlock"
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-12">
+    <EditForm EditContext="@_editContext" @ref="_editForm"
+              OnValidSubmit="HandleValidSubmit"
+              OnInvalidSubmit="HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        @if (_hasValidationError && _validationMessages.Any())
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
+                <ul style="margin:0; padding-left:20px;">
+                    @foreach (var msg in _validationMessages)
+                    {
+                        <li>
+                            <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
+                            </li>
+                    }
+                </ul>
+            </MudAlert>
+        }
+
+        @if (_showErrorAlert)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
+                      ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
+                @_errorMessage
+            </MudAlert>
+        }
+        <MudPaper Elevation="6" Class="pa-6">
+
+            <MudText Typo="Typo.h5" Align="Align.Center">
+                Unlock User Account
+            </MudText>
+
+            <MudTextField @bind-Value="Model.EmployeeCode"
+                          Label="User ID / Email"
+                          Required="true"
+                          FullWidth="true" />
+
+            <MudButton Variant="Variant.Filled"
+                       ButtonType="ButtonType.Submit"
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       Disabled="@_btnProcessing">
+                @if (_btnProcessing)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+                    <span>Processing...</span>
+                }
+                else
+                {
+                    <span>Unlock</span>
+                }
+            </MudButton>
+
+            @* <MudText Color="Color.Error">@ErrorMessage</MudText>
+
+            <MudStack Row="true" Justify="Justify.SpaceBetween" Class="mt-4">
+                <MudLink OnClick="ShowUnlockDialog">Unlock Account</MudLink>
+                <MudLink OnClick="ForgotPassword">Forgot Password?</MudLink>
+            </MudStack>
+
+            <MudDivider Class="my-4" />
+
+            <MudLink OnClick="GoToSupport">
+                Need Support?
+            </MudLink> *@
+        </MudPaper>
+    </EditForm>
+</MudContainer>

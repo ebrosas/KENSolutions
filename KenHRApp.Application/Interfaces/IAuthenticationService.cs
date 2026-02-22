@@ -12,7 +12,7 @@ namespace KenHRApp.Application.Interfaces
     {
         #region Web Methods
         Task<Result<LoginResponseDTO>> LoginAsync(LoginRequestDTO request);
-        Task<Result<bool>> UnlockAccountAsync(UnlockAccountDTO dto);
+        Task<Result<int>> UnlockAccountAsync(UnlockAccountDTO dto, CancellationToken cancellationToken = default);
         Task<Result<bool>> ForgotPasswordAsync(ForgotPasswordDTO dto);
         #endregion
     }
