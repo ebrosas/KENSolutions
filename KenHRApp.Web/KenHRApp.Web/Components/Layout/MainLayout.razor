@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject IAppState State
 @inject ISharedAction Actions
+@inject NavigationManager Nav
 
 <MudThemeProvider />
 <MudPopoverProvider />
@@ -96,11 +97,11 @@
                               Icon="@Icons.Material.TwoTone.Security"
                               IconColor="Color.Info"
                               Label="Security" />
-                 <MudMenuItem Href="Account/Logout"
-                              ForceLoad
+                 <MudMenuItem ForceLoad
                               Icon="@Icons.Material.TwoTone.Logout"
                               Class="navMenu"
-                              Label="Sign Out" />
+                              Label="Sign Out"
+                              OnClick="SignOut" />
              </MudMenu>
              @* <MudDivider /> *@
          </MudMenu>         
@@ -198,6 +199,14 @@
             State.ShowAppDrawer = false;
             Actions.ShowHideDrawer = HideDrawer;
         }
+    }
+
+    private void SignOut()
+    {
+        // Set authentication state
+        State.IsAuthenticated = false;
+
+        Nav.NavigateTo("/login", true);
     }
     #endregion
 }

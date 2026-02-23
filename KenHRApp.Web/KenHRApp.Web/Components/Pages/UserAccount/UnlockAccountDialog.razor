@@ -1,6 +1,7 @@
-﻿@page "/unlock"
+﻿@page "/UserAccount/Unlock"
+@layout KenHRApp.Web.Components.Layout.LoginLayout
 
-<MudContainer MaxWidth="MaxWidth.Small" Class="mt-12">
+<MudContainer MaxWidth="MaxWidth.Small">
     <EditForm EditContext="@_editContext" @ref="_editForm"
               OnValidSubmit="HandleValidSubmit"
               OnInvalidSubmit="HandleInvalidSubmit">
@@ -14,7 +15,7 @@
                     {
                         <li>
                             <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
-                            </li>
+                        </li>
                     }
                 </ul>
             </MudAlert>
@@ -29,21 +30,30 @@
         }
         <MudPaper Elevation="6" Class="pa-6">
 
-            <MudText Typo="Typo.h5" Align="Align.Center">
+            <MudText Typo="Typo.h5" Align="Align.Center" Style="color:#004165;" Class="fw-bold">
                 Unlock User Account
             </MudText>
 
-            <MudTextField @bind-Value="Model.EmployeeCode"
-                          Label="User ID / Email"
-                          Required="true"
-                          FullWidth="true" />
+            <MudPaper Elevation="0" Class="mt-2">
+                <MudTextField @bind-Value="Model.EmployeeCode"
+                              Label="User ID / Email"
+                              Required="true"
+                              Immediate="true"
+                              HelperText="Enter User ID or Registered Email"
+                              HelperTextOnFocus="true"
+                              MaxLength="50"
+                              Counter="50"
+                              FullWidth="true"
+                              Disabled="@_btnProcessing" />
+            </MudPaper>
 
             <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full">
                  <MudButton Variant="Variant.Filled"
                             ButtonType="ButtonType.Submit"
                             Color="Color.Primary"
+                            Style="background-color:#004165;"
                             Class="mt-4"
-                            FullWidth="false"
+                            FullWidth="false"                            
                             Disabled="@_btnProcessing">
                      @if (_btnProcessing)
                     {
@@ -59,7 +69,8 @@
                            Color="Color.Surface"
                            FullWidth="false"
                            Class="mt-4"
-                           OnClick="GoToLogin">
+                           OnClick="GoToLogin"
+                           Disabled="@_btnProcessing">
                     Cancel
                 </MudButton>
             </MudStack>

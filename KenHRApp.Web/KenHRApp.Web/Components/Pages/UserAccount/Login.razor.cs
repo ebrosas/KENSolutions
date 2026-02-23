@@ -7,7 +7,7 @@ using MudBlazor;
 using System.Text;
 using System.Text.Json;
 
-namespace KenHRApp.Web.Components.Pages
+namespace KenHRApp.Web.Components.Pages.UserAccount
 {
     public partial class Login
     {
@@ -212,7 +212,7 @@ namespace KenHRApp.Web.Components.Pages
         protected void ShowUnlockDialog()
         {
             // Open MudDialog for unlock
-            Nav.NavigateTo("/unlock", true);
+            Nav.NavigateTo("/UserAccount/Unlock", true);
         }
 
         protected void ForgotPassword()
@@ -226,7 +226,7 @@ namespace KenHRApp.Web.Components.Pages
 
         protected void GoToSupport()
         {
-            Nav.NavigateTo("/support/ticket", true);
+            Nav.NavigateTo("/UserAccount/Support", true);
         }
         #endregion
 

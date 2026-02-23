@@ -9,15 +9,20 @@ using KenHRApp.Application.Interfaces;
 using static MudBlazor.CategoryTypes;
 using System.Xml.Linq;
 using KenHRApp.Web.Components.Shared;
+using KenHRApp.Web.Components.Common.Interface;
+using Mono.TextTemplating;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace KenHRApp.Web.Components.Pages.CoreHR
 {
-    public partial class DepartmentMaster
+    public partial class DepartmentMaster : IPageAuthorization
     {
         #region Parameters and Injections
         [Inject] private IDialogService DialogService { get; set; } = default!;
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         [Inject] private IEmployeeService EmployeeService { get; set; } = default!;
+        [Inject] private NavigationManager Nav { get; set; } = default!;
+        [Inject] private IAppState State { get; set; } = default!;
 
         [Parameter]
         [SupplyParameterFromQuery]
@@ -46,6 +51,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         private CancellationTokenSource? _cts;
         private bool _enableFilter = false;
         private bool _isActive = true;
+        private bool _redirected;
 
         #region Dialog Box Button Icons
         private readonly string _iconDelete = "fas fa-trash-alt";
@@ -95,6 +101,14 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         ];
         #endregion
 
+        #region IPageAuthorization Implementation
+        public void GoToLogin()
+        {
+            Nav.NavigateTo("/login");
+        }
+
+        #endregion
+
         #region Page Methods
         public void Dispose()
         {
@@ -104,7 +118,16 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         protected override void OnInitialized()
         {
+            if (!State.IsAuthenticated)
+                overlayMessage = "Authentication required. Redirecting to login page...";
+
             BeginLoadComboboxTask();
+        }
+
+        protected override void OnAfterRender(bool firstRender)
+        {
+            if (!State.IsAuthenticated)
+                GoToLogin();
         }
         #endregion
 
@@ -331,7 +354,10 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             _isRunning = true;
 
             // Set the overlay message
-            overlayMessage = "Initializing form, please wait...";
+            if (!State.IsAuthenticated)
+                overlayMessage = "Authentication required. Redirecting to login page...";
+            else 
+                overlayMessage = "Initializing form, please wait...";
 
             _ = LoadComboboxAsync(async () =>
             {
@@ -422,7 +448,10 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             _isRunning = true;
 
             // Set the overlay message
-            overlayMessage = "Loading departments, please wait...";                       
+            if (!State.IsAuthenticated)
+                overlayMessage = "Authentication required. Redirecting to login page...";
+            else 
+                overlayMessage = "Loading departments, please wait...";                       
 
             _ = SearchDepartmentAsync(async () =>
             {
@@ -512,7 +541,10 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             _isRunning = true;
 
             // Set the overlay message
-            overlayMessage = "Refreshing form, please wait...";
+            if (!State.IsAuthenticated)
+                overlayMessage = "Authentication required. Redirecting to login page...";
+            else
+                overlayMessage = "Refreshing form, please wait...";
 
             _ = RefreshPageAsync(async () =>
             {

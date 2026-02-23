@@ -1,19 +1,24 @@
 ﻿using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
+using KenHRApp.Application.Services;
+using KenHRApp.Domain.Entities;
+using KenHRApp.Web.Data.DTOs;
+using KenHRApp.Web.Data.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
+using System.IO;
 using System.Text;
 
-namespace KenHRApp.Web.Components.Pages
+namespace KenHRApp.Web.Components.Pages.UserAccount
 {
-    public partial class UnlockAccountDialog
+    public partial class SupportRequest
     {
         #region Parameters and Injections
-        [Inject] public IAuthenticationService AuthService { get; set; } = default!;
-        [Inject] public NavigationManager Nav { get; set; } = default!;
+        [Inject] private ISupportTicketService SupportTicketService { get; set; } = default!;
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
-        [Inject] private IAppState State { get; set; } = default!;
+        [Inject] private IWebHostEnvironment Environment { get; set; } = default!;
+        [Inject] public NavigationManager Nav { get; set; }
         #endregion
 
         #region Fields
@@ -23,10 +28,10 @@ namespace KenHRApp.Web.Components.Pages
         private List<string> _validationMessages = new();
         private string overlayMessage = "Please wait...";
         private CancellationTokenSource? _cts;
-        protected string ErrorMessage;
-        protected MudForm _form;
-        protected InputType PasswordInputType = InputType.Password;
-        protected string PasswordIcon = Icons.Material.Filled.VisibilityOff;
+        private const long MaxFileSize = 10 * 1024 * 1024; // 10MB
+        private MudForm? Form;
+        private string _webRootPath = string.Empty;
+        private IBrowserFile _file = new DummyBrowserFile("test1.jpg", DateTimeOffset.Now, 0, "image/jpeg", []);
 
         #region Flags
         private bool _hasValidationError = false;
@@ -36,7 +41,9 @@ namespace KenHRApp.Web.Components.Pages
         #endregion
 
         #region Objects and Collections
-        protected UnlockAccountDTO Model = new();
+        private IReadOnlyList<IBrowserFile> _files;
+        private List<IBrowserFile> UploadedFiles { get; set; } = new();
+        private SubmitTicketDTO Ticket = new();
         #endregion
 
         #endregion
@@ -64,11 +71,11 @@ namespace KenHRApp.Web.Components.Pages
         protected override void OnInitialized()
         {
             // Initialize the EditContext 
-            _editContext = new EditContext(Model);
+            _editContext = new EditContext(Ticket);
         }
         #endregion
 
-        #region Form Validation
+        #region Validation Methods
         private void HandleInvalidSubmit(EditContext context)
         {
             _hasValidationError = true;
@@ -89,13 +96,10 @@ namespace KenHRApp.Web.Components.Pages
                 // Set the overlay message
                 overlayMessage = "Saving changes, please wait...";
 
-                _ = UnlockAccountAsync(async () =>
+                _ = SubmitTicketAsync(async () =>
                 {
                     // Set flag to hide the loading button
                     _btnProcessing = false;
-
-                    if (State.IsAuthenticated)
-                        Nav.NavigateTo("/TimeAttendance/tnadashboard");
 
                     // Shows the spinner overlay
                     await InvokeAsync(StateHasChanged);
@@ -113,6 +117,26 @@ namespace KenHRApp.Web.Components.Pages
         #endregion
 
         #region Private Methods
+        private void UploadFiles(InputFileChangeEventArgs e)
+        {
+            //If SuppressOnChangeWhenInvalid is false, perform your validations here
+            //Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            //Snackbar.Add($"Selected file type: .{_model.File.Name.Split(".").Last()}", Severity.Info);
+
+            //TODO upload the files to the server
+        }
+
+        private void RemoveFile(IBrowserFile file)
+        {
+            //_files.Remove(file);
+            _files = _files.Where(f => f != file).ToList();
+        }
+
+        protected void GoToLogin()
+        {
+            Nav.NavigateTo("/login", true);
+        }
+
         private void ShowNotification(string message, SnackBarTypes type, string position = Defaults.Classes.Position.TopCenter)
         {
             Snackbar.Clear();
@@ -164,15 +188,10 @@ namespace KenHRApp.Web.Components.Pages
                 _errorMessage.Clear();
             }
         }
-
-        protected void GoToLogin()
-        {
-            Nav.NavigateTo("/login", true);
-        }
         #endregion
 
-        #region Service Methods
-        private async Task UnlockAccountAsync(Func<Task> callback)
+        #region Database Methods
+        private async Task SubmitTicketAsync(Func<Task> callback)
         {
             try
             {
@@ -185,11 +204,32 @@ namespace KenHRApp.Web.Components.Pages
                 // Initialize the cancellation token
                 _cts = new CancellationTokenSource();
 
+                //await Form!.Validate();
+
+                //if (!Form.IsValid)
+                //    return;
 
                 bool isSuccess = true;
                 string errorMsg = string.Empty;
 
-                var repoResult = await AuthService.UnlockAccountAsync(Model);
+                #region Initialize DTO
+                var fileDtos = new List<FileUploadDTO>();
+
+                foreach (var file in _files)
+                {
+                    var stream = file.OpenReadStream(10 * 1024 * 1024);
+
+                    fileDtos.Add(new FileUploadDTO
+                    {
+                        FileName = file.Name,
+                        ContentType = file.ContentType,
+                        Size = file.Size,
+                        Content = stream
+                    });
+                }
+                #endregion
+
+                var repoResult = await SupportTicketService.CreateTicketAsync(Ticket, fileDtos, Environment.WebRootPath, _cts.Token);
                 isSuccess = repoResult.Success;
                 if (!isSuccess)
                     errorMsg = repoResult.Error!;
@@ -200,10 +240,7 @@ namespace KenHRApp.Web.Components.Pages
                     ShowHideError(false);
 
                     // Show notification
-                    ShowNotification("User Account has been unlocked successfully!", SnackBarTypes.Success);
-
-                    // Set authentication state
-                    //State.IsAuthenticated = true;
+                    ShowNotification("Support ticket has been submitted successfully!", SnackBarTypes.Success);
                 }
                 else
                 {
@@ -225,6 +262,68 @@ namespace KenHRApp.Web.Components.Pages
 
                 ShowHideError(true);
             }
+        }
+
+        private async Task CreateTicketAsync(SubmitTicketDTO dto, List<FileUploadDTO> files)
+        {
+            if (dto is null)
+                throw new ArgumentNullException(nameof(dto));
+
+            var ticket = new SupportTicket(
+                dto.Subject.Trim(),
+                dto.Requester.Trim(),
+                dto.Description.Trim());
+
+            string uploadPath = Path.Combine(
+                _webRootPath,
+                "uploads",
+                "support");
+
+            if (!Directory.Exists(uploadPath))
+                Directory.CreateDirectory(uploadPath);
+
+            if (files is not null && files.Any())
+            {
+                foreach (var file in files)
+                {
+                    if (file.Size > MaxFileSize)
+                        throw new InvalidOperationException(
+                            $"File {file.FileName} exceeds 10MB limit.");
+
+                    if (file.Content is null)
+                        throw new InvalidOperationException(
+                            $"File stream for {file.FileName} is null.");
+
+                    string storedFileName =
+                        $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+
+                    string fullPath =
+                        Path.Combine(uploadPath, storedFileName);
+
+                    await using (var fileStream = new FileStream(
+                        fullPath,
+                        FileMode.Create,
+                        FileAccess.Write,
+                        FileShare.None,
+                        81920,
+                        useAsync: true))
+                    {
+                        await file.Content.CopyToAsync(fileStream);
+                    }
+
+                    var attachment = new SupportTicketAttachment(
+                        ticket.Id,
+                        file.FileName,
+                        storedFileName,
+                        file.ContentType,
+                        file.Size);
+
+                    ticket.AddAttachment(attachment);
+                }
+            }
+
+            //await _context.SupportTickets.AddAsync(ticket);
+            //await _context.SaveChangesAsync();
         }
         #endregion
     }

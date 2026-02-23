@@ -2184,4 +2184,13 @@ employee-autocomplete .mud-input-adornment .mud-icon-button {
 }
 /**/
 
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center; /* Horizontal center */
+    align-items: center; /* Vertical center */
+    padding: 16px; /* Mobile safe spacing */
+    background-color: #f5f5f5; /* Optional */
+}
+
 
