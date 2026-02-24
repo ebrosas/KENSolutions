@@ -1,0 +1,140 @@
+﻿@page "/login"
+@layout KenHRApp.Web.Components.Layout.LoginLayout
+
+<div class="login-root login-background">
+
+    <!-- Floating Icons -->
+    <div class="floating-icons" hidden>
+        <MudIcon Icon="@Icons.Material.Filled.Groups" Color="Color.Primary" />
+        <MudIcon Icon="@Icons.Material.Filled.Badge" />
+        <MudIcon Icon="@Icons.Material.Filled.EventAvailable" />
+        <MudIcon Icon="@Icons.Material.Filled.Payments" />
+        <MudIcon Icon="@Icons.Material.Filled.Assessment" />
+    </div>
+
+    <div class="login-container">
+
+        <!-- Branding Section -->
+        <div class="branding-section fade-in">
+
+            <img src="/images/KENlogo.png"
+                 alt="Company Logo"
+                 class="company-logo" />
+
+            <MudText Typo="Typo.h4" Class="fw-bold mt-4 text-center text-md-start">
+                KEN - HR Management System
+            </MudText>
+
+            <MudText Typo="Typo.body2"
+                     Class="branding-description mt-2 text-center text-md-start">
+                Empowering People. Simplifying Workforce Management.
+            </MudText>
+
+        </div>
+
+        <!-- Login Section -->
+        <div class="login-section fade-in">
+
+            <MudContainer MaxWidth="MaxWidth.Small">
+
+                <EditForm EditContext="@_editContext"
+                          OnValidSubmit="HandleValidSubmit"
+                          OnInvalidSubmit="HandleInvalidSubmit">
+
+                    <DataAnnotationsValidator />
+
+                    <MudPaper Elevation="12" Class="pa-6 pa-md-8 login-card">
+
+                        <MudText Typo="Typo.h5" Class="fw-bold mb-4 text-center" Style="color:#004165;">
+                            Log In
+                        </MudText>
+
+                        @if (_showErrorAlert)
+                        {
+                            <MudAlert Severity="Severity.Error"
+                                      Variant="Variant.Filled"
+                                      ShowCloseIcon="true"
+                                      CloseIconClicked="(() => ShowHideError(false))"
+                                      Class="mb-4">
+                                @_errorMessage.ToString()
+                            </MudAlert>
+                        }
+
+                        <MudTextField @bind-Value="Model.EmployeeCode"
+                                      Label="User ID / Email"
+                                      Variant="Variant.Outlined"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Person"
+                                      Required="true"
+                                      FullWidth="true"
+                                      Class="mb-3"
+                                      Disabled="@_btnProcessing" />
+
+                        <MudTextField @bind-Value="Model.Password"
+                                      Label="Password"
+                                      Variant="Variant.Outlined"
+                                      InputType="@PasswordInputType"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@PasswordIcon"
+                                      OnAdornmentClick="TogglePassword"
+                                      Required="true"
+                                      FullWidth="true"
+                                      Class="mb-3"
+                                      Disabled="@_btnProcessing" />
+
+                        <MudStack Row Justify="Justify.SpaceBetween" Class="mb-4">
+                             <MudCheckBox T="bool"
+                                          @bind-Checked="Model.RememberMe"
+                                          Disabled="@_btnProcessing">
+                                 Remember Me
+                             </MudCheckBox>
+
+                             <MudLink OnClick="ForgotPassword">
+                                 Forgot?
+                             </MudLink>
+                         </MudStack>
+
+                         <MudButton Variant="Variant.Filled"
+                                    ButtonType="ButtonType.Submit"
+                                    Color="Color.Primary"
+                                    Style="background-color:#004165;"
+                                    Size="Size.Large"
+                                    FullWidth="true"
+                                    Disabled="@_btnProcessing"
+                                    Class="login-btn">
+
+                             @if (_btnProcessing)
+                            {
+                                <MudProgressCircular Size="Size.Small"
+                                                     Indeterminate="true"
+                                                     Class="me-2" />
+                                <span>Logging in...</span>
+                            }
+                            else
+                            {
+                                <span>Log In</span>
+                            }
+                        </MudButton>
+
+                        <MudDivider Class="my-5" />
+
+                        <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                            <MudLink OnClick="ShowUnlockDialog">
+                                Unlock Account
+                            </MudLink>
+
+                            <MudLink OnClick="GoToSupport">
+                                Need Support?
+                            </MudLink>
+                        </MudStack>
+
+                    </MudPaper>
+
+                </EditForm>
+
+            </MudContainer>
+
+        </div>
+
+    </div>
+</div>

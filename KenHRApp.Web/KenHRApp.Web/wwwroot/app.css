@@ -2193,4 +2193,16 @@ employee-autocomplete .mud-input-adornment .mud-icon-button {
     background-color: #f5f5f5; /* Optional */
 }
 
+.login-background {
+    background-image: linear-gradient(rgba(0, 65, 101, 0.85), rgba(0, 65, 101, 0.85)), url('/images/hr-background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}
+
+.mud-theme-dark .login-background {
+    background-image: linear-gradient(rgba(18, 18, 18, 0.92), rgba(18, 18, 18, 0.92)), url('/images/hr-background.jpg');
+}
+
 
