@@ -218,16 +218,20 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
             }
         }
 
-        protected void ShowUnlockDialog()
+        protected void ShowUnlockAccount()
         {
-            // Open MudDialog for unlock
             Nav.NavigateTo("/UserAccount/Unlock", true);
+        }
+
+        protected void ShowRegisterUser()
+        {
+            Nav.NavigateTo("/UserAccount/Register", true);
         }
 
         protected void ForgotPassword()
         {
             Nav.NavigateTo("/UserAccount/ForgotPassword", true);
-            //await AuthService.ForgotPasswordAsync(
+            //await AuthService.RegisterUserAccountAsync(
             //    new ForgotPasswordDTO { EmployeeCode = Model.EmployeeCode });
 
             //ErrorMessage = "Temporary password sent to email.";

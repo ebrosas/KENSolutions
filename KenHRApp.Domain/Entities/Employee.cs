@@ -304,6 +304,52 @@ namespace KenHRApp.Domain.Entities
         [Column(TypeName = "bit")]
         public bool IsLocked { get; set; }
 
+        [Column(TypeName = "varchar(150)")]
+        public string? SecurityQuestion1 { get; set; } = null;
+
+        [Column(TypeName = "varchar(50)")]
+        public string? SecurityAnswer1 { get; set; } = null;
+
+        [Column(TypeName = "varchar(150)")]
+        public string? SecurityQuestion2 { get; set; } = null;
+
+        [Column(TypeName = "varchar(50)")]
+        public string? SecurityAnswer2 { get; set; } = null;
+
+        [Column(TypeName = "varchar(150)")]
+        public string? SecurityQuestion3 { get; set; } = null;
+
+        [Column(TypeName = "varchar(50)")]
+        public string? SecurityAnswer3 { get; set; } = null;
+        #endregion
+
+        #region Extended Properties
+        [NotMapped]
+        public string EmployeeFullName
+        {
+            get
+            {
+                return $"{FirstName} {MiddleName} {LastName}";
+            }
+        }
+        #endregion
+        
+        #region Navigation Properties
+        public ICollection<EmergencyContact> EmergencyContactList { get; set; } = new List<EmergencyContact>();
+        public IdentityProof? IdentityProof { get; set; } = null;
+        public ICollection<Qualification> Qualifications { get; set; } = new List<Qualification>();
+        public ICollection<EmployeeSkill> EmployeeSkills { get; set; } = new List<EmployeeSkill>();
+        public ICollection<EmployeeCertification> EmployeeCertifications { get; set; } = new List<EmployeeCertification>();
+        public ICollection<LanguageSkill> LanguageSkills { get; set; } = new List<LanguageSkill>();
+        public ICollection<FamilyMember> FamilyMembers { get; set; } = new List<FamilyMember>();
+        public ICollection<FamilyVisa> FamilyVisas { get; set; } = new List<FamilyVisa>();
+        public ICollection<EmploymentHistory> EmploymentHistories { get; set; } = new List<EmploymentHistory>();
+        public ICollection<OtherDocument> OtherDocuments { get; set; } = new List<OtherDocument>();
+        public ICollection<EmployeeTransaction> EmployeeTransactions { get; set; } = new List<EmployeeTransaction>();
+        public LeaveEntitlement? LeaveEntitlement { get; set; } = null;
+        #endregion
+
+        #region Public Methods
         public void IncrementFailedAttempts()
         {
             FailedLoginAttempts++;
@@ -327,32 +373,20 @@ namespace KenHRApp.Domain.Entities
         {
             PasswordHash = newHash;
         }
-        #endregion
 
-        #region Extended Properties
-        [NotMapped]
-        public string EmployeeFullName
+        public void RegisterAccount(string userID, string email, string passwordHash, string question1, string answer1,
+            string question2, string answer2, string question3, string answer3)
         {
-            get
-            {
-                return $"{FirstName} {MiddleName} {LastName}";
-            }
+            UserID = userID;
+            OfficialEmail = email;
+            PasswordHash = passwordHash;
+            SecurityQuestion1 = question1;
+            SecurityAnswer1 = answer1;
+            SecurityQuestion2 = question2;
+            SecurityAnswer2 = answer2;
+            SecurityQuestion3 = question3;
+            SecurityAnswer3 = answer3;
         }
-        #endregion
-
-        #region Navigation Properties
-        public ICollection<EmergencyContact> EmergencyContactList { get; set; } = new List<EmergencyContact>();
-        public IdentityProof? IdentityProof { get; set; } = null;
-        public ICollection<Qualification> Qualifications { get; set; } = new List<Qualification>();
-        public ICollection<EmployeeSkill> EmployeeSkills { get; set; } = new List<EmployeeSkill>();
-        public ICollection<EmployeeCertification> EmployeeCertifications { get; set; } = new List<EmployeeCertification>();
-        public ICollection<LanguageSkill> LanguageSkills { get; set; } = new List<LanguageSkill>();
-        public ICollection<FamilyMember> FamilyMembers { get; set; } = new List<FamilyMember>();
-        public ICollection<FamilyVisa> FamilyVisas { get; set; } = new List<FamilyVisa>();
-        public ICollection<EmploymentHistory> EmploymentHistories { get; set; } = new List<EmploymentHistory>();
-        public ICollection<OtherDocument> OtherDocuments { get; set; } = new List<OtherDocument>();
-        public ICollection<EmployeeTransaction> EmployeeTransactions { get; set; } = new List<EmployeeTransaction>();
-        public LeaveEntitlement? LeaveEntitlement { get; set; } = null;
         #endregion
     }
 }

@@ -1963,6 +1963,91 @@ namespace KenHRApp.Infrastructure.Repositories
                     return Result<Employee?>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Retrieves an employee by Employee No. and Joining Date
+        /// Case-insensitive comparison.
+        /// </summary>
+        public async Task<Result<Employee?>> GetByEmployeeNoAndHireDateAsync(
+            int? empNo, DateTime doj,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                if (empNo == null || empNo == 0)
+                    throw new ArgumentException(
+                        "Employee No. must be provided.",
+                        nameof(empNo));
+
+                Employee? employee = await _db.Employees
+                    .FirstOrDefaultAsync(e =>
+                        e.EmployeeNo == empNo &&
+                        e.HireDate == doj,
+                        cancellationToken);
+
+                return Result<Employee?>.SuccessResult(employee);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<Employee?>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<Employee?>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Register user account
+        /// </summary>
+        public async Task<Result<int>> RegisterUserAccountAsync(Employee employee, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (employee == null)
+                    throw new ArgumentNullException(nameof(employee));
+
+                var existing = await _db.Employees
+                    .FirstOrDefaultAsync(e =>
+                        e.EmployeeNo == employee.EmployeeNo &&
+                        e.HireDate == employee.HireDate,
+                        cancellationToken);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find employee with the specified Employee No. and Date of Join.");
+
+                #region Update employee information
+                existing.UserID = employee.UserID;
+                existing.OfficialEmail = employee.OfficialEmail;
+                existing.SecurityQuestion1 = employee.SecurityQuestion1;
+                existing.SecurityAnswer1 = employee.SecurityAnswer1;
+                existing.SecurityQuestion2 = employee.SecurityQuestion2;
+                existing.SecurityAnswer2 = employee.SecurityAnswer2;
+                existing.SecurityQuestion3 = employee.SecurityQuestion3;
+                existing.SecurityAnswer3 = employee.SecurityAnswer3;
+                #endregion
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

@@ -36,9 +36,9 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<Employee?>> GetByUserIDOrEmailAsync(string userIdOrEmail, CancellationToken cancellationToken = default);
         Task<Result<int>> UnlockUserAccountAsync(string userIdOrEmail, CancellationToken cancellationToken = default);
         Task<Result<int>> UpdateAsync(Employee employee, CancellationToken cancellationToken = default);
-        Task<Result<Employee?>> GetByEmployeeCodeAndHireDateAsync(
-            string employeeCode, DateTime joiningDate,
-            CancellationToken cancellationToken = default);
+        Task<Result<Employee?>> GetByEmployeeCodeAndHireDateAsync(string employeeCode, DateTime joiningDate, CancellationToken cancellationToken = default);
+        Task<Result<int>> RegisterUserAccountAsync(Employee employee, CancellationToken cancellationToken = default);
+        Task<Result<Employee?>> GetByEmployeeNoAndHireDateAsync(int? empNo, DateTime doj, CancellationToken cancellationToken = default);
         #endregion
     }
 }

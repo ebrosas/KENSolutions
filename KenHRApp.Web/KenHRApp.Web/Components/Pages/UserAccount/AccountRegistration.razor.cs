@@ -9,7 +9,7 @@ using System.Text.Json;
 
 namespace KenHRApp.Web.Components.Pages.UserAccount
 {
-    public partial class Login
+    public partial class AccountRegistration
     {
         #region Parameters and Injections
         [Inject] public IAuthenticationService AuthService { get; set; } = default!;
@@ -38,7 +38,7 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
         #endregion
 
         #region Objects and Collections
-        protected LoginRequestDTO Model = new();
+        protected UserAccountDTO Model = new();
         #endregion
 
         #endregion
@@ -89,15 +89,14 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
                 _btnProcessing = true;
 
                 // Set the overlay message
-                overlayMessage = "Saving changes, please wait...";
+                overlayMessage = "Recovering password, please wait...";
 
-                _ = LoginAsync(async () =>
+                _ = RegisterUserAccountAsync(async () =>
                 {
                     // Set flag to hide the loading button
                     _btnProcessing = false;
 
-                    if (State.IsAuthenticated)
-                        Nav.NavigateTo("/TimeAttendance/tnadashboard");
+                    //Nav.NavigateTo("/login", true);
 
                     // Shows the spinner overlay
                     await InvokeAsync(StateHasChanged);
@@ -110,34 +109,6 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
             catch (Exception ex)
             {
                 ShowNotification($"Error: {ex.Message}", SnackBarTypes.Error);
-            }
-        }
-
-        protected async Task HandleLogin()
-        {
-            await _form.Validate();
-
-            var serviceResult = await AuthService.LoginAsync(Model);
-            if (!serviceResult.Success)
-            {
-                return;
-            }
-
-            var result = serviceResult.Value;
-            if (result!.IsSuccess)
-            {
-                if (Model.RememberMe)
-                {
-                    //await JS.InvokeVoidAsync("localStorage.setItem",
-                    //    "login", JsonSerializer.Serialize(Model));
-                }
-
-                Nav.NavigateTo("/TimeAttendance/tnadashboard");
-            }
-            else
-            {
-                ErrorMessage = result.ErrorMessage;
-                //Snackbar.Add(result.ErrorMessage, Severity.Error);
             }
         }
         #endregion
@@ -208,20 +179,10 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
                 PasswordIcon = Icons.Material.Filled.VisibilityOff;
             }
         }
-        
-        protected void ShowUnlockDialog()
-        {
-            // Open MudDialog for unlock
-            Nav.NavigateTo("/UserAccount/Unlock", true);
-        }
 
-        protected void ForgotPassword()
+        protected void GoToLogin()
         {
-            Nav.NavigateTo("/UserAccount/ForgotPassword", true);
-            //await AuthService.RegisterUserAccountAsync(
-            //    new ForgotPasswordDTO { EmployeeCode = Model.EmployeeCode });
-
-            //ErrorMessage = "Temporary password sent to email.";
+            Nav.NavigateTo("/login", true);
         }
 
         protected void GoToSupport()
@@ -231,12 +192,12 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
         #endregion
 
         #region Service Methods
-        private async Task LoginAsync(Func<Task> callback)
+        private async Task RegisterUserAccountAsync(Func<Task> callback)
         {
             try
             {
                 // Wait for 1 second then gives control back to the runtime
-                await Task.Delay(500);
+                await Task.Delay(300);
 
                 // Reset error messages
                 _errorMessage.Clear();
@@ -244,32 +205,20 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
                 // Initialize the cancellation token
                 _cts = new CancellationTokenSource();
 
-                // Reset autherntication state
-                State.IsAuthenticated = false;
+                var repoResult = await AuthService.RegisterUserAccountAsync(Model);
 
-                bool isSuccess = true;
-                string errorMsg = string.Empty;
-
-                var repoResult = await AuthService.LoginAsync(Model);
-                isSuccess = repoResult.Success;
-                if (!isSuccess)
-                    errorMsg = repoResult.Error!;
-
-                if (isSuccess)
+                if (repoResult.Success)
                 {
                     // Hide error message if any
                     ShowHideError(false);
 
                     // Show notification
-                    //ShowNotification("Support ticket has been submitted successfully!", SnackBarTypes.Success);
-
-                    // Set authentication state
-                    State.IsAuthenticated = true;
+                    ShowNotification("User account has benn registered successfully!", SnackBarTypes.Success);
                 }
                 else
                 {
                     // Set the error message
-                    _errorMessage.AppendLine(errorMsg);
+                    _errorMessage.AppendLine(repoResult.Error!);
                     ShowHideError(true);
                 }
 

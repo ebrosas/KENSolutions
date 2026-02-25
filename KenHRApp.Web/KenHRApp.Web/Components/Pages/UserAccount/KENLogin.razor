@@ -62,7 +62,7 @@
                             </MudAlert>
                         }
 
-                        <MudTextField @bind-Value="Model.EmployeeCode"
+                        <MudTextField @bind-Value="Model.EmployeeCode" 
                                       Label="User ID / Email"
                                       Variant="Variant.Outlined"
                                       Adornment="Adornment.Start"
@@ -91,7 +91,7 @@
                                  Remember Me
                              </MudCheckBox>
 
-                             <MudLink OnClick="ForgotPassword" Disabled="@_btnProcessing">
+                             <MudLink OnClick="ForgotPassword" Disabled="@_btnProcessing" Color="Color.Error" Typo="Typo.subtitle1">
                                  Forgot Password?
                              </MudLink>
                          </MudStack>
@@ -121,11 +121,14 @@
                         <MudDivider Class="my-5" />
 
                         <MudStack AlignItems="AlignItems.Center" Spacing="1">
-                            <MudLink OnClick="ShowUnlockDialog" Disabled="@_btnProcessing">
+                            <MudLink OnClick="ShowRegisterUser" Disabled="@_btnProcessing" Color="Color.Primary" Typo="Typo.subtitle1">
+                                Sign Up
+                            </MudLink>
+                            <MudLink OnClick="ShowUnlockAccount" Disabled="@_btnProcessing" Color="Color.Primary" Typo="Typo.subtitle1">
                                 Unlock Account
                             </MudLink>
 
-                            <MudLink OnClick="GoToSupport" Disabled="@_btnProcessing">
+                            <MudLink OnClick="GoToSupport" Disabled="@_btnProcessing" Color="Color.Primary" Typo="Typo.subtitle1">
                                 Need Support?
                             </MudLink>
                         </MudStack>

@@ -225,6 +225,55 @@ namespace KenHRApp.Application.Services
                 return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in LoginAsync() method.");
             }
         }
+
+        public async Task<Result<bool>> RegisterUserAccountAsync(UserAccountDTO dto, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var repoResult = await _repository.GetByEmployeeNoAndHireDateAsync(dto.EmployeeNo,
+                    dto.DOJ!.Value, cancellationToken);
+                if (!repoResult.Success)
+                {
+                    return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var employee = repoResult.Value;
+                if (employee == null)
+                {
+                    throw new Exception("Employee not found.");
+                }
+
+                // Create hash of the password if it's not null or empty, otherwise set it to null
+                string? passwordHash = null;
+                if (string.IsNullOrEmpty(dto.Password))
+                    passwordHash = _passwordHasher.Hash(dto.Password);
+
+                employee.RegisterAccount(
+                    dto.UserID,
+                    dto.Email,
+                    _passwordHasher.Hash(dto.Password),
+                    dto.SecurityQuestion1,
+                    dto.SecurityAnswer1,
+                    dto.SecurityQuestion2,
+                    dto.SecurityAnswer2,
+                    dto.SecurityQuestion3,
+                    dto.SecurityAnswer3
+                );
+
+                // Save changes to the database
+                var saveResult = await _repository.UpdateAsync(employee);
+                if (!saveResult.Success)
+                {
+                    return Result<bool>.Failure(saveResult.Error ?? "Unknown repository error");
+                }
+
+                return Result<bool>.SuccessResult(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in LoginAsync() method.");
+            }
+        }
         #endregion
     }
 }

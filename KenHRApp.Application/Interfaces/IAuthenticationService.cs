@@ -14,6 +14,7 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<LoginResponseDTO>> LoginAsync(LoginRequestDTO request);
         Task<Result<int>> UnlockAccountAsync(UnlockAccountDTO dto, CancellationToken cancellationToken = default);
         Task<Result<bool>> ForgotPasswordAsync(ForgotPasswordDTO dto, CancellationToken cancellationToken = default);
+        Task<Result<bool>> RegisterUserAccountAsync(UserAccountDTO dto, CancellationToken cancellationToken = default);
         #endregion
     }
 }
