@@ -1,10 +1,11 @@
 ﻿@page "/login"
 @layout KenHRApp.Web.Components.Layout.LoginLayout
+@inject IJSRuntime JS
 
 <div class="login-root login-background">
 
     <!-- Floating Icons -->
-    <div class="floating-icons">
+    <div class="floating-icons" hidden>
         <MudIcon Icon="@Icons.Material.Filled.Groups" Class="text-white" />
         <MudIcon Icon="@Icons.Material.Filled.Badge" Class="text-white" />
         <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Class="text-white" />
@@ -21,12 +22,13 @@
                  alt="Company Logo"
                  class="company-logo" />
 
-            <MudText Typo="Typo.h4" Class="fw-bold mt-4 text-center text-md-start">
+            <MudText Typo="Typo.h4"
+                     Class="fw-bold mt-4 branding-title">
                 KenHR Management System
             </MudText>
 
             <MudText Typo="Typo.body2"
-                     Class="branding-description mt-2 text-center text-md-start">
+                     Class="branding-description mt-1">
                 Empowering People. Simplifying Workforce Management.
             </MudText>
 
@@ -89,7 +91,7 @@
                                  Remember Me
                              </MudCheckBox>
 
-                             <MudLink OnClick="ForgotPassword">
+                             <MudLink OnClick="ForgotPassword" Disabled="@_btnProcessing">
                                  Forgot Password?
                              </MudLink>
                          </MudStack>
@@ -119,11 +121,11 @@
                         <MudDivider Class="my-5" />
 
                         <MudStack AlignItems="AlignItems.Center" Spacing="1">
-                            <MudLink OnClick="ShowUnlockDialog">
+                            <MudLink OnClick="ShowUnlockDialog" Disabled="@_btnProcessing">
                                 Unlock Account
                             </MudLink>
 
-                            <MudLink OnClick="GoToSupport">
+                            <MudLink OnClick="GoToSupport" Disabled="@_btnProcessing">
                                 Need Support?
                             </MudLink>
                         </MudStack>

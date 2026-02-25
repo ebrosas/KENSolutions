@@ -1,13 +1,15 @@
 ﻿using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
+using KenHRApp.Application.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using System.Text;
+using System.Text.Json;
 
 namespace KenHRApp.Web.Components.Pages.UserAccount
 {
-    public partial class UnlockAccountDialog
+    public partial class PasswordRecovery
     {
         #region Parameters and Injections
         [Inject] public IAuthenticationService AuthService { get; set; } = default!;
@@ -36,7 +38,7 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
         #endregion
 
         #region Objects and Collections
-        protected UnlockAccountDTO Model = new();
+        protected ForgotPasswordDTO Model = new();
         #endregion
 
         #endregion
@@ -87,15 +89,14 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
                 _btnProcessing = true;
 
                 // Set the overlay message
-                overlayMessage = "Saving changes, please wait...";
+                overlayMessage = "Recovering password, please wait...";
 
-                _ = UnlockAccountAsync(async () =>
+                _ = ForgotPasswordAsync(async () =>
                 {
                     // Set flag to hide the loading button
                     _btnProcessing = false;
 
-                    if (State.IsAuthenticated)
-                        Nav.NavigateTo("/TimeAttendance/tnadashboard");
+                    //Nav.NavigateTo("/login", true);
 
                     // Shows the spinner overlay
                     await InvokeAsync(StateHasChanged);
@@ -169,10 +170,15 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
         {
             Nav.NavigateTo("/login", true);
         }
+
+        protected void GoToSupport()
+        {
+            Nav.NavigateTo("/UserAccount/Support", true);
+        }
         #endregion
 
         #region Service Methods
-        private async Task UnlockAccountAsync(Func<Task> callback)
+        private async Task ForgotPasswordAsync(Func<Task> callback)
         {
             try
             {
@@ -185,30 +191,20 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
                 // Initialize the cancellation token
                 _cts = new CancellationTokenSource();
 
+                var repoResult = await AuthService.ForgotPasswordAsync(Model);
 
-                bool isSuccess = true;
-                string errorMsg = string.Empty;
-
-                var repoResult = await AuthService.UnlockAccountAsync(Model);
-                isSuccess = repoResult.Success;
-                if (!isSuccess)
-                    errorMsg = repoResult.Error!;
-
-                if (isSuccess)
+                if (repoResult.Success)
                 {
                     // Hide error message if any
                     ShowHideError(false);
 
                     // Show notification
-                    ShowNotification("User Account has been unlocked successfully!", SnackBarTypes.Success);
-
-                    // Set authentication state
-                    //State.IsAuthenticated = true;
+                    ShowNotification("Temporary password has been sent to the registered email successfully!", SnackBarTypes.Success);
                 }
                 else
                 {
                     // Set the error message
-                    _errorMessage.AppendLine(errorMsg);
+                    _errorMessage.AppendLine(repoResult.Error!);
                     ShowHideError(true);
                 }
 

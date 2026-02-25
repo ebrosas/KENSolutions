@@ -1,42 +1,40 @@
-﻿/* ROOT */
+﻿/* ============================= */
+/* ROOT - STABLE BACKGROUND */
+/* ============================= */
+
 .login-root {
     min-height: 100vh;
     width: 100%;
     position: relative;
     overflow: hidden;
-    /* Layered Background */
-    background-image: 
-        linear-gradient(rgba(0, 65, 101, 0.85), 
-        rgba(0, 65, 101, 0.85)), 
-        url('images/hr-background.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    backdrop-filter: saturate(90%);
+    /* Use absolute path */
+    background: linear-gradient(rgba(0, 65, 101, 0.88), rgba(0, 65, 101, 0.88)), url('/images/hr-background.jpg') center / cover no-repeat;
+    background-color: #004165; /* fallback */
 }
 
-/* Static Professional Background */
-.login-root {
-    background-color: #f4f6f9;
-}
-
-/* Dark mode background */
+/* Dark mode */
 .mud-theme-dark .login-root {
-    background-image: linear-gradient(rgba(18, 18, 18, 0.92), rgba(18, 18, 18, 0.92)), url('images/hr-background.jpg');
+    background: linear-gradient(rgba(18, 18, 18, 0.94), rgba(18, 18, 18, 0.94)), url('/images/hr-background.jpg') center / cover no-repeat;
 }
 
-/* Layout - Mobile First */
+/* ============================= */
+/* LAYOUT - MOBILE FIRST */
+/* ============================= */
+
 .login-container {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-/* Branding Section */
+/* Branding */
 .branding-section {
-    padding: 40px 20px;
-    text-align: center;
-    background-color: #004165;
+    padding: 40px 24px;
+    text-align: left; /* LEFT ALIGN */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* ensures children align left */
+    justify-content: center;
     color: white;
 }
 
@@ -52,66 +50,38 @@
 /* Card */
 .login-card {
     border-radius: 16px;
-    backdrop-filter: blur(6px);
+    background-color: rgba(255, 255, 255, 0.98);
+}
+
+.mud-theme-dark .login-card {
+    background-color: #1e1e1e;
 }
 
 /* Logo */
 .company-logo {
-    max-width: 200px;
+    max-width: 180px;
     height: auto;
     display: block;
-    margin-bottom: 0px;
-    /* Optional visual refinement */
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+    margin: 0;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));
 }
 
-/* Floating Icons (More Subtle Now) */
-.floating-icons {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-}
+/* ============================= */
+/* FADE-IN (NO FLICKER SAFE) */
+/* ============================= */
 
-    .floating-icons .mud-icon-root {
-        position: absolute;
-        color: rgba(255,255,255,0.05);
-        font-size: 70px;
-    }
-
-        .floating-icons .mud-icon-root:nth-child(1) {
-            top: 10%;
-            left: 15%;
-        }
-
-        .floating-icons .mud-icon-root:nth-child(2) {
-            top: 70%;
-            left: 20%;
-        }
-
-        .floating-icons .mud-icon-root:nth-child(3) {
-            top: 30%;
-            right: 20%;
-        }
-
-        .floating-icons .mud-icon-root:nth-child(4) {
-            bottom: 10%;
-            right: 10%;
-        }
-
-        .floating-icons .mud-icon-root:nth-child(5) {
-            top: 50%;
-            left: 50%;
-        }
-
-/* Fade-in */
 .fade-in {
-    animation: fadeIn 0.6s ease;
+    opacity: 0;
+}
+
+.page-loaded .fade-in {
+    animation: fadeIn 0.5s ease forwards;
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(15px);
+        transform: translateY(12px);
     }
 
     to {
@@ -120,24 +90,14 @@
     }
 }
 
-/* Tablet */
-@media (min-width: 768px) {
-    .branding-section {
-        padding: 60px 40px;
-    }
+/* ============================= */
+/* DESKTOP SPLIT */
+/* ============================= */
 
-    .company-logo {
-        width: 130px;
-    }
-}
-
-/* Desktop Split */
 @media (min-width: 1024px) {
 
     .login-container {
         flex-direction: row;
-        min-height: 100vh; /* Full viewport height */
-        overflow: hidden; /* prevent vertical scrollbar */
     }
 
     .branding-section {
@@ -151,10 +111,14 @@
 
     .login-section {
         flex: 1;
-        background: var(--mud-palette-background);
+        background: transparent;
     }
+}
 
-    .mud-theme-dark .login-section {
-        background: #1e1e1e;
-    }
+.branding-title {
+    line-height: 1.2;
+}
+
+.branding-description {
+    opacity: 0.9;
 }
