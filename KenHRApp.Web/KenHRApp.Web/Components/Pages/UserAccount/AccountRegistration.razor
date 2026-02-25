@@ -61,63 +61,63 @@
                             </MudAlert>
                         }
 
-                        @* <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Class="mud-width-full mt-3"> *@
-                        <MudTextField @bind-Value="Model.EmployeeNo"
+                        <MudPaper Elevation="0" Class="mt-3">
+                            <MudTextField @bind-Value="Model.EmployeeNo"
                                       Label="Employee No."
                                       Variant="Variant.Outlined"
-                                      Adornment="Adornment.Start"
+                                          Adornment="Adornment.End"
                                       AdornmentIcon="@Icons.Material.Filled.Person"
                                       Required="true"
-                                      FullWidth="true"
-                                      HelperText="Enter valid employee no."
-                                      HelperTextOnFocus="true"
-                                      Class="mb-0"
+                                      FullWidth="true"                                      
+                                      Class="mb-3" 
+                                      Margin="Margin.Dense"
                                       Disabled="@_btnProcessing" />
 
                             <MudDatePicker Label="Joining Date" Editable="true" @bind-Date="Model.DOJ"
-                                           For="@(() => Model.DOJ)" AutoClose="true" Color="Color.Surface"
-                                           Required="true"
-                                           Disabled="@_btnProcessing"
-                                           HelperText="Enter the joining date" HelperTextOnFocus="true" Clearable="false"
-                                           Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Outlined">
+                                    For="@(() => Model.DOJ)" AutoClose="true" Color="Color.Surface"
+                                    Required="true"
+                                    Disabled="@_btnProcessing"
+                                    Margin="Margin.Dense"
+                                    Clearable="false"
+                                    Class="mb-4"
+                                    Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" 
+                                    Placeholder="dd/MM/yyyy" Variant="Variant.Outlined">
                                 <PickerActions Context="dateContext">
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => Model.DOJ = DateTime.Today))">Today</MudButton>
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => Model.DOJ = null))">Clear</MudButton>
                                 </PickerActions>
                             </MudDatePicker>
-                        @* </MudStack> *@
 
-                        @* <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Class="mud-width-full mt-2"> *@
                         <MudTextField @bind-Value="Model.UserID"
                                       For="@(() => Model.UserID)"
                                       Label="User ID"
                                       Variant="Variant.Outlined"
-                                      Adornment="Adornment.Start"
+                                          Adornment="Adornment.End"
                                       AdornmentIcon="@Icons.Material.Filled.VerifiedUser"
                                       Required="true"
                                       Immediate="true"
                                       FullWidth="true"
-                                      MaxLength="40"
-                                      Counter="40"
-                                      Class="mt-0"
-                                      HelperText="Enter valid employee no."
-                                      HelperTextOnFocus="true"
+                                      MaxLength="40"                                      
+                                      Class="mb-4"       
+                                      Margin="Margin.Dense"
                                       Disabled="@_btnProcessing" />
 
                             <MudTextField Label="Email"
-                                          @bind-Value="Model.Email"
-                                          Variant="Variant.Outlined"
-                                          For="@(() => Model.Email)"
-                                          HelperText="Enter official email address"
-                                      HelperTextOnFocus="true"
-                                          MaxLength="50"
-                                          Counter="50"
-                                          Required="true"
-                                          Immediate="true"
-                                          Disabled="@_btnProcessing"
-                                          FullWidth="true" />
+                                    @bind-Value="Model.Email"
+                                    Variant="Variant.Outlined"
+                                    For="@(() => Model.Email)"
+                                          Adornment="Adornment.End"
+                                          AdornmentIcon="@Icons.Material.Rounded.AttachEmail"
+                                    MaxLength="50"                                    
+                                    Required="true"
+                                    Immediate="true"
+                                    Class="mb-4"
+                                      Margin="Margin.Dense"
+                                    Disabled="@_btnProcessing"
+                                    FullWidth="true" />
 
                             <MudTextField @bind-Value="Model.Password"
+                                      For="@(() => Model.Password)"
                                       Label="Password"
                                       Variant="Variant.Outlined"
                                       InputType="@PasswordInputType"
@@ -126,29 +126,26 @@
                                       OnAdornmentClick="TogglePassword"
                                       Required="true"
                                       FullWidth="true"
-                                      Class="mb-0"
-                                      HelperText="Min. password length is 10 chars, should contain alphanumeric"
-                                      HelperTextOnFocus="true"
                                       MaxLength="40"
-                                      Counter="40"
+                                      Class="mb-4"  
+                                      Margin="Margin.Dense"
                                       Disabled="@_btnProcessing" />
 
                             <MudTextField @bind-Value="Model.RetypePassword"
+                                    For="@(() => Model.RetypePassword)"
                                     Label="Retype Password"
                                     Variant="Variant.Outlined"
-                                    InputType="@PasswordInputType"
+                                          InputType="@RetypePasswordInputType"
                                     Adornment="Adornment.End"
-                                    AdornmentIcon="@PasswordIcon"
-                                    OnAdornmentClick="TogglePassword"
+                                    AdornmentIcon="@RetypePasswordIcon"
+                                    OnAdornmentClick="ToggleRetypePassword"
                                     Required="true"
                                     FullWidth="true"
-                                    Class="mb-0"
-                                    HelperText="Value should be the same with Password"
-                                      HelperTextOnFocus="true"
+                                    Class="mb-3"
                                     MaxLength="40"
-                                    Counter="40"
+                                      Margin="Margin.Dense"
                                     Disabled="@_btnProcessing" />
-                        @* </MudStack> *@
+                        </MudPaper>
 
                         <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full" Spacing="2">
                              <MudButton Variant="Variant.Filled"
@@ -192,7 +189,7 @@
                         <MudDivider Class="my-4" />
 
                         <MudStack AlignItems="AlignItems.Center" Spacing="1">
-                            <MudLink OnClick="GoToSupport" Disabled="@_btnProcessing" Color="Color.Primary">
+                            <MudLink OnClick="GoToSupport" Disabled="@_btnProcessing" Color="Color.Primary" Typo="Typo.body2">
                                 Need Support?
                             </MudLink>
                         </MudStack>

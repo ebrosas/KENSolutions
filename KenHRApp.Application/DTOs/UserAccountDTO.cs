@@ -38,9 +38,6 @@ namespace KenHRApp.Application.DTOs
         [StringLength(40, ErrorMessage = "Retype Password can't be more than 40 characters.")]
         public string RetypePassword { get; set; } = null!;
 
-        [Required(ErrorMessage = "Password is required")]
-        [Display(Name = "Password")]
-        [StringLength(200, ErrorMessage = "Password can't be more than 200 characters.")]
         public string PasswordHash { get; set; } = null!;
 
         [Display(Name = "Security Question #1")]

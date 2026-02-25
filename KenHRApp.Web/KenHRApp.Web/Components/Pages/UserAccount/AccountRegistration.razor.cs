@@ -28,7 +28,9 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
         protected string ErrorMessage;
         protected MudForm _form;
         protected InputType PasswordInputType = InputType.Password;
+        protected InputType RetypePasswordInputType = InputType.Password;
         protected string PasswordIcon = Icons.Material.Filled.VisibilityOff;
+        protected string RetypePasswordIcon = Icons.Material.Filled.VisibilityOff;
 
         #region Flags
         private bool _hasValidationError = false;
@@ -177,6 +179,20 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
             {
                 PasswordInputType = InputType.Password;
                 PasswordIcon = Icons.Material.Filled.VisibilityOff;
+            }
+        }
+
+        protected void ToggleRetypePassword()
+        {
+            if (RetypePasswordInputType == InputType.Password)
+            {
+                RetypePasswordInputType = InputType.Text;
+                RetypePasswordIcon = Icons.Material.Filled.Visibility;
+            }
+            else
+            {
+                RetypePasswordInputType = InputType.Password;
+                RetypePasswordIcon = Icons.Material.Filled.VisibilityOff;
             }
         }
 
