@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KenHRApp.Application.Common.Validations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -18,22 +19,26 @@ namespace KenHRApp.Application.DTOs
         [DataType(DataType.Date)]
         public DateTime? DOJ { get; set; } = null;
 
-        [Required(ErrorMessage = "User ID is required")]
+        [Required]
+        [UserId]
         [Display(Name = "User ID")]
         [StringLength(50, ErrorMessage = "User ID can't be more than 50 characters.")]
         public string UserID { get; set; } = null!;
 
-        [Required(ErrorMessage = "Email is required")]
+        [Required]
+        [EmailAddress(ErrorMessage = "Invalid email address format.")]
         [Display(Name = "Email")]
         [StringLength(50, ErrorMessage = "Email can't be more than 50 characters.")]
         public string Email { get; set; } = null!;
 
-        [Required(ErrorMessage = "Password is required")]
+        [Required]
+        [PasswordComplexity]
         [Display(Name = "Password")]
         [StringLength(40, ErrorMessage = "Password can't be more than 40 characters.")]
         public string Password { get; set; } = null!;
 
-        [Required(ErrorMessage = "Retype Password is required")]
+        [Required]
+        [CompareProperty(nameof(Password), ErrorMessage = "Password and Retype Password do not match.")]
         [Display(Name = "Retype Password")]
         [StringLength(40, ErrorMessage = "Retype Password can't be more than 40 characters.")]
         public string RetypePassword { get; set; } = null!;

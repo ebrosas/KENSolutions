@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using System.Text;
 using System.Text.Json;
+using KenHRApp.Web.Components.Shared;
 
 namespace KenHRApp.Web.Components.Pages.UserAccount
 {
@@ -16,6 +17,7 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
         [Inject] public NavigationManager Nav { get; set; } = default!;
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         [Inject] private IAppState State { get; set; } = default!;
+        [Inject] private IDialogService DialogService { get; set; } = default!;
         #endregion
 
         #region Fields
@@ -41,6 +43,14 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
 
         #region Objects and Collections
         protected UserAccountDTO Model = new();
+        #endregion
+
+        #region Dialog Box Button Icons
+        private readonly string _iconDelete = "fas fa-trash-alt";
+        private readonly string _iconCancel = "fas fa-window-close";
+        private readonly string _iconError = "fas fa-times-circle";
+        private readonly string _iconInfo = "fas fa-info-circle";
+        private readonly string _iconWarning = "fas fa-exclamation-circle";
         #endregion
 
         #endregion
@@ -116,6 +126,42 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
         #endregion
 
         #region Private Methods
+        private async Task ShowErrorMessage(MessageBoxTypes msgboxType, string title, string content)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", title},
+                { "DialogIcon", msgboxType == MessageBoxTypes.Error ? _iconError
+                        : msgboxType == MessageBoxTypes.Warning ? _iconWarning
+                        : _iconInfo  },
+                { "ContentText", content },
+                {
+                    "Color", msgboxType == MessageBoxTypes.Error ? Color.Error
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
+                },
+                {
+                    "DialogIconColor", msgboxType == MessageBoxTypes.Error ? Color.Error
+                        : msgboxType == MessageBoxTypes.Info ? Color.Info
+                        : msgboxType == MessageBoxTypes.Warning ? Color.Warning
+                        : Color.Default
+                }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.Center,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<InfoDialog>(title, parameters, options);
+            var result = await dialog.Result;
+        }
+
         private void ShowNotification(string message, SnackBarTypes type, string position = Defaults.Classes.Position.TopCenter)
         {
             Snackbar.Clear();
@@ -205,6 +251,34 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
         {
             Nav.NavigateTo("/UserAccount/Support", true);
         }
+
+        private async Task ShowSuccessDialog()
+        {
+            var parameters = new DialogParameters
+            {
+                { "Message", "Your account has been successfully registered." }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseOnEscapeKey = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+
+            //var dialog = DialogService.ShowAsync<RegistrationSuccessDialog>(
+            //    "Registration Successful",
+            //    parameters,
+            //    options);
+
+            var dialog = await DialogService.ShowAsync<InfoDialog>("Registration Successful", parameters, options);
+            var result = await dialog.Result;
+
+            if (!result!.Canceled)
+            {
+                Nav.NavigateTo("/login", true);
+            }
+        }
         #endregion
 
         #region Service Methods
@@ -229,7 +303,8 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
                     ShowHideError(false);
 
                     // Show notification
-                    ShowNotification("User account has benn registered successfully!", SnackBarTypes.Success);
+                    //ShowNotification("User account has benn registered successfully!", SnackBarTypes.Success);
+                    await ShowSuccessDialog();
                 }
                 else
                 {

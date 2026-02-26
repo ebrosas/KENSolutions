@@ -88,7 +88,7 @@
                                 </PickerActions>
                             </MudDatePicker>
 
-                        <MudTextField @bind-Value="Model.UserID"
+                            <MudTextField @bind-Value="Model.UserID"
                                       For="@(() => Model.UserID)"
                                       Label="User ID"
                                       Variant="Variant.Outlined"
@@ -101,6 +101,12 @@
                                       Class="mb-4"       
                                       Margin="Margin.Dense"
                                       Disabled="@_btnProcessing" />
+
+                            <MudText Typo="Typo.caption" Class="text-muted mb-3">
+                                • Minimum 5 characters <br />
+                                • Must start with a letter or number <br />
+                                • Cannot contain: '  ;  --  /  \  %
+                            </MudText>
 
                             <MudTextField Label="Email"
                                     @bind-Value="Model.Email"
@@ -117,34 +123,45 @@
                                     FullWidth="true" />
 
                             <MudTextField @bind-Value="Model.Password"
-                                      For="@(() => Model.Password)"
-                                      Label="Password"
-                                      Variant="Variant.Outlined"
-                                      InputType="@PasswordInputType"
-                                      Adornment="Adornment.End"
-                                      AdornmentIcon="@PasswordIcon"
-                                      OnAdornmentClick="TogglePassword"
-                                      Required="true"
-                                      FullWidth="true"
-                                      MaxLength="40"
-                                      Class="mb-4"  
-                                      Margin="Margin.Dense"
-                                      Disabled="@_btnProcessing" />
+                                For="@(() => Model.Password)"
+                                Label="Password"
+                                Variant="Variant.Outlined"
+                                InputType="@PasswordInputType"
+                                Adornment="Adornment.End"
+                                AdornmentIcon="@PasswordIcon"
+                                OnAdornmentClick="TogglePassword"
+                                Required="true"
+                                FullWidth="true"
+                                MaxLength="40"
+                                Class="mb-4"  
+                                Margin="Margin.Dense"
+                                Immediate="true"
+                                ValidationDelay="300"
+                                Disabled="@_btnProcessing" />
+
+                            <MudText Typo="Typo.caption" Class="text-muted mb-3">
+                                • Minimum 8 characters <br />
+                                • Must contain uppercase and lowercase letters <br />
+                                • Must contain at least 1 number <br />
+                                • Must contain at least 1 special character
+                            </MudText>
 
                             <MudTextField @bind-Value="Model.RetypePassword"
-                                    For="@(() => Model.RetypePassword)"
-                                    Label="Retype Password"
-                                    Variant="Variant.Outlined"
-                                          InputType="@RetypePasswordInputType"
-                                    Adornment="Adornment.End"
-                                    AdornmentIcon="@RetypePasswordIcon"
-                                    OnAdornmentClick="ToggleRetypePassword"
-                                    Required="true"
-                                    FullWidth="true"
-                                    Class="mb-3"
-                                    MaxLength="40"
-                                      Margin="Margin.Dense"
-                                    Disabled="@_btnProcessing" />
+                                For="@(() => Model.RetypePassword)"
+                                Label="Retype Password"
+                                Variant="Variant.Outlined"
+                                InputType="@RetypePasswordInputType"
+                                Adornment="Adornment.End"
+                                AdornmentIcon="@RetypePasswordIcon"
+                                OnAdornmentClick="ToggleRetypePassword"
+                                Required="true"
+                                FullWidth="true"
+                                Class="mb-3"
+                                MaxLength="40"
+                                Margin="Margin.Dense"
+                                Immediate="true"
+                                ValidationDelay="300"
+                                Disabled="@_btnProcessing" />
                         </MudPaper>
 
                         <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full" Spacing="2">
