@@ -361,32 +361,29 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
 
         private async Task ShowEmailVerificationDialog()
         {
-            //var parameters = new DialogParameters
-            //{
-            //    { nameof(EmailVerificationSentDialog.Email), Model.Email }
-            //};
+            var parameters = new DialogParameters
+            {
+                { nameof(EmailVerificationSentDialog.Email), Model.Email }
+            };
 
-            //var options = new DialogOptions
-            //{
-            //    CloseButton = true,
-            //    MaxWidth = MaxWidth.Small,
-            //    Position = DialogPosition.TopCenter,
-            //    CloseOnEscapeKey = true,   // Prevent ESC from closing
-            //    BackdropClick = false       // Prevent clicking outside to close
-            //};
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
 
-            //var dialog = DialogService.Show<EmailVerificationSentDialog>(
-            //    "Verify Your Email",
-            //    parameters,
-            //    options);
+            // Show the verify email dialog box
+            var dialog = await DialogService.ShowAsync<EmailVerificationSentDialog>("Verify Your Email", parameters, options);
 
-            //var result = await dialog.Result;
-
-            //if (!result.Canceled)
-            //{
-            //    // Redirect user to Login page after dialog confirmation
-            //    Nav.NavigateTo("/login", true);
-            //}
+            var result = await dialog.Result;
+            if (!result!.Canceled)
+            {
+                // Redirect user to Login page after dialog confirmation
+                Nav.NavigateTo("/login", true);
+            }
         }
         #endregion
 

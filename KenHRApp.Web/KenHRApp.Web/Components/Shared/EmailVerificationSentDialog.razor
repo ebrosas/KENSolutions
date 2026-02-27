@@ -1,0 +1,62 @@
+﻿@using MudBlazor
+@inject NavigationManager Nav
+
+<MudDialog>
+
+    <DialogContent>
+
+        <MudStack Spacing="3" AlignItems="AlignItems.Center">
+
+            <MudIcon Icon="@Icons.Material.Filled.MarkEmailRead"
+                     Size="Size.Large"
+                     Color="Color.Primary" />
+
+            <MudText Typo="Typo.h6" Align="Align.Center">
+                Verification Email Sent
+            </MudText>
+
+            <MudText Typo="Typo.body2" Align="Align.Center">
+                A verification link has been sent to:
+            </MudText>
+
+            <MudText Typo="Typo.subtitle2"
+                     Align="Align.Center"
+                     Class="fw-bold">
+                @Email
+            </MudText>
+
+            <MudText Typo="Typo.caption"
+                     Align="Align.Center"
+                     Class="text-muted">
+                Please check your inbox (and spam folder).
+                Click the link to activate your account.
+            </MudText>
+
+        </MudStack>
+
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   OnClick="GoToLogin">
+            Go to Login
+        </MudButton>
+
+    </DialogActions>
+
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public string Email { get; set; } = string.Empty;
+
+    private void GoToLogin()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}
