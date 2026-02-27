@@ -2,10 +2,12 @@
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace KenHRApp.Application.Services
@@ -142,36 +144,7 @@ namespace KenHRApp.Application.Services
                         throw new Exception(result.Error);
                     else
                         throw new Exception("Unable to unlock user account due to an unknown error. Please refresh the page then try again!");
-                }
-
-                //if (!repoResult.Success)
-                //{
-                //    return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
-                //}
-
-                //var employee = repoResult.Value;
-                //if (employee == null)
-                //{
-                //    throw new Exception("Unable to find a matching employee in the database with the specified Date of Birth and Joining Date.");
-                //}
-
-                //if (employee.DOB!.Value.Date != dto.DateOfBirth.Date ||
-                //    employee.HireDate.Date != dto.DateOfJoining.Date)
-                //{
-                //    throw new Exception("Either the specified Date of Birth or Joining Date does not matched with the record in the database.");
-                //}
-
-                //employee.UnlockAccount();
-                //await _repository.UpdateAsync(employee);
-
-                //await _emailService.SendAsync(
-                //    employee.OfficialEmail,
-                //    "Security Code",
-                //    "<p>Your security code is: <b>123456</b></p>",
-                //    true);
-
-                //return Result<bool>.SuccessResult(true);
-
+                }                                
 
                 return Result<int>.SuccessResult(result.Value);
             }
@@ -272,6 +245,79 @@ namespace KenHRApp.Application.Services
             catch (Exception ex)
             {
                 return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in LoginAsync() method.");
+            }
+        }               
+
+        public async Task<Result<bool>> SendVerificationEmailAsync(string email, int empNo, DateTime doj, 
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var token = await GenerateEmailVerificationTokenAsync(empNo, doj, cancellationToken);
+
+                if (string.IsNullOrEmpty(token))
+                    return Result<bool>.Failure("Unable to generate email verification token!");
+
+                var verificationLink =
+                    $"https://yourdomain.com/UserAccount/VerifyEmail?token={Uri.EscapeDataString(token)}";
+
+                await _emailService.SendAsync(email,
+                    "Verify your KenHR account",
+                    $"Click here to verify your account: {verificationLink}");
+
+                return Result<bool>.SuccessResult(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in LoginAsync() method.");
+            }
+        }
+
+        public async Task<string?> GenerateEmailVerificationTokenAsync(int empNo, DateTime doj, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var repoResult = await _repository.GenerateEmailVerificationTokenAsync(empNo,
+                    doj, cancellationToken);
+                if (!repoResult.Success)
+                {
+                    return null;
+                }
+
+                var token = repoResult.Value;
+                if (token == null)
+                {
+                    throw new Exception("Employee not found.");
+                }
+                else
+                    return token.ToString();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<Result<bool>> VerifyEmailTokenAsync(string token, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var repoResult = await _repository.VerifyEmailTokenAsync(token, cancellationToken);
+                if (!repoResult.Success)
+                {
+                    return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+                
+                if (repoResult!.Value == null)
+                {
+                    throw new Exception("Unable to verify token due to unknown error in the DB!");
+                }
+
+                return Result<bool>.SuccessResult(repoResult.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in VerifyEmailTokenAsync() method.");
             }
         }
         #endregion

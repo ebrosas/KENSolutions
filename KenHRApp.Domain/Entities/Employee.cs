@@ -321,6 +321,15 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "varchar(50)")]
         public string? SecurityAnswer3 { get; set; } = null;
+
+        [Column(TypeName = "varchar(500)")]
+        public string? EmailVerificationToken { get; set; }
+
+        [Column(TypeName = "datetime")]
+        public DateTime? EmailVerificationTokenExpiry { get; set; }
+
+        [Column(TypeName = "bit")]
+        public bool IsEmailVerified { get; set; }
         #endregion
 
         #region Extended Properties

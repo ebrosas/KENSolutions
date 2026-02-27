@@ -1,14 +1,17 @@
 
-	SELECT	a.FailedLoginAttempts, a.IsLocked, a.PasswordHash, a.UserID, a.OfficialEmail, a.PersonalEmail,
+	SELECT	a.EmployeeNo, a.EmployeeId, a.FailedLoginAttempts, a.IsLocked, a.PasswordHash, a.UserID, a.OfficialEmail, a.PersonalEmail,
+			a.HireDate, a.OfficialEmail, 
+			a.EmailVerificationToken, a.EmailVerificationTokenExpiry, a.IsEmailVerified,
 			a.* 
 	FROM [kenuser].[Employee] a
 	WHERE a.EmployeeNo = 10003632
 
 	SELECT	a.EmployeeNo, a.EmployeeId, a.FailedLoginAttempts, a.IsLocked, a.PasswordHash, a.UserID, a.OfficialEmail, a.PersonalEmail,
-			a.HireDate, a.OfficialEmail,
+			a.HireDate, a.OfficialEmail, 
+			a.EmailVerificationToken, a.EmailVerificationTokenExpiry, a.IsEmailVerified,
 			a.* 
 	FROM [kenuser].[Employee] a
-	WHERE a.EmployeeNo = 10003636
+	--WHERE a.EmployeeNo = 10003636
 
 	
 

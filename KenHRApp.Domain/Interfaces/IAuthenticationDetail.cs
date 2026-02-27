@@ -12,5 +12,8 @@ namespace KenHRApp.Domain.Interfaces
         string? PasswordHash { get; set; }
         int FailedLoginAttempts { get; set; }
         bool IsLocked { get; set; }
+        string? EmailVerificationToken { get; set; }
+        DateTime? EmailVerificationTokenExpiry { get; set; }
+        bool IsEmailVerified { get; set; }
     }
 }

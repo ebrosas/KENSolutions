@@ -10,8 +10,8 @@ namespace KenHRApp.Application.Common.Validations
 {
     public class PasswordComplexityAttribute : ValidationAttribute
     {
-        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
-       {
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+    {
             if (value == null)
                 return new ValidationResult("Password is required.");
 

@@ -7,6 +7,7 @@ using MudBlazor;
 using System.Text;
 using System.Text.Json;
 using KenHRApp.Web.Components.Shared;
+using System.ComponentModel.DataAnnotations;
 
 namespace KenHRApp.Web.Components.Pages.UserAccount
 {
@@ -33,6 +34,11 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
         protected InputType RetypePasswordInputType = InputType.Password;
         protected string PasswordIcon = Icons.Material.Filled.VisibilityOff;
         protected string RetypePasswordIcon = Icons.Material.Filled.VisibilityOff;
+        private int _passwordStrength = 0;
+        private string _passwordStrengthText = string.Empty;
+        private Color _passwordStrengthColor = Color.Default;
+        private bool _isPasswordValid = false;
+        private bool _isUserIdValid = false;
 
         #region Flags
         private bool _hasValidationError = false;
@@ -279,6 +285,109 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
                 Nav.NavigateTo("/login", true);
             }
         }
+
+        private void OnPasswordChanged()
+        {
+            EvaluatePasswordStrength(Model.Password);
+        }
+        private void EvaluatePasswordStrength(string password)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(password))
+                {
+                    _passwordStrength = 0;
+                    _passwordStrengthText = string.Empty;
+                    _passwordStrengthColor = Color.Default;
+                    _isPasswordValid = false;
+                    return;
+                }
+
+                int score = 0;
+
+                if (password.Length >= 8) score++;
+                if (System.Text.RegularExpressions.Regex.IsMatch(password, @"[A-Z]")) score++;
+                if (System.Text.RegularExpressions.Regex.IsMatch(password, @"[a-z]")) score++;
+                if (System.Text.RegularExpressions.Regex.IsMatch(password, @"[0-9]")) score++;
+                if (System.Text.RegularExpressions.Regex.IsMatch(password, @"[\W_]")) score++;
+
+                _passwordStrength = score * 20;
+
+                switch (score)
+                {
+                    case <= 2:
+                        _passwordStrengthText = "Weak";
+                        _passwordStrengthColor = Color.Error;
+                        break;
+                    case 3:
+                        _passwordStrengthText = "Moderate";
+                        _passwordStrengthColor = Color.Warning;
+                        break;
+                    case 4:
+                        _passwordStrengthText = "Strong";
+                        _passwordStrengthColor = Color.Info;
+                        break;
+                    case 5:
+                        _passwordStrengthText = "Very Strong";
+                        _passwordStrengthColor = Color.Success;
+                        _isPasswordValid = true;
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage(MessageBoxTypes.Error, "System Error", ex.Message.ToString());
+            }
+        }
+
+        private void OnUserIDChanged()
+        {
+            EvaluateUserId(Model.UserID);
+        }
+        private void EvaluateUserId(string value)
+        {
+            var context = new ValidationContext(Model)
+            {
+                MemberName = nameof(Model.UserID)
+            };
+
+            var results = new List<ValidationResult>();
+
+            _isUserIdValid = Validator.TryValidateProperty(
+                value,
+                context,
+                results);
+        }
+
+        private async Task ShowEmailVerificationDialog()
+        {
+            //var parameters = new DialogParameters
+            //{
+            //    { nameof(EmailVerificationSentDialog.Email), Model.Email }
+            //};
+
+            //var options = new DialogOptions
+            //{
+            //    CloseButton = true,
+            //    MaxWidth = MaxWidth.Small,
+            //    Position = DialogPosition.TopCenter,
+            //    CloseOnEscapeKey = true,   // Prevent ESC from closing
+            //    BackdropClick = false       // Prevent clicking outside to close
+            //};
+
+            //var dialog = DialogService.Show<EmailVerificationSentDialog>(
+            //    "Verify Your Email",
+            //    parameters,
+            //    options);
+
+            //var result = await dialog.Result;
+
+            //if (!result.Canceled)
+            //{
+            //    // Redirect user to Login page after dialog confirmation
+            //    Nav.NavigateTo("/login", true);
+            //}
+        }
         #endregion
 
         #region Service Methods
@@ -302,9 +411,15 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
                     // Hide error message if any
                     ShowHideError(false);
 
+                    await AuthService.SendVerificationEmailAsync(Model.Email, 
+                        Convert.ToInt32(Model.EmployeeNo), 
+                        Model.DOJ!.Value.Date, _cts.Token);
+
+                    await ShowEmailVerificationDialog();
+
                     // Show notification
                     //ShowNotification("User account has benn registered successfully!", SnackBarTypes.Success);
-                    await ShowSuccessDialog();
+                    //await ShowSuccessDialog();
                 }
                 else
                 {

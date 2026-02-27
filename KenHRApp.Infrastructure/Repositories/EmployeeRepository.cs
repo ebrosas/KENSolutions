@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using KenHRApp.Domain.Entities;
 using KenHRApp.Domain.Models.Common;
@@ -2046,6 +2047,97 @@ namespace KenHRApp.Infrastructure.Repositories
                     return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
                 else
                     return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<bool>> VerifyEmailTokenAsync(string token, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    throw new ArgumentException(
+                       "Token must be provided.",
+                       nameof(token));
+                }
+
+                // Decode token if you encoded it when sending
+                var decodedToken = token.Trim();
+
+                // Find user by token
+                var user = await _db.Employees
+                    .FirstOrDefaultAsync(u => u.EmailVerificationToken == decodedToken);
+
+                if (user == null)
+                {
+                    throw new KeyNotFoundException(
+                        "Could not find employee with the specified email verification token.");
+                }
+
+                // Check if already verified
+                if (user.IsEmailVerified)
+                {
+                    throw new ArgumentException(
+                       "User account was already verified in the system.",
+                       nameof(token));
+                }
+
+                // Check token expiry
+                if (user.EmailVerificationTokenExpiry == null ||
+                    user.EmailVerificationTokenExpiry < DateTime.UtcNow)
+                {
+                    throw new ArgumentException(
+                       "The token provided was already expired!",
+                       nameof(token));
+                }
+
+                // Mark email as verified
+                user.IsEmailVerified = true;
+
+                // Clear token after successful verification
+                user.EmailVerificationToken = null;
+                user.EmailVerificationTokenExpiry = null;
+
+                await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<bool>.SuccessResult(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in VerifyEmailTokenAsync() method.");
+            }
+        }
+
+        public async Task<Result<string>> GenerateEmailVerificationTokenAsync(int empNo, DateTime doj, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+
+                // Find user by Employee No. and DOJ
+                var user = await _db.Employees
+                    .FirstOrDefaultAsync(e =>
+                        e.EmployeeNo == empNo &&
+                        e.HireDate == doj,
+                        cancellationToken);
+
+                if (user == null)
+                {
+                    throw new KeyNotFoundException(
+                        "Could not find employee with the specified Employee No. and Joining Date.");
+                }
+
+                user.EmailVerificationToken = token;
+                user.EmailVerificationTokenExpiry = DateTime.UtcNow.AddMinutes(30);
+
+                // Save to database
+                await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<string>.SuccessResult(token);
+            }
+            catch (Exception ex)
+            {
+                return Result<string>.Failure(ex.Message.ToString() ?? "Unknown error in GenerateEmailVerificationTokenAsync() method.");
             }
         }
         #endregion
