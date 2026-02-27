@@ -48,10 +48,11 @@
                     }
                     
                     <MudPaper Elevation="12" Class="pa-6 pa-md-8 login-card">
-
-                        <MudText Typo="Typo.h5" Align="Align.Center" Style="color:#004165;" Class="fw-bold mb-3">
-                            User Account Registration
-                        </MudText>
+                        <MudPaper Elevation="0" Class="mb-4">
+                            <MudText Typo="Typo.h5" Align="Align.Center" Style="color:#004165;" Class="fw-bold">
+                                User Account Registration
+                            </MudText>
+                        </MudPaper>
 
                         @if (_showErrorAlert)
                         {
@@ -64,12 +65,12 @@
                         <MudPaper Elevation="0" Class="mt-3">
                             <MudTextField @bind-Value="Model.EmployeeNo"
                                       Label="Employee No."
-                                      Variant="Variant.Outlined"
+                                      Variant="Variant.Outlined" 
                                           Adornment="Adornment.End"
                                       AdornmentIcon="@Icons.Material.Filled.Person"
                                       Required="true"
                                       FullWidth="true"                                      
-                                      Class="mb-3" 
+                                      Class="mb-3"  
                                       Margin="Margin.Dense"
                                       Disabled="@_btnProcessing" />
 
@@ -100,17 +101,19 @@
                                 Required="true"
                                 FullWidth="true"
                                 MaxLength="40"                                      
-                                Class="mb-4"       
+                                Class="mb-2"       
                                 Margin="Margin.Dense"
                                 Disabled="@_btnProcessing" />
 
                             @if (!_isUserIdValid)
                             {
-                                <MudText Typo="Typo.caption" Class="text-muted mb-3">
-                                    • Minimum 5 characters <br />
-                                    • Must start with a letter or number <br />
-                                    • Cannot contain: '  ;  --  /  \  %
-                                </MudText>
+                                <MudPaper Elevation="0" Class="ps-2">
+                                    <MudText Typo="Typo.caption" Class="text-muted mb-3">
+                                        • Minimum 5 characters <br />
+                                        • Must start with a letter or number <br />
+                                        • Cannot contain: '  ;  --  /  \  %
+                                    </MudText>
+                                </MudPaper>
                             }
 
                             <MudTextField Label="Email"
@@ -161,12 +164,14 @@
 
                             @if (!_isPasswordValid)
                             {
-                                <MudText Typo="Typo.caption" Class="text-muted mb-3">
-                                    • Minimum 8 characters <br />
-                                    • Must contain uppercase and lowercase letters <br />
-                                    • Must contain at least 1 number <br />
-                                    • Must contain at least 1 special character
-                                </MudText>
+                                <MudPaper Elevation="0" Class="ps-2">
+                                    <MudText Typo="Typo.caption" Class="text-muted mb-3">
+                                        • Minimum 8 characters <br />
+                                        • Must contain uppercase and lowercase letters <br />
+                                        • Must contain at least 1 number <br />
+                                        • Must contain at least 1 special character
+                                    </MudText>
+                                </MudPaper>                                
                             }
 
                             <MudTextField @bind-Value="Model.RetypePassword"
@@ -212,7 +217,8 @@
                                        FullWidth="false"
                                        Class="mt-3"
                                        Size="Size.Medium"
-                                       Disabled="@_btnProcessing">
+                                       Disabled="@_btnProcessing"
+                                       OnClick="OnResetClicked">
                                 Reset
                             </MudButton>
                             <MudButton Variant="Variant.Text"

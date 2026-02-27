@@ -16,6 +16,7 @@ using KenHRApp.Domain.Entities;
 using KenHRApp.Domain.Interfaces;
 using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.Common.Services;
+using KenHRApp.Infrastructure.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+builder.Services.Configure<AppSettings>(
+    builder.Configuration.GetSection("AppSettings"));
 
 #region Initialize DI container
 builder.Services.AddMudServices();
@@ -50,6 +54,7 @@ builder.Services.AddScoped<IPasswordHasher, PasswordHasherService>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
+builder.Services.AddScoped<IAppUrlProvider, AppUrlProvider>();
 #endregion
 
 builder.Services.AddAuthentication(options =>

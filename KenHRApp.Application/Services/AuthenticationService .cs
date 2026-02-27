@@ -1,4 +1,5 @@
-﻿using KenHRApp.Application.DTOs;
+﻿using KenHRApp.Application.Common.Interfaces;
+using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Repositories;
@@ -18,17 +19,20 @@ namespace KenHRApp.Application.Services
         private readonly IEmployeeRepository _repository;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IEmailService _emailService;
+        private readonly IAppUrlProvider _appUrlProvider;
         #endregion
 
         #region Constructor
         public AuthenticationService(
             IEmployeeRepository repository,
             IPasswordHasher passwordHasher,
-            IEmailService emailService)
+            IEmailService emailService,
+            IAppUrlProvider appUrlProvider)
         {
             _repository = repository;
             _passwordHasher = passwordHasher;
             _emailService = emailService;
+            _appUrlProvider = appUrlProvider;
         }
         #endregion
 
@@ -248,22 +252,59 @@ namespace KenHRApp.Application.Services
             }
         }               
 
-        public async Task<Result<bool>> SendVerificationEmailAsync(string email, int empNo, DateTime doj, 
+        public async Task<Result<bool>> SendVerificationEmailAsync(
+            string email, 
+            int empNo, 
+            DateTime doj, 
             CancellationToken cancellationToken = default)
         {
             try
             {
-                var token = await GenerateEmailVerificationTokenAsync(empNo, doj, cancellationToken);
+                var token = await GenerateEmailVerificationTokenAsync(
+                    empNo, 
+                    doj, 
+                    cancellationToken);
 
                 if (string.IsNullOrEmpty(token))
                     return Result<bool>.Failure("Unable to generate email verification token!");
 
-                var verificationLink =
-                    $"https://yourdomain.com/UserAccount/VerifyEmail?token={Uri.EscapeDataString(token)}";
+                //var verificationLink =
+                //    $"https://yourdomain.com/UserAccount/VerifyEmail?token={Uri.EscapeDataString(token)}";
 
-                await _emailService.SendAsync(email,
-                    "Verify your KenHR account",
-                    $"Click here to verify your account: {verificationLink}");
+                var verificationLink = _appUrlProvider
+                    .GetEmailVerificationUrl(token);
+
+                #region Build the email contents
+                var subject = "Verify your KenHR account";
+
+                var body = $@"
+                    Hello,
+
+                    Thank you for registering with KenHR.
+
+                    Please verify your email by clicking the link below:
+
+                    {verificationLink}
+
+                    Note that the verification link is valid for 24 hours only. If you did not initiate this request, please ignore this email.
+
+                    Regards,
+                    KenHR Team";
+                #endregion
+
+                try
+                {
+                    await _emailService.SendAsync(email, subject, body);
+                }
+                catch (Exception emailErr)
+                {
+                    //throw;
+                }
+                
+
+                //await _emailService.SendAsync(email,
+                //    "Verify your KenHR account",
+                //    $"Click here to verify your account: {verificationLink}");
 
                 return Result<bool>.SuccessResult(true);
             }

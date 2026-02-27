@@ -2128,7 +2128,7 @@ namespace KenHRApp.Infrastructure.Repositories
                 }
 
                 user.EmailVerificationToken = token;
-                user.EmailVerificationTokenExpiry = DateTime.UtcNow.AddMinutes(30);
+                user.EmailVerificationTokenExpiry = DateTime.UtcNow.AddHours(24);
 
                 // Save to database
                 await _db.SaveChangesAsync(cancellationToken);

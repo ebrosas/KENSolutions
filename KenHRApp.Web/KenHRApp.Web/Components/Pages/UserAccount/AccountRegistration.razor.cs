@@ -385,6 +385,19 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
                 Nav.NavigateTo("/login", true);
             }
         }
+
+        private void OnResetClicked()
+        {
+            // Reset data model
+            Model = new();
+
+            // Reset flags
+            _passwordStrength = 0;
+            _passwordStrengthText = string.Empty;
+            _passwordStrengthColor = Color.Default;
+            _isPasswordValid = false;
+            _isUserIdValid = false;
+        }
         #endregion
 
         #region Service Methods
