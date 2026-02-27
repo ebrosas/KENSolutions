@@ -28,6 +28,10 @@
 	SET EmployeeNo = 10003589
 	WHERE EmployeeId = 1006
 
+	UPDATE [kenuser].[Employee]
+	SET IsEmailVerified = 0
+	WHERE EmployeeNo = 10003632
+
 	COMMIT TRAN T1
 	ROLLBACK TRAN T1
 

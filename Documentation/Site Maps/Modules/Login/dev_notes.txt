@@ -1,0 +1,2 @@
+{baseUrl}/UserAccount/VerifyEmail?token={Uri.EscapeDataString(token)}
+https://localhost:7280/UserAccount/VerifyEmail?token=WmPauHQ/Ck6K1pSG66Lb2w==

@@ -268,9 +268,6 @@ namespace KenHRApp.Application.Services
                 if (string.IsNullOrEmpty(token))
                     return Result<bool>.Failure("Unable to generate email verification token!");
 
-                //var verificationLink =
-                //    $"https://yourdomain.com/UserAccount/VerifyEmail?token={Uri.EscapeDataString(token)}";
-
                 var verificationLink = _appUrlProvider
                     .GetEmailVerificationUrl(token);
 
@@ -300,11 +297,6 @@ namespace KenHRApp.Application.Services
                 {
                     //throw;
                 }
-                
-
-                //await _emailService.SendAsync(email,
-                //    "Verify your KenHR account",
-                //    $"Click here to verify your account: {verificationLink}");
 
                 return Result<bool>.SuccessResult(true);
             }

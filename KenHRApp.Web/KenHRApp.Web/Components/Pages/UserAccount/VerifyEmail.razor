@@ -1,0 +1,67 @@
+﻿@page "/UserAccount/VerifyEmail"
+@inject NavigationManager Nav
+@inject IAuthenticationService AuthService
+
+<MudPaper Class="pa-6">
+
+    @if (_verified)
+    {
+        <MudAlert Severity="Severity.Success">
+            Email successfully verified!
+        </MudAlert>
+
+        <MudButton OnClick="GoToLogin" Color="Color.Primary">
+            Go to Login
+        </MudButton>
+    }
+    else if (_invalid)
+    {
+        <MudAlert Severity="Severity.Error">
+            Invalid or expired verification link.
+        </MudAlert>
+    }
+
+</MudPaper>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? Token { get; set; }
+
+    private bool _verified;
+    private bool _invalid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(Token))
+        {
+            var repoResult = await AuthService.VerifyEmailTokenAsync(Token);
+            if (repoResult.Success)
+            {
+                _verified = repoResult.Value;
+                _invalid = !_verified;
+            }
+        }
+    }
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         if (!string.IsNullOrWhiteSpace(Token))
+    //         {
+    //             var repoResult = await AuthService.VerifyEmailTokenAsync(Token);
+    //             if (repoResult.Success)
+    //             {
+    //                 _verified = repoResult.Value;
+    //                 _invalid = !_verified;
+    //             }
+    //         }
+    //     }
+    // }
+
+    private void GoToLogin()
+    {
+        Nav.NavigateTo("/login", true);
+    }
+}
