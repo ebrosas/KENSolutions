@@ -12,5 +12,6 @@ namespace KenHRApp.Application.Interfaces
         bool ShowAppDrawer { get; set; }
         bool IsAuthenticated { get; set; }
         RecruitmentRequestDTO? RecruitmentRequest { get; set; }
+        EmployeeDTO? AuthenticatedUser { get; set; }
     }
 }

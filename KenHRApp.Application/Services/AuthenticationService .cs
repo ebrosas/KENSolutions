@@ -4,6 +4,7 @@ using KenHRApp.Application.Interfaces;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,12 +65,6 @@ namespace KenHRApp.Application.Services
                     return Result<LoginResponseDTO>.Failure("Account is locked.");
                 }
 
-                //string testHashPwd = _passwordHasher.Hash("Garmco#1017");
-
-                //var isValid = _passwordHasher.Verify(
-                //    testHashPwd,
-                //    request.Password);
-
                 var isValid = _passwordHasher.Verify(
                     employee.PasswordHash!,
                     request.Password);
@@ -86,7 +81,19 @@ namespace KenHRApp.Application.Services
 
                 return Result<LoginResponseDTO>.SuccessResult(new LoginResponseDTO
                 {
-                    IsSuccess = true
+                    IsSuccess = true,
+                    AuthenticatedUser = new EmployeeDTO()
+                    {
+                        EmployeeId = employee.EmployeeId,
+                        EmployeeNo = employee.EmployeeNo,
+                        FirstName = employee.FirstName,
+                        MiddleName = employee.MiddleName,
+                        LastName = employee.LastName,
+                        HireDate = employee.HireDate,
+                        DOB = employee.DOB,
+                        DepartmentCode = employee.DepartmentCode,
+                        DepartmentName = employee.DepartmentName
+                    }
                 });
             }
             catch (Exception ex)
@@ -130,7 +137,7 @@ namespace KenHRApp.Application.Services
             }
             catch (Exception ex)
             {
-                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in LoginAsync() method.");
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in UnlockAccountAsyncOld() method.");
             }
         }
 
@@ -199,7 +206,7 @@ namespace KenHRApp.Application.Services
             }
             catch (Exception ex)
             {
-                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in LoginAsync() method.");
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in ForgotPasswordAsync() method.");
             }
         }
 
@@ -248,7 +255,7 @@ namespace KenHRApp.Application.Services
             }
             catch (Exception ex)
             {
-                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in LoginAsync() method.");
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in RegisterUserAccountAsync() method.");
             }
         }               
 
@@ -302,7 +309,7 @@ namespace KenHRApp.Application.Services
             }
             catch (Exception ex)
             {
-                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in LoginAsync() method.");
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in SendVerificationEmailAsync() method.");
             }
         }
 

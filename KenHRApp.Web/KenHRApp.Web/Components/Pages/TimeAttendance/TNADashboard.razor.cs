@@ -4,6 +4,7 @@ using KenHRApp.Application.Interfaces;
 using KenHRApp.Application.Services;
 using KenHRApp.Domain.Entities;
 using KenHRApp.Domain.Models.Common;
+using KenHRApp.Web.Components.Common.Interface;
 using KenHRApp.Web.Components.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -13,7 +14,7 @@ using System.Text;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
-    public partial class TNADashboard
+    public partial class TNADashboard : IPageAuthorization
     {
         #region Parameters and Injections
         [Inject] private IAttendanceService AttendanceService { get; set; } = default!;
@@ -21,7 +22,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
-        [Inject] private IAppState AppState { get; set; } = default!;
+        [Inject] private IAppState State { get; set; } = default!;
         #endregion
 
         #region Fields
@@ -50,6 +51,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string _pickerStyle = "width: 420px;";
         private string _payrollPeriodKey = null!;
         private int _selectedFiscalYear;
+        private string _userName = "Anonymous User";
         #endregion
 
         #region Flags
@@ -122,6 +124,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         }
         #endregion
 
+        #region IPageAuthorization Implementation
+        public void GoToLogin()
+        {
+            Navigation.NavigateTo("/login");
+        }
+
+        #endregion
+
         #region Page Events
         protected override async Task OnInitializedAsync()
         {
@@ -133,6 +143,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             await LoadPayrollPeriodsAsync(_selectedFiscalYear);
             BeginGetAttendanceSummary();                        
+        }
+
+        protected override void OnAfterRender(bool firstRender)
+        {
+            if (!State.IsAuthenticated)
+                GoToLogin();
+
+            _userName = State.AuthenticatedUser.EmployeeFullName;
         }
         #endregion
 

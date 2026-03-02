@@ -278,6 +278,7 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
 
                     // Set authentication state
                     State.IsAuthenticated = true;
+                    State.AuthenticatedUser = repoResult!.Value.AuthenticatedUser;
                 }
                 else
                 {

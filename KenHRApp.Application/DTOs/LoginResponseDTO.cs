@@ -12,6 +12,7 @@ namespace KenHRApp.Application.DTOs
         public bool IsSuccess { get; set; }
         public string ErrorMessage { get; set; } = null!;
         public int FailedAttempts { get; set; }
+        public EmployeeDTO? AuthenticatedUser { get; set; } = null;
         #endregion
     }
 }
