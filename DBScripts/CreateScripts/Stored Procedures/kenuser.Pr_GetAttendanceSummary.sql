@@ -6,7 +6,7 @@
 *
 *	Date			Author		Rev. #		Comments:
 *	11/01/2026		Ervin		1.0			Created
-*	
+*	06/03/2026		Ervin		1.1			Use ISNULL clause for concatenating the first name, middle name, and last name
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetAttendanceSummary
@@ -24,7 +24,7 @@ BEGIN
 	DECLARE @fiscalYear	INT = YEAR(GETDATE())
 
 	SELECT	a.EmployeeNo,
-			RTRIM(a.FirstName) + RTRIM(a.MiddleName) + ' ' + RTRIM(a.LastName) AS EmployeeName,
+			RTRIM(ISNULL(a.FirstName, '')) + RTRIM(ISNULL(a.MiddleName, '')) + ' ' + RTRIM(ISNULL(a.LastName, '')) AS EmployeeName,		--Rev. #1.1
 			RTRIM(b.ShiftPatternCode) AS ShiftRoster,
 			b.ShiftPatternDescription AS ShiftRosterDesc,			
 			FORMAT(CAST(b.SchedTimeIn AS DATETIME), 'hh:mm tt') + ' - ' + FORMAT(CAST(b.SchedTimeOut AS DATETIME), 'hh:mm tt') AS ShiftTiming,
@@ -119,7 +119,7 @@ PARAMETERS:
 	@endDate			DATETIME
 
 	EXEC kenuser.Pr_GetAttendanceSummary 10003632, '02/01/2026', '02/28/2026'
-	EXEC kenuser.Pr_GetAttendanceSummary 10003632, '01/16/2026', '02/15/2026'
+	EXEC kenuser.Pr_GetAttendanceSummary 10003636, '01/16/2026', '02/15/2026'
 	EXEC kenuser.Pr_GetAttendanceSummary 10003632, '02/16/2026', '03/15/2026'
 
 */

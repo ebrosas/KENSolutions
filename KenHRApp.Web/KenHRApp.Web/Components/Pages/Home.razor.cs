@@ -19,17 +19,20 @@ namespace KenHRApp.Web.Components.Pages
         #region Page Events
         protected override void OnInitialized()
         {
-                //Navigation.NavigateTo("/TimeAttendance/tnadashboard", replace: true);   //(Notes: replace: true prevents back-button loop)
-                //Navigation.NavigateTo("/TimeAttendance/tnadashboard", true);
+           
+
+            //Navigation.NavigateTo("/TimeAttendance/tnadashboard", replace: true);   //(Notes: replace: true prevents back-button loop)
+            //Navigation.NavigateTo("/TimeAttendance/tnadashboard", true);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (firstRender && !_redirected)
-            {
-                _redirected = true;
-                Navigation.NavigateTo("/TimeAttendance/tnadashboard", replace: true);
-            }
+            //if (firstRender && !_redirected)
+            //{
+            //    _redirected = true;
+            //    Navigation.NavigateTo("/login", true);
+            //    //Navigation.NavigateTo("/TimeAttendance/tnadashboard", replace: true);
+            //}
         }
         #endregion
     }

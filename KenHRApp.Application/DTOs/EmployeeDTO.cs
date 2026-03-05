@@ -361,6 +361,14 @@ namespace KenHRApp.Application.DTOs
             }
         }
 
+        public string EmployeeShortName
+        {
+            get
+            {
+                return $"{FirstName} {LastName}";
+            }
+        }
+
         public string Tenure
         {
             get

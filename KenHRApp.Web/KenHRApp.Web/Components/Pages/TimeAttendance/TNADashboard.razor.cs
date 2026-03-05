@@ -39,7 +39,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private int currentPage = 1;
         private int pageSize = 5;
         private int pageCount => (int)Math.Ceiling((double)_holidayList.Count / pageSize);        
-        private int _currentEmpNo = 10003632;
+        private int _currentEmpNo = 0;
         private DateTime _payrollStartDate = new DateTime(2026, 1, 16);
         private DateTime _payrollEndDate = new DateTime(2026, 2, 15);
         private int _fiscalYear = DateTime.Now.Year;
@@ -138,19 +138,32 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Initialize the EditContext 
             _editContext = new EditContext(_swipeLog);
 
-            PopulateFiscalYears();
-            _selectedFiscalYear = DateTime.Now.Year;
+            //PopulateFiscalYears();
+            //_selectedFiscalYear = DateTime.Now.Year;
 
-            await LoadPayrollPeriodsAsync(_selectedFiscalYear);
-            BeginGetAttendanceSummary();                        
+            //await LoadPayrollPeriodsAsync(_selectedFiscalYear);
+            //BeginGetAttendanceSummary();                        
         }
 
-        protected override void OnAfterRender(bool firstRender)
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!State.IsAuthenticated)
-                GoToLogin();
+            if (firstRender)
+            {
+                if (!State.IsAuthenticated)
+                    GoToLogin();
 
-            _userName = State.AuthenticatedUser.EmployeeFullName;
+                PopulateFiscalYears();
+                _selectedFiscalYear = DateTime.Now.Year;
+                await LoadPayrollPeriodsAsync(_selectedFiscalYear);
+
+                if (State.AuthenticatedUser != null)
+                {
+                    _userName = State.AuthenticatedUser!.EmployeeShortName;
+                    _currentEmpNo = State.AuthenticatedUser.EmployeeNo;
+                    
+                    BeginGetAttendanceSummary();
+                }
+            }
         }
         #endregion
 

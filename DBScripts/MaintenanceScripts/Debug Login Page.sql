@@ -6,12 +6,14 @@
 	FROM [kenuser].[Employee] a
 	WHERE a.EmployeeNo = 10003632
 
-	SELECT	a.EmployeeNo, a.EmployeeId, a.FailedLoginAttempts, a.IsLocked, a.PasswordHash, a.UserID, a.OfficialEmail, a.PersonalEmail,
+	SELECT	a.EmployeeNo, a.EmployeeId, 
+			RTRIM(ISNULL(a.FirstName, '')) + RTRIM(ISNULL(a.MiddleName, '')) + ' ' + RTRIM(ISNULL(a.LastName, '')) AS EmployeeName,
+			a.FailedLoginAttempts, a.IsLocked, a.PasswordHash, a.UserID, a.OfficialEmail, a.PersonalEmail,
 			a.HireDate, a.OfficialEmail, 
 			a.EmailVerificationToken, a.EmailVerificationTokenExpiry, a.IsEmailVerified,
 			a.* 
 	FROM [kenuser].[Employee] a
-	--WHERE a.EmployeeNo = 10003636
+	WHERE a.EmployeeNo = 10003636
 
 	
 
@@ -29,8 +31,8 @@
 	WHERE EmployeeId = 1006
 
 	UPDATE [kenuser].[Employee]
-	SET IsEmailVerified = 0
-	WHERE EmployeeNo = 10003632
+	SET IsEmailVerified = 1
+	WHERE EmployeeNo = 10003637
 
 	COMMIT TRAN T1
 	ROLLBACK TRAN T1

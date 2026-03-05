@@ -1,4 +1,5 @@
-﻿@page "/login"
+﻿@page "/"
+@page "/login"
 @layout KenHRApp.Web.Components.Layout.LoginLayout
 @inject IJSRuntime JS
 
@@ -84,13 +85,15 @@
                                       Class="mb-3"
                                       Disabled="@_btnProcessing" />
 
-                        <MudStack Row Justify="Justify.SpaceBetween" Class="mb-4">
+                        <MudStack Row Justify="Justify.SpaceBetween" Breakpoint="Breakpoint.Xs" Class="mb-4">
                              <MudCheckBox T="bool"
                                           @bind-Checked="Model.RememberMe"
+                                          Dense="true"
+                                          UncheckedColor="Color.Surface"
+                                          Color="Color.Success" 
                                           Disabled="@_btnProcessing">
                                  Remember Me
                              </MudCheckBox>
-
                              <MudLink OnClick="ForgotPassword" Disabled="@_btnProcessing" Color="Color.Error" Typo="Typo.body2">
                                  Forgot Password?
                              </MudLink>
@@ -110,7 +113,7 @@
                                 <MudProgressCircular Size="Size.Small"
                                                      Indeterminate="true"
                                                      Class="me-2" />
-                                <span>Logging in...</span>
+                                <span>Signing in...</span>
                             }
                             else
                             {
