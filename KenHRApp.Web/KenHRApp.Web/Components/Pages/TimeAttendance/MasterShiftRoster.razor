@@ -30,77 +30,118 @@
         }
 
         <MudPaper class="paper-header w-100 px-4" Elevation="0">          
-            <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="4" Class="mud-primary-text" />
-            <MudSpacer></MudSpacer>
-            <MudPaper Elevation="0">
-                @if (ActionType == ActionTypes.Edit.ToString() || 
-                    ActionType == ActionTypes.View.ToString())
-                {
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit"
-                               Size="Size.Small" Color="Color.Surface" Disabled="@(_isEditMode)" OnClick="HandleEditButton">
-                        Edit
-                    </MudButton>
-                }
+            <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" 
+                Class="mud-width-full"
+                StretchItems="StretchItems.End" Breakpoint="Breakpoint.Xs">
+                <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" 
+                    MaxItems="4" Class="mud-primary-text" />
+                @* <MudSpacer /> *@
+                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexEnd" Spacing="2">
+                    @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
+                    {
+                        <MudButton Variant="Variant.Filled" 
+                            StartIcon="@Icons.Material.Filled.Edit"
+                            Size="Size.Small" 
+                            Color="Color.Primary"
+                            Style="background-color:#004165;"
+                            Disabled="@(_isEditMode)" 
+                            OnClick="HandleEditButton">
+                            Edit
+                        </MudButton>
+                    }
 
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" ButtonType="ButtonType.Submit" Class="ml-1"
-                           Size="Size.Small" Color="Color.Success" Disabled="@(!_saveBtnEnabled)">
-                    Save
-                </MudButton>
+                    <MudButton Variant="Variant.Filled" 
+                        StartIcon="@Icons.Material.Filled.Save"
+                        ButtonType="ButtonType.Submit" 
+                        Size="Size.Small"
+                        Color="Color.Success"
+                        Disabled="@(!_saveBtnEnabled)">
+                        Save
+                    </MudButton>
 
-                @if (ActionType == ActionTypes.Edit.ToString() || 
-                    ActionType == ActionTypes.View.ToString())
-                {
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Undo" Class="ml-1"
-                               Size="Size.Small" Color="Color.Warning" Disabled="@(!_isEditMode)" OnClick="HandleUndoButton">
-                        Undo
-                    </MudButton>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" Class="ml-1" ButtonType="ButtonType.Reset"
-                               Size="Size.Small" Color="Color.Surface" Disabled="@(_isEditMode)" OnClick="HandleRefreshButton">
-                        Refresh
-                    </MudButton>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Class="ml-1"
-                               Size="Size.Small" Color="Color.Error" Disabled="@_isEditMode" OnClick="ShowDeleteDialog">
-                        Delete
-                    </MudButton>
-                }
+                    @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
+                    {
+                        <MudButton Variant="Variant.Filled" 
+                            StartIcon="@Icons.Material.Filled.Undo" 
+                            Size="Size.Small" Color="Color.Warning" 
+                            Disabled="@(!_isEditMode)" 
+                            OnClick="HandleUndoButton">
+                            Undo
+                        </MudButton>
 
-                @if (ActionType == ActionTypes.Add.ToString())
-                {
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" Class="ml-1" OnClick="ShowCancelDialog"
-                               Size="Size.Small" Color="Color.Surface">
-                        Cancel
-                    </MudButton>
-                }
-            </MudPaper>
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" 
+                            ButtonType="ButtonType.Reset"
+                            Size="Size.Small"
+                                   Color="Color.Primary"
+                            Style="background-color:#004165;"
+                            Disabled="@(_isEditMode)" 
+                            OnClick="HandleRefreshButton">
+                            Refresh
+                        </MudButton>
+                        
+                        <MudButton Variant="Variant.Filled" 
+                            StartIcon="@Icons.Material.Filled.Delete" 
+                            Size="Size.Small" Color="Color.Error" 
+                            Disabled="@_isEditMode" 
+                            OnClick="ShowDeleteDialog">
+                            Delete
+                        </MudButton>
+                    }
+
+                    @if (ActionType == ActionTypes.Add.ToString())
+                    {
+                        <MudButton Variant="Variant.Filled" 
+                            StartIcon="@Icons.Material.Filled.Cancel" 
+                            OnClick="ShowCancelDialog"
+                            Size="Size.Small" 
+                            Color="Color.Surface">
+                            Cancel
+                        </MudButton>
+                    }
+                </MudStack>
+            </MudStack>
         </MudPaper>
 
         <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">                  
             <MudPaper Elevation="5" Square="true" Class="w-100 mt-0 ps-4">
-                <MudGrid>
+                <MudGrid Spacing="4">
                     <MudItem xs="12" sm="2">
-                        <MudTextField @bind-Value="_shiftPattern.ShiftPatternCode" Label="Shift Roster Code"
+                        <MudTextField @bind-Value="_shiftPattern.ShiftPatternCode" 
+                                Label="Shift Roster Code"
                                 For="@(() => _shiftPattern.ShiftPatternCode)"
-                                HelperText="Max. text input is 20 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                Variant="Variant.Outlined" 
                                 Disabled="@(!(ActionType == ActionTypes.Add.ToString()))"
-                                Required="true" RequiredError="Shift Roster Code is required"
-                                Clearable="@_isClearable" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                Required="true" 
+                                RequiredError="Shift Roster Code is required"
+                                Clearable="@_isClearable" 
+                                Immediate="true" 
+                                Margin="Margin.Dense" 
+                                HelperTextOnFocus="true"
+                                HelperText="Enter code for shift roster. Max. input is 20 chars."
+                                Typo="Typo.subtitle2" />
                     </MudItem>
+
                     <MudItem xs="12" sm="5">
-                        <MudTextField @bind-Value="_shiftPattern.ShiftPatternDescription" Label="Description"
-                                For="@(() => _shiftPattern.ShiftPatternDescription)"
-                                HelperText="Type a brief description about the shift roster" Variant="Variant.Text" HelperTextOnFocus="true"
-                                Counter="300" MaxLength="300" Disabled="@_isDisabled"
-                                Clearable="@_isClearable" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        <MudTextField @bind-Value="_shiftPattern.ShiftPatternDescription" 
+                            Label="Description"
+                            For="@(() => _shiftPattern.ShiftPatternDescription)"
+                            Variant="Variant.Outlined" 
+                            MaxLength="300" Disabled="@_isDisabled"
+                            Clearable="@_isClearable" Immediate="true"
+                            HelperTextOnFocus="true"
+                            HelperText="Type a brief description about the shift roster"
+                            Margin="Margin.Dense" Typo="Typo.subtitle2" />
                     </MudItem>                    
-                    <MudItem xs="12" sm="2">
-                        <MudPaper Elevation="0" Class="d-flex align-content-end">
-                            <MudSwitch @bind-Value="_shiftPattern.IsActive" Color="Color.Info" UncheckedColor="Color.Default"
-                                       Label="Is Active?" LabelPlacement="Placement.Start" Disabled="@_isDisabled" />
+                    <MudItem xs="12" sm="3">
+                        <MudPaper Elevation="0" Class="d-flex align-content-end mt-2">
+                            <MudSwitch @bind-Value="_shiftPattern.IsActive" 
+                                Color="Color.Success" UncheckedColor="Color.Default" 
+                                Label="Is Active?" LabelPlacement="Placement.Start" Disabled="@_isDisabled" />
                         </MudPaper>                        
                     </MudItem>
                 </MudGrid>
 
-                <MudExpansionPanels Elevation="0" MultiExpansion="true" Class="mt-0">
+                <MudExpansionPanels Elevation="0" MultiExpansion="true" Class="m-0 p-0">
                     <!-- SHIFT TIMING SCHEDULE PANEL -->
                     <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters Expanded>
                         <TitleContent>
@@ -121,36 +162,43 @@
                                                  TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true"
                                                  @ref="_timingGrid">
                                         <ToolBarContent>
-                                            <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0" Width="220px">
-                                                <MudSelect T="string"
-                                                           @bind-Value="_selectedTimingForSchedule"
-                                                           Label="Shift Timing"
-                                                           Variant="Variant.Outlined"
-                                                           Margin="Margin.Dense"
-                                                           Placeholder="Please Select"
-                                                           AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
-                                                           AdornmentColor="Color.Default"
-                                                           Immediate="true"
-                                                           Dense="true"
-                                                           Disabled="@(!_allowGridEdit)"
-                                                           Typo="Typo.subtitle2">
-                                                    @foreach (var shift in _shiftMasterList)
-                                                    {
-                                                        <MudSelectItem Value="shift.ShiftCode">@($"{shift.ShiftCode} - {shift.ShiftDescription}")</MudSelectItem>
-                                                    }
-                                                </MudSelect>
-                                            </MudPaper>
-                                            <MudPaper Class="ms-3" Elevation="0">
-                                                <MudIconButton Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Filled"
-                                                    Disabled="@(!_allowGridEdit)"
-                                                    Color="Color.Info" Size="Size.Small" OnClick="AddTimingToSchedule" />
-                                            </MudPaper>
-                                            <MudSpacer />
-                                            <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                            <MudStack Row="true" AlignItems="AlignItems.Start"
+                                                Justify="Justify.FlexStart" Breakpoint="Breakpoint.Xs">
+
+                                                <MudPaper Elevation="0" Width="220px">
+                                                    <MudSelect T="string"
+                                                               @bind-Value="_selectedTimingForSchedule"
+                                                               Label="Shift Timing"
+                                                               Variant="Variant.Outlined"
+                                                               Margin="Margin.Dense"
+                                                               Placeholder="Please Select"
+                                                               AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                                               AdornmentColor="Color.Default"
+                                                               Immediate="true"
+                                                               Dense="true"
+                                                               Disabled="@(!_allowGridEdit)"
+                                                               Typo="Typo.subtitle2">
+                                                        @foreach (var shift in _shiftMasterList)
+                                                        {
+                                                            <MudSelectItem Value="shift.ShiftCode">@($"{shift.ShiftCode} - {shift.ShiftDescription}")</MudSelectItem>
+                                                        }
+                                                    </MudSelect>
+                                                </MudPaper>
+                                                <MudPaper Class="mt-2 ms-1" Elevation="0">
+                                                    <MudIconButton Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Filled"
+                                                        Disabled="@(!_allowGridEdit)"
+                                                        Color="Color.Info" Size="Size.Small" OnClick="AddTimingToSchedule" />
+                                                </MudPaper>
+                                                <MudSpacer />
                                                 <MudSwitch @bind-Value="_enableShiftTimingFilter" Color="Color.Success" UncheckedColor="Color.Default" Style="font-size: 14px;"
                                                            Disabled="false"
                                                            Label="Enable Custom Filter" LabelPlacement="Placement.Start" />
-                                            </MudPaper>
+                                            </MudStack>
+                                            
+                                            @* <MudSpacer />
+                                            <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                                
+                                            </MudPaper> *@
                                         </ToolBarContent>
                                         <Columns>
                                             <PropertyColumn Property="x => x.ShiftTimingId" Hidden Editable="false">
@@ -260,7 +308,7 @@
                     </MudExpansionPanel>
 
                     <!-- SHIFT TIMING SEQUENCE PANEL -->
-                    <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters Expanded>
+                    <MudExpansionPanel Class="pt-0 mt-0 mb-5" Dense Gutters Expanded>
                         <TitleContent>
                             <div class="d-flex">
                                 <MudIcon Icon="fas fa-clock" Style="color: #004165;" class="mr-3" Size=Size.Small></MudIcon>
@@ -268,7 +316,7 @@
                             </div>
                         </TitleContent>
                         <ChildContent>
-                            <MudPaper Elevation="5" Square="true" Class="w-50 mb-4">
+                            <MudPaper Elevation="5" Square="true" Class="w-100 mb-5">
                                 <div class="shift-roster-grid">
                                     <MudDataGrid T="ShiftPointerDTO" Items="@_shiftPattern.ShiftPointerList" Hover="true" Striped="true" 
                                                  Filterable="_enableShiftPointerFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
@@ -279,8 +327,10 @@
                                                  TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true"
                                                  @ref="_pointerGrid">
                                         <ToolBarContent>
-                                            <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0" Width="220px">
-                                                <MudSelect T="string"
+                                            <MudStack Row="true" AlignItems="AlignItems.Start" Class="p-0"
+                                                Justify="Justify.SpaceBetween" Breakpoint="Breakpoint.Xs">
+                                                <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0" Width="220px">
+                                                    <MudSelect T="string"
                                                            @bind-Value="_selectedTimingForSequence"
                                                            Label="Shift Timing"
                                                            Variant="Variant.Outlined"
@@ -292,23 +342,24 @@
                                                            Dense="true"
                                                            Disabled="@(!_allowGridEdit)"
                                                            Typo="Typo.subtitle2">
-                                                    @foreach (var shift in _shiftMasterPointerList)
-                                                    {
-                                                        <MudSelectItem Value="shift.ShiftCode">@($"{shift.ShiftCode} - {shift.ShiftDescription}")</MudSelectItem>
-                                                    }
-                                                </MudSelect>
-                                            </MudPaper>
-                                            <MudPaper Class="ms-3" Elevation="0">
-                                                <MudIconButton Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Filled"
-                                                               Disabled="@(!_allowGridEdit)"
-                                                    Color="Color.Info" Size="Size.Small" OnClick="AddPointerToSequence" />
-                                            </MudPaper>
-                                            <MudSpacer />
-                                            <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
-                                                <MudSwitch @bind-Value="_enableShiftPointerFilter" Color="Color.Success" UncheckedColor="Color.Default" Style="font-size: 14px;"
+                                                        @foreach (var shift in _shiftMasterPointerList)
+                                                        {
+                                                            <MudSelectItem Value="shift.ShiftCode">@($"{shift.ShiftCode} - {shift.ShiftDescription}")</MudSelectItem>
+                                                        }
+                                                    </MudSelect>
+                                                    <MudPaper Class="ms-3 mt-2" Elevation="0">
+                                                        <MudIconButton Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Filled"
+                                                                   Disabled="@(!_allowGridEdit)"
+                                                                   Color="Color.Info" Size="Size.Small" OnClick="AddPointerToSequence" />
+                                                    </MudPaper>
+                                                </MudPaper>
+                                                <MudPaper Class="mt-2" Elevation="0">
+                                                    <MudSwitch @bind-Value="_enableShiftPointerFilter" Color="Color.Success" 
+                                                        UncheckedColor="Color.Default" Style="font-size: 14px;"
                                                         Disabled="false"
                                                         Label="Enable Custom Filter" LabelPlacement="Placement.Start" />
-                                            </MudPaper>
+                                                </MudPaper>                                                
+                                            </MudStack>
                                         </ToolBarContent>
                                         <Columns>
                                             <PropertyColumn Property="x => x.ShiftPointerId" Hidden Editable="false">

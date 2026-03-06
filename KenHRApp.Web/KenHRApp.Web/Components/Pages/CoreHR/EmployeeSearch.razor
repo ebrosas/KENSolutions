@@ -153,9 +153,9 @@
                     OnClick="@(() => BeginSearchEmployeeTask(true))"
                     Disabled="@_isRunning">
                     @if (_isRunning)
-                    {
-                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+                    {                        
                         <span>Searching...</span>
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
                     }
                     else
                     {
@@ -253,8 +253,9 @@
                         </PropertyColumn>
                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                             <CellTemplate>
-                                <MudIconButton Color="Color.Info" title="View and edit employee information"
+                                <MudIconButton title="View and edit employee information"
                                     Class="show-btn fa-icon-btn"
+                                               Style="color:#004165;"
                                     OnClick="@(()=>GoToEmployeeDetail(context.Item))">
                                     <ChildContent>
                                         <i class="fas fa-edit fa-1x"></i>
@@ -344,7 +345,7 @@
 
     private List<BreadcrumbItem> _breadcrumbItems =
     [
-        new("Home", href: "/", icon: Icons.Material.Filled.Home),
+        new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
         new("Employee Master", href: "/CoreHR/employeesearch", icon: @Icons.Material.Filled.PeopleAlt, disabled: true)
     ];
     #endregion

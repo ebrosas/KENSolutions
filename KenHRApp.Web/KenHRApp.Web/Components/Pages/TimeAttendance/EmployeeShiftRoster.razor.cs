@@ -117,7 +117,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Collections
         private List<BreadcrumbItem> _breadcrumbItems =
         [
-            new("Home", href: "/", icon: Icons.Material.Filled.Home),
+            new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
             new("Shift Roster Master", href: "/TimeAttendance/shiftrostersearch", icon: @Icons.Material.Filled.CalendarMonth),
             new("Manage Shift Roster", href: null, disabled: true, @Icons.Material.Filled.EditNote)
         ];

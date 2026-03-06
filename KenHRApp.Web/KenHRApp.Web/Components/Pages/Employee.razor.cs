@@ -192,7 +192,7 @@ namespace KenHRApp.Web.Components.Pages
 
         private List<BreadcrumbItem> _breadcrumbItems =
         [
-            new("Home", href: "/", icon: Icons.Material.Filled.Home),
+            new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
             new("Employee Master", href: "/CoreHR/employeesearch", icon: @Icons.Material.Filled.PeopleAlt),
             new("Employee Detail", href: null, disabled: true, @Icons.Material.Filled.EditNote)
         ];

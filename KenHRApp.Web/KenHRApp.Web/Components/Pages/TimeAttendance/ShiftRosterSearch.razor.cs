@@ -53,7 +53,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<ShiftPatternMasterDTO> _shiftRosterList = new List<ShiftPatternMasterDTO>();
         private List<BreadcrumbItem> _breadcrumbItems =
         [
-            new("Home", href: "/", icon: Icons.Material.Filled.Home),
+            new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
             new("Shift Roster Master", href: null, disabled: true, @Icons.Material.Filled.CalendarMonth)
         ];
         #endregion

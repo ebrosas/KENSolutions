@@ -19,15 +19,19 @@
             </ul>
             </MudAlert>
         }
-        <MudPaper class="paper-header w-100 px-4" Elevation="0">
-            <MudText Typo="Typo.h5" Align="Align.Start" Class="pb-3 ps-3" Style="color: #004165;">@employee.EmployeeFullName</MudText>
+        <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" 
+            Breakpoint="Breakpoint.Xs">
+            <MudText Typo="Typo.h5" Align="Align.Start" Class="pb-3 ps-3 fw-bold" Style="color: #004165;">@employee.EmployeeFullName</MudText>
             <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="4" Class="mud-primary-text" />
-            <MudPaper>
+            <MudPaper Elevation="0">
                 @if (ActionType == ActionTypes.Edit.ToString() ||
                     ActionType == ActionTypes.View.ToString())
                 {
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit"
-                               Size="Size.Small" Color="Color.Info" Disabled="@(_isEditMode)" OnClick="HandleEditEmployee">
+                        Size="Size.Small" 
+                        Color="Color.Info" 
+                        Style="background-color:#004165;"
+                        Disabled="@(_isEditMode)" OnClick="HandleEditEmployee">
                         Edit
                     </MudButton>
                 }
@@ -39,11 +43,14 @@
                     ActionType == ActionTypes.View.ToString())
                 {
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Undo" Class="ml-1"
-                        Size="Size.Small" Color="Color.Warning" Disabled="@(!_isEditMode)" OnClick="HandleUndoChanges">
+                        Size="Size.Small" Color="Color.Warning" 
+                        Disabled="@(!_isEditMode)" OnClick="HandleUndoChanges">
                         Undo
                     </MudButton>
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" 
-                        Size="Size.Small" Color="Color.Tertiary" Disabled="@(_isEditMode)" OnClick="HandleRefreshPage">
+                        Size="Size.Small" Color="Color.Tertiary" 
+                            Style="background-color:#004165;"
+                        Disabled="@(_isEditMode)" OnClick="HandleRefreshPage">
                         Refresh
                     </MudButton>
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete"
@@ -59,7 +66,8 @@
                     </MudButton>
                 }
             </MudPaper>
-        </MudPaper>
+        </MudStack>
+        
         <MudTabs Elevation="4" Rounded="true" ApplyEffectsToContainer="true" Position="Position.Top" Color="Color.Default"
             PanelClass="pa-6" ActiveTabClass="border-solid border-2 mud-border-primary">
             @if (_showErrorAlert)

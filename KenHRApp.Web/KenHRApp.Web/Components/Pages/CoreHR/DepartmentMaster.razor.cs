@@ -52,6 +52,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         private bool _enableFilter = false;
         private bool _isActive = true;
         private bool _redirected;
+        private string _userName = "Anonymous User";
 
         #region Dialog Box Button Icons
         private readonly string _iconDelete = "fas fa-trash-alt";
@@ -96,7 +97,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         private List<BreadcrumbItem> _breadcrumbItems =
         [
-            new("Home", href: "/", icon: Icons.Material.Filled.Home),
+            new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
             new("Department Master", href: null, icon: @Icons.Material.Filled.AccountBalance, disabled: true)
         ];
         #endregion
@@ -115,19 +116,21 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             // Cleanup resources
             Logger.LogInformation("Department Master page disposed");
         }
-
-        protected override void OnInitialized()
-        {
-            if (!State.IsAuthenticated)
-                overlayMessage = "Authentication required. Redirecting to login page...";
-
-            BeginLoadComboboxTask();
-        }
-
+        
         protected override void OnAfterRender(bool firstRender)
         {
-            if (!State.IsAuthenticated)
-                GoToLogin();
+            if (firstRender)
+            {
+                if (!State.IsAuthenticated)
+                    GoToLogin();
+               
+                if (State.AuthenticatedUser != null)
+                {
+                    _userName = State.AuthenticatedUser!.EmployeeShortName;
+
+                    BeginLoadComboboxTask();
+                }
+            }
         }
         #endregion
 

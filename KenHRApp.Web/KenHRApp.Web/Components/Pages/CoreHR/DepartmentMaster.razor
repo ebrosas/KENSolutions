@@ -9,7 +9,10 @@
 @inject NavigationManager NavigationManager
 @inject ILookupCacheService LookupCache
 
-<MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Department Master</MudText>
+<MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
+    <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Department Master</MudText>
+    <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @_userName</MudText>
+</MudStack>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
     @if (_showErrorAlert)
@@ -22,18 +25,18 @@
     <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
         <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
                         CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
-
-        <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
+        
+        <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-5 mb-0">
             <MudPaper Elevation="0" Square="true" Class="w-100">
                 <MudGrid Spacing="5">
-                    <MudItem xs="3">
+                    <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudTextField @bind-Value="_departmentName" Label="Department Name" HelperText="Enter department search string"
                                 Variant="Variant.Text" HelperTextOnFocus="true" Counter="100" MaxLength="100"
                                 Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                         </MudPaper>
                     </MudItem>
-                    <MudItem xs="3">
+                    <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="_selectedGroup"
                                              SearchFunc="SearchDepartmentGroup!"
@@ -49,7 +52,7 @@
                                              Modal="true" />
                         </MudPaper>
                     </MudItem>
-                    <MudItem xs="3">
+                    <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="_selectedHead"
                                              SearchFunc="SearchEmployee!"
@@ -65,7 +68,7 @@
                                              Modal="true" />
                         </MudPaper>
                     </MudItem>
-                    <MudItem xs="3">
+                    <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="_selectedManager"
                                              SearchFunc="SearchEmployee!"
@@ -82,12 +85,46 @@
                         </MudPaper>
                     </MudItem>
                 </MudGrid>
+                
                 <MudGrid Spacing="5">
                     <MudItem xs="2">
-                        <MudSwitch @bind-Value="_isActive" Color="Color.Success">Is Active?</MudSwitch>
+                        <MudSwitch @bind-Value="_isActive" Color="Color.Primary">Active?</MudSwitch>
                     </MudItem>
                     <MudItem xs="10">
-                        <MudPaper Class="d-flex gap-2 justify-content-end me-1 mt-0 p-0" Elevation="0">
+                        <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full mt-0" Spacing="2">
+                            <MudButton Variant="Variant.Filled"                            
+                                Color="Color.Primary"
+                                Style="background-color:#004165;"
+                                Class="mt-1 px-4"
+                                FullWidth="false"
+                                Size="Size.Small"
+                                StartIcon="@Icons.Material.Filled.PersonSearch"
+                                        OnClick="@(() => BeginSearchDepartmentTask(true))"
+                                Disabled="@_isRunning">
+                                @if (_isRunning)
+                                {                                    
+                                    <span>Searching...</span>
+                                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+                                }
+                                else
+                                {
+                                    <span>Search</span>
+                                }
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled"
+                                ButtonType="ButtonType.Reset"
+                                Color="Color.Warning"
+                                FullWidth="false"
+                                Class="mt-1 px-4"
+                                Size="Size.Small"
+                                Disabled="@_isRunning"
+                                StartIcon="@Icons.Material.Filled.Refresh"
+                                OnClick="BeginRefreshPageTask">
+                                Reset
+                            </MudButton>
+                        </MudStack>
+
+                        @* <MudPaper Class="d-flex gap-2 justify-content-end me-1 mt-0 p-0" Elevation="0">
                             <div @onmouseover="() => _isSearchHovered = true" @onmouseout="() => _isSearchHovered = false">
                                 <MudButton Variant="@(_isSearchHovered ? Variant.Filled : Variant.Outlined)"
                                            StartIcon="@Icons.Material.Filled.PersonSearch" Class="px-5"
@@ -102,7 +139,7 @@
                                     <MudText Typo="Typo.button" HtmlTag="h3">Reset</MudText>
                                 </MudButton>
                             </div>
-                        </MudPaper>
+                        </MudPaper> *@
                     </MudItem>
                 </MudGrid>
             </MudPaper>
@@ -265,7 +302,9 @@
                         </PropertyColumn>                        
                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                             <CellTemplate Context="row">
-                                <MudIconButton Color="Color.Info" title="View and edit employee information" Class="show-btn fa-icon-btn"
+                                <MudIconButton title="View and edit employee information" 
+                                    Class="show-btn fa-icon-btn"
+                                    Style="color:#004165;"
                                     OnClick="@row.Actions.StartEditingItemAsync">
                                     <ChildContent>
                                         <i class="fas fa-edit fa-1x"></i>

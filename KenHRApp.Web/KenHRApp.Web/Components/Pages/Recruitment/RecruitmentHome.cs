@@ -76,7 +76,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         #region Collections        
         private List<BreadcrumbItem> _breadcrumbItems =
         [
-            new("Home", href: "/", icon: Icons.Material.Filled.Home),
+            new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
             new("Recruitment Management", href: null, disabled: true, @Icons.Material.Outlined.People)
         ];
 
