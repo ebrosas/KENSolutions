@@ -2,7 +2,7 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ActiveDebugProfile>KenHRApp</ActiveDebugProfile>
-    <NameOfLastUsedPublishProfile>C:\NET Projects\KEN Solutions\KenHRApp\KenHRApp.Web\KenHRApp.Web\Properties\PublishProfiles\as-kenhrapp - Zip Deploy.pubxml</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>C:\NET Projects\KEN Solutions\KenHRApp\KenHRApp.Web\KenHRApp.Web\Properties\PublishProfiles\FolderProfile.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
