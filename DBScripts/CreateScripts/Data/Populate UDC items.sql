@@ -2133,6 +2133,182 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@Amount						= NULL
 		
 	*/
+
+	/*	Populate Leave Request Types
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'LEAVETYPES'
+
+		SELECT	@UDCCode					= 'AL',
+				@UDCDesc1					= 'Annual Leave',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'HD',
+				@UDCDesc1					= 'Half day leave',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'HL',
+				@UDCDesc1					= 'Hajj Leave',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 3,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'IL',
+				@UDCDesc1					= 'Injury Leave',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 4,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ILU',
+				@UDCDesc1					= 'Injury Leave - Unpaid',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 5,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ML',
+				@UDCDesc1					= 'Maternity Leave',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 6,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'SLP',
+				@UDCDesc1					= 'Sick Leave Paid',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 7,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'SLU',
+				@UDCDesc1					= 'Sick Leave Unpaid',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 8,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'UL',
+				@UDCDesc1					= 'Unpaid Leave',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 9,
+				@IsActive					= 1,
+				@Amount						= NULL
+		
+	*/
+
+	/*	Populate Leave Day Portions
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'LEAVEAPORTION'
+
+		SELECT	@UDCCode					= 'LEAVEFD',
+				@UDCDesc1					= 'Full day',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'LEAVEFH',
+				@UDCDesc1					= 'First half of the day',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'LEAVESH',
+				@UDCDesc1					= 'Second half of the day',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 3,
+				@IsActive					= 1,
+				@Amount						= NULL 
+		
+	*/
+
+	/*	Populate Leave Approval Flags
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'LEAVEAPVFLAG'
+
+		SELECT	@UDCCode					= 'A',
+				@UDCDesc1					= 'Approved / Paid',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'C',
+				@UDCDesc1					= 'Canceled',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'D',
+				@UDCDesc1					= 'Draft',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 3,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'N',
+				@UDCDesc1					= 'Approved / Not Paid',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 4,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'P',
+				@UDCDesc1					= 'Waiting for advance',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 5,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'R',
+				@UDCDesc1					= 'Rejected',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 6,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'W',
+				@UDCDesc1					= 'Waiting for Approval',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 7,
+				@IsActive					= 1,
+				@Amount						= NULL 
+		
+	*/
 	
 
 	IF @actionType = 0
@@ -2193,7 +2369,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	BEGIN TRAN T1
 
 	DELETE FROM kenuser.UserDefinedCode
-	WHERE UDCId = 3384
+	WHERE UDCId = 2952
 
 	COMMIT TRAN T1
 

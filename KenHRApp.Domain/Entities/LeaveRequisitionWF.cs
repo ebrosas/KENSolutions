@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -93,6 +94,39 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "varchar(50)")]
         public string? LeaveUpdatedEmail { get; set; } = null;
+
+        public Guid WorkflowId { get; private set; } = Guid.NewGuid();
+
+        [Column(TypeName = "varchar(20)")]
+        public string? LeaveDayPortionType { get; set; } = null;
+
+        private readonly List<LeaveAttachment> _attachments = new();
+        public IReadOnlyCollection<LeaveAttachment> Attachments => _attachments;
+        #endregion
+
+        #region Constructors
+        private LeaveRequisitionWF() { }
+
+        public LeaveRequisitionWF(int empNo, string leaveType, DateTime startDate, DateTime endDate, DateTime resumeDate,
+            string leaveDayPortion, string reason)
+        {
+            LeaveEmpNo = empNo;
+            LeaveType = leaveType;
+            LeaveStartDate = startDate;
+            LeaveEndDate = endDate;
+            LeaveResumeDate = resumeDate;
+            LeaveDayPortionType = leaveDayPortion;
+            LeaveRemarks = reason;
+        }
+        #endregion
+
+        #region Public Methods
+        public void AddAttachment(int leaveRequestId, string fileName, string contentType,
+            string storedFileName, long fileSize, byte[] data)
+        {
+            _attachments.Add(new LeaveAttachment(leaveRequestId, fileName, contentType,
+                storedFileName, fileSize, data));
+        }
         #endregion
     }
 }
