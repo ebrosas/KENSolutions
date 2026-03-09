@@ -113,11 +113,10 @@ namespace KenHRApp.Application.DTOs
 
         public Guid WorkflowId { get; private set; } = Guid.NewGuid();
 
-        [Label("Leave Day Portion")]
-        [StringLength(20, ErrorMessage = "Leave Day Portion can't be more than 20 characters.")]
-        public string? LeaveDayPortionType { get; set; } = null;
+        public byte? StartDayMode { get; set; }
+        public byte? EndDayMode { get; set; }
 
-        private readonly List<LeaveAttachment> _attachments = new();
+        public List<FileUploadDTO> Files { get; set; } = new();
         #endregion
     }
 }

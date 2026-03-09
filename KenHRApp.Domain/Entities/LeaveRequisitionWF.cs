@@ -10,6 +10,15 @@ namespace KenHRApp.Domain.Entities
 {
     public class LeaveRequisitionWF
     {
+        #region Enums
+        public enum LeaveDayMode
+        {
+            FullDay = 1,
+            FirstHalf = 2,
+            SecondHalf = 3
+        }
+        #endregion
+
         #region Properties
         public long LeaveRequestId { get; set; }       // Identity column  
 
@@ -94,30 +103,23 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "varchar(50)")]
         public string? LeaveUpdatedEmail { get; set; } = null;
+        #endregion
 
+        #region Extended Properties
         public Guid WorkflowId { get; private set; } = Guid.NewGuid();
 
-        [Column(TypeName = "varchar(20)")]
-        public string? LeaveDayPortionType { get; set; } = null;
+        [Column(TypeName = "tinyint")]
+        public byte? StartDayMode { get; set; }
+
+        [Column(TypeName = "tinyint")]
+        public byte? EndDayMode { get; set; }
 
         private readonly List<LeaveAttachment> _attachments = new();
         public IReadOnlyCollection<LeaveAttachment> Attachments => _attachments;
         #endregion
 
         #region Constructors
-        private LeaveRequisitionWF() { }
-
-        public LeaveRequisitionWF(int empNo, string leaveType, DateTime startDate, DateTime endDate, DateTime resumeDate,
-            string leaveDayPortion, string reason)
-        {
-            LeaveEmpNo = empNo;
-            LeaveType = leaveType;
-            LeaveStartDate = startDate;
-            LeaveEndDate = endDate;
-            LeaveResumeDate = resumeDate;
-            LeaveDayPortionType = leaveDayPortion;
-            LeaveRemarks = reason;
-        }
+        public LeaveRequisitionWF() { }
         #endregion
 
         #region Public Methods
