@@ -19,12 +19,22 @@ namespace KenHRApp.Application.Services
         #endregion
 
         #region Enums
-        public enum LeaveDayMode
+        public enum LeaveDayMode : byte
         {
-            FullDay = 1,
-            FirstHalf = 2,
-            SecondHalf = 3
+            NotDefined,
+            FullDay,
+            FirstHalf,
+            SecondHalf
         }
+        #endregion
+
+        #region Constants
+        private readonly string CONST_APPROVED_PAID = "A";
+        private readonly string CONST_WAITING_FOR_APPROVAL = "W";
+        private readonly string CONST_APPROVED_NOT_PAID = "N";
+        private readonly string CONST_CANCELLED = "C";
+        private readonly string CONST_DRAFT = "D";
+        private readonly string CONST_REJECTED = "R";
         #endregion
 
         #region Constructors
@@ -34,13 +44,13 @@ namespace KenHRApp.Application.Services
         }
         #endregion
 
-        #region Public Methods
-        public async Task<Result<decimal>> CalculateAsync(
-            int empNo,
-            DateTime start,
-            DateTime end,
-            LeaveDayMode startMode,
-            LeaveDayMode endMode)
+        #region Private Methods
+        private async Task<decimal> CalculateAsync(
+           int empNo,
+           DateTime start,
+           DateTime end,
+           LeaveDayMode startMode,
+           LeaveDayMode endMode)
         {
             try
             {
@@ -63,26 +73,35 @@ namespace KenHRApp.Application.Services
                 if (endMode != LeaveDayMode.FullDay)
                     total -= 0.5m;
 
-                return Result<decimal>.SuccessResult(total);
+                return total;
             }
             catch (Exception ex)
             {
-                return Result<decimal>.Failure(ex.Message.ToString() ?? "Unknown error while fetching shift roster records from the database.");
+                return 0;
             }
         }
+        #endregion
 
+        #region Public Methods       
         public async Task<Result<int>> AddLeaveRequestAsync(LeaveRequisitionDTO dto, CancellationToken cancellationToken = default)
         {
             try
             {
-                //var total = await CalculateAsync(
-                //    dto.LeaveEmpNo,
-                //    dto.LeaveStartDate!.Value,
-                //    dto.LeaveEndDate!.Value,
-                //    dto.StartDayMode!.Value,
-                //    dto.EndDayMode!.Value,
-                //    _shiftService,
-                //    _holidayService);
+
+                LeaveDayMode startMode = LeaveDayMode.NotDefined;
+                if (Enum.IsDefined(typeof(LeaveDayMode), dto.StartDayMode!.Value))
+                    startMode = (LeaveDayMode)dto.StartDayMode!.Value;
+
+                LeaveDayMode endMode = LeaveDayMode.NotDefined;
+                if (Enum.IsDefined(typeof(LeaveDayMode), dto.EndDayMode!.Value))
+                    endMode = (LeaveDayMode)dto.EndDayMode!.Value;
+
+                var total = await CalculateAsync(
+                    dto.LeaveEmpNo,
+                    dto.LeaveStartDate!.Value,
+                    dto.LeaveEndDate!.Value,
+                    startMode,
+                    endMode);
 
                 #region Create "LeaveRequisitionWF" entity from DTO
                 LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
@@ -91,12 +110,16 @@ namespace KenHRApp.Application.Services
                     LeaveEmpNo = dto.LeaveEmpNo,
                     LeaveEmpName = dto.LeaveEmpName,
                     LeaveEmpEmail = dto.LeaveEmpEmail,
+                    LeaveEmpCostCenter = dto.LeaveEmpCostCenter,
                     LeaveStartDate = Convert.ToDateTime(dto.LeaveStartDate),
                     LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
                     LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
-                    LeaveEmpCostCenter = dto.LeaveEmpCostCenter,
+                    LeaveBalance = dto.LeaveBalance,
+                    LeaveDuration = Convert.ToDouble(total),            
+                    NoOfHolidays = dto.NoOfHolidays,
+                    NoOfWeekends = dto.NoOfWeekends,
                     LeaveCreatedBy = dto.LeaveCreatedBy,
-                    LeaveApprovalFlag = 'A',
+                    LeaveApprovalFlag = char.Parse(CONST_WAITING_FOR_APPROVAL),
                     LeaveRemarks = dto.LeaveRemarks,
                     LeaveCreatedUserID = dto.LeaveCreatedUserID,
                     LeaveCreatedDate = DateTime.Now
@@ -109,7 +132,7 @@ namespace KenHRApp.Application.Services
                     if (!string.IsNullOrEmpty(result.Error))
                         throw new Exception(result.Error);
                     else
-                        throw new Exception("Unable to save shift roster changes due to error. Please check the data entry then try to save again!");
+                        throw new Exception("Unable to save leave request due to error. Please check the data entry then try to save again!");
                 }
 
                 return Result<int>.SuccessResult(result.Value);

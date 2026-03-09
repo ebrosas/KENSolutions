@@ -1,4 +1,5 @@
-﻿using KenHRApp.Domain.Models.Common;
+﻿using KenHRApp.Application.DTOs;
+using KenHRApp.Domain.Models.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +12,7 @@ namespace KenHRApp.Application.Interfaces
     public interface ILeaveRequestService
     {
         #region Abstract Methods
-        Task<Result<decimal>> CalculateAsync(
-            int employeeId,
-            DateTime start,
-            DateTime end,
-            LeaveDayMode startMode,
-            LeaveDayMode endMode);
+        Task<Result<int>> AddLeaveRequestAsync(LeaveRequisitionDTO dto, CancellationToken cancellationToken = default);
         #endregion
     }
 }

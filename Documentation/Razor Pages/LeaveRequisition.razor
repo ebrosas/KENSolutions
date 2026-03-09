@@ -1,0 +1,124 @@
+@page "/TimeAttendance/leaverequest"
+
+<MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-0 ps-4 fw-bolder" Style="color: #004165;">Leave Request</MudText>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="px-4">
+    <EditForm EditContext="@_editContext" @ref="_editForm"
+              OnValidSubmit="HandleValidSubmit"
+              OnInvalidSubmit="HandleInvalidSubmit">
+
+        <DataAnnotationsValidator />
+        @if (_hasValidationError && _validationMessages.Any())
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
+                <ul style="margin:0; padding-left:20px;">
+                    @foreach (var msg in _validationMessages)
+                    {
+                        <li>
+                            <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
+                            </li>
+                    }
+                </ul>
+            </MudAlert>
+        }
+
+        @if (_showErrorAlert)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
+                      ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
+                @_errorMessage
+            </MudAlert>
+        }
+
+        <MudPaper class="paper-header w-100 px-4" Elevation="0">   
+            <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween"
+                      Class="mud-width-full"
+                      StretchItems="StretchItems.End" Breakpoint="Breakpoint.Xs">
+                <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
+                                MaxItems="4" Class="mud-primary-text" />
+                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexEnd" Spacing="2">
+                    @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
+                    {
+                        <MudButton Variant="Variant.Filled"
+                                   StartIcon="@Icons.Material.Filled.Edit"
+                                   Size="Size.Small"
+                                   Color="Color.Primary"
+                                   Style="background-color:#004165;"
+                                   Disabled="@(_isEditMode)"
+                                   OnClick="HandleEditButton">
+                            Edit
+                        </MudButton>
+                    }
+
+                    <MudButton Variant="Variant.Filled"
+                               StartIcon="@Icons.Material.Filled.Save"
+                               ButtonType="ButtonType.Submit"
+                               Size="Size.Small"
+                               Color="Color.Success"
+                               Disabled="@(!_saveBtnEnabled)">
+                        Save
+                    </MudButton>
+
+                    @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
+                    {
+                        <MudButton Variant="Variant.Filled"
+                                   StartIcon="@Icons.Material.Filled.Undo"
+                                   Size="Size.Small" Color="Color.Warning"
+                                   Disabled="@(!_isEditMode)"
+                                   OnClick="HandleUndoButton">
+                            Undo
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh"
+                                   ButtonType="ButtonType.Reset"
+                                   Size="Size.Small"
+                                   Color="Color.Primary"
+                                   Style="background-color:#004165;"
+                                   Disabled="@(_isEditMode)"
+                                   OnClick="HandleRefreshButton">
+                            Refresh
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Filled"
+                                   StartIcon="@Icons.Material.Filled.Delete"
+                                   Size="Size.Small" Color="Color.Error"
+                                   Disabled="@_isEditMode"
+                                   OnClick="ShowDeleteDialog">
+                            Delete
+                        </MudButton>
+                    }
+
+                    @if (ActionType == ActionTypes.Add.ToString())
+                    {
+                        <MudButton Variant="Variant.Filled"
+                                   StartIcon="@Icons.Material.Filled.Cancel"
+                                   OnClick="ShowCancelDialog"
+                                   Size="Size.Small"
+                                   Color="Color.Surface">
+                            Cancel
+                        </MudButton>
+                    }
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+
+        <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">                  
+            <MudScrollToTop TopOffset="100"
+                            Selector="#mainPanel"
+                            VisibleCssClass="visible absolute"
+                            HiddenCssClass="hidden absolute">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+            </MudScrollToTop>
+        </div>
+    </EditForm>
+</MudContainer>
+
+<!-- Full-screen overlay -->
+@if (_isRunning)
+{
+    <div class="fullscreen-overlay">
+        <MudProgressCircular Indeterminate="true" Size="Size.Medium" Color="Color.Info" />
+        <MudText Typo="Typo.h6" Class="mt-2 text-white">@overlayMessage</MudText>
+        </div>
+}
