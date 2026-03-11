@@ -2,7 +2,7 @@
 
 <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Employee Attendance Dashboard</MudText>
-    <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @_userName</MudText>
+    <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserName</MudText>
 </MudStack>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
@@ -251,7 +251,7 @@
                                     </MudPaper>
                                 </MudStack>
                                 <MudStack Justify="Justify.Center" Spacing="2">
-                                    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" DropShadow="true">Apply Leave</MudButton>
+                                    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" DropShadow="true" OnClick="GoToLeaveRequest">Apply Leave</MudButton>
                                     <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" DropShadow="true">Regularize</MudButton>
                                     <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" DropShadow="true">Apply Outdoor</MudButton>
                                 </MudStack>

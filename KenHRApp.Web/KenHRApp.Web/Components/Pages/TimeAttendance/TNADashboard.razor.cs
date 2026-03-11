@@ -39,7 +39,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private int currentPage = 1;
         private int pageSize = 5;
         private int pageCount => (int)Math.Ceiling((double)_holidayList.Count / pageSize);        
-        private int _currentEmpNo = 0;
+        //private int _currentEmpNo = 0;
         private DateTime _payrollStartDate = new DateTime(2026, 1, 16);
         private DateTime _payrollEndDate = new DateTime(2026, 2, 15);
         private int _fiscalYear = DateTime.Now.Year;
@@ -125,15 +125,17 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region IPageAuthorization Implementation
+        public string UserName { get; set; } = "Anonymous User";
+        public int UserEmpNo { get; set; } = 0;
+
         public void GoToLogin()
         {
             Navigation.NavigateTo("/login");
         }
-
         #endregion
 
         #region Page Events
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
             // Initialize the EditContext 
             _editContext = new EditContext(_swipeLog);
@@ -158,8 +160,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 if (State.AuthenticatedUser != null)
                 {
-                    _userName = State.AuthenticatedUser!.EmployeeShortName;
-                    _currentEmpNo = State.AuthenticatedUser.EmployeeNo;
+                    UserName = State.AuthenticatedUser!.EmployeeShortName;
+                    UserEmpNo = State.AuthenticatedUser.EmployeeNo;
                     
                     BeginGetAttendanceSummary();
                 }
@@ -340,7 +342,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _lastTimeOut = $"{now.Day}{GetOrdinal(now.Day)} {now:MMMM yyyy hh:mm:ss tt}";
 
             #region Initialize DTO
-            _swipeLog.EmpNo = _currentEmpNo;
+            _swipeLog.EmpNo = UserEmpNo;
             _swipeLog.SwipeDate = now.Date;
             _swipeLog.SwipeTime = now;
             _swipeLog.SwipeType = !_isPunchedIn ? "IN" : "OUT";
@@ -353,7 +355,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             AttendanceSwipeDTO punchSwipe = new AttendanceSwipeDTO()
             {
-                EmpNo = _currentEmpNo,
+                EmpNo = UserEmpNo,
                 SwipeDate = punchTime.Date,
                 SwipeTime = punchTime,
                 SwipeLogDate = DateTime.Now
@@ -379,6 +381,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 await InvokeAsync(StateHasChanged);
 
             }, date);
+        }
+
+        public void GoToLeaveRequest()
+        {
+            Navigation.NavigateTo("/TimeAttendance/leaverequest");
         }
         #endregion
 
@@ -421,7 +428,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     //_errorMessage.Clear();
                     //ShowHideError(false);
 
-                }, _currentEmpNo, _payrollStartDate, _payrollEndDate);
+                }, UserEmpNo, _payrollStartDate, _payrollEndDate);
             }
             catch (Exception ex)
             {
@@ -484,7 +491,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Invoke the event handler to get the attendance detail for today's date
                 OnDateChanged(_selectedDate);
 
-            }, _currentEmpNo, _payrollStartDate, _payrollEndDate);
+            }, UserEmpNo, _payrollStartDate, _payrollEndDate);
         }
 
         private async Task GetAttendanceSummaryAsync(Func<Task> callback, int empNo, DateTime? startDate, DateTime? endDate)
@@ -642,7 +649,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (isSuccess)
             {
                 #region Get Attendance Duration
-                var attendanceResult = await AttendanceService.GetAttendanceDurationAsync(_currentEmpNo, _selectedDate!.Value.Date);
+                var attendanceResult = await AttendanceService.GetAttendanceDurationAsync(UserEmpNo, _selectedDate!.Value.Date);
                 if (attendanceResult.Success)
                     _attendanceDuration = attendanceResult!.Value;
                 else
@@ -688,7 +695,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _errorMessage.Clear();
                 _attendanceChips.Clear();
 
-                var attendanceResult = await AttendanceService.GetAttendanceDetailAsync(_currentEmpNo, selectedDate!.Value.Date);
+                var attendanceResult = await AttendanceService.GetAttendanceDetailAsync(UserEmpNo, selectedDate!.Value.Date);
                 if (attendanceResult.Success)
                 {
                     _attendanceDetail = new AttendanceDetailDTO();
@@ -711,7 +718,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                         #endregion
 
                         #region Get Attendance Duration
-                        var durationResult = await AttendanceService.GetAttendanceDurationAsync(_currentEmpNo, selectedDate!.Value.Date);
+                        var durationResult = await AttendanceService.GetAttendanceDurationAsync(UserEmpNo, selectedDate!.Value.Date);
                         if (durationResult.Success)
                             _attendanceDuration = durationResult!.Value;
                         else

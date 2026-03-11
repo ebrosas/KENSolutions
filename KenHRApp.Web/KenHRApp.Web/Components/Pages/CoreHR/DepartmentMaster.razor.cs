@@ -52,7 +52,6 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         private bool _enableFilter = false;
         private bool _isActive = true;
         private bool _redirected;
-        private string _userName = "Anonymous User";
 
         #region Dialog Box Button Icons
         private readonly string _iconDelete = "fas fa-trash-alt";
@@ -103,6 +102,8 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         #endregion
 
         #region IPageAuthorization Implementation
+        public string UserName { get; set; } = "Anonymous User";
+        public int UserEmpNo { get; set; } = 0;
         public void GoToLogin()
         {
             Nav.NavigateTo("/login");
@@ -126,7 +127,8 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                
                 if (State.AuthenticatedUser != null)
                 {
-                    _userName = State.AuthenticatedUser!.EmployeeShortName;
+                    UserName = State.AuthenticatedUser!.EmployeeShortName;
+                    UserEmpNo = State.AuthenticatedUser.EmployeeNo;
 
                     BeginLoadComboboxTask();
                 }

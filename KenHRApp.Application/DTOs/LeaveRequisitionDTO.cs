@@ -16,10 +16,11 @@ namespace KenHRApp.Application.DTOs
                 
         public string? LeaveInstanceID { get; set; } = null;
 
-        [Required(ErrorMessage = "Leave Type is required")]
-        [Label("Leave Type")]
-        [StringLength(20, ErrorMessage = "Leave Type can't be more than 20 characters.")]
         public string LeaveType { get; set; } = null!;
+
+        [Required(ErrorMessage = "Leave Type is required")]
+        [Display(Name = "Leave Type")]
+        public string LeaveTypeDesc { get; set; } = null!;
 
         public int LeaveEmpNo { get; set; }
 
@@ -114,7 +115,14 @@ namespace KenHRApp.Application.DTOs
         public Guid WorkflowId { get; private set; } = Guid.NewGuid();
 
         public byte? StartDayMode { get; set; }
+
+        [Display(Name = "Mode")]
+        public string StartDayModeDesc { get; set; } = null!;
+
         public byte? EndDayMode { get; set; }
+
+        [Display(Name = "Mode")]
+        public string EndDayModeDesc { get; set; } = null!;
 
         public List<FileUploadDTO> Files { get; set; } = new();
         #endregion
