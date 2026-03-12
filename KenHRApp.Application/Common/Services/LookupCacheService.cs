@@ -1,5 +1,6 @@
 ﻿using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.DTOs;
+using KenHRApp.Application.DTOs.TNA;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Application.Services;
 using KenHRApp.Domain.Models.Common;
@@ -16,6 +17,7 @@ namespace KenHRApp.Application.Common.Services
         #region Fields
         private readonly IEmployeeService _employeeService;
         private readonly IAttendanceService _attendanceService;
+        private readonly ILeaveRequestService _leaveService;
         private List<EmployeeMasterDTO>? _employeeList;
         private List<UserDefinedCodeDTO>? _userDefinedCodeList;
         private List<UserDefinedCodeDTO>? _employmentTypeList;
@@ -24,6 +26,7 @@ namespace KenHRApp.Application.Common.Services
         private List<DepartmentDTO>? _departmentList;
         private List<EmployeeDTO>? _reportingManagerList;
         private List<ShiftPatternMasterDTO>? _shiftPatternList;
+        private List<EmployeeResultDTO>? _employeeMasterList;
 
         #region Enums
         private enum UDCKeys
@@ -38,10 +41,11 @@ namespace KenHRApp.Application.Common.Services
         #endregion
 
         #region Constructor
-        public LookupCacheService(IEmployeeService employeeService, IAttendanceService attendanceService)
+        public LookupCacheService(IEmployeeService employeeService, IAttendanceService attendanceService, ILeaveRequestService leaveService)
         {
             _employeeService = employeeService;
             _attendanceService = attendanceService;
+            _leaveService = leaveService;
         }
         #endregion
 
@@ -57,7 +61,8 @@ namespace KenHRApp.Application.Common.Services
             _employmentTypeList = null;
             _employeeStatusList = null;
             _departmentList = null;
-            _reportingManagerList = null;   
+            _reportingManagerList = null;
+            _employeeMasterList = null;
         }
 
         public void ClearCache(string key)
@@ -211,6 +216,22 @@ namespace KenHRApp.Application.Common.Services
             }
 
             return Result<IReadOnlyList<ShiftPatternMasterDTO>>.SuccessResult(_shiftPatternList!);
+        }
+
+        public async Task<Result<IReadOnlyList<EmployeeResultDTO>>> GetEmployeeAsync(bool forceLoad = false)
+        {
+            if ((_employeeMasterList == null || !_employeeMasterList.Any()) || forceLoad)
+            {
+                var repoResult = await _leaveService.GetEmployeeAsync();
+                if (!repoResult.Success)
+                {
+                    return Result<IReadOnlyList<EmployeeResultDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                _employeeMasterList = repoResult.Value;
+            }
+
+            return Result<IReadOnlyList<EmployeeResultDTO>>.SuccessResult(_employeeMasterList!);
         }
         #endregion
     }

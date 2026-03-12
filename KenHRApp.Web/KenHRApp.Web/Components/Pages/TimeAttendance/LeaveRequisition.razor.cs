@@ -8,6 +8,8 @@ using MudBlazor;
 using System.Text;
 using KenHRApp.Web.Components.Common.Interface;
 using Mono.TextTemplating;
+using KenHRApp.Application.Services;
+using KenHRApp.Application.DTOs.TNA;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
@@ -15,6 +17,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
     {
         #region Parameters and Injections
         [Inject] private ILeaveRequestService LeaveService { get; set; } = default!;
+        [Inject] private IEmployeeService EmployeeService { get; set; } = default!;
         [Inject] private IDialogService DialogService { get; set; } = default!;
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
@@ -78,6 +81,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             Warning,
             Error
         }
+
+        private enum UDCKeys
+        {
+            LEAVETYPES,         // Leave Request Types
+            LEAVEAPVFLAG,       // Leave Approval Flags
+            LEAVEAPORTION       // Leave Day Portions
+        }
         #endregion
 
         #region Dialog Box Button Icons
@@ -105,7 +115,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<UserDefinedCodeDTO> _leaveModeList = new List<UserDefinedCodeDTO>();
 
         private string[]? _employeeArray = null;
-        private IReadOnlyList<EmployeeDTO> _employeeList = new List<EmployeeDTO>();
+        private IReadOnlyList<EmployeeResultDTO> _employeeList = new List<EmployeeResultDTO>();
         #endregion
 
         #endregion
@@ -147,8 +157,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 if (State.AuthenticatedUser != null)
                 {
-                    UserName = State.AuthenticatedUser!.EmployeeShortName;
+                    UserName = State.AuthenticatedUser!.EmployeeFullName;
                     UserEmpNo = State.AuthenticatedUser.EmployeeNo;
+
+                    BeginLoadComboboxTask();
                 }
             }
         }
@@ -568,6 +580,118 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
 
             return _leaveModeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+        #endregion
+
+        #region Database Methods
+        private void BeginLoadComboboxTask()
+        {
+            _isRunning = true;
+
+            // Set the overlay message
+            if (!State.IsAuthenticated)
+                overlayMessage = "Authentication required. Redirecting to login page...";
+            else
+                overlayMessage = "Initializing form, please wait...";
+
+            _ = LoadComboboxAsync(async () =>
+            {
+                _isRunning = false;
+
+                if (_errorMessage.Length > 0)
+                    ShowHideError(true);
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            });
+        }
+
+        private async Task LoadComboboxAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(300);
+
+            #region Get employee list
+            var repoResult = await LookupCache.GetEmployeeAsync();
+            if (repoResult.Success)
+            {
+                _employeeList = repoResult.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(repoResult.Error);
+            }
+
+            if (_employeeList != null)
+            {
+                _employeeArray = _employeeList.Select(d => d.EmployeeNameWithCode).OrderBy(d => d).ToArray();
+            }
+            #endregion
+
+            #region Get all UDC group codes
+            List<UserDefinedCodeGroupDTO>? udcGroupList = new();
+            int groupID = 0;
+
+            var resultUDC = await EmployeeService.GetUserDefinedCodeGroupAsync();
+            if (resultUDC.Success)
+            {
+                udcGroupList = resultUDC!.Value;
+            }
+            else
+                _errorMessage.Append(resultUDC.Error);
+            #endregion
+
+            // Get UDC dataset
+            var result = await EmployeeService.GetUserDefinedCodeAllAsync();
+            if (result.Success)
+            {
+                var udcData = result.Value;
+                if (udcData!.Any() && udcGroupList!.Any())
+                {
+                    #region Get Leave Types
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.LEAVETYPES.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Leave Types group id: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _leaveTypeList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_leaveTypeList != null)
+                            _leaveTypeArray = _leaveTypeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Leave Day Portions
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.LEAVEAPORTION.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Leave Mode group id: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _leaveModeList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_leaveModeList != null)
+                            _leaveModeArray = _leaveModeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
         }
         #endregion
     }

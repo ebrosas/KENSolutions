@@ -90,6 +90,12 @@ namespace KenHRApp.Infrastructure.Data
                 entity.HasNoKey();
                 entity.ToView(null); // prevents migration
             });
+
+            modelBuilder.Entity<EmployeeResult>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView(null); // prevents migration
+            });
             #endregion                        
 
             #region Configure models

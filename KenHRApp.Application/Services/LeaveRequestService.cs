@@ -1,7 +1,9 @@
 ﻿using Azure.Core;
 using KenHRApp.Application.DTOs;
+using KenHRApp.Application.DTOs.TNA;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Domain.Entities;
+using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Repositories;
 using System;
@@ -37,7 +39,7 @@ namespace KenHRApp.Application.Services
         private readonly string CONST_REJECTED = "R";
         #endregion
 
-        #region Constructors
+        #region Contructors
         public LeaveRequestService(ILeaveRequestRepository repository)
         {
             _repository = repository;
@@ -142,6 +144,48 @@ namespace KenHRApp.Application.Services
                 return Result<int>.Failure(ex.Message.ToString());
             }
         }
+
+        public async Task<Result<List<EmployeeResultDTO>>> GetEmployeeAsync(int? empNo = 0, string costCenter = "")
+        {
+            List<EmployeeResultDTO> employeeList = new();
+
+            try
+            {
+                var repoResult = await _repository.GetEmployeeAsync(empNo, costCenter);
+                if (!repoResult.Success)
+                {
+                    return Result<List<EmployeeResultDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null && model.Any())
+                {
+                    employeeList = model.Select(e => new EmployeeResultDTO
+                    {
+                        EmployeeId = e.EmployeeId,
+                        EmployeeNo = e.EmployeeNo,
+                        FirstName = e.FirstName,
+                        MiddleName = e.MiddleName,
+                        LastName = e.LastName,
+                        Gender = e.Gender,
+                        HireDate = e.HireDate,
+                        DOB = e.DOB,
+                        ReportingManagerCode = e.ReportingManagerCode,
+                        ReportingManager = e.ReportingManager,
+                        DepartmentCode = e.DepartmentCode,
+                        DepartmentName = e.DepartmentName,
+                        JobTitle = e.JobTitle
+                    }).ToList();
+                }
+
+                return Result<List<EmployeeResultDTO>>.SuccessResult(employeeList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<EmployeeResultDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching employee list from the database.");
+            }
+        }
+
         #endregion
     }
 }

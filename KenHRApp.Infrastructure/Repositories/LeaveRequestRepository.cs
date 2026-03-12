@@ -1,6 +1,8 @@
 ﻿using KenHRApp.Domain.Entities;
+using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,6 +65,46 @@ namespace KenHRApp.Infrastructure.Repositories
             catch (Exception ex)
             {
                 return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<List<EmployeeResult>>> GetEmployeeAsync(int? empNo, string? costCenter)
+        {
+            List<EmployeeResult> employeeList = new();
+
+            try
+            {
+                var model = await _db.Set<EmployeeResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetEmployeeList @empNo = {0}, @costCenter = {1}",
+                    empNo!, costCenter!)
+                    .AsNoTracking()
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    employeeList = model.Select(e => new EmployeeResult
+                    {
+                        EmployeeId = e.EmployeeId,
+                        EmployeeNo = e.EmployeeNo,
+                        FirstName  = e.FirstName,
+                        MiddleName  = e.MiddleName,
+                        LastName  = e.LastName,
+                        Gender  = e.Gender,
+                        HireDate  = e.HireDate,
+                        DOB  = e.DOB,
+                        ReportingManagerCode  = e.ReportingManagerCode,
+                        ReportingManager  = e.ReportingManager,
+                        DepartmentCode  = e.DepartmentCode,
+                        DepartmentName  = e.DepartmentName,
+                        JobTitle = e.JobTitle
+                    }).ToList();
+                }
+
+                return Result<List<EmployeeResult>>.SuccessResult(employeeList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<EmployeeResult>>.Failure($"Database error: {ex.Message}");
             }
         }
         #endregion

@@ -1,4 +1,5 @@
 ﻿using KenHRApp.Domain.Entities;
+using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Domain.Models.Common;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace KenHRApp.Infrastructure.Repositories
 
         #region Abstract methods
         Task<Result<int>> AddLeaveRequestAsync(LeaveRequisitionWF entity, CancellationToken cancellationToken);
+        Task<Result<List<EmployeeResult>>> GetEmployeeAsync(int? empNo, string? costCenter);
         #endregion
     }
 }

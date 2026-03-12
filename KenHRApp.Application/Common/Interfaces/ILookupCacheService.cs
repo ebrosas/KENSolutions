@@ -1,4 +1,5 @@
 ﻿using KenHRApp.Application.DTOs;
+using KenHRApp.Application.DTOs.TNA;
 using KenHRApp.Domain.Models.Common;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ namespace KenHRApp.Application.Common.Interfaces
         Task<Result<IReadOnlyList<EmployeeDTO>>> GetReportingManagerAsync(bool forceLoad = false);
         Task<Result<IReadOnlyList<UserDefinedCodeDTO>>> GetChangeTypeAsync(bool forceLoad = false);
         Task<Result<IReadOnlyList<ShiftPatternMasterDTO>>> GetShiftPatternAsync(bool forceLoad = false);
+        Task<Result<IReadOnlyList<EmployeeResultDTO>>> GetEmployeeAsync(bool forceLoad = false);
         #endregion
     }
 }

@@ -113,25 +113,10 @@
                 <MudGrid Spacing="5">
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="w-100">
-                            <!--
-                            <MudAutocomplete @bind-Value="_selectedLeaveType"
-                                             SearchFunc="SearchLeaveTypes!"
-                                             Variant="Variant.Text"
-                                             Label="Leave Type"
-                                             Margin="Margin.Normal"
-                                             Dense="true"
-                                             Placeholder="Please Select"
-                                             HelperText="Type a key to search for leave type"
-                                             HelperTextOnFocus="true"
-                                             Clearable="true" Typo="Typo.subtitle2"
-                                             MaxItems="@(_leaveTypeList != null ? _leaveTypeList.Count : 10)"
-                                             Modal="true" />
-                            -->
-
                             <MudAutocomplete @bind-Value="_leaveRequest.LeaveTypeDesc"
                                              For="@(() => _leaveRequest.LeaveTypeDesc)"
                                              Class="employee-autocomplete"
-                                             Label="Religion"
+                                             Label="Leave Type"
                                              SearchFunc="SearchLeaveTypes!"
                                              Variant="Variant.Text"
                                              Margin="Margin.Dense"
@@ -189,7 +174,7 @@
                                              For="@(() => _leaveRequest.StartDayModeDesc)"
                                              SearchFunc="SearchLeaveMode!"
                                              Variant="Variant.Text"
-                                             Label="Mode"
+                                             Label="Start Day Mode"
                                              Margin="Margin.Dense"
                                              Dense="true"
                                              Placeholder="Please Select"
@@ -226,7 +211,7 @@
                                              For="@(() => _leaveRequest.EndDayModeDesc)"
                                              SearchFunc="SearchLeaveMode!"
                                              Variant="Variant.Text"
-                                             Label="Mode"
+                                             Label="End Day Mode"
                                              Margin="Margin.Dense"
                                              Dense="true"
                                              Placeholder="Please Select"
@@ -253,41 +238,88 @@
                     </MudItem>
 
                     <MudItem xs="6">
-                        <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Class="mud-width-full">
-                            <MudFileUpload @bind-Files="_files"
-                                           Class="mt-3"
-                                           Accept=".doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.pdf,.png,.jpg"
-                                           MaxFileSize="10485760"
-                                           Disabled="@_btnProcessing">
-
-                                <ActivatorContent>
-                                    <MudButton Variant="Variant.Filled"
-                                               Color="Color.Primary">
-                                        Upload Files
-                                    </MudButton>
-                                </ActivatorContent>
-
-                            </MudFileUpload>
-
-                            @if (_files?.Any() == true)
-                            {
-                                <MudChipSet T="IBrowserFile" Class="mt-2">
-                                    @foreach (var file in _files)
-                                    {
-                                        <MudChip T="IBrowserFile"
-                                                 Color="Color.Primary"
-                                                 Variant="Variant.Outlined"
-                                                 Closeable="true"
-                                                 Disabled="@_btnProcessing"
-                                                 OnClose="@(() => RemoveFile(file))">
-                                            @file.Name (@(file.Size / 1024) KB)
-                                        </MudChip>
-                                    }
-                                </MudChipSet>
-                            }
+                        <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Spacing="5" Breakpoint="Breakpoint.Xs">
+                            <MudStack Justify="Justify.FlexStart" Spacing="0">
+                                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
+                                    <MudAvatar Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
+                                        <MudIcon Icon="@Icons.Material.Filled.TimeToLeave" />
+                                    </MudAvatar>
+                                    @* <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.LeaveDuration!.Value.ToString("F2") days</MudText> *@
+                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">0 days</MudText>
+                                    </MudStack>
+                                    <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Success">Leave Duration</MudText>
+                            </MudStack>
+                            <MudStack Justify="Justify.FlexStart" Spacing="0">
+                                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
+                                    <MudAvatar Size="Size.Small" Color="Color.Secondary" Variant="Variant.Filled">
+                                        <MudIcon Icon="@Icons.Material.Filled.Weekend" />
+                                    </MudAvatar>
+                                    @* <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.NoOfWeekends!.Value.ToString("F2") days</MudText> *@
+                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Secondary">0 days</MudText>
+                                    </MudStack>
+                                 <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">Weekends</MudText>
+                            </MudStack>
+                            <MudStack Justify="Justify.FlexStart" Spacing="0">
+                                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
+                                    <MudAvatar Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
+                                        <MudIcon Icon="@Icons.Material.Filled.HolidayVillage" />
+                                    </MudAvatar>
+                                    @* <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.NoOfHolidays!.Value.ToString("F2") days</MudText> *@
+                                    <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Info">0 days</MudText>
+                                </MudStack>
+                                 <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Info">Holidays</MudText>
+                            </MudStack>
                         </MudStack>
                     </MudItem>
                 </MudGrid>
+
+                <MudExpansionPanels Elevation="0" MultiExpansion="true" Class="p-0 m-0">
+                    <MudExpansionPanel Class="p-0" Dense Gutters Expanded>
+                        <TitleContent>
+                            <div class="d-flex">
+                                <MudIcon Icon="fas fa-briefcase" Style="color: #004165;" class="mr-2" Size=Size.Small></MudIcon>
+                                <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>File Attachments</strong></MudText>
+                            </div>
+                        </TitleContent>
+                        <ChildContent>
+                            <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Class="mud-width-full">
+                                <MudFileUpload @bind-Files="_files"
+                                               Class="mt-1"
+                                               Accept=".doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.pdf,.png,.jpg"
+                                               MaxFileSize="10485760"
+                                               Disabled="@_btnProcessing">
+
+                                    <ActivatorContent>
+                                        <MudButton Variant="Variant.Filled"
+                                            EndIcon="@Icons.Material.Filled.AttachFile"
+                                            Size="Size.Small"
+                                            Color="Color.Primary">
+                                            Upload Files
+                                        </MudButton>
+                                    </ActivatorContent>
+
+                                </MudFileUpload>
+
+                                @if (_files?.Any() == true)
+                                {
+                                    <MudChipSet T="IBrowserFile" Class="mt-2">
+                                        @foreach (var file in _files)
+                                        {
+                                            <MudChip T="IBrowserFile"
+                                                     Color="Color.Primary"
+                                                     Variant="Variant.Outlined"
+                                                     Closeable="true"
+                                                     Disabled="@_btnProcessing"
+                                                     OnClose="@(() => RemoveFile(file))">
+                                                @file.Name (@(file.Size / 1024) KB)
+                                            </MudChip>
+                                        }
+                                    </MudChipSet>
+                                }
+                            </MudStack>
+                        </ChildContent>
+                    </MudExpansionPanel>
+                </MudExpansionPanels>
             </MudPaper>
             <MudScrollToTop TopOffset="100"
                             Selector="#mainPanel"

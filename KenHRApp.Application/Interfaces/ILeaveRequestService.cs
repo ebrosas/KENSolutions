@@ -1,4 +1,5 @@
 ﻿using KenHRApp.Application.DTOs;
+using KenHRApp.Application.DTOs.TNA;
 using KenHRApp.Domain.Models.Common;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace KenHRApp.Application.Interfaces
     {
         #region Abstract Methods
         Task<Result<int>> AddLeaveRequestAsync(LeaveRequisitionDTO dto, CancellationToken cancellationToken = default);
+        Task<Result<List<EmployeeResultDTO>>> GetEmployeeAsync(int? empNo = 0, string costCenter = "");
         #endregion
     }
 }

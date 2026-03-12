@@ -1,0 +1,53 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace KenHRApp.Application.DTOs.TNA
+{
+    public class EmployeeResultDTO
+    {
+        #region Properties
+        public int EmployeeId { get; set; }
+        public int EmployeeNo { get; set; }
+        public string? FirstName { get; set; } = null;
+        public string? MiddleName { get; set; } = null;
+        public string? LastName { get; set; } = null;
+        public string? Gender { get; set; } = null;
+        public DateTime? HireDate { get; set; } = null;
+        public DateTime? DOB { get; set; } = null;
+        public string? ReportingManagerCode { get; set; } = null;
+        public string? ReportingManager { get; set; } = null;
+        public string? DepartmentCode { get; set; } = null;
+        public string? DepartmentName { get; set; } = null;
+        public string JobTitle { get; set; } = null!;
+        #endregion
+
+        #region Extended Properties
+        public string EmployeeFullName
+        {
+            get
+            {
+                return $"{FirstName} {MiddleName} {LastName}";
+            }
+        }
+
+        public string EmployeeShortName
+        {
+            get
+            {
+                return $"{FirstName} {LastName}";
+            }
+        }
+
+        public string EmployeeNameWithCode
+        {
+            get
+            {
+                return $"{EmployeeNo} - {FirstName} {MiddleName} {LastName}";
+            }
+        }
+        #endregion
+    }
+}
