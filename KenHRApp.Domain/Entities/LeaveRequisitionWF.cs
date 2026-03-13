@@ -106,6 +106,11 @@ namespace KenHRApp.Domain.Entities
         #endregion
 
         #region Extended Properties
+        public int? LeaveStatusID { get; set; }
+
+        [Column(TypeName = "varchar(20)")]
+        public string? StatusHandlingCode { get; set; } = null;
+
         public Guid WorkflowId { get; private set; } = Guid.NewGuid();
 
         [Column(TypeName = "tinyint")]
@@ -113,9 +118,10 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "tinyint")]
         public byte? EndDayMode { get; set; }
+        #endregion
 
-        private readonly List<LeaveAttachment> _attachments = new();
-        public IReadOnlyCollection<LeaveAttachment> Attachments => _attachments;
+        #region Reference Navigations
+        public ICollection<LeaveAttachment> AttachmentList { get; set; } = new List<LeaveAttachment>();
         #endregion
 
         #region Constructors
@@ -126,7 +132,7 @@ namespace KenHRApp.Domain.Entities
         public void AddAttachment(int leaveRequestId, string fileName, string contentType,
             string storedFileName, long fileSize, byte[] data)
         {
-            _attachments.Add(new LeaveAttachment(leaveRequestId, fileName, contentType,
+            AttachmentList.Add(new LeaveAttachment(leaveRequestId, fileName, contentType,
                 storedFileName, fileSize, data));
         }
         #endregion

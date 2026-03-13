@@ -61,8 +61,9 @@
                                ButtonType="ButtonType.Submit"
                                Size="Size.Small"
                                Color="Color.Success"
+                               Style="background-color:#004165;"
                                Disabled="@(!_saveBtnEnabled)">
-                        Save
+                        Submit
                     </MudButton>
 
                     @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
@@ -110,6 +111,43 @@
 
         <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
             <MudPaper Elevation="0" Square="true" Class="w-100 px-4 mt-5">
+                 <MudGrid Spacing="5">
+                    <MudItem xs="12">
+                        <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Spacing="4">
+                             <MudStack Justify="Justify.FlexStart" Spacing="0">
+                                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
+                                     <MudAvatar Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
+                                         <MudIcon Icon="@Icons.Material.Filled.TimeToLeave" />
+                                     </MudAvatar>
+                                     @* <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.LeaveDuration!.Value.ToString("F2") days</MudText> *@
+                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">0 days</MudText>
+                                 </MudStack>
+                                 <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Success">Leave Duration</MudText>
+                             </MudStack>
+                             <MudStack Justify="Justify.FlexStart" Spacing="0">
+                                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
+                                     <MudAvatar Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
+                                         <MudIcon Icon="@Icons.Material.Filled.Weekend" />
+                                     </MudAvatar>
+                                     @* <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.NoOfWeekends!.Value.ToString("F2") days</MudText> *@
+                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Info">0 days</MudText>
+                                 </MudStack>
+                                 <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Info">Weekends</MudText>
+                             </MudStack>
+                             <MudStack Justify="Justify.FlexStart" Spacing="0">
+                                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
+                                     <MudAvatar Size="Size.Small" Color="Color.Secondary" Variant="Variant.Filled">
+                                         <MudIcon Icon="@Icons.Material.Filled.HolidayVillage" />
+                                     </MudAvatar>
+                                     @* <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.NoOfHolidays!.Value.ToString("F2") days</MudText> *@
+                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Secondary">0 days</MudText>
+                                 </MudStack>
+                                 <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">Holidays</MudText>
+                             </MudStack>
+                         </MudStack>
+                    </MudItem>
+                </MudGrid>
+
                 <MudGrid Spacing="5">
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="w-100">
@@ -128,6 +166,7 @@
                                              Typo="Typo.subtitle2"
                                              Disabled="@_isDisabled"
                                              MaxItems="@(_leaveTypeList != null ? _leaveTypeList.Count : 10)"
+                                             Required="true" RequiredError="Leave Type is required"
                                              Modal="true" />
                         </MudPaper>
                     </MudItem>
@@ -147,6 +186,7 @@
                                              Typo="Typo.subtitle2"
                                              Disabled="@_isDisabled"
                                              MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
+                                              Required="true" RequiredError="Employee is required"
                                              Modal="true" />
                         </MudPaper>
                     </MudItem>
@@ -160,6 +200,7 @@
                                            For="@(() => _leaveRequest.LeaveStartDate)"
                                            Margin="Margin.Dense" 
                                            HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" Clearable="false" Disabled="@_isDisabled" Color="Color.Surface"
+                                            Required="true" RequiredError="Start Date is required"
                                            Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = DateTime.Today))">Today</MudButton>
@@ -192,12 +233,13 @@
                 <MudGrid Spacing="5">
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudDatePicker Label="Start Date" Editable="true" AutoClose="true"
-                                           @bind-Date="_leaveRequest.LeaveResumeDate"
-                                           For="@(() => _leaveRequest.LeaveResumeDate)"
-                                           Margin="Margin.Dense"
-                                           HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" Clearable="false" Disabled="@_isDisabled" Color="Color.Surface"
-                                           Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Text">
+                        <MudDatePicker Label="Resume Date" Editable="true" AutoClose="true"
+                                        @bind-Date="_leaveRequest.LeaveResumeDate"
+                                        For="@(() => _leaveRequest.LeaveResumeDate)"
+                                        Margin="Margin.Dense"
+                                        HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" Clearable="false" Disabled="@_isDisabled" Color="Color.Surface"
+                                        Required="true" RequiredError="Resume Date is required"
+                                        Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveResumeDate = DateTime.Today))">Today</MudButton>
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveResumeDate = null))">Clear</MudButton>
@@ -233,46 +275,35 @@
                                           For="@(() => _leaveRequest.LeaveRemarks)"
                                           HelperText="Max. text input is 500 chars."
                                           Variant="Variant.Text" HelperTextOnFocus="true" Counter="500" MaxLength="500" Lines="3"
+                                           Required="true" RequiredError="Leave Reason is required"
                                           Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                         </MudPaper>
                     </MudItem>
 
                     <MudItem xs="6">
-                        <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Spacing="5" Breakpoint="Breakpoint.Xs">
-                            <MudStack Justify="Justify.FlexStart" Spacing="0">
-                                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
-                                    <MudAvatar Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
-                                        <MudIcon Icon="@Icons.Material.Filled.TimeToLeave" />
-                                    </MudAvatar>
-                                    @* <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.LeaveDuration!.Value.ToString("F2") days</MudText> *@
-                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">0 days</MudText>
-                                    </MudStack>
-                                    <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Success">Leave Duration</MudText>
-                            </MudStack>
-                            <MudStack Justify="Justify.FlexStart" Spacing="0">
-                                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
-                                    <MudAvatar Size="Size.Small" Color="Color.Secondary" Variant="Variant.Filled">
-                                        <MudIcon Icon="@Icons.Material.Filled.Weekend" />
-                                    </MudAvatar>
-                                    @* <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.NoOfWeekends!.Value.ToString("F2") days</MudText> *@
-                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Secondary">0 days</MudText>
-                                    </MudStack>
-                                 <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">Weekends</MudText>
-                            </MudStack>
-                            <MudStack Justify="Justify.FlexStart" Spacing="0">
-                                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
-                                    <MudAvatar Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
-                                        <MudIcon Icon="@Icons.Material.Filled.HolidayVillage" />
-                                    </MudAvatar>
-                                    @* <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.NoOfHolidays!.Value.ToString("F2") days</MudText> *@
-                                    <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Info">0 days</MudText>
-                                </MudStack>
-                                 <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Info">Holidays</MudText>
-                            </MudStack>
-                        </MudStack>
+                        <MudPaper Elevation="0">
+                            <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Spacing="3" Breakpoint="Breakpoint.Xs">
+                                 <MudPaper Elevation="0">
+                                     <MudText Typo="Typo.caption" Align="Align.Start" Style="color: #004165;">Require Visa?</MudText>
+                                     <MudPaper Elevation="0" Class="p-0 w-100 d-flex justify-content-start">
+                                         <MudSwitch @bind-Value="_leaveRequest.LeaveVisaRequired" Color="Color.Success" UncheckedColor="Color.Default"
+                                                    Disabled="@_isDisabled"
+                                                    LabelPlacement="Placement.Start">No/Yes</MudSwitch>
+                                     </MudPaper>
+                                 </MudPaper>
+                                 <MudPaper Elevation="0">
+                                     <MudText Typo="Typo.caption" Align="Align.Start" Style="color: #004165;">Require Adv. Payment?</MudText>
+                                     <MudPaper Elevation="0" Class="p-0 w-100 d-flex justify-content-start">
+                                         <MudSwitch @bind-Value="_leaveRequest.LeavePayAdv" Color="Color.Success" UncheckedColor="Color.Default"
+                                                    Disabled="@_isDisabled"
+                                                    LabelPlacement="Placement.Start">No/Yes</MudSwitch>
+                                     </MudPaper>
+                                 </MudPaper>
+                            </MudStack>                            
+                        </MudPaper>
                     </MudItem>
                 </MudGrid>
-
+                               
                 <MudExpansionPanels Elevation="0" MultiExpansion="true" Class="p-0 m-0">
                     <MudExpansionPanel Class="p-0" Dense Gutters Expanded>
                         <TitleContent>
@@ -293,7 +324,7 @@
                                         <MudButton Variant="Variant.Filled"
                                             EndIcon="@Icons.Material.Filled.AttachFile"
                                             Size="Size.Small"
-                                            Color="Color.Primary">
+                                                   Color="Color.Info">
                                             Upload Files
                                         </MudButton>
                                     </ActivatorContent>
@@ -306,7 +337,7 @@
                                         @foreach (var file in _files)
                                         {
                                             <MudChip T="IBrowserFile"
-                                                     Color="Color.Primary"
+                                                     Color="Color.Info"
                                                      Variant="Variant.Outlined"
                                                      Closeable="true"
                                                      Disabled="@_btnProcessing"

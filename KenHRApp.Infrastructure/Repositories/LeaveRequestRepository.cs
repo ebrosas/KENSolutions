@@ -39,23 +39,20 @@ namespace KenHRApp.Infrastructure.Repositories
         #endregion
 
         #region Abstract methods
-        public async Task<Result<int>> AddLeaveRequestAsync(LeaveRequisitionWF entity, CancellationToken cancellationToken)
+        /// <summary>
+        /// Add new leave request
+        /// </summary>
+        public async Task<Result<int>> AddLeaveRequestAsync(LeaveRequisitionWF leaveRequest, CancellationToken cancellationToken)
         {
-            int rowsUpdated = 0;
+            int rowsInserted = 0;
 
             try
             {
-                // Add new leave request entity
-                var newShiftRoster = new LeaveRequisitionWF
-                {
-                    LeaveEmpNo = entity.LeaveEmpNo,
-                    LeaveEmpName = entity.LeaveEmpName
-                };
-
                 // Save to database
-                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                _db.LeaveRequisitionWFs.Add(leaveRequest);
+                rowsInserted = await _db.SaveChangesAsync(cancellationToken);
 
-                return Result<int>.SuccessResult(rowsUpdated);
+                return Result<int>.SuccessResult(rowsInserted);
 
             }
             catch (InvalidOperationException invEx)
@@ -65,6 +62,103 @@ namespace KenHRApp.Infrastructure.Repositories
             catch (Exception ex)
             {
                 return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Update leave request
+        /// </summary>
+        public async Task<Result<int>> UpdateLeaveRequestAsync(LeaveRequisitionWF leaveRequest, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (leaveRequest == null)
+                    throw new ArgumentNullException(nameof(leaveRequest));
+
+                var existing = await _db.LeaveRequisitionWFs
+                    .FirstOrDefaultAsync(e =>
+                        e.LeaveRequestId == leaveRequest.LeaveRequestId,
+                        cancellationToken);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find leave request with the specified request no.");
+
+                #region Update leave request information
+                existing.LeaveType = leaveRequest.LeaveType;
+                existing.LeaveStartDate = leaveRequest.LeaveStartDate;
+                existing.StartDayMode = leaveRequest.StartDayMode;
+                existing.LeaveResumeDate = leaveRequest.LeaveResumeDate;
+                existing.EndDayMode = leaveRequest.EndDayMode;
+                existing.LeaveRemarks = leaveRequest.LeaveRemarks;
+                existing.LeaveVisaRequired = leaveRequest.LeaveVisaRequired;
+                existing.LeavePayAdv = leaveRequest.LeavePayAdv;
+                existing.LeaveUpdatedBy = leaveRequest.LeaveUpdatedBy;
+                existing.LeaveUpdatedUserID = leaveRequest.LeaveUpdatedUserID;
+                existing.LeaveUpdatedEmail = leaveRequest.LeaveUpdatedEmail;
+                existing.LeaveUpdatedDate = leaveRequest.LeaveUpdatedDate;
+                #endregion
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Cancel leave request
+        /// </summary>
+        public async Task<Result<int>> CancelLeaveRequestAsync(LeaveRequisitionWF leaveRequest, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (leaveRequest == null)
+                    throw new ArgumentNullException(nameof(leaveRequest));
+
+                var existing = await _db.LeaveRequisitionWFs
+                    .FirstOrDefaultAsync(e =>
+                        e.LeaveRequestId == leaveRequest.LeaveRequestId,
+                        cancellationToken);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find leave request with the specified request no.");
+
+                #region Update leave request information to cancel the request
+                existing.LeaveStatusCode = leaveRequest.LeaveStatusCode;
+                existing.LeaveUpdatedBy = leaveRequest.LeaveUpdatedBy;
+                existing.LeaveUpdatedUserID = leaveRequest.LeaveUpdatedUserID;
+                existing.LeaveUpdatedEmail = leaveRequest.LeaveUpdatedEmail;
+                existing.LeaveUpdatedDate = leaveRequest.LeaveUpdatedDate;
+                #endregion
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
             }
         }
 
@@ -105,6 +199,32 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 // Log error here if needed (Serilog, NLog, etc.)
                 return Result<List<EmployeeResult>>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<bool>> CheckIfLeaveDateIsHolidayAsync(DateTime? leaveDate)
+        {
+            bool result = false;
+
+            try
+            {
+                if (leaveDate == null)
+                    return Result<bool>.Failure("Leave date cannot be null.");
+
+                var query = _db.Holidays.AsQueryable()
+                            .Where(h => h.HolidayDate.Date == leaveDate.Value.Date &&
+                            h.HolidayType == 1);
+
+                var model = await query.FirstOrDefaultAsync();
+                if (model != null)
+                    result = true;
+
+                return Result<bool>.SuccessResult(result);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<bool>.Failure($"Database error: {ex.Message}");
             }
         }
         #endregion

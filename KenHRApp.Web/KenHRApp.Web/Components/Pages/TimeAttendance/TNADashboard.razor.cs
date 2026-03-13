@@ -385,7 +385,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         public void GoToLeaveRequest()
         {
-            Navigation.NavigateTo("/TimeAttendance/leaverequest");
+            Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=Add");
         }
         #endregion
 

@@ -48,6 +48,14 @@ namespace KenHRApp.Application.DTOs.TNA
                 return $"{EmployeeNo} - {FirstName} {MiddleName} {LastName}";
             }
         }
+
+        public string EmployeeNameWithCostCenter
+        {
+            get
+            {
+                return $"{EmployeeNo} - {FirstName} {LastName} ({DepartmentName})";
+            }
+        }
         #endregion
     }
 }

@@ -54,6 +54,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _isEditMode = false;
         private bool _saveBtnEnabled = false;
         private bool _btnProcessing = false;
+        private bool _forceLoad = false;
         #endregion
 
         #region Enums
@@ -122,6 +123,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         #region IPageAuthorization Implementation
         public string UserName { get; set; } = "Anonymous User";
+        public string? UserID { get; set; } = "";
+        public string? UserEmail { get; set; } = "";
         public int UserEmpNo { get; set; } = 0;
 
         public void GoToLogin()
@@ -159,6 +162,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 {
                     UserName = State.AuthenticatedUser!.EmployeeFullName;
                     UserEmpNo = State.AuthenticatedUser.EmployeeNo;
+                    UserID = State.AuthenticatedUser!.UserID;
+                    UserEmail = State.AuthenticatedUser!.OfficialEmail;
 
                     BeginLoadComboboxTask();
                 }
@@ -171,20 +176,32 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             _hasValidationError = true;
             _validationMessages = context.GetValidationMessages().ToList();
-            // ShowNotification("Please fix the errors and try again.", NotificationType.Error);
         }
 
         private void HandleValidSubmit(EditContext context)
         {
             try
             {
-                #region Check for Shift Timing Sequence
-                //if (_shiftPattern.ShiftPointerList.Any() == false)
-                //{
-                //    ShowNotification("At least one (1) Shift pointer must be added to the Shift Timing Sequence.", NotificationType.Error);
-                //    return;
-                //}
+                #region Check if Leave Start Date is public holiday or not
+                bool isStartDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_leaveRequest.LeaveStartDate).Result;
+                if (isStartDateHoliday)
+                {
+                    _hasValidationError = true;
+                    _validationMessages.Append("Start Date should not be a public holiday.");
+                }
                 #endregion
+
+                #region Check if Leave Resume Date is public holiday or not
+                bool isResumeDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_leaveRequest.LeaveResumeDate).Result;
+                if (isResumeDateHoliday)
+                {
+                    _hasValidationError = true;
+                    _validationMessages.Append("Resume Date should not be a public holiday.");
+                }
+                #endregion
+
+                if (_hasValidationError && _validationMessages.Any())
+                    return;
 
                 // If we got here, model is valid
                 _hasValidationError = false;
@@ -196,7 +213,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set the overlay message
                 overlayMessage = "Saving changes, please wait...";
 
-                _ = SaveLeaveRequestAsync(async () =>
+                _ = SubmitLeaveRequestAsync(async () =>
                 {
                     _isRunning = false;
 
@@ -326,7 +343,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Cancel"},
                 { "DialogIcon", _iconCancel },
-                { "ContentText", "Do you really want to cancel this leave request?" },
+                { "ContentText", "Are you sure you want to cancel submitting leave request?" },
                 { "ConfirmText", "Yes" },
                 { "CancelText", "No" },
                 { "Color", Color.Success }
@@ -338,13 +355,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                CancelAddShiftRoster();
+                CancelAddingLeaveRequest();
             }
         }
 
-        private void CancelAddShiftRoster()
+        private void CancelAddingLeaveRequest()
         {
-            Navigation.NavigateTo("/TimeAttendance/shiftrostersearch");
+            Navigation.NavigateTo("/TimeAttendance/tnadashboard");
         }
 
         private void ShowNotification(string message, NotificationType type)
@@ -384,7 +401,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task SaveLeaveRequestAsync(Func<Task> callback)
+        private async Task SubmitLeaveRequestAsync(Func<Task> callback)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(500);
@@ -392,65 +409,69 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Reset error messages
             _errorMessage.Clear();
 
-            //bool isNewRequition = _shiftPattern.ShiftPatternId == 0;
+            bool isNewRequition = _leaveRequest.LeaveRequestId == 0;
 
-            //// Initialize the cancellation token
-            //_cts = new CancellationTokenSource();
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
 
-            //bool isSuccess = true;
-            //string errorMsg = string.Empty;
+            bool isSuccess = true;
+            string errorMsg = string.Empty;
 
-            //if (isNewRequition)
-            //{
-            //    // Set the user who created the record and the timestamp
-            //    _shiftPattern.CreatedDate = DateTime.Now;
+            if (isNewRequition)
+            {
+                // Set the user who created the record and the timestamp
+                _leaveRequest.LeaveCreatedDate = DateTime.Now;
+                _leaveRequest.LeaveCreatedBy = UserEmpNo;
+                _leaveRequest.LeaveCreatedUserID = UserID;
 
-            //    var addResult = await AttendanceService.AddShiftRosterMasterAsync(_shiftPattern, _cts.Token);
-            //    isSuccess = addResult.Success;
-            //    if (!isSuccess)
-            //        errorMsg = addResult.Error!;
-            //    else
-            //    {
-            //        // Set flag to enable reload of _recruitmentRequests when navigating back to the Employe Search page
-            //        _forceLoad = true;
-            //    }
-            //}
-            //else
-            //{
-            //    // Set the user who created the record and the timestamp
-            //    _shiftPattern.LastUpdateDate = DateTime.Now;
+                var addResult = await LeaveService.AddLeaveRequestAsync(_leaveRequest, _cts.Token);
+                isSuccess = addResult.Success;
+                if (!isSuccess)
+                    errorMsg = addResult.Error!;
+                else
+                {
+                    // Set flag to enable reload when navigating back to the caller page
+                    _forceLoad = true;
+                }
+            }
+            else
+            {
+                // Set the user who update the record and the timestamp
+                _leaveRequest.LeaveUpdatedDate = DateTime.Now;
+                _leaveRequest.LeaveUpdatedBy = UserEmpNo;
+                _leaveRequest.LeaveUpdatedUserID = UserID;
 
-            //    var saveResult = await AttendanceService.UpdateShiftRosterMasterAsync(_shiftPattern, _cts.Token);
-            //    isSuccess = saveResult.Success;
-            //    if (!isSuccess)
-            //        errorMsg = saveResult.Error!;
-            //}
+                var saveResult = await LeaveService.UpdateLeaveRequestAsync(_leaveRequest, _cts.Token);
+                isSuccess = saveResult.Success;
+                if (!isSuccess)
+                    errorMsg = saveResult.Error!;
+            }
 
-            //if (isSuccess)
-            //{
-            //    // Reset flags
-            //    _isEditMode = false;
-            //    _saveBtnEnabled = false;
-            //    _isDisabled = true;
+            if (isSuccess)
+            {
+                // Reset flags
+                _isEditMode = false;
+                _saveBtnEnabled = false;
+                _isDisabled = true;
 
-            //    // Hide error message if any
-            //    ShowHideError(false);
+                // Hide error message if any
+                ShowHideError(false);
 
-            //    // Show notification
-            //    if (isNewRequition)
-            //        ShowNotification("Shift Roster has been created successfully!", NotificationType.Success);
-            //    else
-            //        ShowNotification("Shift Roster has been updated successfully!", NotificationType.Success);
+                // Show notification
+                if (isNewRequition)
+                    ShowNotification("Leave request has been submitted successfully!", NotificationType.Success);
+                else
+                    ShowNotification("Leave request has been updated successfully!", NotificationType.Success);
 
-            //    // Go back to Shift Roster Master page
-            //    Navigation.NavigateTo("/TimeAttendance/shiftrostersearch");
-            //}
-            //else
-            //{
-            //    // Set the error message
-            //    _errorMessage.AppendLine(errorMsg);
-            //    ShowHideError(true);
-            //}
+                // Go back to T&A dashboard
+                Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(errorMsg);
+                ShowHideError(true);
+            }
 
             if (callback != null)
             {
@@ -625,7 +646,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             if (_employeeList != null)
             {
-                _employeeArray = _employeeList.Select(d => d.EmployeeNameWithCode).OrderBy(d => d).ToArray();
+                _employeeArray = _employeeList.Select(d => d.EmployeeNameWithCostCenter).OrderBy(d => d).ToArray();
             }
             #endregion
 

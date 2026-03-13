@@ -47,6 +47,7 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<PayrollPeriod> PayrollPeriods => Set<PayrollPeriod>();
         public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
         public DbSet<SupportTicketAttachment> SupportTicketAttachments => Set<SupportTicketAttachment>();
+        public DbSet<LeaveAttachment> LeaveAttachments => Set<LeaveAttachment>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -62,7 +63,10 @@ namespace KenHRApp.Infrastructure.Data
             // Configure SQL Server to be case-insensitive
             modelBuilder.UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
+            #region Custom Entity Configurations
             //new EmployeeEntityConfig().Configure(modelBuilder.Entity<Employee>());
+            new LeaveAttachmentConfig().Configure(modelBuilder.Entity<LeaveAttachment>());
+            #endregion
 
             #region Configure keyless models that are mapped to views or stored procedures
             modelBuilder.Entity<EmployeeMaster>().HasNoKey();
@@ -450,6 +454,15 @@ namespace KenHRApp.Infrastructure.Data
                 entity.HasIndex(e => new { e.LeaveEmpNo, e.LeaveType, e.LeaveStartDate, e.LeaveEndDate, e.LeaveStatusCode })
                      .HasDatabaseName("IX_LeaveRequisitionWF_CompoKeys")
                      .IsUnique();
+
+                #region Set relationships 
+                entity.HasMany(e => e.AttachmentList)
+                      .WithOne(e => e.LeaveRequest)
+                      .HasPrincipalKey(e => e.LeaveRequestId)     // Map to LeaveRequestId primary key of LeaveRequisitionWF principal
+                      .HasForeignKey(c => c.LeaveRequestId)
+                      .IsRequired()
+                      .OnDelete(DeleteBehavior.Cascade);
+                #endregion
             });
 
             modelBuilder.Entity<LeaveEntitlement>(
@@ -469,20 +482,20 @@ namespace KenHRApp.Infrastructure.Data
             });
 
             modelBuilder.Entity<PayrollPeriod>(
-           entity =>
-           {
-               entity.ToTable("PayrollPeriod");
-               entity.HasKey(a => a.PayrollPeriodId)
-                   .HasName("PK_PayrollPeriod_PayrollPeriodId");
-               entity.Property(a => a.PayrollPeriodId)
+            entity =>
+            {
+                entity.ToTable("PayrollPeriod");
+                entity.HasKey(a => a.PayrollPeriodId)
+                    .HasName("PK_PayrollPeriod_PayrollPeriodId");
+                entity.Property(a => a.PayrollPeriodId)
                     .ValueGeneratedOnAdd()
                     .UseIdentityColumn(1, 1); // seed = 1, increment = 1
-               entity.Property(a => a.CreatedDate)
-                       .HasDefaultValue(DateTime.Now);
-               entity.HasIndex(e => new { e.FiscalYear, e.FiscalMonth, e.PayrollStartDate, e.PayrollEndDate })
+                entity.Property(a => a.CreatedDate)
+                        .HasDefaultValue(DateTime.Now);
+                entity.HasIndex(e => new { e.FiscalYear, e.FiscalMonth, e.PayrollStartDate, e.PayrollEndDate })
                     .HasDatabaseName("IX_PayrollPeriod_CompoKeys")
                     .IsUnique();
-           });
+            });
             #endregion
 
             #region Set Employee navigation                         

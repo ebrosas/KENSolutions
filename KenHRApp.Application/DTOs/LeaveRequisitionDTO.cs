@@ -1,4 +1,6 @@
-﻿using KenHRApp.Domain.Entities;
+﻿using KenHRApp.Application.Common.Validations;
+using KenHRApp.Application.Interfaces;
+using KenHRApp.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -32,16 +34,18 @@ namespace KenHRApp.Application.DTOs
         [StringLength(50, ErrorMessage = "Email can't be more than 50 characters.")]
         public string? LeaveEmpEmail { get; set; } = null;
 
-        [Display(Name = "Leave Start Date")]
+        [Display(Name = "Start Date")]
         [DataType(DataType.Date)]
+        [LeaveDateValidation("LeaveResumeDate")] // ✅ custom validation
         public DateTime? LeaveStartDate { get; set; }
 
-        [Display(Name = "Leave End Date")]
+        [Display(Name = "End Date")]
         [DataType(DataType.Date)]
         public DateTime? LeaveEndDate { get; set; }
 
-        [Display(Name = "Leave Resume Date")]
+        [Display(Name = "Resume Date")]
         [DataType(DataType.Date)]
+        [LeaveDateValidation("LeaveStartDate")] // ✅ custom validation
         public DateTime? LeaveResumeDate { get; set; }
 
         [Label("Cost Center")]
@@ -111,6 +115,10 @@ namespace KenHRApp.Application.DTOs
         public string? LeaveUpdatedUserID { get; set; } = null;
 
         public string? LeaveUpdatedEmail { get; set; } = null;
+
+        public int? LeaveStatusID { get; set; }
+
+        public string? StatusHandlingCode { get; set; } = null;
 
         public Guid WorkflowId { get; private set; } = Guid.NewGuid();
 

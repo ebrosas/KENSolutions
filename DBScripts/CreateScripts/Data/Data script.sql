@@ -25,6 +25,11 @@
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'LEAVEAPORTION')
 
+	--Request statuses
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'STATUS')
+
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = 8
@@ -149,6 +154,9 @@
 
 	SELECT * FROM [kenuser].[SupportTickets] a
 	SELECT * FROM [kenuser].[SupportTicketAttachments] a
+
+	SELECT * FROM kenuser.Holiday a
+	WHERE YEAR(a.HolidayDate) = 2026
 
 /*	Data updates:
 

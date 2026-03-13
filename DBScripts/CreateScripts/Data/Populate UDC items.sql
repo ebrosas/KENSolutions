@@ -2310,6 +2310,117 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 		
 	*/
 	
+	/*	Populate Service Request Status
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'STATUS'
+
+		SELECT	@UDCCode					= '120',
+				@UDCDesc1					= 'Approved by Approver',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Approved',
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= '101',
+				@UDCDesc1					= 'Cancelled by User',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Cancelled',
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= '123',
+				@UDCDesc1					= 'Closed by Approver',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Closed',
+				@SequenceNo					= 3,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= '99',
+				@UDCDesc1					= 'Closed By User',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Closed',
+				@SequenceNo					= 4,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= '03',
+				@UDCDesc1					= 'Re-Opened',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Open',
+				@SequenceNo					= 5,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= '06',
+				@UDCDesc1					= 'Sent Back to User',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Open',
+				@SequenceNo					= 6,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= '04',
+				@UDCDesc1					= 'Resubmitted for processing',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Open',
+				@SequenceNo					= 7,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= '01',
+				@UDCDesc1					= 'Draft',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Open',
+				@SequenceNo					= 7,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= '05',
+				@UDCDesc1					= 'Waiting for Approval',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Open',
+				@SequenceNo					= 8,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= '121',
+				@UDCDesc1					= 'Assigned to Next Approver',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Open',
+				@SequenceNo					= 7,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= '122',
+				@UDCDesc1					= 'Reassigned to Other Approver',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Open',
+				@SequenceNo					= 9,
+				@IsActive					= 1,
+				@Amount						= NULL
+
+		SELECT	@UDCCode					= '02',
+				@UDCDesc1					= 'Request Sent',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Open',
+				@SequenceNo					= 10,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= '110',
+				@UDCDesc1					= 'Rejected By Approver',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= 'Rejected',
+				@SequenceNo					= 11,
+				@IsActive					= 1,
+				@Amount						= NULL
+		
+	*/
 
 	IF @actionType = 0
 	BEGIN

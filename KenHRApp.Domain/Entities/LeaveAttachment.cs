@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -12,8 +13,6 @@ namespace KenHRApp.Domain.Entities
         #region Properties
         public Guid Id { get; private set; } = Guid.NewGuid();
 
-        public int LeaveRequestId { get; set; }
-
         [Column(TypeName = "varchar(100)")]
         public string FileName { get; set; } = null!;
 
@@ -25,7 +24,7 @@ namespace KenHRApp.Domain.Entities
 
         public long FileSize { get; set; }
 
-        public byte[] FileData { get; set; }
+        public byte[]? FileData { get; set; }
         #endregion
 
         #region Constructors
@@ -41,6 +40,14 @@ namespace KenHRApp.Domain.Entities
             FileSize = fileSize;
             FileData = fileData;
         }
+        #endregion
+
+        #region Reference Navation to LeaveRequisitionWF
+        [Comment("Foreign key that references primary key: LeaveRequisitionWF.LeaveRequestId")]
+        [Column(TypeName = "varchar(20)")]
+        public long LeaveRequestId { get; set; }
+
+        public LeaveRequisitionWF LeaveRequest { get; set; } = default!;
         #endregion
     }
 }

@@ -31,12 +31,21 @@ namespace KenHRApp.Application.Services
         #endregion
 
         #region Constants
+
+        #region Leave Approval Flags
         private readonly string CONST_APPROVED_PAID = "A";
-        private readonly string CONST_WAITING_FOR_APPROVAL = "W";
+        private readonly string CONST_WAITING_APPROVAL = "W";
         private readonly string CONST_APPROVED_NOT_PAID = "N";
         private readonly string CONST_CANCELLED = "C";
         private readonly string CONST_DRAFT = "D";
         private readonly string CONST_REJECTED = "R";
+        #endregion
+
+        #region Leave Request Statuses
+        private readonly string CONST_REQUEST_SENT = "02";              // Request Sent
+        private readonly string CONST_WAITING_FOR_APPROVAL = "05";      // Waiting for Approval
+        #endregion
+
         #endregion
 
         #region Contructors
@@ -89,7 +98,6 @@ namespace KenHRApp.Application.Services
         {
             try
             {
-
                 LeaveDayMode startMode = LeaveDayMode.NotDefined;
                 if (Enum.IsDefined(typeof(LeaveDayMode), dto.StartDayMode!.Value))
                     startMode = (LeaveDayMode)dto.StartDayMode!.Value;
@@ -120,11 +128,16 @@ namespace KenHRApp.Application.Services
                     LeaveDuration = Convert.ToDouble(total),            
                     NoOfHolidays = dto.NoOfHolidays,
                     NoOfWeekends = dto.NoOfWeekends,
-                    LeaveCreatedBy = dto.LeaveCreatedBy,
-                    LeaveApprovalFlag = char.Parse(CONST_WAITING_FOR_APPROVAL),
+                    LeavePayAdv = dto.LeavePayAdv,
+                    LeaveVisaRequired = dto.LeaveVisaRequired,
                     LeaveRemarks = dto.LeaveRemarks,
+                    LeaveCreatedBy = dto.LeaveCreatedBy,
+                    LeaveCreatedEmail = dto.LeaveCreatedEmail,
                     LeaveCreatedUserID = dto.LeaveCreatedUserID,
-                    LeaveCreatedDate = DateTime.Now
+                    LeaveCreatedDate = dto.LeaveCreatedDate,
+                    LeaveStatusCode = dto.LeaveStatusCode,
+                    LeaveStatusID = dto.LeaveStatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode
                 };
                 #endregion
 
@@ -135,6 +148,70 @@ namespace KenHRApp.Application.Services
                         throw new Exception(result.Error);
                     else
                         throw new Exception("Unable to save leave request due to error. Please check the data entry then try to save again!");
+                }
+
+                return Result<int>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<int>> UpdateLeaveRequestAsync(LeaveRequisitionDTO dto, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                LeaveDayMode startMode = LeaveDayMode.NotDefined;
+                if (Enum.IsDefined(typeof(LeaveDayMode), dto.StartDayMode!.Value))
+                    startMode = (LeaveDayMode)dto.StartDayMode!.Value;
+
+                LeaveDayMode endMode = LeaveDayMode.NotDefined;
+                if (Enum.IsDefined(typeof(LeaveDayMode), dto.EndDayMode!.Value))
+                    endMode = (LeaveDayMode)dto.EndDayMode!.Value;
+
+                var total = await CalculateAsync(
+                    dto.LeaveEmpNo,
+                    dto.LeaveStartDate!.Value,
+                    dto.LeaveEndDate!.Value,
+                    startMode,
+                    endMode);
+
+                #region Create "LeaveRequisitionWF" entity from DTO
+                LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
+                {
+                    LeaveType = dto.LeaveType,
+                    //LeaveEmpNo = dto.LeaveEmpNo,
+                    //LeaveEmpName = dto.LeaveEmpName,
+                    //LeaveEmpEmail = dto.LeaveEmpEmail,
+                    //LeaveEmpCostCenter = dto.LeaveEmpCostCenter,
+                    LeaveStartDate = Convert.ToDateTime(dto.LeaveStartDate),
+                    LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
+                    LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
+                    LeaveBalance = dto.LeaveBalance,
+                    LeaveDuration = Convert.ToDouble(total),
+                    NoOfHolidays = dto.NoOfHolidays,
+                    NoOfWeekends = dto.NoOfWeekends,
+                    LeavePayAdv = dto.LeavePayAdv,
+                    LeaveVisaRequired = dto.LeaveVisaRequired,
+                    LeaveRemarks = dto.LeaveRemarks,
+                    LeaveUpdatedBy = dto.LeaveCreatedBy,                    
+                    LeaveUpdatedEmail = dto.LeaveUpdatedEmail,
+                    LeaveUpdatedUserID = dto.LeaveUpdatedUserID,
+                    LeaveUpdatedDate = dto.LeaveUpdatedDate,
+                    LeaveStatusCode = dto.LeaveStatusCode,
+                    LeaveStatusID = dto.LeaveStatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode                    
+                };
+                #endregion
+
+                var result = await _repository.UpdateLeaveRequestAsync(leaveRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to save shift roster changes due to error. Please check the data entry then try to save again!");
                 }
 
                 return Result<int>.SuccessResult(result.Value);
@@ -186,6 +263,25 @@ namespace KenHRApp.Application.Services
             }
         }
 
+        public async Task<bool> CheckIfLeaveDateIsHolidayAsync(DateTime? leaveDate)
+        {
+            try
+            {
+                var repoResult = await _repository.CheckIfLeaveDateIsHolidayAsync(leaveDate);
+                if (!repoResult.Success)
+                {
+                    return false;
+                }
+
+                bool isHoliday = repoResult.Value;
+
+                return isHoliday;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
         #endregion
     }
 }
