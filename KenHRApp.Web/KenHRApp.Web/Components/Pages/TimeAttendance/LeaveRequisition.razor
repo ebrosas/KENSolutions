@@ -237,7 +237,9 @@
                                         @bind-Date="_leaveRequest.LeaveResumeDate"
                                         For="@(() => _leaveRequest.LeaveResumeDate)"
                                         Margin="Margin.Dense"
-                                        HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" Clearable="false" Disabled="@_isDisabled" Color="Color.Surface"
+                                        HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" 
+                                        Clearable="false" Disabled="@_isDisabled" Color="Color.Surface"
+                                            Immediate="true"
                                         Required="true" RequiredError="Resume Date is required"
                                         Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
@@ -255,7 +257,8 @@
                                              Variant="Variant.Text"
                                              Label="End Day Mode"
                                              Margin="Margin.Dense"
-                                             Dense="true"
+                                             Dense="true" 
+                                             Immediate="true"
                                              Placeholder="Please Select"
                                              HelperText="Type a key to search for value"
                                              HelperTextOnFocus="true"

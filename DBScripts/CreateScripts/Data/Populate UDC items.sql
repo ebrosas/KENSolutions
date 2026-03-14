@@ -2376,7 +2376,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Draft',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= 'Open',
-				@SequenceNo					= 7,
+				@SequenceNo					= 8,
 				@IsActive					= 1,
 				@Amount						= NULL 
 
@@ -2384,7 +2384,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Waiting for Approval',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= 'Open',
-				@SequenceNo					= 8,
+				@SequenceNo					= 9,
 				@IsActive					= 1,
 				@Amount						= NULL 
 
@@ -2392,7 +2392,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Assigned to Next Approver',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= 'Open',
-				@SequenceNo					= 7,
+				@SequenceNo					= 10,
 				@IsActive					= 1,
 				@Amount						= NULL 
 
@@ -2400,7 +2400,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Reassigned to Other Approver',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= 'Open',
-				@SequenceNo					= 9,
+				@SequenceNo					= 11,
 				@IsActive					= 1,
 				@Amount						= NULL
 
@@ -2408,7 +2408,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Request Sent',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= 'Open',
-				@SequenceNo					= 10,
+				@SequenceNo					= 12,
 				@IsActive					= 1,
 				@Amount						= NULL 
 
@@ -2416,7 +2416,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Rejected By Approver',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= 'Rejected',
-				@SequenceNo					= 11,
+				@SequenceNo					= 13,
 				@IsActive					= 1,
 				@Amount						= NULL
 		
@@ -2480,7 +2480,12 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	BEGIN TRAN T1
 
 	DELETE FROM kenuser.UserDefinedCode
-	WHERE UDCId = 2952
+	WHERE UDCId IN
+	(
+		2967,
+		2968,
+		2969
+	)
 
 	COMMIT TRAN T1
 
