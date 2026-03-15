@@ -102,8 +102,11 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         #endregion
 
         #region IPageAuthorization Implementation
-        public string UserName { get; set; } = "Anonymous User";
+        public string UserName { get; set; } = "";
+        public string? UserID { get; set; } = "";
+        public string? UserEmail { get; set; } = "";
         public int UserEmpNo { get; set; } = 0;
+        public string? UserCostCenter { get; set; } = "";
         public void GoToLogin()
         {
             Nav.NavigateTo("/login");
@@ -127,8 +130,11 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                
                 if (State.AuthenticatedUser != null)
                 {
-                    UserName = State.AuthenticatedUser!.EmployeeShortName;
+                    UserName = State.AuthenticatedUser!.EmployeeFullName;
                     UserEmpNo = State.AuthenticatedUser.EmployeeNo;
+                    UserID = State.AuthenticatedUser!.UserID;
+                    UserEmail = State.AuthenticatedUser!.OfficialEmail;
+                    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
 
                     BeginLoadComboboxTask();
                 }

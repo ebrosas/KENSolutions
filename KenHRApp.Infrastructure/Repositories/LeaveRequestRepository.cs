@@ -61,7 +61,10 @@ namespace KenHRApp.Infrastructure.Repositories
             }
             catch (Exception ex)
             {
-                return Result<int>.Failure($"Database error: {ex.Message}");
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
             }
         }
 

@@ -13,6 +13,23 @@ namespace KenHRApp.Application.DTOs
 {
     public class LeaveRequisitionDTO
     {
+        #region Constructors
+        public LeaveRequisitionDTO() 
+        {
+            LeaveDuration = 0;
+            NoOfHolidays = 0;
+            NoOfWeekends = 0;
+        }
+
+        public LeaveRequisitionDTO(int empNo, string empName, string empEmail, string costCenter)
+        {
+            LeaveEmpNo = empNo;
+            LeaveEmpName = empName;
+            LeaveEmpEmail = empEmail;
+            LeaveEmpCostCenter = costCenter;
+        }
+        #endregion
+
         #region Properties
         public long LeaveRequestId { get; set; }       // Identity column  
                 
@@ -132,7 +149,7 @@ namespace KenHRApp.Application.DTOs
         [Display(Name = "Mode")]
         public string EndDayModeDesc { get; set; } = null!;
 
-        public List<FileUploadDTO> Files { get; set; } = new();
+        public List<LeaveAttachmentDTO> Files { get; set; } = new();
         #endregion
     }
 }

@@ -88,7 +88,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             LEAVETYPES,         // Leave Request Types
             LEAVEAPVFLAG,       // Leave Approval Flags
-            LEAVEAPORTION       // Leave Day Portions
+            LEAVEAPORTION,      // Leave Day Portions
+            STATUS              // Leave Statuses
         }
         #endregion
 
@@ -118,15 +119,36 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private string[]? _employeeArray = null;
         private IReadOnlyList<EmployeeResultDTO> _employeeList = new List<EmployeeResultDTO>();
+
+        private List<UserDefinedCodeDTO> _leaveStatusList = new();
+        #endregion
+
+        #region Constants
+
+        #region Leave Approval Flags
+        private readonly char CONST_APPROVED_PAID = 'A';
+        private readonly char CONST_WAITING_APPROVAL = 'W';
+        private readonly char CONST_APPROVED_NOT_PAID = 'N';
+        private readonly char CONST_CANCELLED = 'C';
+        private readonly char CONST_DRAFT = 'D';
+        private readonly char CONST_REJECTED = 'R';
+        #endregion
+
+        #region Leave Request Statuses
+        private readonly string CONST_REQUEST_SENT = "02";              // Request Sent
+        private readonly string CONST_WAITING_FOR_APPROVAL = "05";      // Waiting for Approval
+        #endregion
+
         #endregion
 
         #endregion
 
         #region IPageAuthorization Implementation
-        public string UserName { get; set; } = "Anonymous User";
+        public string UserName { get; set; } = "";
         public string? UserID { get; set; } = "";
         public string? UserEmail { get; set; } = "";
         public int UserEmpNo { get; set; } = 0;
+        public string? UserCostCenter { get; set; } = "";
 
         public void GoToLogin()
         {
@@ -165,6 +187,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     UserEmpNo = State.AuthenticatedUser.EmployeeNo;
                     UserID = State.AuthenticatedUser!.UserID;
                     UserEmail = State.AuthenticatedUser!.OfficialEmail;
+                    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
+
+                    // Initialize the Leave Request object
+                    _leaveRequest.LeaveCreatedBy = UserEmpNo;
+                    _leaveRequest.LeaveCreatedEmail = UserEmail;
+                    _leaveRequest.LeaveCreatedUserID = UserID;
+                    _leaveRequest.LeaveStatusCode = CONST_REQUEST_SENT;
 
                     BeginLoadComboboxTask();
                 }
@@ -183,23 +212,23 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             try
             {
-                #region Check if Leave Start Date is public holiday or not
-                bool isStartDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_leaveRequest.LeaveStartDate).Result;
-                if (isStartDateHoliday)
-                {
-                    _hasValidationError = true;
-                    _validationMessages.Append("Start Date should not be a public holiday.");
-                }
-                #endregion
+                //#region Check if Leave Start Date is public holiday or not
+                //bool isStartDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_leaveRequest.LeaveStartDate).Result;
+                //if (isStartDateHoliday)
+                //{
+                //    _hasValidationError = true;
+                //    _validationMessages.Append("Start Date should not be a public holiday.");
+                //}
+                //#endregion
 
-                #region Check if Leave Resume Date is public holiday or not
-                bool isResumeDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_leaveRequest.LeaveResumeDate).Result;
-                if (isResumeDateHoliday)
-                {
-                    _hasValidationError = true;
-                    _validationMessages.Append("Resume Date should not be a public holiday.");
-                }
-                #endregion
+                //#region Check if Leave Resume Date is public holiday or not
+                //bool isResumeDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_leaveRequest.LeaveResumeDate).Result;
+                //if (isResumeDateHoliday)
+                //{
+                //    _hasValidationError = true;
+                //    _validationMessages.Append("Resume Date should not be a public holiday.");
+                //}
+                //#endregion
 
                 if (_hasValidationError && _validationMessages.Any())
                     return;
@@ -212,7 +241,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _isRunning = true;
 
                 // Set the overlay message
-                overlayMessage = "Saving changes, please wait...";
+                overlayMessage = "Submitting leave request, please wait...";
 
                 _ = SubmitLeaveRequestAsync(async () =>
                 {
@@ -525,21 +554,38 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             return _leaveModeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        private void OnLeaveDateChanged(DateTime? date)
+        private void OnStartDateChanged(DateTime? date)
         {
             //_isRunning = true;
 
-            // Set the overlay message
-            //overlayMessage = "Loading attendance details, please wait...";
+            //Set the overlay message
+            overlayMessage = "Calculating leave duration, please wait...";
 
-            //_ = GetAttendanceDetail(async () =>
-            //{
-            //    //_isRunning = false;
+            _ = CalculateLeaveDurationAsync(async () =>
+            {
+                //_isRunning = false;
 
-            //    // Shows the spinner overlay
-            //    await InvokeAsync(StateHasChanged);
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
 
-            //}, date);
+            }, "LeaveStartDate", date);
+        }
+
+        private void OnResumeDateChanged(DateTime? date)
+        {
+            //_isRunning = true;
+
+            //Set the overlay message
+            overlayMessage = "Calculating leave duration, please wait...";
+
+            _ = CalculateLeaveDurationAsync(async () =>
+            {
+                //_isRunning = false;
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+
+            }, "LeaveResumeDate", date);
         }
         #endregion
 
@@ -644,6 +690,22 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             _leaveModeArray = _leaveModeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
                     }
                     #endregion
+
+                    #region Leave Statuses
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.STATUS.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Leave Status group id: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _leaveStatusList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                    }
+                    #endregion
                 }
             }
 
@@ -672,10 +734,22 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             if (isNewRequition)
             {
-                // Set the user who created the record and the timestamp
+                // Set leave request flags
                 _leaveRequest.LeaveCreatedDate = DateTime.Now;
-                _leaveRequest.LeaveCreatedBy = UserEmpNo;
-                _leaveRequest.LeaveCreatedUserID = UserID;
+                _leaveRequest.LeaveApprovalFlag = CONST_WAITING_APPROVAL;
+
+                #region Set leave status to "Request Sent" 
+                if (_leaveStatusList != null && _leaveStatusList.Any())
+                {
+                    UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_REQUEST_SENT).FirstOrDefault();
+                    if (statusFlag != null)
+                    {
+                        _leaveRequest.LeaveStatusCode = statusFlag.UDCCode;
+                        _leaveRequest.LeaveStatusID = statusFlag.UDCId;
+                        _leaveRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
+                    }
+                }
+                #endregion
 
                 var addResult = await LeaveService.AddLeaveRequestAsync(_leaveRequest, _cts.Token);
                 isSuccess = addResult.Success;
@@ -691,8 +765,20 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 // Set the user who update the record and the timestamp
                 _leaveRequest.LeaveUpdatedDate = DateTime.Now;
-                _leaveRequest.LeaveUpdatedBy = UserEmpNo;
-                _leaveRequest.LeaveUpdatedUserID = UserID;
+                _leaveRequest.LeaveApprovalFlag = CONST_WAITING_APPROVAL;
+
+                #region Set leave status to "Request Sent" 
+                if (_leaveStatusList != null && _leaveStatusList.Any())
+                {
+                    UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_REQUEST_SENT).FirstOrDefault();
+                    if (statusFlag != null)
+                    {
+                        _leaveRequest.LeaveStatusCode = statusFlag.UDCCode;
+                        _leaveRequest.LeaveStatusID = statusFlag.UDCId;
+                        _leaveRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
+                    }
+                }
+                #endregion
 
                 var saveResult = await LeaveService.UpdateLeaveRequestAsync(_leaveRequest, _cts.Token);
                 isSuccess = saveResult.Success;
@@ -733,16 +819,32 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task CalculateDurationAsync()
+        private async Task CalculateLeaveDurationAsync(Func<Task> callback, string inputDateName, DateTime? selectedDate)
         {
             try
             {
+                // Reset errors
+                _errorMessage.Clear();
+
+                if (inputDateName == "LeaveStartDate")
+                    _leaveRequest.LeaveStartDate = selectedDate;
+                else if (inputDateName == "LeaveResumeDate")
+                    _leaveRequest.LeaveResumeDate = selectedDate;
+
                 _leaveDuration = await LeaveService.CalculateAsync(
                                 _leaveRequest.LeaveEmpNo,
                                 Convert.ToDateTime(_leaveRequest.LeaveStartDate).Date,
                                 Convert.ToDateTime(_leaveRequest.LeaveResumeDate).Date,
                                 _leaveRequest.StartDayMode,
                                 _leaveRequest.EndDayMode);
+
+                _leaveRequest.LeaveDuration = Convert.ToDouble(_leaveDuration);
+
+                if (callback != null)
+                {
+                    // Hide the spinner overlay
+                    await callback.Invoke();
+                }
             }
             catch (Exception ex)
             {

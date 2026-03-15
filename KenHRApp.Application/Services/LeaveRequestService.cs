@@ -29,25 +29,7 @@ namespace KenHRApp.Application.Services
             SecondHalf
         }
         #endregion
-
-        #region Constants
-
-        #region Leave Approval Flags
-        private readonly string CONST_APPROVED_PAID = "A";
-        private readonly string CONST_WAITING_APPROVAL = "W";
-        private readonly string CONST_APPROVED_NOT_PAID = "N";
-        private readonly string CONST_CANCELLED = "C";
-        private readonly string CONST_DRAFT = "D";
-        private readonly string CONST_REJECTED = "R";
-        #endregion
-
-        #region Leave Request Statuses
-        private readonly string CONST_REQUEST_SENT = "02";              // Request Sent
-        private readonly string CONST_WAITING_FOR_APPROVAL = "05";      // Waiting for Approval
-        #endregion
-
-        #endregion
-
+                
         #region Contructors
         public LeaveRequestService(ILeaveRequestRepository repository)
         {
@@ -56,49 +38,7 @@ namespace KenHRApp.Application.Services
         #endregion
 
         #region Private Methods
-        public async Task<decimal> CalculateAsync(
-           int empNo,
-           DateTime start,
-           DateTime end,
-           byte? startDay,
-           byte? endDay)
-        {
-            try
-            {
-                decimal total = 0;
-                LeaveDayMode startMode = LeaveDayMode.FullDay;
-                LeaveDayMode endMode = LeaveDayMode.FullDay;
-
-                if (startDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), startDay.Value))
-                    startMode = (LeaveDayMode)startDay.Value;
-
-                if (endDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), endDay.Value))
-                    endMode = (LeaveDayMode)endDay.Value;
-
-                for (var date = start; date <= end; date = date.AddDays(1))
-                {
-                    if (await _repository.IsDayOffAsync(empNo, date))
-                        continue;
-
-                    if (await _repository.IsPublicHolidayAsync(date))
-                        continue;
-
-                    total += 1;
-                }
-
-                if (startMode != LeaveDayMode.FullDay)
-                    total -= 0.5m;
-
-                if (endMode != LeaveDayMode.FullDay)
-                    total -= 0.5m;
-
-                return total;
-            }
-            catch (Exception ex)
-            {
-                return 0;
-            }
-        }
+        
         #endregion
 
         #region Public Methods       
@@ -133,7 +73,7 @@ namespace KenHRApp.Application.Services
                     LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
                     LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
                     LeaveBalance = dto.LeaveBalance,
-                    LeaveDuration = dto.LeaveDuration, //Convert.ToDouble(total),            
+                    LeaveDuration = dto.LeaveDuration, 
                     NoOfHolidays = dto.NoOfHolidays,
                     NoOfWeekends = dto.NoOfWeekends,
                     LeavePayAdv = dto.LeavePayAdv,
@@ -288,6 +228,50 @@ namespace KenHRApp.Application.Services
             catch (Exception ex)
             {
                 return false;
+            }
+        }
+
+        public async Task<decimal> CalculateAsync(
+           int empNo,
+           DateTime start,
+           DateTime end,
+           byte? startDay,
+           byte? endDay)
+        {
+            try
+            {
+                decimal total = 0;
+                LeaveDayMode startMode = LeaveDayMode.FullDay;
+                LeaveDayMode endMode = LeaveDayMode.FullDay;
+
+                if (startDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), startDay.Value))
+                    startMode = (LeaveDayMode)startDay.Value;
+
+                if (endDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), endDay.Value))
+                    endMode = (LeaveDayMode)endDay.Value;
+
+                for (var date = start; date <= end; date = date.AddDays(1))
+                {
+                    if (await _repository.IsDayOffAsync(empNo, date))
+                        continue;
+
+                    if (await _repository.IsPublicHolidayAsync(date))
+                        continue;
+
+                    total += 1;
+                }
+
+                if (startMode != LeaveDayMode.FullDay)
+                    total -= 0.5m;
+
+                if (endMode != LeaveDayMode.FullDay)
+                    total -= 0.5m;
+
+                return total;
+            }
+            catch (Exception ex)
+            {
+                return 0;
             }
         }
         #endregion

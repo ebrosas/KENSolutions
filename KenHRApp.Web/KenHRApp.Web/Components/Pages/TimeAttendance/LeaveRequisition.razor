@@ -119,8 +119,7 @@
                                      <MudAvatar Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
                                          <MudIcon Icon="@Icons.Material.Filled.TimeToLeave" />
                                      </MudAvatar>
-                                     @* <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.LeaveDuration!.Value.ToString("F2") days</MudText> *@
-                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveDuration days</MudText>
+                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.LeaveDuration!.Value.ToString("F1") days</MudText>
                                  </MudStack>
                                  <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Success">Leave Duration</MudText>
                              </MudStack>
@@ -129,8 +128,7 @@
                                      <MudAvatar Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
                                          <MudIcon Icon="@Icons.Material.Filled.Weekend" />
                                      </MudAvatar>
-                                     @* <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.NoOfWeekends!.Value.ToString("F2") days</MudText> *@
-                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Info">0 days</MudText>
+                                    <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Info">@_leaveRequest.NoOfWeekends!.Value.ToString() days</MudText>
                                  </MudStack>
                                  <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Info">Weekends</MudText>
                              </MudStack>
@@ -139,8 +137,7 @@
                                      <MudAvatar Size="Size.Small" Color="Color.Secondary" Variant="Variant.Filled">
                                          <MudIcon Icon="@Icons.Material.Filled.HolidayVillage" />
                                      </MudAvatar>
-                                     @* <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.NoOfHolidays!.Value.ToString("F2") days</MudText> *@
-                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Secondary">0 days</MudText>
+                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Secondary">@_leaveRequest.NoOfHolidays!.Value.ToString() days</MudText>
                                  </MudStack>
                                  <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">Holidays</MudText>
                              </MudStack>
@@ -211,11 +208,16 @@
                             <MudDatePicker Label="Start Date" Editable="true" AutoClose="true"
                                         For="@(() => _leaveRequest.LeaveStartDate)"
                                         Margin="Margin.Dense" 
-                                        HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" Clearable="false" Disabled="@_isDisabled" Color="Color.Surface"
+                                        HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" 
+                                        Clearable="false" Disabled="@_isDisabled" 
+                                        Color="Color.Surface"
                                         Required="true" RequiredError="Start Date is required"
                                         Date="_leaveRequest.LeaveStartDate"
-                                        DateChanged="OnLeaveDateChanged"
-                                        Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Text">
+                                        DateChanged="OnStartDateChanged"
+                                        Mask="@(new DateMask("dd/MM/yyyy"))" 
+                                        DateFormat="dd/MM/yyyy" 
+                                        Placeholder="dd/MM/yyyy" 
+                                        Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = DateTime.Today))">Today</MudButton>
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = null))">Clear</MudButton>
@@ -248,13 +250,19 @@
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                         <MudDatePicker Label="Resume Date" Editable="true" AutoClose="true"
-                                        @bind-Date="_leaveRequest.LeaveResumeDate"
+                                        Date="_leaveRequest.LeaveResumeDate"
+                                        DateChanged="OnResumeDateChanged"
                                         For="@(() => _leaveRequest.LeaveResumeDate)"
                                         Margin="Margin.Dense"
                                         HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" 
-                                        Clearable="false" Disabled="@_isDisabled" Color="Color.Surface"
+                                        Clearable="false" 
+                                        Disabled="@_isDisabled" 
+                                        Color="Color.Surface"
                                         Required="true" RequiredError="Resume Date is required"
-                                        Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Text">
+                                        Mask="@(new DateMask("dd/MM/yyyy"))" 
+                                        DateFormat="dd/MM/yyyy" 
+                                        Placeholder="dd/MM/yyyy" 
+                                        Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveResumeDate = DateTime.Today))">Today</MudButton>
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveResumeDate = null))">Clear</MudButton>

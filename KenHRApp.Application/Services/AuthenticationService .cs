@@ -92,7 +92,9 @@ namespace KenHRApp.Application.Services
                         HireDate = employee.HireDate,
                         DOB = employee.DOB,
                         DepartmentCode = employee.DepartmentCode,
-                        DepartmentName = employee.DepartmentName
+                        DepartmentName = employee.DepartmentName,
+                        UserID = employee.UserID,
+                        OfficialEmail = employee.OfficialEmail
                     }
                 });
             }
