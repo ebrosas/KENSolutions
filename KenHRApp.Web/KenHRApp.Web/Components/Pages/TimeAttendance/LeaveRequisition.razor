@@ -120,7 +120,7 @@
                                          <MudIcon Icon="@Icons.Material.Filled.TimeToLeave" />
                                      </MudAvatar>
                                      @* <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.LeaveDuration!.Value.ToString("F2") days</MudText> *@
-                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">0 days</MudText>
+                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveDuration days</MudText>
                                  </MudStack>
                                  <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Success">Leave Duration</MudText>
                              </MudStack>
@@ -162,7 +162,7 @@
                                              Placeholder="Please Select"
                                              HelperText="Type a key to search for value"
                                              HelperTextOnFocus="true"
-                                             Clearable="false"
+                                             Clearable="true"
                                              Typo="Typo.subtitle2"
                                              Disabled="@_isDisabled"
                                              MaxItems="@(_leaveTypeList != null ? _leaveTypeList.Count : 10)"
@@ -182,7 +182,7 @@
                                              Placeholder="Please Select"
                                              HelperText="Type a key to search for value"
                                              HelperTextOnFocus="true"
-                                             Clearable="false"
+                                             Clearable="true"
                                              Typo="Typo.subtitle2"
                                              Disabled="@_isDisabled"
                                              MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
@@ -195,13 +195,27 @@
                 <MudGrid Spacing="5">
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
+                            @* <MudDatePicker Label="Start Date" Editable="true" AutoClose="true"
+                                        @bind-Date="_leaveRequest.LeaveStartDate"
+                                        For="@(() => _leaveRequest.LeaveStartDate)"
+                                        Margin="Margin.Dense" 
+                                        HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" Clearable="false" Disabled="@_isDisabled" Color="Color.Surface"
+                                        Required="true" RequiredError="Start Date is required"
+                                        Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Text">
+                                <PickerActions Context="dateContext">
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = DateTime.Today))">Today</MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = null))">Clear</MudButton>
+                                </PickerActions>
+                            </MudDatePicker> *@
+
                             <MudDatePicker Label="Start Date" Editable="true" AutoClose="true"
-                                           @bind-Date="_leaveRequest.LeaveStartDate"
-                                           For="@(() => _leaveRequest.LeaveStartDate)"
-                                           Margin="Margin.Dense" 
-                                           HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" Clearable="false" Disabled="@_isDisabled" Color="Color.Surface"
-                                            Required="true" RequiredError="Start Date is required"
-                                           Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Text">
+                                        For="@(() => _leaveRequest.LeaveStartDate)"
+                                        Margin="Margin.Dense" 
+                                        HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" Clearable="false" Disabled="@_isDisabled" Color="Color.Surface"
+                                        Required="true" RequiredError="Start Date is required"
+                                        Date="_leaveRequest.LeaveStartDate"
+                                        DateChanged="OnLeaveDateChanged"
+                                        Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = DateTime.Today))">Today</MudButton>
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = null))">Clear</MudButton>
@@ -221,7 +235,7 @@
                                              Placeholder="Please Select"
                                              HelperText="Type a key to search for value"
                                              HelperTextOnFocus="true"
-                                             Clearable="false"
+                                             Clearable="true"
                                              Typo="Typo.subtitle2"
                                              Disabled="@_isDisabled"
                                              MaxItems="@(_leaveModeList != null ? _leaveModeList.Count : 10)"
@@ -239,7 +253,6 @@
                                         Margin="Margin.Dense"
                                         HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" 
                                         Clearable="false" Disabled="@_isDisabled" Color="Color.Surface"
-                                            Immediate="true"
                                         Required="true" RequiredError="Resume Date is required"
                                         Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
@@ -258,11 +271,10 @@
                                              Label="End Day Mode"
                                              Margin="Margin.Dense"
                                              Dense="true" 
-                                             Immediate="true"
                                              Placeholder="Please Select"
                                              HelperText="Type a key to search for value"
                                              HelperTextOnFocus="true"
-                                             Clearable="false"
+                                             Clearable="true"
                                              Typo="Typo.subtitle2"
                                              Disabled="@_isDisabled"
                                              MaxItems="@(_leaveModeList != null ? _leaveModeList.Count : 10)"

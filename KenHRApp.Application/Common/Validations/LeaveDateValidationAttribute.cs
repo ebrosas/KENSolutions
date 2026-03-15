@@ -41,17 +41,32 @@ namespace KenHRApp.Application.Common.Validations
             // Get values
             var comparisonValue = comparisonPropertyInfo.GetValue(validationContext.ObjectInstance);
 
-            //if (comparisonValue == null)
-            //    return ValidationResult.Success;
+            if (comparisonValue == null)
+                return ValidationResult.Success;
 
             // Convert both to datetime
-            DateTime? leaveStarDate = Convert.ToDateTime(comparisonValue);   
-            DateTime? leaveResumeDate = value != null ? Convert.ToDateTime(value) : null;
-            
+            DateTime? leaveStarDate = null; 
+            DateTime? leaveResumeDate = null;
+
+            if (comparisonPropertyInfo.Name == "LeaveResumeDate")
+            {
+                leaveStarDate = value != null ? Convert.ToDateTime(value) : null;
+                leaveResumeDate = comparisonValue != null ? Convert.ToDateTime(comparisonValue) : null;
+            }
+            else
+            {
+                leaveStarDate = comparisonValue != null ? Convert.ToDateTime(comparisonValue) : null;
+                leaveResumeDate = value != null ? Convert.ToDateTime(value) : null;
+            }
 
             // Validation rules
-            if (leaveStarDate > leaveResumeDate)
-                return new ValidationResult("Start Date cannot be greater than the Resume Date.");
+            if (leaveStarDate.HasValue && leaveResumeDate.HasValue && leaveStarDate > leaveResumeDate)
+            {
+                if (comparisonPropertyInfo.Name == "LeaveResumeDate")
+                    return new ValidationResult("Start Date cannot be greater than the Resume Date.");
+                else
+                    return new ValidationResult("Resume Date cannot be less than the Start Date.");
+            }
                         
             return ValidationResult.Success;
         }

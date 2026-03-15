@@ -56,16 +56,24 @@ namespace KenHRApp.Application.Services
         #endregion
 
         #region Private Methods
-        private async Task<decimal> CalculateAsync(
+        public async Task<decimal> CalculateAsync(
            int empNo,
            DateTime start,
            DateTime end,
-           LeaveDayMode startMode,
-           LeaveDayMode endMode)
+           byte? startDay,
+           byte? endDay)
         {
             try
             {
                 decimal total = 0;
+                LeaveDayMode startMode = LeaveDayMode.FullDay;
+                LeaveDayMode endMode = LeaveDayMode.FullDay;
+
+                if (startDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), startDay.Value))
+                    startMode = (LeaveDayMode)startDay.Value;
+
+                if (endDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), endDay.Value))
+                    endMode = (LeaveDayMode)endDay.Value;
 
                 for (var date = start; date <= end; date = date.AddDays(1))
                 {
@@ -98,20 +106,20 @@ namespace KenHRApp.Application.Services
         {
             try
             {
-                LeaveDayMode startMode = LeaveDayMode.NotDefined;
-                if (Enum.IsDefined(typeof(LeaveDayMode), dto.StartDayMode!.Value))
-                    startMode = (LeaveDayMode)dto.StartDayMode!.Value;
+                //LeaveDayMode startMode = LeaveDayMode.NotDefined;
+                //if (Enum.IsDefined(typeof(LeaveDayMode), dto.StartDayMode!.Value))
+                //    startMode = (LeaveDayMode)dto.StartDayMode!.Value;
 
-                LeaveDayMode endMode = LeaveDayMode.NotDefined;
-                if (Enum.IsDefined(typeof(LeaveDayMode), dto.EndDayMode!.Value))
-                    endMode = (LeaveDayMode)dto.EndDayMode!.Value;
+                //LeaveDayMode endMode = LeaveDayMode.NotDefined;
+                //if (Enum.IsDefined(typeof(LeaveDayMode), dto.EndDayMode!.Value))
+                //    endMode = (LeaveDayMode)dto.EndDayMode!.Value;
 
-                var total = await CalculateAsync(
-                    dto.LeaveEmpNo,
-                    dto.LeaveStartDate!.Value,
-                    dto.LeaveEndDate!.Value,
-                    startMode,
-                    endMode);
+                //var total = await CalculateAsync(
+                //    dto.LeaveEmpNo,
+                //    dto.LeaveStartDate!.Value,
+                //    dto.LeaveEndDate!.Value,
+                //    startMode,
+                //    endMode);
 
                 #region Create "LeaveRequisitionWF" entity from DTO
                 LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
@@ -125,7 +133,7 @@ namespace KenHRApp.Application.Services
                     LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
                     LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
                     LeaveBalance = dto.LeaveBalance,
-                    LeaveDuration = Convert.ToDouble(total),            
+                    LeaveDuration = dto.LeaveDuration, //Convert.ToDouble(total),            
                     NoOfHolidays = dto.NoOfHolidays,
                     NoOfWeekends = dto.NoOfWeekends,
                     LeavePayAdv = dto.LeavePayAdv,
@@ -162,20 +170,20 @@ namespace KenHRApp.Application.Services
         {
             try
             {
-                LeaveDayMode startMode = LeaveDayMode.NotDefined;
-                if (Enum.IsDefined(typeof(LeaveDayMode), dto.StartDayMode!.Value))
-                    startMode = (LeaveDayMode)dto.StartDayMode!.Value;
+                //LeaveDayMode startMode = LeaveDayMode.NotDefined;
+                //if (Enum.IsDefined(typeof(LeaveDayMode), dto.StartDayMode!.Value))
+                //    startMode = (LeaveDayMode)dto.StartDayMode!.Value;
 
-                LeaveDayMode endMode = LeaveDayMode.NotDefined;
-                if (Enum.IsDefined(typeof(LeaveDayMode), dto.EndDayMode!.Value))
-                    endMode = (LeaveDayMode)dto.EndDayMode!.Value;
+                //LeaveDayMode endMode = LeaveDayMode.NotDefined;
+                //if (Enum.IsDefined(typeof(LeaveDayMode), dto.EndDayMode!.Value))
+                //    endMode = (LeaveDayMode)dto.EndDayMode!.Value;
 
-                var total = await CalculateAsync(
-                    dto.LeaveEmpNo,
-                    dto.LeaveStartDate!.Value,
-                    dto.LeaveEndDate!.Value,
-                    startMode,
-                    endMode);
+                //var total = await CalculateAsync(
+                //    dto.LeaveEmpNo,
+                //    dto.LeaveStartDate!.Value,
+                //    dto.LeaveEndDate!.Value,
+                //    startMode,
+                //    endMode);
 
                 #region Create "LeaveRequisitionWF" entity from DTO
                 LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
@@ -189,7 +197,7 @@ namespace KenHRApp.Application.Services
                     LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
                     LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
                     LeaveBalance = dto.LeaveBalance,
-                    LeaveDuration = Convert.ToDouble(total),
+                    LeaveDuration = dto.LeaveDuration, //Convert.ToDouble(total),
                     NoOfHolidays = dto.NoOfHolidays,
                     NoOfWeekends = dto.NoOfWeekends,
                     LeavePayAdv = dto.LeavePayAdv,

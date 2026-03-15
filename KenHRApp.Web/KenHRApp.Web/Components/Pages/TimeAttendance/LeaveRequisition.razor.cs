@@ -43,6 +43,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private CancellationTokenSource? _cts;
         private string _searchString = string.Empty;
         private StringBuilder _errorMessage = new StringBuilder();
+        private decimal _leaveDuration = 0;
         #endregion
 
         #region Flags
@@ -400,86 +401,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     break;
             }
         }
-
-        private async Task SubmitLeaveRequestAsync(Func<Task> callback)
-        {
-            // Wait for 1 second then gives control back to the runtime
-            await Task.Delay(500);
-
-            // Reset error messages
-            _errorMessage.Clear();
-
-            bool isNewRequition = _leaveRequest.LeaveRequestId == 0;
-
-            // Initialize the cancellation token
-            _cts = new CancellationTokenSource();
-
-            bool isSuccess = true;
-            string errorMsg = string.Empty;
-
-            if (isNewRequition)
-            {
-                // Set the user who created the record and the timestamp
-                _leaveRequest.LeaveCreatedDate = DateTime.Now;
-                _leaveRequest.LeaveCreatedBy = UserEmpNo;
-                _leaveRequest.LeaveCreatedUserID = UserID;
-
-                var addResult = await LeaveService.AddLeaveRequestAsync(_leaveRequest, _cts.Token);
-                isSuccess = addResult.Success;
-                if (!isSuccess)
-                    errorMsg = addResult.Error!;
-                else
-                {
-                    // Set flag to enable reload when navigating back to the caller page
-                    _forceLoad = true;
-                }
-            }
-            else
-            {
-                // Set the user who update the record and the timestamp
-                _leaveRequest.LeaveUpdatedDate = DateTime.Now;
-                _leaveRequest.LeaveUpdatedBy = UserEmpNo;
-                _leaveRequest.LeaveUpdatedUserID = UserID;
-
-                var saveResult = await LeaveService.UpdateLeaveRequestAsync(_leaveRequest, _cts.Token);
-                isSuccess = saveResult.Success;
-                if (!isSuccess)
-                    errorMsg = saveResult.Error!;
-            }
-
-            if (isSuccess)
-            {
-                // Reset flags
-                _isEditMode = false;
-                _saveBtnEnabled = false;
-                _isDisabled = true;
-
-                // Hide error message if any
-                ShowHideError(false);
-
-                // Show notification
-                if (isNewRequition)
-                    ShowNotification("Leave request has been submitted successfully!", NotificationType.Success);
-                else
-                    ShowNotification("Leave request has been updated successfully!", NotificationType.Success);
-
-                // Go back to T&A dashboard
-                Navigation.NavigateTo("/TimeAttendance/tnadashboard");
-            }
-            else
-            {
-                // Set the error message
-                _errorMessage.AppendLine(errorMsg);
-                ShowHideError(true);
-            }
-
-            if (callback != null)
-            {
-                // Hide the spinner overlay
-                await callback.Invoke();
-            }
-        }
-
+        
         private void ResetForm()
         {
             //_shiftPattern = new ShiftPatternMasterDTO
@@ -602,6 +524,23 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             return _leaveModeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
+
+        private void OnLeaveDateChanged(DateTime? date)
+        {
+            //_isRunning = true;
+
+            // Set the overlay message
+            //overlayMessage = "Loading attendance details, please wait...";
+
+            //_ = GetAttendanceDetail(async () =>
+            //{
+            //    //_isRunning = false;
+
+            //    // Shows the spinner overlay
+            //    await InvokeAsync(StateHasChanged);
+
+            //}, date);
+        }
         #endregion
 
         #region Database Methods
@@ -712,6 +651,102 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 // Hide the spinner overlay
                 await callback.Invoke();
+            }
+        }
+
+        private async Task SubmitLeaveRequestAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            bool isNewRequition = _leaveRequest.LeaveRequestId == 0;
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = true;
+            string errorMsg = string.Empty;
+
+            if (isNewRequition)
+            {
+                // Set the user who created the record and the timestamp
+                _leaveRequest.LeaveCreatedDate = DateTime.Now;
+                _leaveRequest.LeaveCreatedBy = UserEmpNo;
+                _leaveRequest.LeaveCreatedUserID = UserID;
+
+                var addResult = await LeaveService.AddLeaveRequestAsync(_leaveRequest, _cts.Token);
+                isSuccess = addResult.Success;
+                if (!isSuccess)
+                    errorMsg = addResult.Error!;
+                else
+                {
+                    // Set flag to enable reload when navigating back to the caller page
+                    _forceLoad = true;
+                }
+            }
+            else
+            {
+                // Set the user who update the record and the timestamp
+                _leaveRequest.LeaveUpdatedDate = DateTime.Now;
+                _leaveRequest.LeaveUpdatedBy = UserEmpNo;
+                _leaveRequest.LeaveUpdatedUserID = UserID;
+
+                var saveResult = await LeaveService.UpdateLeaveRequestAsync(_leaveRequest, _cts.Token);
+                isSuccess = saveResult.Success;
+                if (!isSuccess)
+                    errorMsg = saveResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Reset flags
+                _isEditMode = false;
+                _saveBtnEnabled = false;
+                _isDisabled = true;
+
+                // Hide error message if any
+                ShowHideError(false);
+
+                // Show notification
+                if (isNewRequition)
+                    ShowNotification("Leave request has been submitted successfully!", NotificationType.Success);
+                else
+                    ShowNotification("Leave request has been updated successfully!", NotificationType.Success);
+
+                // Go back to T&A dashboard
+                Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(errorMsg);
+                ShowHideError(true);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task CalculateDurationAsync()
+        {
+            try
+            {
+                _leaveDuration = await LeaveService.CalculateAsync(
+                                _leaveRequest.LeaveEmpNo,
+                                Convert.ToDateTime(_leaveRequest.LeaveStartDate).Date,
+                                Convert.ToDateTime(_leaveRequest.LeaveResumeDate).Date,
+                                _leaveRequest.StartDayMode,
+                                _leaveRequest.EndDayMode);
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
             }
         }
         #endregion

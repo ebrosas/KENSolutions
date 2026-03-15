@@ -17,6 +17,12 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<int>> UpdateLeaveRequestAsync(LeaveRequisitionDTO dto, CancellationToken cancellationToken = default);
         Task<Result<List<EmployeeResultDTO>>> GetEmployeeAsync(int? empNo = 0, string costCenter = "");
         Task<bool> CheckIfLeaveDateIsHolidayAsync(DateTime? leaveDate);
+        Task<decimal> CalculateAsync(
+            int empNo,
+            DateTime start,
+            DateTime end,
+            byte? startDay,
+            byte? endDay);
         #endregion
     }
 }
