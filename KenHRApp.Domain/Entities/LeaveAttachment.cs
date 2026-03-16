@@ -12,6 +12,7 @@ namespace KenHRApp.Domain.Entities
     {
         #region Properties
         public Guid Id { get; private set; } = Guid.NewGuid();
+        public Guid LeaveAttachmentId { get; set; }
 
         [Column(TypeName = "varchar(100)")]
         public string FileName { get; set; } = null!;
@@ -28,23 +29,22 @@ namespace KenHRApp.Domain.Entities
         #endregion
 
         #region Constructors
-        private LeaveAttachment() { }
+        public LeaveAttachment() { }
 
-        public LeaveAttachment(int leaveRequestId, string fileName, string contentType, 
-            string storedFileName, long fileSize, byte[] fileData)
+        public LeaveAttachment(Guid leaveAttachmentId, string fileName, string contentType, 
+            string storedFileName, long fileSize)
         {
-            LeaveRequestId = leaveRequestId;
+            LeaveAttachmentId = leaveAttachmentId;
             FileName = fileName;
             ContentType = contentType;
             StoredFileName = storedFileName;
             FileSize = fileSize;
-            FileData = fileData;
+            //FileData = fileData;
         }
         #endregion
 
         #region Reference Navation to LeaveRequisitionWF
         [Comment("Foreign key that references primary key: LeaveRequisitionWF.LeaveRequestId")]
-        [Column(TypeName = "varchar(20)")]
         public long LeaveRequestId { get; set; }
 
         public LeaveRequisitionWF LeaveRequest { get; set; } = default!;

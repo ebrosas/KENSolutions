@@ -118,10 +118,12 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "tinyint")]
         public byte? EndDayMode { get; set; }
+
+        public Guid LeaveAttachmentId { get; private set; } = Guid.NewGuid();
         #endregion
 
         #region Reference Navigations
-        public ICollection<LeaveAttachment> AttachmentList { get; set; } = new List<LeaveAttachment>();
+        public List<LeaveAttachment> AttachmentList { get; set; } = new();
         #endregion
 
         #region Constructors
@@ -129,11 +131,16 @@ namespace KenHRApp.Domain.Entities
         #endregion
 
         #region Public Methods
-        public void AddAttachment(int leaveRequestId, string fileName, string contentType,
-            string storedFileName, long fileSize, byte[] data)
+        public void AddAttachment(LeaveAttachment attachment)
         {
-            AttachmentList.Add(new LeaveAttachment(leaveRequestId, fileName, contentType,
-                storedFileName, fileSize, data));
+            AttachmentList.Add(attachment);
+        }
+
+        public void AddAttachment(Guid leaveAttachmentId, string fileName, string contentType,
+            string storedFileName, long fileSize)
+        {
+            AttachmentList.Add(new LeaveAttachment(leaveAttachmentId, fileName, contentType,
+                storedFileName, fileSize));
         }
         #endregion
     }

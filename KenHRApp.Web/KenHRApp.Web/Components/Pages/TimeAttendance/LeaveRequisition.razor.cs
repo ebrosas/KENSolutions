@@ -23,6 +23,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IAppState State { get; set; } = default!;
+        [Inject] private IWebHostEnvironment Environment { get; set; } = default!;
 
         [Parameter]
         [SupplyParameterFromQuery]
@@ -732,11 +733,57 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             bool isSuccess = true;
             string errorMsg = string.Empty;
 
+            #region Get the selected leave type
+            if (!string.IsNullOrEmpty(_leaveRequest.LeaveTypeDesc))
+            {
+                UserDefinedCodeDTO? selectedLeaveType = _leaveTypeList
+                    .Where(a => a.UDCDesc1 == _leaveRequest.LeaveTypeDesc)
+                    .FirstOrDefault();
+                if (selectedLeaveType != null)
+                    _leaveRequest.LeaveType = selectedLeaveType.UDCCode;
+            }
+            #endregion
+
+            #region Get the selected employee information 
+            if (!string.IsNullOrEmpty(_leaveRequest.LeaveEmpName))
+            {
+                EmployeeResultDTO? selectedEmployee = _employeeList
+                    .Where(a => a.EmployeeNameWithCostCenter == _leaveRequest.LeaveEmpName)
+                    .FirstOrDefault();
+                if (selectedEmployee != null)
+                {
+                    _leaveRequest.LeaveEmpNo = selectedEmployee.EmployeeNo;
+                    _leaveRequest.LeaveEmpCostCenter = selectedEmployee.DepartmentCode;
+                    _leaveRequest.LeaveEmpName = selectedEmployee.EmployeeFullName;
+                    _leaveRequest.LeaveEmpEmail = selectedEmployee.EmpEmail;
+                    _leaveRequest.LeaveBalance = selectedEmployee.LeaveBalance;
+                }
+            }
+            #endregion
+
+            #region Initialize DTO
+            var fileDtos = new List<FileUploadDTO>();
+
+            foreach (var file in _files)
+            {
+                var stream = file.OpenReadStream(10 * 1024 * 1024);
+
+                fileDtos.Add(new FileUploadDTO
+                {
+                    FileName = file.Name,
+                    ContentType = file.ContentType,
+                    Size = file.Size,
+                    Content = stream
+                });
+            }
+            #endregion
+
             if (isNewRequition)
             {
                 // Set leave request flags
                 _leaveRequest.LeaveCreatedDate = DateTime.Now;
                 _leaveRequest.LeaveApprovalFlag = CONST_WAITING_APPROVAL;
+                _leaveRequest.LeaveEndDate = _leaveRequest.LeaveResumeDate!.Value.AddDays(-1);
 
                 #region Set leave status to "Request Sent" 
                 if (_leaveStatusList != null && _leaveStatusList.Any())
@@ -751,7 +798,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 }
                 #endregion
 
-                var addResult = await LeaveService.AddLeaveRequestAsync(_leaveRequest, _cts.Token);
+                var addResult = await LeaveService.AddLeaveRequestAsync(_leaveRequest, fileDtos, Environment.WebRootPath, _cts.Token);
                 isSuccess = addResult.Success;
                 if (!isSuccess)
                     errorMsg = addResult.Error!;
@@ -766,6 +813,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set the user who update the record and the timestamp
                 _leaveRequest.LeaveUpdatedDate = DateTime.Now;
                 _leaveRequest.LeaveApprovalFlag = CONST_WAITING_APPROVAL;
+                _leaveRequest.LeaveEndDate = _leaveRequest.LeaveResumeDate!.Value.AddDays(-1);
 
                 #region Set leave status to "Request Sent" 
                 if (_leaveStatusList != null && _leaveStatusList.Any())

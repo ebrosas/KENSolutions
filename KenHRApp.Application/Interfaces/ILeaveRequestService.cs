@@ -13,7 +13,12 @@ namespace KenHRApp.Application.Interfaces
     public interface ILeaveRequestService
     {
         #region Abstract Methods
-        Task<Result<int>> AddLeaveRequestAsync(LeaveRequisitionDTO dto, CancellationToken cancellationToken = default);
+        Task<Result<int>> AddLeaveRequestAsync(
+            LeaveRequisitionDTO dto,
+            List<FileUploadDTO> files,
+            string webRootPath,
+            CancellationToken cancellationToken = default);
+
         Task<Result<int>> UpdateLeaveRequestAsync(LeaveRequisitionDTO dto, CancellationToken cancellationToken = default);
         Task<Result<List<EmployeeResultDTO>>> GetEmployeeAsync(int? empNo = 0, string costCenter = "");
         Task<bool> CheckIfLeaveDateIsHolidayAsync(DateTime? leaveDate);

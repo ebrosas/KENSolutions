@@ -22,6 +22,10 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public string? DepartmentCode { get; set; } = null;
         public string? DepartmentName { get; set; } = null;
         public string JobTitle { get; set; } = null!;
+        public string? EmpEmail { get; set; } = null;
+        public double? DILBalance { get; set; }
+        public double? LeaveBalance { get; set; }
+        public double? SLBalance { get; set; }
         #endregion
     }
 }

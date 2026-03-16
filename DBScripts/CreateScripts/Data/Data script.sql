@@ -144,6 +144,9 @@
 	SELECT * FROM [kenuser].[LeaveEntitlement] a
 
 	SELECT * FROM [kenuser].[LeaveRequisitionWF] a
+	WHERE a.LeaveEmpNo = 10003632
+
+	SELECT * FROM [kenuser].[LeaveRequisitionWF] a
 	WHERE RTRIM(a.LeaveApprovalFlag) NOT IN ('C', 'R', 'D')
 
 	SELECT * FROM [kenuser].[LeaveRequisitionWF] a

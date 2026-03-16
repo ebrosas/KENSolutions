@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -42,14 +43,59 @@ namespace KenHRApp.Infrastructure.Repositories
         /// <summary>
         /// Add new leave request
         /// </summary>
-        public async Task<Result<int>> AddLeaveRequestAsync(LeaveRequisitionWF leaveRequest, CancellationToken cancellationToken)
+        public async Task<Result<int>> AddLeaveRequestAsync(LeaveRequisitionWF dto, CancellationToken cancellationToken)
         {
             int rowsInserted = 0;
 
             try
             {
+                if (dto is null)
+                    throw new ArgumentNullException(nameof(dto));
+
+                #region Initialize entity
+                var leaveRequest = new LeaveRequisitionWF
+                {
+                    LeaveType = dto.LeaveType,
+                    LeaveEmpNo = dto.LeaveEmpNo,
+                    LeaveEmpName = dto.LeaveEmpName,
+                    LeaveEmpEmail = dto.LeaveEmpEmail,
+                    LeaveEmpCostCenter = dto.LeaveEmpCostCenter,
+                    LeaveStartDate = Convert.ToDateTime(dto.LeaveStartDate),
+                    LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
+                    LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
+                    LeaveBalance = dto.LeaveBalance,
+                    LeaveDuration = dto.LeaveDuration,
+                    NoOfHolidays = dto.NoOfHolidays,
+                    NoOfWeekends = dto.NoOfWeekends,
+                    LeavePayAdv = dto.LeavePayAdv,
+                    LeaveVisaRequired = dto.LeaveVisaRequired,
+                    LeaveRemarks = dto.LeaveRemarks,
+                    LeaveCreatedBy = dto.LeaveCreatedBy,
+                    LeaveCreatedEmail = dto.LeaveCreatedEmail,
+                    LeaveCreatedUserID = dto.LeaveCreatedUserID,
+                    LeaveCreatedDate = dto.LeaveCreatedDate,
+                    LeaveStatusCode = dto.LeaveStatusCode,
+                    LeaveStatusID = dto.LeaveStatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode
+                };
+                #endregion
+
+                #region Initialize attachments
+                if (dto.AttachmentList != null && dto.AttachmentList.Any())
+                {
+                    leaveRequest.AttachmentList = dto.AttachmentList.Select(e => new LeaveAttachment
+                    {
+                        LeaveAttachmentId = e.LeaveAttachmentId,
+                        FileName = e.FileName,
+                        StoredFileName = e.StoredFileName,
+                        ContentType = e.ContentType,
+                        FileSize = e.FileSize
+                    }).ToList();
+                }
+                #endregion
+
                 // Save to database
-                _db.LeaveRequisitionWFs.Add(leaveRequest);
+                await _db.LeaveRequisitionWFs.AddAsync(leaveRequest);
                 rowsInserted = await _db.SaveChangesAsync(cancellationToken);
 
                 return Result<int>.SuccessResult(rowsInserted);
@@ -192,7 +238,11 @@ namespace KenHRApp.Infrastructure.Repositories
                         ReportingManager  = e.ReportingManager,
                         DepartmentCode  = e.DepartmentCode,
                         DepartmentName  = e.DepartmentName,
-                        JobTitle = e.JobTitle
+                        JobTitle = e.JobTitle,
+                        EmpEmail = e.EmpEmail,
+                        DILBalance = e.DILBalance,
+                        LeaveBalance = e.LeaveBalance,
+                        SLBalance = e.SLBalance
                     }).ToList();
                 }
 

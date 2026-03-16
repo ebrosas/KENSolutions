@@ -9,6 +9,7 @@ using KenHRApp.Infrastructure.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,6 +19,7 @@ namespace KenHRApp.Application.Services
     {
         #region Fields
         private readonly ILeaveRequestRepository _repository;
+        private const long MaxFileSize = 10 * 1024 * 1024; // 10MB
         #endregion
 
         #region Enums
@@ -42,25 +44,14 @@ namespace KenHRApp.Application.Services
         #endregion
 
         #region Public Methods       
-        public async Task<Result<int>> AddLeaveRequestAsync(LeaveRequisitionDTO dto, CancellationToken cancellationToken = default)
+        public async Task<Result<int>> AddLeaveRequestAsync(
+            LeaveRequisitionDTO dto, 
+            List<FileUploadDTO> files,
+            string webRootPath,
+            CancellationToken cancellationToken = default)
         {
             try
             {
-                //LeaveDayMode startMode = LeaveDayMode.NotDefined;
-                //if (Enum.IsDefined(typeof(LeaveDayMode), dto.StartDayMode!.Value))
-                //    startMode = (LeaveDayMode)dto.StartDayMode!.Value;
-
-                //LeaveDayMode endMode = LeaveDayMode.NotDefined;
-                //if (Enum.IsDefined(typeof(LeaveDayMode), dto.EndDayMode!.Value))
-                //    endMode = (LeaveDayMode)dto.EndDayMode!.Value;
-
-                //var total = await CalculateAsync(
-                //    dto.LeaveEmpNo,
-                //    dto.LeaveStartDate!.Value,
-                //    dto.LeaveEndDate!.Value,
-                //    startMode,
-                //    endMode);
-
                 #region Create "LeaveRequisitionWF" entity from DTO
                 LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
                 {
@@ -87,6 +78,58 @@ namespace KenHRApp.Application.Services
                     LeaveStatusID = dto.LeaveStatusID,
                     StatusHandlingCode = dto.StatusHandlingCode
                 };
+                #endregion
+
+                #region Initialize the file upload path
+                string uploadPath = Path.Combine(
+                    webRootPath,
+                    "uploads",
+                    "attachments");
+
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
+                #endregion
+
+                #region Initialize file attachments
+                if (files is not null && files.Any())
+                {
+                    foreach (var file in files)
+                    {
+                        if (file.Size > MaxFileSize)
+                            throw new InvalidOperationException(
+                                $"File {file.FileName} exceeds 10MB limit.");
+
+                        if (file.Content is null)
+                            throw new InvalidOperationException(
+                                $"File stream for {file.FileName} is null.");
+
+                        string storedFileName =
+                            $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+
+                        string fullPath =
+                            Path.Combine(uploadPath, storedFileName);
+
+                        await using (var fileStream = new FileStream(
+                            fullPath,
+                            FileMode.Create,
+                            FileAccess.Write,
+                            FileShare.None,
+                            81920,
+                            useAsync: true))
+                        {
+                            await file.Content.CopyToAsync(fileStream);
+                        }
+
+                        var attachment = new LeaveAttachment(
+                            leaveRequest.LeaveAttachmentId,
+                            file.FileName,
+                            storedFileName,
+                            file.ContentType,
+                            file.Size);
+
+                        leaveRequest.AddAttachment(attachment);
+                    }
+                }
                 #endregion
 
                 var result = await _repository.AddLeaveRequestAsync(leaveRequest, cancellationToken);
@@ -199,7 +242,11 @@ namespace KenHRApp.Application.Services
                         ReportingManager = e.ReportingManager,
                         DepartmentCode = e.DepartmentCode,
                         DepartmentName = e.DepartmentName,
-                        JobTitle = e.JobTitle
+                        JobTitle = e.JobTitle,
+                        EmpEmail = e.EmpEmail,
+                        DILBalance = e.DILBalance,
+                        LeaveBalance = e.LeaveBalance,
+                        SLBalance = e.SLBalance
                     }).ToList();
                 }
 
