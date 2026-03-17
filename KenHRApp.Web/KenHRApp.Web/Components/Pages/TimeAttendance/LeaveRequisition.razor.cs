@@ -47,6 +47,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private decimal _leaveDuration = 0;
         #endregion
 
+        #region Constants
+        private const string CONST_LEAVE_FULL_DAY = "LEAVEFD";
+        private const string CONST_LEAVE_FIRST_HALF = "LEAVEFH";
+        private const string CONST_LEAVE_SECOND_HALF = "LEAVESH";
+        #endregion
+
         #region Flags
         private bool _showErrorAlert = false;
         private bool _hasValidationError = false;
@@ -91,6 +97,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             LEAVEAPVFLAG,       // Leave Approval Flags
             LEAVEAPORTION,      // Leave Day Portions
             STATUS              // Leave Statuses
+        }
+
+        public enum LeaveDayMode : byte
+        {
+            NotDefined,
+            FullDay,
+            FirstHalf,
+            SecondHalf
         }
         #endregion
 
@@ -874,19 +888,52 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Reset errors
                 _errorMessage.Clear();
 
+                // Get the Full Day udc key
+                UserDefinedCodeDTO udc = _leaveModeList.Where(a => a.UDCCode == CONST_LEAVE_FULL_DAY).FirstOrDefault();
+
                 if (inputDateName == "LeaveStartDate")
+                {
                     _leaveRequest.LeaveStartDate = selectedDate;
+                    if (_leaveRequest.StartDayMode == null)
+                    {
+                        if (_leaveModeList != null && _leaveModeList.Any())
+                        {
+                            if (udc != null)
+                            {
+                                _leaveRequest.StartDayMode = udc.UDCCode;
+                                _leaveRequest.StartDayModeDesc = udc.UDCDesc1;
+                            }
+                        }
+                    }
+                }
                 else if (inputDateName == "LeaveResumeDate")
+                {
                     _leaveRequest.LeaveResumeDate = selectedDate;
+                    if (_leaveRequest.EndDayMode == null)
+                    {
+                        if (_leaveModeList != null && _leaveModeList.Any())
+                        {
+                            if (udc != null)
+                            {
+                                _leaveRequest.EndDayMode = udc.UDCCode;
+                                _leaveRequest.EndDayModeDesc = udc.UDCDesc1;
+                            }
+                        }
+                    }
+                }
 
-                _leaveDuration = await LeaveService.CalculateAsync(
-                                _leaveRequest.LeaveEmpNo,
-                                Convert.ToDateTime(_leaveRequest.LeaveStartDate).Date,
-                                Convert.ToDateTime(_leaveRequest.LeaveResumeDate).Date,
-                                _leaveRequest.StartDayMode,
-                                _leaveRequest.EndDayMode);
+                if (_leaveRequest.LeaveStartDate.HasValue &&
+                    _leaveRequest.LeaveResumeDate.HasValue)
+                {
+                    _leaveDuration = await LeaveService.CalculateAsync(
+                                    _leaveRequest.LeaveEmpNo,
+                                    Convert.ToDateTime(_leaveRequest.LeaveStartDate).Date,
+                                    Convert.ToDateTime(_leaveRequest.LeaveResumeDate).Date,
+                                    _leaveRequest.StartDayMode,
+                                    _leaveRequest.EndDayMode);
 
-                _leaveRequest.LeaveDuration = Convert.ToDouble(_leaveDuration);
+                    _leaveRequest.LeaveDuration = Convert.ToDouble(_leaveDuration);
+                }
 
                 if (callback != null)
                 {

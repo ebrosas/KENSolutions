@@ -155,6 +155,23 @@
 
 	SELECT * FROM kenuser.PayrollPeriod a
 
+/*	Manage Payroll Period:
+	BEGIN TRAN T1
+	
+	UPDATE kenuser.PayrollPeriod
+	SET IsActive = 0
+	WHERE FiscalYear = 2026
+		AND FiscalMonth = 2
+
+	UPDATE kenuser.PayrollPeriod
+	SET IsActive = 1
+	WHERE FiscalYear = 2026
+		AND FiscalMonth = 4
+
+	COMMIT TRAN T1
+
+*/
+
 	SELECT * FROM [kenuser].[SupportTickets] a
 	SELECT * FROM [kenuser].[SupportTicketAttachments] a
 

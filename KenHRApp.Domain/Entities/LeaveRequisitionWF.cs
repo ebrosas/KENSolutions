@@ -21,6 +21,8 @@ namespace KenHRApp.Domain.Entities
 
         #region Properties
         public long LeaveRequestId { get; set; }       // Identity column  
+        public Guid LeaveAttachmentId { get; private set; } = Guid.NewGuid();
+        public Guid WorkflowId { get; private set; } = Guid.NewGuid();
 
         [Column(TypeName = "varchar(50)")]
         public string? LeaveInstanceID { get; set; } = null;
@@ -111,15 +113,11 @@ namespace KenHRApp.Domain.Entities
         [Column(TypeName = "varchar(20)")]
         public string? StatusHandlingCode { get; set; } = null;
 
-        public Guid WorkflowId { get; private set; } = Guid.NewGuid();
+        [Column(TypeName = "varchar(20)")]
+        public string? StartDayMode { get; set; } = null;
 
-        [Column(TypeName = "tinyint")]
-        public byte? StartDayMode { get; set; }
-
-        [Column(TypeName = "tinyint")]
-        public byte? EndDayMode { get; set; }
-
-        public Guid LeaveAttachmentId { get; private set; } = Guid.NewGuid();
+        [Column(TypeName = "varchar(20)")]
+        public string? EndDayMode { get; set; } = null;               
         #endregion
 
         #region Reference Navigations
@@ -136,12 +134,12 @@ namespace KenHRApp.Domain.Entities
             AttachmentList.Add(attachment);
         }
 
-        public void AddAttachment(Guid leaveAttachmentId, string fileName, string contentType,
-            string storedFileName, long fileSize)
-        {
-            AttachmentList.Add(new LeaveAttachment(leaveAttachmentId, fileName, contentType,
-                storedFileName, fileSize));
-        }
+        //public void AddAttachment(Guid leaveAttachmentId, string fileName, string contentType,
+        //    string storedFileName, long fileSize)
+        //{
+        //    AttachmentList.Add(new LeaveAttachment(leaveAttachmentId, fileName, contentType,
+        //        storedFileName, fileSize));
+        //}
         #endregion
     }
 }

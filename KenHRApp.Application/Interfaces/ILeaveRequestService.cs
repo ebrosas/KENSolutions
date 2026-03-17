@@ -26,8 +26,8 @@ namespace KenHRApp.Application.Interfaces
             int empNo,
             DateTime start,
             DateTime end,
-            byte? startDay,
-            byte? endDay);
+            string? startDay,
+            string? endDay);
         #endregion
     }
 }

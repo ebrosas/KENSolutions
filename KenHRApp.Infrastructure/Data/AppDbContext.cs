@@ -457,11 +457,11 @@ namespace KenHRApp.Infrastructure.Data
 
                 #region Set relationships 
                 entity.HasMany(e => e.AttachmentList)
-                      .WithOne(e => e.LeaveRequest)
-                      .HasPrincipalKey(e => e.LeaveRequestId)     // Map to LeaveRequestId primary key of LeaveRequisitionWF principal
-                      .HasForeignKey(c => c.LeaveRequestId)
-                      .IsRequired()
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .WithOne()
+                      .HasPrincipalKey(e => e.LeaveAttachmentId)     // Map to LeaveAttachmentId alternate key of LeaveRequisitionWF principal
+                      .HasForeignKey(c => c.LeaveAttachmentId);
+                      //.IsRequired()
+                      //.OnDelete(DeleteBehavior.Cascade);
                 #endregion
             });
 

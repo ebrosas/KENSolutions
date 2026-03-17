@@ -31,8 +31,12 @@ namespace KenHRApp.Domain.Entities
         #region Constructors
         public LeaveAttachment() { }
 
-        public LeaveAttachment(Guid leaveAttachmentId, string fileName, string contentType, 
-            string storedFileName, long fileSize)
+        public LeaveAttachment(
+            Guid leaveAttachmentId, 
+            string fileName, 
+            string contentType, 
+            string storedFileName, 
+            long fileSize)
         {
             LeaveAttachmentId = leaveAttachmentId;
             FileName = fileName;
@@ -44,10 +48,10 @@ namespace KenHRApp.Domain.Entities
         #endregion
 
         #region Reference Navation to LeaveRequisitionWF
-        [Comment("Foreign key that references primary key: LeaveRequisitionWF.LeaveRequestId")]
-        public long LeaveRequestId { get; set; }
+        //[Comment("Foreign key that references primary key: LeaveRequisitionWF.LeaveRequestId")]
+        //public long LeaveRequestId { get; set; }
 
-        public LeaveRequisitionWF LeaveRequest { get; set; } = default!;
+        //public LeaveRequisitionWF LeaveRequest { get; set; } = default!;
         #endregion
     }
 }

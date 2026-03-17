@@ -63,6 +63,8 @@ namespace KenHRApp.Infrastructure.Repositories
                     LeaveStartDate = Convert.ToDateTime(dto.LeaveStartDate),
                     LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
                     LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
+                    StartDayMode = dto.StartDayMode,
+                    EndDayMode = dto.EndDayMode,
                     LeaveBalance = dto.LeaveBalance,
                     LeaveDuration = dto.LeaveDuration,
                     NoOfHolidays = dto.NoOfHolidays,

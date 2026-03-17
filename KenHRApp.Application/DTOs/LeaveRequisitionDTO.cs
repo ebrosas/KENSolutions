@@ -139,12 +139,12 @@ namespace KenHRApp.Application.DTOs
 
         public Guid WorkflowId { get; private set; } = Guid.NewGuid();
 
-        public byte? StartDayMode { get; set; }
+        public string? StartDayMode { get; set; } = null;
 
         [Display(Name = "Mode")]
         public string StartDayModeDesc { get; set; } = null!;
 
-        public byte? EndDayMode { get; set; }
+        public string? EndDayMode { get; set; } = null;
 
         [Display(Name = "Mode")]
         public string EndDayModeDesc { get; set; } = null!;

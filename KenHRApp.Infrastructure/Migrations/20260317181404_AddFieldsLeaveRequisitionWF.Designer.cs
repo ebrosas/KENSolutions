@@ -4,6 +4,7 @@ using KenHRApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KenHRApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260317181404_AddFieldsLeaveRequisitionWF")]
+    partial class AddFieldsLeaveRequisitionWF
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,7 +171,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("SwipeLogDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 49, 59, 209, DateTimeKind.Local).AddTicks(8579));
+                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 14, 2, 835, DateTimeKind.Local).AddTicks(8427));
 
                     b.Property<DateTime?>("SwipeTime")
                         .HasColumnType("datetime");
@@ -223,7 +226,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 49, 59, 210, DateTimeKind.Local).AddTicks(5704));
+                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 14, 2, 836, DateTimeKind.Local).AddTicks(3511));
 
                     b.Property<string>("DIL_Entitlement")
                         .HasColumnType("varchar(10)");
@@ -347,7 +350,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 3, 17, 18, 49, 59, 186, DateTimeKind.Utc).AddTicks(2617));
+                        .HasDefaultValue(new DateTime(2026, 3, 17, 18, 14, 2, 822, DateTimeKind.Utc).AddTicks(3902));
 
                     b.Property<string>("DepartmentCode")
                         .IsRequired()
@@ -1172,7 +1175,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 49, 59, 209, DateTimeKind.Local).AddTicks(1661));
+                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 14, 2, 835, DateTimeKind.Local).AddTicks(3014));
 
                     b.Property<DateTime>("HolidayDate")
                         .HasColumnType("datetime");
@@ -1519,6 +1522,10 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<Guid>("LeaveAttachmentId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<long>("LeaveRequestId")
+                        .HasColumnType("bigint")
+                        .HasComment("Foreign key that references primary key: LeaveRequisitionWF.LeaveRequestId");
+
                     b.Property<string>("StoredFileName")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -1527,7 +1534,9 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("PK_LeaveAttachment_Id");
 
-                    b.HasIndex("LeaveAttachmentId");
+                    b.HasIndex("LeaveRequestId", "FileName", "ContentType")
+                        .IsUnique()
+                        .HasDatabaseName("IX_LeaveAttachment_CompoKeys");
 
                     b.ToTable("LeaveAttachments", "kenuser");
                 });
@@ -1543,7 +1552,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 49, 59, 215, DateTimeKind.Local).AddTicks(7034));
+                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 14, 2, 838, DateTimeKind.Local).AddTicks(6831));
 
                     b.Property<string>("CreatedUserID")
                         .HasColumnType("varchar(50)");
@@ -1630,7 +1639,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("LeaveCreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 49, 59, 212, DateTimeKind.Local).AddTicks(5591));
+                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 14, 2, 837, DateTimeKind.Local).AddTicks(7337));
 
                     b.Property<string>("LeaveCreatedEmail")
                         .HasColumnType("varchar(50)");
@@ -1784,7 +1793,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 49, 59, 196, DateTimeKind.Local).AddTicks(8647));
+                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 14, 2, 831, DateTimeKind.Local).AddTicks(3261));
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -1977,7 +1986,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 49, 59, 216, DateTimeKind.Local).AddTicks(3481));
+                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 14, 2, 839, DateTimeKind.Local).AddTicks(1330));
 
                     b.Property<int>("FiscalMonth")
                         .HasColumnType("int");
@@ -2111,7 +2120,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 49, 59, 187, DateTimeKind.Local).AddTicks(2641));
+                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 14, 2, 823, DateTimeKind.Local).AddTicks(665));
 
                     b.Property<string>("DepartmentCode")
                         .IsRequired()
@@ -2182,7 +2191,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 49, 59, 190, DateTimeKind.Local).AddTicks(6655));
+                        .HasDefaultValue(new DateTime(2026, 3, 17, 21, 14, 2, 824, DateTimeKind.Local).AddTicks(9069));
 
                     b.Property<int?>("DailySalaryRange")
                         .HasColumnType("int");
@@ -2665,12 +2674,13 @@ namespace KenHRApp.Infrastructure.Migrations
 
             modelBuilder.Entity("KenHRApp.Domain.Entities.LeaveAttachment", b =>
                 {
-                    b.HasOne("KenHRApp.Domain.Entities.LeaveRequisitionWF", null)
+                    b.HasOne("KenHRApp.Domain.Entities.LeaveRequisitionWF", "LeaveRequest")
                         .WithMany("AttachmentList")
-                        .HasForeignKey("LeaveAttachmentId")
-                        .HasPrincipalKey("LeaveAttachmentId")
+                        .HasForeignKey("LeaveRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("LeaveRequest");
                 });
 
             modelBuilder.Entity("KenHRApp.Domain.Entities.LeaveEntitlement", b =>

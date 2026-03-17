@@ -62,15 +62,21 @@ namespace KenHRApp.Application.Services
                         string fullPath =
                             Path.Combine(uploadPath, storedFileName);
 
-                        await using (var fileStream = new FileStream(
-                            fullPath,
-                            FileMode.Create,
-                            FileAccess.Write,
-                            FileShare.None,
-                            81920,
-                            useAsync: true))
+                        try
                         {
-                            await file.Content.CopyToAsync(fileStream);
+                            await using (var fileStream = new FileStream(
+                               fullPath,
+                               FileMode.Create,
+                               FileAccess.Write,
+                               FileShare.None,
+                               81920,
+                               useAsync: true))
+                                {
+                                    await file.Content.CopyToAsync(fileStream);
+                                }
+                        }
+                        catch (Exception attachErr)
+                        {
                         }
 
                         var attachment = new SupportTicketAttachment(

@@ -28,9 +28,9 @@ namespace KenHRApp.Infrastructure.EntityConfiguration
                 .IsRequired()
                 .HasMaxLength(50);
 
-            builder.HasIndex(e => new { e.LeaveRequestId, e.FileName, e.ContentType })
-                .HasDatabaseName("IX_LeaveAttachment_CompoKeys")
-                .IsUnique();
+            //builder.HasIndex(e => new { e.LeaveRequestId, e.FileName, e.ContentType })
+            //    .HasDatabaseName("IX_LeaveAttachment_CompoKeys")
+            //    .IsUnique();
         }
     }
 }

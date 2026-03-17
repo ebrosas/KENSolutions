@@ -20,6 +20,7 @@ namespace KenHRApp.Application.Services
         #region Fields
         private readonly ILeaveRequestRepository _repository;
         private const long MaxFileSize = 10 * 1024 * 1024; // 10MB
+        private const string CONST_LEAVE_FULL_DAY = "LEAVEFD";
         #endregion
 
         #region Enums
@@ -63,6 +64,8 @@ namespace KenHRApp.Application.Services
                     LeaveStartDate = Convert.ToDateTime(dto.LeaveStartDate),
                     LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
                     LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
+                    StartDayMode = dto.StartDayMode,
+                    EndDayMode = dto.EndDayMode,
                     LeaveBalance = dto.LeaveBalance,
                     LeaveDuration = dto.LeaveDuration, 
                     NoOfHolidays = dto.NoOfHolidays,
@@ -109,22 +112,28 @@ namespace KenHRApp.Application.Services
                         string fullPath =
                             Path.Combine(uploadPath, storedFileName);
 
-                        await using (var fileStream = new FileStream(
-                            fullPath,
-                            FileMode.Create,
-                            FileAccess.Write,
-                            FileShare.None,
-                            81920,
-                            useAsync: true))
+                        try
                         {
-                            await file.Content.CopyToAsync(fileStream);
+                            await using (var fileStream = new FileStream(
+                               fullPath,
+                               FileMode.Create,
+                               FileAccess.Write,
+                               FileShare.None,
+                               81920,
+                               useAsync: true))
+                                {
+                                    await file.Content.CopyToAsync(fileStream);
+                                }
+                        }
+                        catch (Exception attachErr)
+                        {
                         }
 
                         var attachment = new LeaveAttachment(
                             leaveRequest.LeaveAttachmentId,
-                            file.FileName,
-                            storedFileName,
+                            file.FileName,                            
                             file.ContentType,
+                            storedFileName,
                             file.Size);
 
                         leaveRequest.AddAttachment(attachment);
@@ -278,24 +287,68 @@ namespace KenHRApp.Application.Services
             }
         }
 
+        //public async Task<decimal> CalculateAsync(
+        //   int empNo,
+        //   DateTime start,
+        //   DateTime end,
+        //   byte? startDay,
+        //   byte? endDay)
+        //{
+        //    try
+        //    {
+        //        decimal total = 0;
+        //        LeaveDayMode startMode = LeaveDayMode.FullDay;
+        //        LeaveDayMode endMode = LeaveDayMode.FullDay;
+
+        //        if (startDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), startDay.Value))
+        //            startMode = (LeaveDayMode)startDay.Value;
+
+        //        if (endDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), endDay.Value))
+        //            endMode = (LeaveDayMode)endDay.Value;
+
+        //        for (var date = start; date <= end; date = date.AddDays(1))
+        //        {
+        //            if (await _repository.IsDayOffAsync(empNo, date))
+        //                continue;
+
+        //            if (await _repository.IsPublicHolidayAsync(date))
+        //                continue;
+
+        //            total += 1;
+        //        }
+
+        //        if (startMode != LeaveDayMode.FullDay)
+        //            total -= 0.5m;
+
+        //        if (endMode != LeaveDayMode.FullDay)
+        //            total -= 0.5m;
+
+        //        return total;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return 0;
+        //    }
+        //}
+
         public async Task<decimal> CalculateAsync(
            int empNo,
            DateTime start,
            DateTime end,
-           byte? startDay,
-           byte? endDay)
+           string? startDay,
+           string? endDay)
         {
             try
             {
                 decimal total = 0;
-                LeaveDayMode startMode = LeaveDayMode.FullDay;
-                LeaveDayMode endMode = LeaveDayMode.FullDay;
+                //LeaveDayMode startMode = LeaveDayMode.FullDay;
+                //LeaveDayMode endMode = LeaveDayMode.FullDay;
 
-                if (startDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), startDay.Value))
-                    startMode = (LeaveDayMode)startDay.Value;
+                //if (startDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), startDay.Value))
+                //    startMode = (LeaveDayMode)startDay.Value;
 
-                if (endDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), endDay.Value))
-                    endMode = (LeaveDayMode)endDay.Value;
+                //if (endDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), endDay.Value))
+                //    endMode = (LeaveDayMode)endDay.Value;
 
                 for (var date = start; date <= end; date = date.AddDays(1))
                 {
@@ -308,10 +361,10 @@ namespace KenHRApp.Application.Services
                     total += 1;
                 }
 
-                if (startMode != LeaveDayMode.FullDay)
+                if (startDay != CONST_LEAVE_FULL_DAY)
                     total -= 0.5m;
 
-                if (endMode != LeaveDayMode.FullDay)
+                if (endDay != CONST_LEAVE_FULL_DAY)
                     total -= 0.5m;
 
                 return total;
