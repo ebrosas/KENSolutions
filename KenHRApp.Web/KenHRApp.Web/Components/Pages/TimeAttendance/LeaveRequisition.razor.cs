@@ -10,6 +10,7 @@ using KenHRApp.Web.Components.Common.Interface;
 using Mono.TextTemplating;
 using KenHRApp.Application.Services;
 using KenHRApp.Application.DTOs.TNA;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
@@ -227,23 +228,34 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             try
             {
-                //#region Check if Leave Start Date is public holiday or not
-                //bool isStartDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_leaveRequest.LeaveStartDate).Result;
-                //if (isStartDateHoliday)
-                //{
-                //    _hasValidationError = true;
-                //    _validationMessages.Append("Start Date should not be a public holiday.");
-                //}
-                //#endregion
+                #region Check if Leave Start Date is public holiday or not
+                bool isStartDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_leaveRequest.LeaveStartDate!.Value).Result;
+                if (isStartDateHoliday)
+                {
+                    _hasValidationError = true;
+                    _validationMessages.Add("Start Date should not be a public holiday.");
+                }
+                #endregion
 
-                //#region Check if Leave Resume Date is public holiday or not
-                //bool isResumeDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_leaveRequest.LeaveResumeDate).Result;
-                //if (isResumeDateHoliday)
-                //{
-                //    _hasValidationError = true;
-                //    _validationMessages.Append("Resume Date should not be a public holiday.");
-                //}
-                //#endregion
+                #region Check if Leave Resume Date is public holiday or not
+                bool isResumeDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_leaveRequest.LeaveResumeDate!.Value).Result;
+                if (isResumeDateHoliday)
+                {
+                    _hasValidationError = true;
+                    _validationMessages.Add("Resume Date should not be a public holiday.");
+                }
+                #endregion
+
+                #region Check if leave period exist
+                bool isLeaveExist = LeaveService.CheckIfLeavePeriodExistAsync(
+                    _leaveRequest.LeaveEmpNo,
+                    _leaveRequest.LeaveResumeDate!.Value).Result;
+                if (isLeaveExist)
+                {
+                    _hasValidationError = true;
+                    _validationMessages.Add("The specified date period overlaps with an existing leave request.");
+                }
+                #endregion
 
                 if (_hasValidationError && _validationMessages.Any())
                     return;
@@ -609,7 +621,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 _leaveRequest.StartDayMode = newValue;
 
-                // Get the associated shift pointers
+                // Get the description
                 if (_leaveModeList.Any())
                 {
                     UserDefinedCodeDTO? udc = _leaveModeList.Where(s => s.UDCCode.Trim() == newValue).FirstOrDefault();
@@ -619,8 +631,70 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     }
                 }
 
-                // Reset pointer when roster changes
-                //row.ShiftPointer = 0;
+                #region Calculate duration
+                if (_leaveRequest.LeaveStartDate.HasValue &&
+                    _leaveRequest.LeaveResumeDate.HasValue)
+                {
+                    _ = CalculateLeaveDurationAsync(async () =>
+                    {
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+
+                    }, "LeaveStartDate", _leaveRequest.LeaveStartDate);
+                }
+                #endregion
+            }
+        }
+
+        private void OnResumeDayModeChanged(string newValue)
+        {
+            if (_leaveRequest.EndDayMode != newValue)
+            {
+                _leaveRequest.EndDayMode = newValue;
+
+                // Get the description
+                if (_leaveModeList.Any())
+                {
+                    UserDefinedCodeDTO? udc = _leaveModeList.Where(s => s.UDCCode.Trim() == newValue).FirstOrDefault();
+                    if (udc != null)
+                    {
+                        _leaveRequest.EndDayModeDesc = udc.UDCDesc1;
+                    }
+                }
+
+                #region Calculate leave duration
+                if (_leaveRequest.LeaveStartDate.HasValue &&
+                    _leaveRequest.LeaveResumeDate.HasValue)
+                {
+                    _ = CalculateLeaveDurationAsync(async () =>
+                    {
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+
+                    }, "LeaveResumeDate", _leaveRequest.LeaveResumeDate);
+                }
+                #endregion
+            }
+        }
+
+        private void OnEmployeeChanged(int newValue)
+        {
+            if (_leaveRequest.LeaveEmpNo != newValue)
+            {
+                _leaveRequest.LeaveEmpNo = newValue;
+
+                // Get the employee details
+                if (_employeeList.Any())
+                {
+                    EmployeeResultDTO? employee = _employeeList.Where(e => e.EmployeeNo == newValue).FirstOrDefault();
+                    if (employee != null)
+                    {
+                        _leaveRequest.LeaveEmpName = employee.EmployeeFullName;
+                        _leaveRequest.LeaveEmpCostCenter = employee.DepartmentCode;
+                        _leaveRequest.LeaveEmpEmail = employee.EmpEmail;
+                        _leaveRequest.LeaveBalance = employee.LeaveBalance;
+                    }
+                }
             }
         }
         #endregion
@@ -954,6 +1028,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                                     _leaveRequest.EndDayMode);
 
                     _leaveRequest.LeaveDuration = Convert.ToDouble(_leaveDuration);
+                    _leaveRequest.NoOfHolidays = await LeaveService.HolidayCount();
+                    _leaveRequest.NoOfWeekends = await LeaveService.WeekendCount();
                 }
 
                 if (callback != null)

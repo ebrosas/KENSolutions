@@ -14,6 +14,7 @@ namespace KenHRApp.Infrastructure.Repositories
         #region Properties
         Task<bool> IsPublicHolidayAsync(DateTime date);
         Task<bool> IsDayOffAsync(int employeeId, DateTime date);
+        Task<bool> IsLeaveOverlapAsync(int employeeNo, DateTime date);
         #endregion
 
         #region Abstract methods

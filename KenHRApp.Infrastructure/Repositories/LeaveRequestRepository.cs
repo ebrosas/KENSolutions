@@ -8,7 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KenHRApp.Infrastructure.Repositories
 {
@@ -28,14 +30,60 @@ namespace KenHRApp.Infrastructure.Repositories
         #region Properties
         public Task<bool> IsPublicHolidayAsync(DateTime date)
         {
-            // Implement logic to check if the given date is a public holiday
-            return Task.FromResult(false); // Placeholder implementation
+            bool result = false;
+
+            try
+            {
+                var existing = _db.Holidays
+                    .FirstOrDefault(e =>
+                        e.HolidayDate == date && e.HolidayType == 1);
+
+                if (existing != null)
+                    result = true;
+
+                return Task.FromResult(result);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(false);
+            }
         }
 
         public Task<bool> IsDayOffAsync(int employeeId, DateTime date)
         {
             // Implement logic to check if the given date is a day off for the specified employee
             return Task.FromResult(false); // Placeholder implementation
+        }
+
+        public Task<bool> IsLeaveOverlapAsync(int employeeNo, DateTime date)
+        {
+            bool result = false;
+
+            try
+            {
+                var existing = _db.LeaveRequisitionWFs
+                    .FirstOrDefault(e =>
+                        e.LeaveEmpNo == employeeNo &&
+                        (date >= e.LeaveStartDate && date <= e.LeaveEndDate) &&
+                        (e.StatusHandlingCode != "Cancelled" && e.StatusHandlingCode != "Rejected"));
+
+                if (existing != null)
+                    result = true;
+
+                return Task.FromResult(result);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(false);
+            }
         }
         #endregion
 
@@ -266,13 +314,20 @@ namespace KenHRApp.Infrastructure.Repositories
                 if (leaveDate == null)
                     return Result<bool>.Failure("Leave date cannot be null.");
 
-                var query = _db.Holidays.AsQueryable()
-                            .Where(h => h.HolidayDate.Date == leaveDate.Value.Date &&
-                            h.HolidayType == 1);
+                var existing = await _db.Holidays
+                    .FirstOrDefaultAsync(e => e.HolidayDate == Convert.ToDateTime(leaveDate).Date 
+                        && e.HolidayType == 1);
 
-                var model = await query.FirstOrDefaultAsync();
-                if (model != null)
+                if (existing != null)
                     result = true;
+
+                //var query = _db.Holidays.AsQueryable()
+                //            .Where(h => h.HolidayDate.Date == leaveDate.Value.Date &&
+                //            h.HolidayType == 1);
+
+                //var model = await query.FirstOrDefaultAsync();
+                //if (model != null)
+                //    result = true;
 
                 return Result<bool>.SuccessResult(result);
             }

@@ -21,6 +21,8 @@ namespace KenHRApp.Application.Services
         private readonly ILeaveRequestRepository _repository;
         private const long MaxFileSize = 10 * 1024 * 1024; // 10MB
         private const string CONST_LEAVE_FULL_DAY = "LEAVEFD";
+        private int _holidayCount = 0;
+        private int _weekendCount = 0;
         #endregion
 
         #region Enums
@@ -40,8 +42,19 @@ namespace KenHRApp.Application.Services
         }
         #endregion
 
-        #region Private Methods
-        
+        #region Properties
+        //public int HolidayCount { get; set; }
+        //public int WeekendCount { get; set; }
+
+        public Task<int> HolidayCount()
+        {
+            return Task.FromResult(_holidayCount);
+        }
+
+        public Task<int> WeekendCount()
+        {
+            return Task.FromResult(_weekendCount);
+        }
         #endregion
 
         #region Public Methods       
@@ -267,17 +280,24 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<bool> CheckIfLeaveDateIsHolidayAsync(DateTime? leaveDate)
+        public async Task<bool> CheckIfLeaveDateIsHolidayAsync(DateTime leaveDate)
         {
+            bool isHoliday = false;
+
             try
             {
-                var repoResult = await _repository.CheckIfLeaveDateIsHolidayAsync(leaveDate);
-                if (!repoResult.Success)
+                if (await _repository.IsPublicHolidayAsync(leaveDate))
                 {
-                    return false;
+                    isHoliday = true;
                 }
 
-                bool isHoliday = repoResult.Value;
+                //var repoResult = await _repository.CheckIfLeaveDateIsHolidayAsync(leaveDate);
+                //if (!repoResult.Success)
+                //{
+                //    return false;
+                //}
+
+                //bool isHoliday = repoResult.Value;
 
                 return isHoliday;
             }
@@ -287,49 +307,24 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        //public async Task<decimal> CalculateAsync(
-        //   int empNo,
-        //   DateTime start,
-        //   DateTime end,
-        //   byte? startDay,
-        //   byte? endDay)
-        //{
-        //    try
-        //    {
-        //        decimal total = 0;
-        //        LeaveDayMode startMode = LeaveDayMode.FullDay;
-        //        LeaveDayMode endMode = LeaveDayMode.FullDay;
+        public async Task<bool> CheckIfLeavePeriodExistAsync(int employeeNo, DateTime leaveDate)
+        {
+            bool isLeaveExist = false;
 
-        //        if (startDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), startDay.Value))
-        //            startMode = (LeaveDayMode)startDay.Value;
+            try
+            {
+                if (await _repository.IsLeaveOverlapAsync(employeeNo, leaveDate))
+                {
+                    isLeaveExist = true;
+                }
 
-        //        if (endDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), endDay.Value))
-        //            endMode = (LeaveDayMode)endDay.Value;
-
-        //        for (var date = start; date <= end; date = date.AddDays(1))
-        //        {
-        //            if (await _repository.IsDayOffAsync(empNo, date))
-        //                continue;
-
-        //            if (await _repository.IsPublicHolidayAsync(date))
-        //                continue;
-
-        //            total += 1;
-        //        }
-
-        //        if (startMode != LeaveDayMode.FullDay)
-        //            total -= 0.5m;
-
-        //        if (endMode != LeaveDayMode.FullDay)
-        //            total -= 0.5m;
-
-        //        return total;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return 0;
-        //    }
-        //}
+                return isLeaveExist;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
 
         public async Task<decimal> CalculateAsync(
            int empNo,
@@ -341,22 +336,25 @@ namespace KenHRApp.Application.Services
             try
             {
                 decimal total = 0;
-                //LeaveDayMode startMode = LeaveDayMode.FullDay;
-                //LeaveDayMode endMode = LeaveDayMode.FullDay;
 
-                //if (startDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), startDay.Value))
-                //    startMode = (LeaveDayMode)startDay.Value;
-
-                //if (endDay.HasValue && Enum.IsDefined(typeof(LeaveDayMode), endDay.Value))
-                //    endMode = (LeaveDayMode)endDay.Value;
+                // Reset holiday and weekend counter
+                _holidayCount = 0;
+                _weekendCount = 0;
 
                 for (var date = start; date <= end; date = date.AddDays(1))
                 {
                     if (await _repository.IsDayOffAsync(empNo, date))
+                    {
+                        _weekendCount++;
                         continue;
+                    }
 
                     if (await _repository.IsPublicHolidayAsync(date))
+                    {
+                        // Increment the holiday count
+                        _holidayCount++;
                         continue;
+                    }
 
                     total += 1;
                 }

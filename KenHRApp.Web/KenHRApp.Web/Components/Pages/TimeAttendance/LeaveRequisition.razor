@@ -169,7 +169,7 @@
                     </MudItem>
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudAutocomplete @bind-Value="_leaveRequest.LeaveEmpName"
+                            @* <MudAutocomplete @bind-Value="_leaveRequest.LeaveEmpName"
                                              For="@(() => _leaveRequest.LeaveEmpName)"
                                              SearchFunc="SearchEmployee!"
                                              Variant="Variant.Text"
@@ -184,7 +184,26 @@
                                              Disabled="@_isDisabled"
                                              MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
                                               Required="true" RequiredError="Employee is required"
-                                             Modal="true" />
+                                             Modal="true" /> *@
+
+                            <MudSelect T="int"
+                                       Value="_leaveRequest.LeaveEmpNo"
+                                       ValueChanged="@((v) => OnEmployeeChanged(v))"
+                                       Label="Employee"
+                                       Variant="Variant.Text"
+                                       Margin="Margin.Dense"
+                                       Placeholder="Please Select"
+                                       AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                       AdornmentColor="Color.Default"
+                                       HelperText="Type a key to search for value"
+                                       HelperTextOnFocus="true"
+                                       Immediate="true"
+                                       Typo="Typo.subtitle2">
+                                @foreach (var emp in _employeeList!)
+                                {
+                                    <MudSelectItem Value="emp.EmployeeNo">@emp.EmployeeNameWithCostCenter</MudSelectItem>
+                                }
+                            </MudSelect>
                         </MudPaper>
                     </MudItem>
                 </MudGrid>
@@ -246,13 +265,13 @@
                             <MudSelect T="string"
                                        Value="_leaveRequest.StartDayMode"
                                        ValueChanged="@((v) => OnStartDayModeChanged(v))"
-                                       Label="Shift Roster"
+                                       Label="Start Day Mode"
                                        Variant="Variant.Text"
                                        Margin="Margin.Dense"
                                        Placeholder="Please Select"
                                        AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
                                        AdornmentColor="Color.Default"
-                                       HelperText="Select job title"
+                                       HelperText="Type a key to search for value"
                                        HelperTextOnFocus="true"
                                        Immediate="true"
                                        Typo="Typo.subtitle2">
@@ -291,7 +310,7 @@
                     </MudItem>
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudAutocomplete @bind-Value="_leaveRequest.EndDayModeDesc"
+                            @* <MudAutocomplete @bind-Value="_leaveRequest.EndDayModeDesc"
                                              For="@(() => _leaveRequest.EndDayModeDesc)"
                                              SearchFunc="SearchLeaveMode!"
                                              Variant="Variant.Text"
@@ -305,7 +324,26 @@
                                              Typo="Typo.subtitle2"
                                              Disabled="@_isDisabled"
                                              MaxItems="@(_leaveModeList != null ? _leaveModeList.Count : 10)"
-                                             Modal="true" />
+                                             Modal="true" /> *@
+
+                            <MudSelect T="string"
+                                       Value="_leaveRequest.EndDayMode"
+                                       ValueChanged="@((v) => OnResumeDayModeChanged(v))"
+                                       Label="End Day Mode"
+                                       Variant="Variant.Text"
+                                       Margin="Margin.Dense"
+                                       Placeholder="Please Select"
+                                       AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                       AdornmentColor="Color.Default"
+                                       HelperText="Type a key to search for value"
+                                       HelperTextOnFocus="true"
+                                       Immediate="true"
+                                       Typo="Typo.subtitle2">
+                                @foreach (var mode in _leaveModeList!)
+                                {
+                                    <MudSelectItem Value="mode.UDCCode">@mode.UDCDesc1</MudSelectItem>
+                                }
+                            </MudSelect>
                         </MudPaper>
                     </MudItem>                    
                 </MudGrid>                                 

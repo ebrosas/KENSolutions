@@ -177,6 +177,7 @@
 
 	SELECT * FROM kenuser.Holiday a
 	WHERE YEAR(a.HolidayDate) = 2026
+	ORDER BY a.HolidayDate
 
 /*	Data updates:
 
