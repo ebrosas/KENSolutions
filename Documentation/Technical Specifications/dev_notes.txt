@@ -33,7 +33,7 @@ Max: 100
 
 Leave Requisition Page:
 
-To-do List:
+To-do List (As of 17-Mar-2026):
 1. Fix the Start Day Mode where the value of "_leaveRequest.StartDayMode" is not sync with the selected item
 2. Fix the End Day Mode where the value of "_leaveRequest.EndDayMode" is not sync with the selected item
-3. Perform data migration because "StartDayMode" and "EndDayMode" were changed to [Column(TypeName = "varchar(20)")]
+3. Perform data migration because "StartDayMode" and "EndDayMode" were changed to [Column(TypeName = "varchar(20)")]	-Done

@@ -227,7 +227,7 @@
                     </MudItem>
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudAutocomplete @bind-Value="_leaveRequest.StartDayModeDesc"
+                            @* <MudAutocomplete @bind-Value="_leaveRequest.StartDayModeDesc"
                                              For="@(() => _leaveRequest.StartDayModeDesc)"
                                              SearchFunc="SearchLeaveMode!"
                                              Variant="Variant.Text"
@@ -239,9 +239,28 @@
                                              HelperTextOnFocus="true"
                                              Clearable="true"
                                              Typo="Typo.subtitle2"
-                                             Disabled="@_isDisabled"
+                                             Disabled="@_isDisabled" 
                                              MaxItems="@(_leaveModeList != null ? _leaveModeList.Count : 10)"
-                                             Modal="true" />
+                                             Modal="true" /> *@
+
+                            <MudSelect T="string"
+                                       Value="_leaveRequest.StartDayMode"
+                                       ValueChanged="@((v) => OnStartDayModeChanged(v))"
+                                       Label="Shift Roster"
+                                       Variant="Variant.Text"
+                                       Margin="Margin.Dense"
+                                       Placeholder="Please Select"
+                                       AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                       AdornmentColor="Color.Default"
+                                       HelperText="Select job title"
+                                       HelperTextOnFocus="true"
+                                       Immediate="true"
+                                       Typo="Typo.subtitle2">
+                                @foreach (var mode in _leaveModeList!)
+                                {
+                                    <MudSelectItem Value="mode.UDCCode">@mode.UDCDesc1</MudSelectItem>
+                                }
+                            </MudSelect>
                         </MudPaper>
                     </MudItem>
                 </MudGrid>

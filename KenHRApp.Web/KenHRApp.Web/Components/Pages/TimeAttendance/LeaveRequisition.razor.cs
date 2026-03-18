@@ -602,6 +602,27 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             }, "LeaveResumeDate", date);
         }
+
+        private void OnStartDayModeChanged(string newValue)
+        {
+            if (_leaveRequest.StartDayMode != newValue)
+            {
+                _leaveRequest.StartDayMode = newValue;
+
+                // Get the associated shift pointers
+                if (_leaveModeList.Any())
+                {
+                    UserDefinedCodeDTO? udc = _leaveModeList.Where(s => s.UDCCode.Trim() == newValue).FirstOrDefault();
+                    if (udc != null)
+                    {
+                        _leaveRequest.StartDayModeDesc = udc.UDCDesc1;
+                    }
+                }
+
+                // Reset pointer when roster changes
+                //row.ShiftPointer = 0;
+            }
+        }
         #endregion
 
         #region Database Methods

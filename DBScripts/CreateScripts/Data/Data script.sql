@@ -219,7 +219,7 @@
 	WHERE EmployeeNo = 10003633
 
 	DELETE FROM [dbo].[__EFMigrationsHistory]
-	WHERE MigrationID IN ('20260219123954_AddAuthFieldsToEmployee')
+	WHERE MigrationID IN ('20260317185002_ModifyRelationLeaveAttachment')
 
 	UPDATE kenuser.MasterShiftPatternTitle
 	SET CreatedByEmpNo = 10003632,
