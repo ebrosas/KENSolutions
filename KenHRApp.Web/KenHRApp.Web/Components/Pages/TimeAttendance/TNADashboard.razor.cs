@@ -393,6 +393,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=Add");
         }
+
+        public void OpenLeaveRequest()
+        {
+            Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo=9");
+        }
         #endregion
 
         #region Database Methods

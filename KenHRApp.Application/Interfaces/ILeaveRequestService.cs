@@ -18,13 +18,14 @@ namespace KenHRApp.Application.Interfaces
         #endregion
 
         #region Abstract Methods
-        Task<Result<int>> AddLeaveRequestAsync(
+        Task<Result<long>> AddLeaveRequestAsync(
             LeaveRequisitionDTO dto,
             List<FileUploadDTO> files,
             string webRootPath,
             CancellationToken cancellationToken = default);
 
         Task<Result<int>> UpdateLeaveRequestAsync(LeaveRequisitionDTO dto, CancellationToken cancellationToken = default);
+        Task<Result<int>> CancelLeaveRequestAsync(LeaveRequisitionDTO dto, CancellationToken cancellationToken = default);
         Task<Result<List<EmployeeResultDTO>>> GetEmployeeAsync(int? empNo = 0, string costCenter = "");
         Task<bool> CheckIfLeaveDateIsHolidayAsync(DateTime leaveDate);
         Task<bool> CheckIfLeavePeriodExistAsync(int employeeNo, DateTime leaveDate);

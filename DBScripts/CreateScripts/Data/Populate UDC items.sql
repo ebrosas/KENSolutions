@@ -2475,6 +2475,16 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 
 	END 
 
+/*	Check records:
+
+	--Leave Request Types
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'LEAVETYPES')
+	
+*/
+
+
 /*	Data updates:
 
 	BEGIN TRAN T1
@@ -2486,6 +2496,11 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 		2968,
 		2969
 	)
+
+	--Disable UDC items
+	UPDATE kenuser.UserDefinedCode
+	SET IsActive = 0
+	WHERE RTRIM(UDCCode) IN ('HD', 'ILU', 'SLU')
 
 	COMMIT TRAN T1
 

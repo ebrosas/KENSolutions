@@ -39,4 +39,13 @@ To-do List (As of 17-Mar-2026):
 3. Perform data migration because "StartDayMode" and "EndDayMode" were changed to [Column(TypeName = "varchar(20)")]	-Done
 
 To-do List (As of 18-Mar-2026):
-1. Refactor the logic in the employee drop-down box to populate the employee details in the entity upon selection of an employee.
+1. Refactor the logic in the employee drop-down box to populate the employee details in the entity upon selection of an employee.	-Done 	
+
+To-do List (As of 21-Mar-2026):
+1. Complete the logic in "kenuser.Pr_GetLeaveRequestDetail" stored procedure.
+2. Test the leave cancellation process.
+3. Complete the code for loading the leave request from the dashboard. 
+4. Add panel to display leave status and workflow.
+
+Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo=9");
+

@@ -89,12 +89,82 @@ namespace KenHRApp.Infrastructure.Repositories
 
         #region Abstract methods
         /// <summary>
+        /// Get leave request details
+        /// </summary>
+        /// <param name="leaveRequestNo"></param>
+        /// <returns></returns>
+        public async Task<Result<AttendanceDetailResult>> GetLeaveRequestDetail(long leaveRequestNo)
+        {
+            AttendanceDetailResult attendanceDetail = new AttendanceDetailResult();
+
+            try
+            {
+                var model = await _db.Set<AttendanceDetailResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetLeaveRequestDetail @leaveNo = {0}",
+                    leaveRequestNo)
+                    .AsNoTracking()
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    attendanceDetail.EmployeeNo = model[0].EmployeeNo;
+                    attendanceDetail.AttendanceDate = model[0].AttendanceDate;
+                    attendanceDetail.FirstTimeIn = model[0].FirstTimeIn;
+                    attendanceDetail.LastTimeOut = model[0].LastTimeOut;
+                    attendanceDetail.WorkDurationDesc = model[0].WorkDurationDesc;
+                    attendanceDetail.DeficitHoursDesc = model[0].DeficitHoursDesc;
+                    attendanceDetail.RegularizedType = model[0].RegularizedType;
+                    attendanceDetail.RegularizedReason = model[0].RegularizedReason;
+                    attendanceDetail.LeaveStatus = model[0].LeaveStatus;
+                    attendanceDetail.LeaveDetails = model[0].LeaveDetails;
+                    attendanceDetail.RawSwipes = model[0].RawSwipes;
+                    attendanceDetail.SwipeType = model[0].SwipeType;
+
+                    #region Get the swipe logs
+                    List<AttendanceSwipeLog> swipeLogs = new List<AttendanceSwipeLog>();
+
+                    var swipeModel = await (from log in _db.AttendanceSwipeLogs
+                                            where log.EmpNo == attendanceDetail.EmployeeNo &&
+                                                log.SwipeDate == attendanceDetail.AttendanceDate
+                                            select log).ToListAsync();
+                    if (swipeModel != null)
+                    {
+                        attendanceDetail.SwipeLogList = swipeModel.Select(e => new AttendanceSwipeLog
+                        {
+                            SwipeID = e.SwipeID,
+                            EmpNo = e.EmpNo,
+                            SwipeDate = e.SwipeDate,
+                            SwipeTime = e.SwipeTime,
+                            SwipeType = e.SwipeType,
+                            SwipeLogDate = e.SwipeLogDate
+                        }).ToList();
+                    }
+                    #endregion
+                }
+                else
+                {
+                    attendanceDetail.WorkDurationDesc = "-";
+                    attendanceDetail.DeficitHoursDesc = "-";
+                    attendanceDetail.RegularizedType = "-";
+                    attendanceDetail.RegularizedReason = "-";
+                    attendanceDetail.LeaveStatus = "-";
+                    attendanceDetail.LeaveDetails = "-";
+                    attendanceDetail.RawSwipes = "-";
+                }
+
+                return Result<AttendanceDetailResult>.SuccessResult(attendanceDetail);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<AttendanceDetailResult>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Add new leave request
         /// </summary>
-        public async Task<Result<int>> AddLeaveRequestAsync(LeaveRequisitionWF dto, CancellationToken cancellationToken)
+        public async Task<Result<long>> AddLeaveRequestAsync(LeaveRequisitionWF dto, CancellationToken cancellationToken)
         {
-            int rowsInserted = 0;
-
             try
             {
                 if (dto is null)
@@ -146,9 +216,12 @@ namespace KenHRApp.Infrastructure.Repositories
 
                 // Save to database
                 await _db.LeaveRequisitionWFs.AddAsync(leaveRequest);
-                rowsInserted = await _db.SaveChangesAsync(cancellationToken);
+                await _db.SaveChangesAsync(cancellationToken);
 
-                return Result<int>.SuccessResult(rowsInserted);
+                // ✅ EF Core automatically populates identity after SaveChanges
+                long generatedId = leaveRequest.LeaveRequestId;
+
+                return Result<long>.SuccessResult(generatedId);
 
             }
             catch (InvalidOperationException invEx)
@@ -158,9 +231,9 @@ namespace KenHRApp.Infrastructure.Repositories
             catch (Exception ex)
             {
                 if (ex.InnerException != null)
-                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                    return Result<long>.Failure($"Database error: {ex.InnerException.Message}");
                 else
-                    return Result<int>.Failure($"Database error: {ex.Message}");
+                    return Result<long>.Failure($"Database error: {ex.Message}");
             }
         }
 
@@ -237,8 +310,9 @@ namespace KenHRApp.Infrastructure.Repositories
                     throw new KeyNotFoundException(
                         "Could not find leave request with the specified request no.");
 
-                #region Update leave request information to cancel the request
+                #region Update leave information to cancel the request
                 existing.LeaveStatusCode = leaveRequest.LeaveStatusCode;
+                existing.LeaveApprovalFlag = leaveRequest.LeaveApprovalFlag;
                 existing.LeaveUpdatedBy = leaveRequest.LeaveUpdatedBy;
                 existing.LeaveUpdatedUserID = leaveRequest.LeaveUpdatedUserID;
                 existing.LeaveUpdatedEmail = leaveRequest.LeaveUpdatedEmail;

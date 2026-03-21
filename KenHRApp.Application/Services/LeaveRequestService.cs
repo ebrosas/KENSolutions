@@ -58,7 +58,7 @@ namespace KenHRApp.Application.Services
         #endregion
 
         #region Public Methods       
-        public async Task<Result<int>> AddLeaveRequestAsync(
+        public async Task<Result<long>> AddLeaveRequestAsync(
             LeaveRequisitionDTO dto, 
             List<FileUploadDTO> files,
             string webRootPath,
@@ -92,7 +92,8 @@ namespace KenHRApp.Application.Services
                     LeaveCreatedDate = dto.LeaveCreatedDate,
                     LeaveStatusCode = dto.LeaveStatusCode,
                     LeaveStatusID = dto.LeaveStatusID,
-                    StatusHandlingCode = dto.StatusHandlingCode
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    LeaveApprovalFlag = dto.LeaveApprovalFlag
                 };
                 #endregion
 
@@ -163,11 +164,11 @@ namespace KenHRApp.Application.Services
                         throw new Exception("Unable to save leave request due to error. Please check the data entry then try to save again!");
                 }
 
-                return Result<int>.SuccessResult(result.Value);
+                return Result<long>.SuccessResult(result.Value);
             }
             catch (Exception ex)
             {
-                return Result<int>.Failure(ex.Message.ToString());
+                return Result<long>.Failure(ex.Message.ToString());
             }
         }
 
@@ -175,21 +176,6 @@ namespace KenHRApp.Application.Services
         {
             try
             {
-                //LeaveDayMode startMode = LeaveDayMode.NotDefined;
-                //if (Enum.IsDefined(typeof(LeaveDayMode), dto.StartDayMode!.Value))
-                //    startMode = (LeaveDayMode)dto.StartDayMode!.Value;
-
-                //LeaveDayMode endMode = LeaveDayMode.NotDefined;
-                //if (Enum.IsDefined(typeof(LeaveDayMode), dto.EndDayMode!.Value))
-                //    endMode = (LeaveDayMode)dto.EndDayMode!.Value;
-
-                //var total = await CalculateAsync(
-                //    dto.LeaveEmpNo,
-                //    dto.LeaveStartDate!.Value,
-                //    dto.LeaveEndDate!.Value,
-                //    startMode,
-                //    endMode);
-
                 #region Create "LeaveRequisitionWF" entity from DTO
                 LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
                 {
@@ -225,6 +211,58 @@ namespace KenHRApp.Application.Services
                         throw new Exception(result.Error);
                     else
                         throw new Exception("Unable to save shift roster changes due to error. Please check the data entry then try to save again!");
+                }
+
+                return Result<int>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<int>> CancelLeaveRequestAsync(LeaveRequisitionDTO dto, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Create "LeaveRequisitionWF" entity from DTO
+                LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
+                {
+                    LeaveType = dto.LeaveType,
+                    LeaveEmpNo = dto.LeaveEmpNo,
+                    LeaveEmpName = dto.LeaveEmpName,
+                    LeaveEmpEmail = dto.LeaveEmpEmail,
+                    LeaveEmpCostCenter = dto.LeaveEmpCostCenter,
+                    LeaveStartDate = Convert.ToDateTime(dto.LeaveStartDate),
+                    LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
+                    LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
+                    StartDayMode = dto.StartDayMode,
+                    EndDayMode = dto.EndDayMode,
+                    LeaveBalance = dto.LeaveBalance,
+                    LeaveDuration = dto.LeaveDuration,
+                    NoOfHolidays = dto.NoOfHolidays,
+                    NoOfWeekends = dto.NoOfWeekends,
+                    LeavePayAdv = dto.LeavePayAdv,
+                    LeaveVisaRequired = dto.LeaveVisaRequired,
+                    LeaveRemarks = dto.LeaveRemarks,
+                    LeaveUpdatedBy = dto.LeaveCreatedBy,
+                    LeaveUpdatedEmail = dto.LeaveUpdatedEmail,
+                    LeaveUpdatedUserID = dto.LeaveUpdatedUserID,
+                    LeaveUpdatedDate = dto.LeaveUpdatedDate,
+                    LeaveStatusCode = dto.LeaveStatusCode,
+                    LeaveStatusID = dto.LeaveStatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    LeaveApprovalFlag = dto.LeaveApprovalFlag
+                };
+                #endregion
+
+                var result = await _repository.CancelLeaveRequestAsync(leaveRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to cancel leave request due to unhandled error. Please check the data entry then try again!");
                 }
 
                 return Result<int>.SuccessResult(result.Value);
@@ -371,7 +409,7 @@ namespace KenHRApp.Application.Services
             {
                 return 0;
             }
-        }
+        }                
         #endregion
     }
 }

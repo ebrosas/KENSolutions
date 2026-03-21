@@ -18,7 +18,7 @@ namespace KenHRApp.Infrastructure.Repositories
         #endregion
 
         #region Abstract methods
-        Task<Result<int>> AddLeaveRequestAsync(LeaveRequisitionWF leaveRequest, CancellationToken cancellationToken);
+        Task<Result<long>> AddLeaveRequestAsync(LeaveRequisitionWF leaveRequest, CancellationToken cancellationToken);
         Task<Result<int>> UpdateLeaveRequestAsync(LeaveRequisitionWF leaveRequest, CancellationToken cancellationToken = default);
         Task<Result<int>> CancelLeaveRequestAsync(LeaveRequisitionWF leaveRequest, CancellationToken cancellationToken = default);
         Task<Result<List<EmployeeResult>>> GetEmployeeAsync(int? empNo, string? costCenter);
