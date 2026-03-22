@@ -14,7 +14,6 @@ namespace KenHRApp.Application.Services
         public bool ShowAppDrawer { get; set; } = false;
         public bool IsAuthenticated { get; set; } = false;
         public RecruitmentRequestDTO? RecruitmentRequest { get; set; }
-
         public EmployeeDTO? AuthenticatedUser { get; set; } = null;
         #endregion
     }

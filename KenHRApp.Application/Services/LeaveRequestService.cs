@@ -409,7 +409,85 @@ namespace KenHRApp.Application.Services
             {
                 return 0;
             }
-        }                
+        }
+
+        public async Task<Result<LeaveRequisitionDTO?>> GetLeaveRequestAsync(long leaveRequestNo)
+        {
+            LeaveRequisitionDTO? leaveRequest = null;
+
+            try
+            {
+                var repoResult = await _repository.GetLeaveRequestAsync(leaveRequestNo);
+                if (!repoResult.Success)
+                {
+                    return Result<LeaveRequisitionDTO?>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null)
+                {
+                    leaveRequest = new LeaveRequisitionDTO
+                    {
+                        LeaveRequestId = model.LeaveRequestId,
+                        LeaveAttachmentId = model.LeaveAttachmentId,
+                        WorkflowId = model.WorkflowId,
+                        LeaveInstanceID = model.LeaveInstanceID,
+                        LeaveType = model.LeaveType,
+                        LeaveEmpNo = model.LeaveEmpNo,
+                        LeaveEmpName = model.LeaveEmpName,
+                        LeaveEmpEmail = model.LeaveEmpEmail,
+                        LeaveStartDate = model.LeaveStartDate,
+                        LeaveEndDate = model.LeaveEndDate,
+                        LeaveResumeDate = model.LeaveResumeDate,
+                        LeaveEmpCostCenter = model.LeaveEmpCostCenter,
+                        LeaveRemarks = model.LeaveRemarks,
+                        LeaveConstraints = model.LeaveConstraints,
+                        LeaveStatusCode = model.LeaveStatusCode,
+                        LeaveApprovalFlag = model.LeaveApprovalFlag,
+                        LeaveVisaRequired = model.LeaveVisaRequired,
+                        LeavePayAdv = model.LeavePayAdv,
+                        LeaveIsFTMember = model.LeaveIsFTMember,
+                        LeaveBalance = model.LeaveBalance,
+                        LeaveDuration = model.LeaveDuration,
+                        NoOfHolidays = model.NoOfHolidays,
+                        NoOfWeekends = model.NoOfWeekends,
+                        PlannedLeave = model.PlannedLeave,
+                        LeavePlannedNo = model.LeavePlannedNo,
+                        HalfDayLeaveFlag = model.HalfDayLeaveFlag,
+                        LeaveCreatedDate = model.LeaveCreatedDate,
+                        LeaveCreatedBy = model.LeaveCreatedBy,
+                        LeaveCreatedUserID = model.LeaveCreatedUserID,
+                        LeaveCreatedEmail = model.LeaveCreatedEmail,
+                        LeaveUpdatedDate = model.LeaveUpdatedDate,
+                        LeaveUpdatedBy = model.LeaveUpdatedBy,
+                        LeaveUpdatedUserID = model.LeaveType,
+                        LeaveUpdatedEmail = model.LeaveUpdatedEmail,
+                        LeaveStatusID = model.LeaveStatusID,
+                        StatusHandlingCode = model.StatusHandlingCode,
+                        StartDayMode = model.StartDayMode,
+                        EndDayMode = model.EndDayMode,
+                        StatusDesc = model.StatusDesc,
+                        ApprovalFlagDesc = model.ApprovalFlagDesc,
+
+                        Files = model.AttachmentList!.Select(e => new LeaveAttachmentDTO
+                        {
+                            Id = e.Id,
+                            LeaveAttachmentId = e.LeaveAttachmentId,
+                            FileName = e.FileName,
+                            StoredFileName = e.StoredFileName,
+                            ContentType = e.ContentType,
+                            FileSize = e.FileSize
+                        }).ToList(),
+                    };
+                }
+
+                return Result<LeaveRequisitionDTO?>.SuccessResult(leaveRequest);
+            }
+            catch (Exception ex)
+            {
+                return Result<LeaveRequisitionDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching leave request record from the database.");
+            }
+        }
         #endregion
     }
 }

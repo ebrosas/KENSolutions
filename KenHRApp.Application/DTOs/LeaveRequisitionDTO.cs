@@ -32,7 +32,9 @@ namespace KenHRApp.Application.DTOs
 
         #region Properties
         public long LeaveRequestId { get; set; }       // Identity column  
-                
+        public Guid LeaveAttachmentId { get; set; } = Guid.NewGuid();
+        public Guid WorkflowId { get; set; } = Guid.NewGuid();
+
         public string? LeaveInstanceID { get; set; } = null;
 
         public string LeaveType { get; set; } = null!;
@@ -137,8 +139,6 @@ namespace KenHRApp.Application.DTOs
 
         public string? StatusHandlingCode { get; set; } = null;
 
-        public Guid WorkflowId { get; private set; } = Guid.NewGuid();
-
         public string? StartDayMode { get; set; } = null;
 
         [Display(Name = "Mode")]
@@ -148,6 +148,9 @@ namespace KenHRApp.Application.DTOs
 
         [Display(Name = "Mode")]
         public string EndDayModeDesc { get; set; } = null!;
+
+        public string? StatusDesc { get; set; } = null;
+        public string? ApprovalFlagDesc { get; set; } = null;
 
         public List<LeaveAttachmentDTO> Files { get; set; } = new();
         #endregion

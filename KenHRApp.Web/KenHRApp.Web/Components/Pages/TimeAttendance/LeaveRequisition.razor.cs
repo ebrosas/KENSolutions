@@ -33,6 +33,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Parameter]
         [SupplyParameterFromQuery]
         public long LeaveRequestNo { get; set; } = 0;
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string CallerForm { get; set; } = "";
         #endregion
 
         #region Fields
@@ -188,11 +192,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _isDisabled = true;
 
                 if (LeaveRequestNo > 0)
-                {
                     _pageTitle = $"Submitted Leave Request No. {LeaveRequestNo}";
-
-                    BeginLoadLeaveRequest(LeaveRequestNo);
-                }
             }
             else if (ActionType == ActionTypes.Add.ToString())
             {
@@ -222,7 +222,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _leaveRequest.LeaveCreatedUserID = UserID;
                     _leaveRequest.LeaveStatusCode = CONST_REQUEST_SENT;
 
-                    BeginLoadComboboxTask();
+                    BeginLoadComboboxTask();                                        
                 }
             }
         }
@@ -403,6 +403,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
             });
+        }
+
+        private void HandleBackButton()
+        {
+            if (!string.IsNullOrEmpty(CallerForm) &&
+                CallerForm == "TNADashboard")
+            {
+                Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+            }
         }
         #endregion
 
@@ -787,6 +796,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
+
+                if (LeaveRequestNo > 0)
+                {
+                    BeginLoadLeaveRequest(LeaveRequestNo);
+                }
             });
         }
 
@@ -1192,7 +1206,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _isRunning = true;
 
             // Set the overlay message
-            overlayMessage = "Loading leave request details, please wait...";
+            overlayMessage = "Loading leave request, please wait...";
 
             _ = GetLeaveRequestDetail(async () =>
             {
@@ -1214,56 +1228,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Clear attachment list
             _files = Array.Empty<IBrowserFile>();
 
-            //var result = await AttendanceService.GetShiftRosterDetailAsync(leaveRequestNo);
-            //if (result.Success)
-            //{
-            //    _shiftPattern = result.Value!;
+            var result = await LeaveService.GetLeaveRequestAsync(leaveRequestNo);
+            if (result.Success)
+            {
+                _leaveRequest = result.Value!;
 
-            //    // Recreate the EditContext with the loaded _shiftPattern
-            //    _editContext = new EditContext(_shiftPattern);
-            //}
-            //else
-            //{
-            //    // Set the error message
-            //    _errorMessage.Append(result.Error);
+                // Recreate the EditContext with the loaded _leaveRequest
+                _editContext = new EditContext(_leaveRequest);
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.Append(result.Error);
 
-            //    ShowHideError(true);
-            //}
-
-            #region Populate Shift Timing drop-down items in "Shift Timing Sequence" grid
-            //if (_shiftPattern.ShiftTimingList != null && _shiftPattern.ShiftTimingList.Any())
-            //{
-            //    foreach (var shiftTiming in _shiftPattern.ShiftTimingList)
-            //    {
-            //        if (!_shiftMasterPointerList.Any(x => x.ShiftCode == shiftTiming.ShiftCode))
-            //        {
-            //            if (_shiftMasterPointerList.Count == 0)
-            //            {
-            //                // Add Day-off shift timing
-            //                _shiftMasterPointerList.Add(new ShiftMasterDTO()
-            //                {
-            //                    ShiftCode = CONST_DAYOFF_CODE,
-            //                    ShiftDescription = CONST_DAYOFF_DESC
-            //                });
-            //            }
-
-            //            _shiftMasterPointerList.Add(new ShiftMasterDTO()
-            //            {
-            //                ShiftCode = shiftTiming.ShiftCode,
-            //                ShiftDescription = shiftTiming.ShiftDescription,
-            //                ArrivalFrom = shiftTiming.ArrivalFrom,
-            //                ArrivalTo = shiftTiming.ArrivalTo!.Value,
-            //                DepartFrom = shiftTiming.DepartFrom!.Value,
-            //                DepartTo = shiftTiming.DepartTo,
-            //                RArrivalFrom = shiftTiming.RArrivalFrom,
-            //                RArrivalTo = shiftTiming.RArrivalTo!.Value,
-            //                RDepartFrom = shiftTiming.RDepartFrom!.Value,
-            //                RDepartTo = shiftTiming.RDepartTo
-            //            });
-            //        }
-            //    }
-            //}
-            #endregion
+                ShowHideError(true);
+            }
 
             if (callback != null)
             {

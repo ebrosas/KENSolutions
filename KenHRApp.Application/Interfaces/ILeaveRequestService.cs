@@ -35,6 +35,7 @@ namespace KenHRApp.Application.Interfaces
             DateTime end,
             string? startDay,
             string? endDay);
+        Task<Result<LeaveRequisitionDTO?>> GetLeaveRequestAsync(long leaveRequestNo);
         #endregion
     }
 }

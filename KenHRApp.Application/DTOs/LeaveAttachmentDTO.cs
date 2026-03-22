@@ -10,7 +10,8 @@ namespace KenHRApp.Application.DTOs
     public class LeaveAttachmentDTO
     {
         #region Properties
-        public Guid Id { get; private set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid LeaveAttachmentId { get; set; }
         public long LeaveRequestId { get; set; }
 
         public string FileName { get; set; } = null!;

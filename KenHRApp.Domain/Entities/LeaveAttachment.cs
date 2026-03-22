@@ -11,7 +11,7 @@ namespace KenHRApp.Domain.Entities
     public class LeaveAttachment
     {
         #region Properties
-        public Guid Id { get; private set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
         public Guid LeaveAttachmentId { get; set; }
 
         [Column(TypeName = "varchar(100)")]

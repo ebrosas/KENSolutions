@@ -21,8 +21,8 @@ namespace KenHRApp.Domain.Entities
 
         #region Properties
         public long LeaveRequestId { get; set; }       // Identity column  
-        public Guid LeaveAttachmentId { get; private set; } = Guid.NewGuid();
-        public Guid WorkflowId { get; private set; } = Guid.NewGuid();
+        public Guid LeaveAttachmentId { get; set; } = Guid.NewGuid();
+        public Guid WorkflowId { get; set; } = Guid.NewGuid();
 
         [Column(TypeName = "varchar(50)")]
         public string? LeaveInstanceID { get; set; } = null;
@@ -117,7 +117,15 @@ namespace KenHRApp.Domain.Entities
         public string? StartDayMode { get; set; } = null;
 
         [Column(TypeName = "varchar(20)")]
-        public string? EndDayMode { get; set; } = null;               
+        public string? EndDayMode { get; set; } = null;
+        #endregion
+
+        #region Unmapped Properties
+        [NotMapped]
+        public string? StatusDesc { get; set; } = null;
+
+        [NotMapped]
+        public string? ApprovalFlagDesc { get; set; } = null;
         #endregion
 
         #region Reference Navigations

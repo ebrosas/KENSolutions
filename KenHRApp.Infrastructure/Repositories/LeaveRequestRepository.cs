@@ -93,70 +93,86 @@ namespace KenHRApp.Infrastructure.Repositories
         /// </summary>
         /// <param name="leaveRequestNo"></param>
         /// <returns></returns>
-        public async Task<Result<AttendanceDetailResult>> GetLeaveRequestDetail(long leaveRequestNo)
+        public async Task<Result<LeaveRequisitionWF>> GetLeaveRequestAsync(long leaveRequestNo)
         {
-            AttendanceDetailResult attendanceDetail = new AttendanceDetailResult();
+            LeaveRequisitionWF leaveRequest = new();
 
             try
             {
-                var model = await _db.Set<AttendanceDetailResult>()
+                var model = await _db.Set<LeaveRequisitionWF>()
                     .FromSqlRaw("EXEC kenuser.Pr_GetLeaveRequestDetail @leaveNo = {0}",
                     leaveRequestNo)
-                    .AsNoTracking()
                     .ToListAsync();
                 if (model != null && model.Any())
                 {
-                    attendanceDetail.EmployeeNo = model[0].EmployeeNo;
-                    attendanceDetail.AttendanceDate = model[0].AttendanceDate;
-                    attendanceDetail.FirstTimeIn = model[0].FirstTimeIn;
-                    attendanceDetail.LastTimeOut = model[0].LastTimeOut;
-                    attendanceDetail.WorkDurationDesc = model[0].WorkDurationDesc;
-                    attendanceDetail.DeficitHoursDesc = model[0].DeficitHoursDesc;
-                    attendanceDetail.RegularizedType = model[0].RegularizedType;
-                    attendanceDetail.RegularizedReason = model[0].RegularizedReason;
-                    attendanceDetail.LeaveStatus = model[0].LeaveStatus;
-                    attendanceDetail.LeaveDetails = model[0].LeaveDetails;
-                    attendanceDetail.RawSwipes = model[0].RawSwipes;
-                    attendanceDetail.SwipeType = model[0].SwipeType;
+                    leaveRequest.LeaveRequestId = model[0].LeaveRequestId;
+                    leaveRequest.LeaveAttachmentId = model[0].LeaveAttachmentId;
+                    leaveRequest.WorkflowId = model[0].WorkflowId;
+                    leaveRequest.LeaveInstanceID = model[0].LeaveInstanceID;
+                    leaveRequest.LeaveType = model[0].LeaveType;
+                    leaveRequest.LeaveEmpNo = model[0].LeaveEmpNo;
+                    leaveRequest.LeaveEmpName = model[0].LeaveEmpName; 
+                    leaveRequest.LeaveEmpEmail = model[0].LeaveEmpEmail; 
+                    leaveRequest.LeaveStartDate = model[0].LeaveStartDate;
+                    leaveRequest.LeaveEndDate = model[0].LeaveEndDate;
+                    leaveRequest.LeaveResumeDate = model[0].LeaveResumeDate;
+                    leaveRequest.LeaveEmpCostCenter = model[0].LeaveEmpCostCenter; 
+                    leaveRequest.LeaveRemarks = model[0].LeaveRemarks; 
+                    leaveRequest.LeaveConstraints = model[0].LeaveConstraints; 
+                    leaveRequest.LeaveStatusCode = model[0].LeaveStatusCode; 
+                    leaveRequest.LeaveApprovalFlag = model[0].LeaveApprovalFlag;
+                    leaveRequest.LeaveVisaRequired = model[0].LeaveVisaRequired; 
+                    leaveRequest.LeavePayAdv = model[0].LeavePayAdv; 
+                    leaveRequest.LeaveIsFTMember = model[0].LeaveIsFTMember; 
+                    leaveRequest.LeaveBalance = model[0].LeaveBalance;
+                    leaveRequest.LeaveDuration = model[0].LeaveDuration;
+                    leaveRequest.NoOfHolidays = model[0].NoOfHolidays;
+                    leaveRequest.NoOfWeekends = model[0].NoOfWeekends;
+                    leaveRequest.PlannedLeave = model[0].PlannedLeave;
+                    leaveRequest.LeavePlannedNo = model[0].LeavePlannedNo;
+                    leaveRequest.HalfDayLeaveFlag = model[0].HalfDayLeaveFlag;
+                    leaveRequest.LeaveCreatedDate = model[0].LeaveCreatedDate;
+                    leaveRequest.LeaveCreatedBy = model[0].LeaveCreatedBy;
+                    leaveRequest.LeaveCreatedUserID = model[0].LeaveCreatedUserID; 
+                    leaveRequest.LeaveCreatedEmail = model[0].LeaveCreatedEmail; 
+                    leaveRequest.LeaveUpdatedDate = model[0].LeaveUpdatedDate;
+                    leaveRequest.LeaveUpdatedBy = model[0].LeaveUpdatedBy;
+                    leaveRequest.LeaveUpdatedUserID = model[0].LeaveType; 
+                    leaveRequest.LeaveUpdatedEmail = model[0].LeaveUpdatedEmail;
+                    leaveRequest.LeaveStatusID = model[0].LeaveStatusID;
+                    leaveRequest.StatusHandlingCode = model[0].StatusHandlingCode; 
+                    leaveRequest.StartDayMode = model[0].StartDayMode; 
+                    leaveRequest.EndDayMode = model[0].EndDayMode; 
+                    leaveRequest.StatusDesc = model[0].StatusDesc;
+                    leaveRequest.ApprovalFlagDesc = model[0].ApprovalFlagDesc;
 
-                    #region Get the swipe logs
-                    List<AttendanceSwipeLog> swipeLogs = new List<AttendanceSwipeLog>();
+                    #region Get the file attachments
+                    List<LeaveAttachment> attachments = new();
 
-                    var swipeModel = await (from log in _db.AttendanceSwipeLogs
-                                            where log.EmpNo == attendanceDetail.EmployeeNo &&
-                                                log.SwipeDate == attendanceDetail.AttendanceDate
-                                            select log).ToListAsync();
-                    if (swipeModel != null)
+                    var attachModel = await (from attach in _db.LeaveAttachments
+                                            where attach.LeaveAttachmentId == leaveRequest.LeaveAttachmentId
+                                            select attach).ToListAsync();
+                    if (attachModel != null)
                     {
-                        attendanceDetail.SwipeLogList = swipeModel.Select(e => new AttendanceSwipeLog
+                        leaveRequest.AttachmentList = attachModel.Select(e => new LeaveAttachment
                         {
-                            SwipeID = e.SwipeID,
-                            EmpNo = e.EmpNo,
-                            SwipeDate = e.SwipeDate,
-                            SwipeTime = e.SwipeTime,
-                            SwipeType = e.SwipeType,
-                            SwipeLogDate = e.SwipeLogDate
+                            Id = e.Id,
+                            LeaveAttachmentId = e.LeaveAttachmentId,
+                            FileName = e.FileName,
+                            StoredFileName = e.StoredFileName,
+                            ContentType = e.ContentType,
+                            FileSize = e.FileSize
                         }).ToList();
                     }
                     #endregion
                 }
-                else
-                {
-                    attendanceDetail.WorkDurationDesc = "-";
-                    attendanceDetail.DeficitHoursDesc = "-";
-                    attendanceDetail.RegularizedType = "-";
-                    attendanceDetail.RegularizedReason = "-";
-                    attendanceDetail.LeaveStatus = "-";
-                    attendanceDetail.LeaveDetails = "-";
-                    attendanceDetail.RawSwipes = "-";
-                }
 
-                return Result<AttendanceDetailResult>.SuccessResult(attendanceDetail);
+                return Result<LeaveRequisitionWF>.SuccessResult(leaveRequest);
             }
             catch (Exception ex)
             {
                 // Log error here if needed (Serilog, NLog, etc.)
-                return Result<AttendanceDetailResult>.Failure($"Database error: {ex.Message}");
+                return Result<LeaveRequisitionWF>.Failure($"Database error: {ex.Message}");
             }
         }
 
@@ -196,7 +212,8 @@ namespace KenHRApp.Infrastructure.Repositories
                     LeaveCreatedDate = dto.LeaveCreatedDate,
                     LeaveStatusCode = dto.LeaveStatusCode,
                     LeaveStatusID = dto.LeaveStatusID,
-                    StatusHandlingCode = dto.StatusHandlingCode
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    LeaveApprovalFlag = dto.LeaveApprovalFlag
                 };
                 #endregion
 

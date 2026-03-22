@@ -396,7 +396,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         public void OpenLeaveRequest()
         {
-            Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo=9");
+            Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo=9&CallerForm=TNADashboard");
         }
         #endregion
 
