@@ -109,11 +109,11 @@
         <MudNavLink Href="/EmployeeSeparation" Icon="@Icons.Material.TwoTone.AreaChart" Class="navMenu navlink-icon-sm">Employee Separation</MudNavLink>
     </MudNavGroup>
     <MudNavGroup Title="Leave Management" Icon="fas fa-user-cog" Class="navMenu navlink-icon-sm">
-        <MudNavLink Href="/security" Icon="@Icons.Material.TwoTone.Security" Class="navMenu navlink-icon-sm">Leave Request</MudNavLink>
+        <MudNavLink Icon="@Icons.Material.TwoTone.Security" Class="navMenu navlink-icon-sm" OnClick="OpenLeaveRequest">Leave Request</MudNavLink>
         <MudNavLink Href="/users" Icon="far fa-thumbs-up" Class="navMenu navlink-icon-sm">Leave Approval</MudNavLink>
         <MudNavLink Href="/users" Icon="@Icons.Material.TwoTone.People" Class="navMenu navlink-icon-sm">Leave Entitlement</MudNavLink>
         <MudNavLink Href="/users" Icon="@Icons.Material.TwoTone.People" Class="navMenu navlink-icon-sm">Leave Cancellation</MudNavLink>
-        <MudNavLink Href="/users" Icon="@Icons.Material.TwoTone.People" Class="navMenu navlink-icon-sm">Leave Planner</MudNavLink>
+        <MudNavLink Href="/users" Icon="@Icons.Material.TwoTone.People" Class="navMenu navlink-icon-sm" hidden>Leave Planner</MudNavLink>
     </MudNavGroup>
     <MudNavGroup Title="Learning Management" Icon="fas fa-chalkboard-teacher" Class="navMenu navlink-icon-sm">
         <MudNavLink Href="/security" Icon="fas fa-laptop" Class="navMenu navlink-icon-sm">Training Registration</MudNavLink>
@@ -227,6 +227,12 @@
     {
         NavigationManager.NavigateTo("/TimeAttendance/tnadashboard");
         // NavigationManager.NavigateTo("/TimeAttendance/shiftrostersearch");
+        Actions.InvokeShowHideDrawer();
+    }
+
+    private void OpenLeaveRequest()
+    {
+        NavigationManager.NavigateTo("/TimeAttendance/leaverequest");
         Actions.InvokeShowHideDrawer();
     }
     #endregion

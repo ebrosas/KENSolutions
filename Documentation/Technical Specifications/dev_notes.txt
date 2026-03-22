@@ -42,10 +42,14 @@ To-do List (As of 18-Mar-2026):
 1. Refactor the logic in the employee drop-down box to populate the employee details in the entity upon selection of an employee.	-Done 	
 
 To-do List (As of 21-Mar-2026):
-1. Complete the logic in "kenuser.Pr_GetLeaveRequestDetail" stored procedure.
-2. Test the leave cancellation process.
-3. Complete the code for loading the leave request from the dashboard. 
-4. Add panel to display leave status and workflow.
+1. Complete the logic in "kenuser.Pr_GetLeaveRequestDetail" stored procedure.	-Done
+2. Test the leave cancellation process.	-Done
+3. Complete the code for loading the leave request from the dashboard. 	-Done
+4. Add panel to display leave status and workflow.	-Done
+
+To-do List (As of 22-Mar-2026):
+1. Create the Leave Inquiry page
+2. Implement code to load file attachment once clicked the mudchip item
 
 Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo=9");
 

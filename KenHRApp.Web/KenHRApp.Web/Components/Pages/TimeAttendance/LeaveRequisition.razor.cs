@@ -50,7 +50,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string _searchString = string.Empty;
         private StringBuilder _errorMessage = new StringBuilder();
         private decimal _leaveDuration = 0;
-        private string _pageTitle = "Apply Leave";
+        private string _pageTitle = "Leave Request";
         #endregion
                 
         #region Flags
@@ -191,8 +191,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 _isDisabled = true;
 
-                if (LeaveRequestNo > 0)
-                    _pageTitle = $"Submitted Leave Request No. {LeaveRequestNo}";
+                //if (LeaveRequestNo > 0)
+                //    _pageTitle = $"Submitted Leave Request No. {LeaveRequestNo}";
             }
             else if (ActionType == ActionTypes.Add.ToString())
             {
@@ -220,7 +220,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _leaveRequest.LeaveCreatedBy = UserEmpNo;
                     _leaveRequest.LeaveCreatedEmail = UserEmail;
                     _leaveRequest.LeaveCreatedUserID = UserID;
-                    _leaveRequest.LeaveStatusCode = CONST_REQUEST_SENT;
+                    //_leaveRequest.LeaveStatusCode = CONST_REQUEST_SENT;
 
                     BeginLoadComboboxTask();                                        
                 }
@@ -287,6 +287,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                     // Shows the spinner overlay
                     await InvokeAsync(StateHasChanged);
+
+                    if (_leaveRequest.LeaveRequestId > 0)
+                    {
+                        BeginLoadLeaveRequest(_leaveRequest.LeaveRequestId);
+                    }
                 });
             }
             catch (OperationCanceledException)
@@ -378,32 +383,32 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             #endregion
         }
 
-        private void HandleCancelRequestButton()
-        {
-            // Set flag to display the loading panel
-            _isRunning = true;
+        //private void HandleCancelRequestButton()
+        //{
+        //    // Set flag to display the loading panel
+        //    _isRunning = true;
 
-            // Set the overlay message
-            overlayMessage = "Cancelling leave request, please wait...";
+        //    // Set the overlay message
+        //    overlayMessage = "Cancelling leave request, please wait...";
 
-            _ = CancelLeaveRequestAsync(async () =>
-            {
-                // Reset the flags
-                _isEditMode = false;
-                _isDisabled = false;
-                _isRunning = false;
-                _saveBtnEnabled = false;
-                _hasValidationError = false;
-                _validationMessages.Clear();
+        //    _ = CancelLeaveRequestAsync(async () =>
+        //    {
+        //        // Reset the flags
+        //        _isEditMode = false;
+        //        _isDisabled = false;
+        //        _isRunning = false;
+        //        _saveBtnEnabled = false;
+        //        _hasValidationError = false;
+        //        _validationMessages.Clear();
 
-                // Reset error messages
-                _errorMessage.Clear();
-                ShowHideError(false);
+        //        // Reset error messages
+        //        _errorMessage.Clear();
+        //        ShowHideError(false);
 
-                // Shows the spinner overlay
-                await InvokeAsync(StateHasChanged);
-            });
-        }
+        //        // Shows the spinner overlay
+        //        await InvokeAsync(StateHasChanged);
+        //    });
+        //}
 
         private void HandleBackButton()
         {
@@ -750,7 +755,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                         _leaveRequest.LeaveEmpName = employee.EmployeeFullName;
                         _leaveRequest.LeaveEmpCostCenter = employee.DepartmentCode;
                         _leaveRequest.LeaveEmpEmail = employee.EmpEmail;
-                        _leaveRequest.LeaveBalance = employee.LeaveBalance;
+                        _leaveRequest.LeaveBalance = employee.LeaveBalance.HasValue ? Convert.ToDouble(employee.LeaveBalance) : 0;
                     }
                 }
             }
@@ -772,6 +777,74 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                         _leaveRequest.LeaveTypeDesc = udc.UDCDesc1;
                     }
                 }
+            }
+        }
+
+        private async Task ConfirmCancel()
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Cancel"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to cancel leave requsition no. '{_leaveRequest.LeaveRequestId}'?" },
+                { "ConfirmText", "Cancel Leave" },
+                { "Color", Color.Error },
+                { "DialogIconColor", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Cancel Leave Confirmation", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                BeginLeaveCancellation(_leaveRequest);
+            }
+        }
+
+        private void BeginLeaveCancellation(LeaveRequisitionDTO leaveRequest)
+        {
+            try
+            {
+                // Exit process if leave status is Cancelled
+                if (_leaveRequest.StatusHandlingCode == "Cancelled")
+                {
+                    _hasValidationError = true;
+                    _validationMessages.Add("Unable to cancel leave request because it was already been cancelled!");
+                    return;
+                }
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Cancelling leave request, please wait...";
+
+                _ = CancelLeaveRequestAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    StateHasChanged();
+
+                }, leaveRequest);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Leave cancellation aborted (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
             }
         }
         #endregion
@@ -1002,8 +1075,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     // Set action type flag
                     ActionType = ActionTypes.Edit.ToString();
 
+                    // Get the new identity seed value
+                    _leaveRequest.LeaveRequestId = addResult.Value;
+
                     // Display the requisition number in the page title
-                    _pageTitle = $" Submitted Leave Request No. {addResult.Value}";
+                    //_pageTitle = $" Submitted Leave Request No. {addResult.Value}";
                 }
             }
             else
@@ -1133,7 +1209,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task CancelLeaveRequestAsync(Func<Task> callback)
+        private async Task CancelLeaveRequestAsync(Func<Task> callback, LeaveRequisitionDTO leaveRequest)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(500);
@@ -1141,7 +1217,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Reset error messages
             _errorMessage.Clear();
 
-            //bool isNewRequition = _leaveRequest.LeaveRequestId == 0;
+            //bool isNewRequition = leaveRequest.LeaveRequestId == 0;
 
             // Initialize the cancellation token
             _cts = new CancellationTokenSource();
@@ -1150,8 +1226,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             string errorMsg = string.Empty;
 
             // Set the user who update the record and the timestamp
-            _leaveRequest.LeaveUpdatedDate = DateTime.Now;
-            _leaveRequest.LeaveApprovalFlag = CONST_CANCELLED;
+            leaveRequest.LeaveUpdatedDate = DateTime.Now;
+            leaveRequest.LeaveApprovalFlag = CONST_CANCELLED;
 
             #region Set workflow status to "101 - Cancelled by User" 
             if (_leaveStatusList != null && _leaveStatusList.Any())
@@ -1159,14 +1235,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_CANCELLED_BY_USER).FirstOrDefault();
                 if (statusFlag != null)
                 {
-                    _leaveRequest.LeaveStatusCode = statusFlag.UDCCode;
-                    _leaveRequest.LeaveStatusID = statusFlag.UDCId;
-                    _leaveRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
+                    leaveRequest.LeaveStatusCode = statusFlag.UDCCode;
+                    leaveRequest.LeaveStatusID = statusFlag.UDCId;
+                    leaveRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
                 }
             }
             #endregion
 
-            var saveResult = await LeaveService.CancelLeaveRequestAsync(_leaveRequest, _cts.Token);
+            var saveResult = await LeaveService.CancelLeaveRequestAsync(leaveRequest, _cts.Token);
             isSuccess = saveResult.Success;
             if (!isSuccess)
                 errorMsg = saveResult.Error!;

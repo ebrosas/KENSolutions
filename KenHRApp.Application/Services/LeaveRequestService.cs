@@ -228,6 +228,7 @@ namespace KenHRApp.Application.Services
                 #region Create "LeaveRequisitionWF" entity from DTO
                 LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
                 {
+                    LeaveRequestId = dto.LeaveRequestId,
                     LeaveType = dto.LeaveType,
                     LeaveEmpNo = dto.LeaveEmpNo,
                     LeaveEmpName = dto.LeaveEmpName,
@@ -468,6 +469,7 @@ namespace KenHRApp.Application.Services
                         EndDayMode = model.EndDayMode,
                         StatusDesc = model.StatusDesc,
                         ApprovalFlagDesc = model.ApprovalFlagDesc,
+                        CreatedByName = model.CreatedByName,
 
                         Files = model.AttachmentList!.Select(e => new LeaveAttachmentDTO
                         {

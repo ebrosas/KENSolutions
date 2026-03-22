@@ -11,6 +11,12 @@ DECLARE @leaveNo	BIGINT = 9
 		FROM kenuser.LeaveRequisitionWF x
 		WHERE x.LeaveRequestId = @leaveNo
 	)
+
+	SELECT a.LeaveApprovalFlag, * 
+	FROM kenuser.LeaveRequisitionWF a
+	WHERE a.LeaveEmpNo = 10003632
+	ORDER BY a.LeaveVisaRequired
+
 	
 /*	Remove records:
 

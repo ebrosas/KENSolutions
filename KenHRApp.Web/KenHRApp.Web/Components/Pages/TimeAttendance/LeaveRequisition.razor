@@ -36,7 +36,7 @@
             </MudAlert>
         }
 
-        <MudPaper class="paper-header w-100 px-4" Elevation="0">   
+        <MudPaper class="paper-header w-100 px-2" Elevation="0">   
             <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Class="mud-width-full"
                 StretchItems="StretchItems.End" Breakpoint="Breakpoint.Xs">
 
@@ -81,14 +81,14 @@
                                    Size="Size.Small"
                                    Color="Color.Error"
                                    Disabled="@(_isEditMode)"
-                                   OnClick="HandleCancelRequestButton">
+                                   OnClick="ConfirmCancel">
                             Cancel Leave
                         </MudButton>
 
                         <MudButton Variant="Variant.Text"
                                    StartIcon="@Icons.Material.Filled.ArrowBackIos"
                                    Size="Size.Small"
-                                   Color="Color.Primary"
+                                   Color="Color.Surface"
                                    Disabled="@(_isEditMode)"
                                    OnClick="HandleBackButton">
                             Go back
@@ -127,8 +127,43 @@
         <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
             <MudPaper Elevation="0" Square="true" Class="w-100 px-2 mt-4">
                  <MudGrid Spacing="5">
-                    <MudItem xs="12">
+                    <MudItem xs="12" sm="6">
+                        @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
+                        {
+                            <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Spacing="0">
+                                <!-- Leave Requisition No. -->
+                                <MudText Typo="Typo.h6" Color="Color.Surface" Class="fw-bold">
+                                    Leave Requisition No. @_leaveRequest.LeaveRequestId
+                                </MudText>
+
+                                <!-- Created Date and Time -->
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    Created On: @_leaveRequest.LeaveCreatedDate?.ToString("MMM dd, yyyy hh:mm tt")
+                                </MudText>
+
+                                <!-- Employee Name and Number -->
+                                <MudText Typo="Typo.body2" Color="Color.Surface">
+                                    Created By: @_leaveRequest.CreatedByName
+                                </MudText>
+
+                                <!-- Current Status -->
+                                <MudText Typo="Typo.body2" Color="@(_leaveRequest.StatusHandlingCode == "Cancelled" ? Color.Error : _leaveRequest.StatusHandlingCode == "Approved" || _leaveRequest.StatusHandlingCode == "Closed" ? Color.Success : Color.Info)" Class="fw-semibold">
+                                    @($"Status: {_leaveRequest.StatusHandlingCode} - {_leaveRequest.StatusDesc}")
+                                </MudText>
+                            </MudStack>
+                        }
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
                         <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Spacing="4">
+                             <MudStack Justify="Justify.FlexStart" Spacing="0">
+                                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
+                                     <MudAvatar Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
+                                         <MudIcon Icon="@Icons.Material.Filled.Balance" />
+                                     </MudAvatar>
+                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Info">@_leaveRequest.LeaveBalance.ToString("F1") days</MudText>
+                                </MudStack>
+                                <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Info">Leave Balance</MudText>
+                            </MudStack>
                              <MudStack Justify="Justify.FlexStart" Spacing="0">
                                  <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
                                      <MudAvatar Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
@@ -136,31 +171,31 @@
                                      </MudAvatar>
                                      <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.LeaveDuration!.Value.ToString("F1") days</MudText>
                                  </MudStack>
-                                 <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Success">Leave Duration</MudText>
+                                <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Success">Duration</MudText>
                              </MudStack>
                              <MudStack Justify="Justify.FlexStart" Spacing="0">
                                  <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
-                                     <MudAvatar Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
+                                     <MudAvatar Size="Size.Small" Color="Color.Surface" Variant="Variant.Filled">
                                          <MudIcon Icon="@Icons.Material.Filled.Weekend" />
                                      </MudAvatar>
-                                    <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Info">@_leaveRequest.NoOfWeekends!.Value.ToString() days</MudText>
+                                    <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Surface">@_leaveRequest.NoOfWeekends!.Value.ToString() days</MudText>
                                  </MudStack>
-                                 <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Info">Weekends</MudText>
+                                 <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Surface">Weekends</MudText>
                              </MudStack>
                              <MudStack Justify="Justify.FlexStart" Spacing="0">
                                  <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
-                                     <MudAvatar Size="Size.Small" Color="Color.Secondary" Variant="Variant.Filled">
+                                     <MudAvatar Size="Size.Small" Color="Color.Surface" Variant="Variant.Filled">
                                          <MudIcon Icon="@Icons.Material.Filled.HolidayVillage" />
                                      </MudAvatar>
-                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Secondary">@_leaveRequest.NoOfHolidays!.Value.ToString() days</MudText>
+                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Surface">@_leaveRequest.NoOfHolidays!.Value.ToString() days</MudText>
                                  </MudStack>
-                                 <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">Holidays</MudText>
+                                <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Surface">Holidays</MudText>
                              </MudStack>
                          </MudStack>
                     </MudItem>
                 </MudGrid>
 
-                <MudGrid Spacing="5">
+                <MudGrid Spacing="5" Class="mt-0">
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="w-100">
                             @* <MudAutocomplete @bind-Value="_leaveRequest.LeaveTypeDesc"

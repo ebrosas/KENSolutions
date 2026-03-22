@@ -38,7 +38,7 @@ BEGIN
 			a.LeaveVisaRequired,
 			a.LeavePayAdv,
 			a.LeaveIsFTMember,
-			a.LeaveBalance,
+			ISNULL(a.LeaveBalance, 0) AS LeaveBalance,
 			a.LeaveDuration,
 			a.NoOfHolidays,
 			a.NoOfWeekends,
@@ -58,10 +58,12 @@ BEGIN
 			a.StartDayMode,
 			a.EndDayMode,
 			RTRIM(b.UDCDesc1) as StatusDesc,
-			RTRIM(c.UDCDesc1) as ApprovalFlagDesc
+			RTRIM(c.UDCDesc1) as ApprovalFlagDesc,
+			RTRIM(d.FirstName) + ' ' + RTRIM(d.MiddleName) + ' ' + RTRIM(d.LastName) AS CreatedByName
 	FROM kenuser.LeaveRequisitionWF a WITH (NOLOCK)
 		LEFT JOIN kenuser.UserDefinedCode b WITH (NOLOCK) ON RTRIM(a.LeaveStatusCode) = RTRIM(b.UDCCOde)
 		LEFT JOIN kenuser.UserDefinedCode c WITH (NOLOCK) ON RTRIM(a.LeaveApprovalFlag) = RTRIM(c.UDCCOde)
+		LEFT JOIN kenuser.Employee d WITH (NOLOCK) ON a.LeaveCreatedBy = d.EmployeeNo
 	WHERE a.LeaveRequestId = @leaveNo
 	
 	
@@ -72,6 +74,18 @@ END
 PARAMETERS:
 	@leaveNo	BIGINT
 
-	EXEC kenuser.Pr_GetLeaveRequestDetail 9
+	EXEC kenuser.Pr_GetLeaveRequestDetail 11
+
+*/
+
+/*	Data updates:
+
+	BEGIN TRAN T1
+
+	UPDATE kenuser.LeaveRequisitionWF 
+	SET StatusHandlingCode = 'Cancelled'
+	WHERE LeaveRequestId = 9
+
+	COMMIT TRAN T1
 
 */

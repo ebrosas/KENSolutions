@@ -78,7 +78,7 @@ namespace KenHRApp.Application.DTOs
         [Display(Name = "Leave Constraints")]
         public bool? LeaveConstraints { get; set; } = null;
 
-        [Required(ErrorMessage = "Leave Status Code is required")]
+        //[Required(ErrorMessage = "Leave Status Code is required")]
         [Label("Leave Status Code")]
         [StringLength(20, ErrorMessage = "Leave Status Code can't be more than 20 characters.")]
         public string LeaveStatusCode { get; set; } = null!;
@@ -96,7 +96,7 @@ namespace KenHRApp.Application.DTOs
         public bool? LeaveIsFTMember { get; set; } = null;
 
         [Display(Name = "Leave Balance")]
-        public double? LeaveBalance { get; set; }
+        public double LeaveBalance { get; set; } = 0;
 
         [Display(Name = "Leave Duration")]
         public double? LeaveDuration { get; set; }
@@ -151,6 +151,7 @@ namespace KenHRApp.Application.DTOs
 
         public string? StatusDesc { get; set; } = null;
         public string? ApprovalFlagDesc { get; set; } = null;
+        public string? CreatedByName { get; set; } = null;
 
         public List<LeaveAttachmentDTO> Files { get; set; } = new();
         #endregion

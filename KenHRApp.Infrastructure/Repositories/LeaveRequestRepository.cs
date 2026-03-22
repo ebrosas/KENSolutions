@@ -93,13 +93,13 @@ namespace KenHRApp.Infrastructure.Repositories
         /// </summary>
         /// <param name="leaveRequestNo"></param>
         /// <returns></returns>
-        public async Task<Result<LeaveRequisitionWF>> GetLeaveRequestAsync(long leaveRequestNo)
+        public async Task<Result<LeaveRequestResult>> GetLeaveRequestAsync(long leaveRequestNo)
         {
-            LeaveRequisitionWF leaveRequest = new();
+            LeaveRequestResult leaveRequest = new();
 
             try
             {
-                var model = await _db.Set<LeaveRequisitionWF>()
+                var model = await _db.Set<LeaveRequestResult>()
                     .FromSqlRaw("EXEC kenuser.Pr_GetLeaveRequestDetail @leaveNo = {0}",
                     leaveRequestNo)
                     .ToListAsync();
@@ -145,6 +145,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     leaveRequest.EndDayMode = model[0].EndDayMode; 
                     leaveRequest.StatusDesc = model[0].StatusDesc;
                     leaveRequest.ApprovalFlagDesc = model[0].ApprovalFlagDesc;
+                    leaveRequest.CreatedByName = model[0].CreatedByName;
 
                     #region Get the file attachments
                     List<LeaveAttachment> attachments = new();
@@ -167,12 +168,12 @@ namespace KenHRApp.Infrastructure.Repositories
                     #endregion
                 }
 
-                return Result<LeaveRequisitionWF>.SuccessResult(leaveRequest);
+                return Result<LeaveRequestResult>.SuccessResult(leaveRequest);
             }
             catch (Exception ex)
             {
                 // Log error here if needed (Serilog, NLog, etc.)
-                return Result<LeaveRequisitionWF>.Failure($"Database error: {ex.Message}");
+                return Result<LeaveRequestResult>.Failure($"Database error: {ex.Message}");
             }
         }
 
@@ -329,6 +330,8 @@ namespace KenHRApp.Infrastructure.Repositories
 
                 #region Update leave information to cancel the request
                 existing.LeaveStatusCode = leaveRequest.LeaveStatusCode;
+                existing.LeaveStatusID = leaveRequest.LeaveStatusID;
+                existing.StatusHandlingCode = leaveRequest.StatusHandlingCode;
                 existing.LeaveApprovalFlag = leaveRequest.LeaveApprovalFlag;
                 existing.LeaveUpdatedBy = leaveRequest.LeaveUpdatedBy;
                 existing.LeaveUpdatedUserID = leaveRequest.LeaveUpdatedUserID;

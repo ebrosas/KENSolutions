@@ -23,7 +23,7 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<int>> CancelLeaveRequestAsync(LeaveRequisitionWF leaveRequest, CancellationToken cancellationToken = default);
         Task<Result<List<EmployeeResult>>> GetEmployeeAsync(int? empNo, string? costCenter);
         Task<Result<bool>> CheckIfLeaveDateIsHolidayAsync(DateTime? leaveDate);
-        Task<Result<LeaveRequisitionWF>> GetLeaveRequestAsync(long leaveRequestNo);
+        Task<Result<LeaveRequestResult>> GetLeaveRequestAsync(long leaveRequestNo);
         #endregion
     }
 }
