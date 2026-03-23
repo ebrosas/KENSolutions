@@ -42,7 +42,7 @@
 
                 <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="3" Class="mud-primary-text" />
 
-                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexEnd" Spacing="3">
+                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexEnd" Spacing="2">
                     @if (ActionType == ActionTypes.Add.ToString())
                     {
                         <MudButton Variant="Variant.Filled"
@@ -132,7 +132,7 @@
                         {
                             <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Spacing="0">
                                 <!-- Leave Requisition No. -->
-                                <MudText Typo="Typo.h6" Color="Color.Surface" Class="fw-bold">
+                                <MudText Typo="Typo.h6" Color="Color.Primary" Class="fw-bold">
                                     Leave Requisition No. @_leaveRequest.LeaveRequestId
                                 </MudText>
 

@@ -490,6 +490,85 @@ namespace KenHRApp.Application.Services
                 return Result<LeaveRequisitionDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching leave request record from the database.");
             }
         }
+
+        public async Task<Result<List<LeaveRequestResultDTO>>> SearchLeaveRequestAsync(
+            long? leaveRequestNo,
+            int? empNo,
+            string? costCenter,
+            string? leaveType,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate)
+        {
+            List<LeaveRequestResultDTO> leaveRequestList = new();
+
+            try
+            {
+                var repoResult = await _repository.SearchLeaveRequestAsync(leaveRequestNo, empNo, costCenter, leaveType, status, startDate, endDate);
+                if (!repoResult.Success)
+                {
+                    return Result<List<LeaveRequestResultDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null && model.Any())
+                {
+                    leaveRequestList = model.Select(e => new LeaveRequestResultDTO
+                    {
+                        LeaveRequestId = e.LeaveRequestId,
+                        LeaveAttachmentId = e.LeaveAttachmentId,
+                        WorkflowId = e.WorkflowId,
+                        LeaveInstanceID = e.LeaveInstanceID,
+                        LeaveType = e.LeaveType,
+                        LeaveEmpNo = e.LeaveEmpNo,
+                        LeaveEmpName = e.LeaveEmpName,
+                        LeaveEmpEmail = e.LeaveEmpEmail,
+                        LeaveStartDate = e.LeaveStartDate,
+                        LeaveEndDate = e.LeaveEndDate,
+                        LeaveResumeDate = e.LeaveResumeDate,
+                        LeaveEmpCostCenter = e.LeaveEmpCostCenter,
+                        LeaveRemarks = e.LeaveRemarks,
+                        LeaveConstraints = e.LeaveConstraints,
+                        LeaveStatusCode = e.LeaveStatusCode,
+                        LeaveApprovalFlag = e.LeaveApprovalFlag,
+                        LeaveVisaRequired = e.LeaveVisaRequired,
+                        LeavePayAdv = e.LeavePayAdv,
+                        LeaveIsFTMember = e.LeaveIsFTMember,
+                        LeaveBalance = e.LeaveBalance,
+                        LeaveDuration = e.LeaveDuration,
+                        NoOfHolidays = e.NoOfHolidays,
+                        NoOfWeekends = e.NoOfWeekends,
+                        PlannedLeave = e.PlannedLeave,
+                        LeavePlannedNo = e.LeavePlannedNo,
+                        HalfDayLeaveFlag = e.HalfDayLeaveFlag,
+                        LeaveCreatedDate = e.LeaveCreatedDate,
+                        LeaveCreatedBy = e.LeaveCreatedBy,
+                        LeaveCreatedUserID = e.LeaveCreatedUserID,
+                        LeaveCreatedEmail = e.LeaveCreatedEmail,
+                        LeaveUpdatedDate = e.LeaveUpdatedDate,
+                        LeaveUpdatedBy = e.LeaveUpdatedBy,
+                        LeaveUpdatedUserID = e.LeaveType,
+                        LeaveUpdatedEmail = e.LeaveUpdatedEmail,
+                        LeaveStatusID = e.LeaveStatusID,
+                        StatusHandlingCode = e.StatusHandlingCode,
+                        StartDayMode = e.StartDayMode,
+                        EndDayMode = e.EndDayMode,
+                        StatusDesc = e.StatusDesc,
+                        ApprovalFlagDesc = e.ApprovalFlagDesc,
+                        CreatedByName = e.CreatedByName,
+                        DepartmentCode = e.CreatedByName,
+                        DepartmentName = e.CreatedByName,
+                        AttachmentList = e.AttachmentList
+                    }).ToList();
+                }
+
+                return Result<List<LeaveRequestResultDTO>>.SuccessResult(leaveRequestList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<LeaveRequestResultDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the leave requisition records from the database.");
+            }
+        }
         #endregion
     }
 }

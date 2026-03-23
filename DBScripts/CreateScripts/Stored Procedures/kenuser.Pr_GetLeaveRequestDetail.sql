@@ -10,14 +10,42 @@
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetLeaveRequestDetail
-(   		
-	@leaveNo	BIGINT
+(   	
+	@leaveNo		BIGINT = NULL,
+	@empNo			INT = NULL,
+	@costCenter		VARCHAR(20) = NULL,	
+	@leaveType		VARCHAR(20) = NULL,	
+	@status			VARCHAR(20) = NULL,
+	@startDate		DATETIME = NULL,
+	@endDate		DATETIME = NULL
 )
 AS
 BEGIN
 
 	--Tell SQL Engine not to return the row-count information
 	SET NOCOUNT ON 
+
+	--Validate parameters
+	IF ISNULL(@leaveNo, 0) = 0
+		SET @leaveNo = NULL
+
+	IF ISNULL(@leaveType, 0) = ''
+		SET @leaveType = NULL
+
+	IF ISNULL(@costCenter, 0) = ''
+		SET @costCenter = NULL
+
+	IF ISNULL(@empNo, 0) = 0
+		SET @empNo = NULL
+
+	IF ISNULL(@status, 0) = ''
+		SET @status = NULL
+
+	IF	@startDate IS NOT NULL AND CAST(@startDate AS DATETIME) = CAST('' AS DATETIME)
+		SET @startDate = NULL
+
+	IF	@endDate IS NOT NULL AND CAST(@endDate AS DATETIME) = CAST('' AS DATETIME)
+		SET @endDate = NULL
 
 	SELECT	a.LeaveRequestId,
 			a.LeaveAttachmentId,
@@ -59,12 +87,30 @@ BEGIN
 			a.EndDayMode,
 			RTRIM(b.UDCDesc1) as StatusDesc,
 			RTRIM(c.UDCDesc1) as ApprovalFlagDesc,
-			RTRIM(d.FirstName) + ' ' + RTRIM(d.MiddleName) + ' ' + RTRIM(d.LastName) AS CreatedByName
+			RTRIM(d.FirstName) + ' ' + RTRIM(d.MiddleName) + ' ' + RTRIM(d.LastName) AS CreatedByName,
+			emp.DepartmentCode,
+			dep.DepartmentName
 	FROM kenuser.LeaveRequisitionWF a WITH (NOLOCK)
+		INNER JOIN kenuser.Employee emp WITH (NOLOCK) ON a.LeaveEmpNo = emp.EmployeeNo
+		INNER JOIN kenuser.DepartmentMaster dep WITH (NOLOCK) ON RTRIM(emp.DepartmentCode) = RTRIM(dep.DepartmentCode)
 		LEFT JOIN kenuser.UserDefinedCode b WITH (NOLOCK) ON RTRIM(a.LeaveStatusCode) = RTRIM(b.UDCCOde)
 		LEFT JOIN kenuser.UserDefinedCode c WITH (NOLOCK) ON RTRIM(a.LeaveApprovalFlag) = RTRIM(c.UDCCOde)
 		LEFT JOIN kenuser.Employee d WITH (NOLOCK) ON a.LeaveCreatedBy = d.EmployeeNo
-	WHERE a.LeaveRequestId = @leaveNo
+	WHERE 
+		(a.LeaveRequestId = @leaveNo OR @leaveNo IS NULL)
+		AND (a.LeaveEmpNo = @empNo OR @empNo IS NULL) 
+		AND (RTRIM(a.LeaveType) = @leaveType OR @leaveType IS NULL)
+		AND (RTRIM(emp.DepartmentCode) = @costCenter OR @costCenter IS NULL)
+		AND (RTRIM(a.StatusHandlingCode) = @status OR @status IS NULL)
+		AND 
+		(
+			(
+				a.LeaveStartDate BETWEEN @startDate AND @endDate
+				AND a.LeaveResumeDate BETWEEN @startDate AND @endDate
+				AND (@startDate IS NOT NULL AND @endDate IS NOT NULL)
+			)
+			OR (@startDate IS NULL AND @endDate IS NULL) 
+		)
 	
 	
 END
@@ -72,9 +118,21 @@ END
 /*	Debug:
 
 PARAMETERS:
-	@leaveNo	BIGINT
+	@leaveNo		BIGINT = 0,
+	@empNo			INT = 0,
+	@costCenter		VARCHAR(20) = '',	
+	@leaveType		VARCHAR(20) = '',	
+	@status			VARCHAR(20) = '',
+	@startDate		DATETIME = NULL,
+	@endDate		DATETIME = NULL
 
+	EXEC kenuser.Pr_GetLeaveRequestDetail
 	EXEC kenuser.Pr_GetLeaveRequestDetail 11
+	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 10003632
+	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '7600'
+	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '', 'AL'
+	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '', '', 'Open'
+	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '', '', '', '03/01/2026', '03/31/2026'
 
 */
 

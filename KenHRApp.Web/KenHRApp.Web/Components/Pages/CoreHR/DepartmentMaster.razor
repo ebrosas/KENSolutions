@@ -31,8 +31,9 @@
                 <MudGrid Spacing="5">
                     <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudTextField @bind-Value="_departmentName" Label="Department Name" HelperText="Enter department search string"
-                                Variant="Variant.Text" HelperTextOnFocus="true" Counter="100" MaxLength="100"
+                            <MudTextField @bind-Value="_departmentName" 
+                                Label="Department Name" HelperText="Enter department search string"
+                                Variant="Variant.Text" HelperTextOnFocus="true" Counter="100" MaxLength="100"                                
                                 Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                         </MudPaper>
                     </MudItem>
@@ -42,8 +43,7 @@
                                              SearchFunc="SearchDepartmentGroup!"
                                              Variant="Variant.Text"
                                              Label="Group Name"
-                                             Margin="Margin.Normal"
-                                             Dense="true"
+                                             Margin="Margin.Dense"                                             
                                              Placeholder="Please Select"
                                              HelperText="Type a key to search for group"
                                              HelperTextOnFocus="true"
@@ -58,8 +58,7 @@
                                              SearchFunc="SearchEmployee!"
                                              Variant="Variant.Text"
                                              Label="Department Head"
-                                             Margin="Margin.Normal"
-                                             Dense="true"
+                                             Margin="Margin.Dense"                                             
                                              Placeholder="Please Select"
                                              HelperText="Type a key to search for employee"
                                              HelperTextOnFocus="true"
@@ -74,7 +73,7 @@
                                              SearchFunc="SearchEmployee!"
                                              Variant="Variant.Text"
                                              Label="Department Manager"
-                                             Margin="Margin.Normal"
+                                             Margin="Margin.Dense"
                                              Dense="true"
                                              Placeholder="Please Select"
                                              HelperText="Type a key to search for employee"

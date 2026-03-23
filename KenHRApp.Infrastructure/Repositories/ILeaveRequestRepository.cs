@@ -24,6 +24,14 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<List<EmployeeResult>>> GetEmployeeAsync(int? empNo, string? costCenter);
         Task<Result<bool>> CheckIfLeaveDateIsHolidayAsync(DateTime? leaveDate);
         Task<Result<LeaveRequestResult>> GetLeaveRequestAsync(long leaveRequestNo);
+        Task<Result<List<LeaveRequestResult>>> SearchLeaveRequestAsync(
+            long? leaveRequestNo,
+            int? empNo,
+            string? costCenter,
+            string? leaveType,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate);
         #endregion
     }
 }

@@ -36,6 +36,14 @@ namespace KenHRApp.Application.Interfaces
             string? startDay,
             string? endDay);
         Task<Result<LeaveRequisitionDTO?>> GetLeaveRequestAsync(long leaveRequestNo);
+        Task<Result<List<LeaveRequestResultDTO>>> SearchLeaveRequestAsync(
+            long? leaveRequestNo,
+            int? empNo,
+            string? costCenter,
+            string? leaveType,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate);
         #endregion
     }
 }

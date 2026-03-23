@@ -29,9 +29,9 @@
                     <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudTextField @bind-Value="_employeeCode" 
-                                Label="Employee No." 
-                                Variant="Variant.Outlined" 
-                                MaxLength="20"
+                                Label="Employee No."
+                                          Variant="Variant.Text"
+                                          MaxLength="20"
                                 Immediate="true" 
                                 Margin="Margin.Dense" 
                                 Adornment="Adornment.End"
@@ -44,9 +44,9 @@
                     <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudTextField @bind-Value="_firstName" 
-                                Label="First Name" 
-                                Variant="Variant.Outlined" 
-                                MaxLength="50"
+                                Label="First Name"
+                                          Variant="Variant.Text"
+                                          MaxLength="50"
                                 Immediate="true" 
                                 Margin="Margin.Dense"
                                 HelperTextOnFocus="true"
@@ -58,7 +58,7 @@
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudTextField @bind-Value="_lastName" 
                                 Label="Last Name"
-                                Variant="Variant.Outlined" 
+                                Variant="Variant.Text" 
                                 MaxLength="50"
                                 Immediate="true" 
                                 Margin="Margin.Dense"
@@ -69,11 +69,13 @@
                     </MudItem>
                     <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudDatePicker @ref="_dojPicker" Label="Date of Joining" Editable="true" @bind-Date="_dateOfJoining" 
+                            <MudDatePicker @ref="_dojPicker" 
+                                Label="Date of Joining" Editable="true" 
+                                @bind-Date="_dateOfJoining" 
                                 Margin="Margin.Dense" Color="Color.Primary"
                                 HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" AutoClose="true"
                                 Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy" 
-                                Variant="Variant.Outlined">
+                                Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
                                     <MudButton Class="mr-auto align-self-start" OnClick="@(() => _dojPicker.ClearAsync())">Clear</MudButton>
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _dateOfJoining = DateTime.Today))">Today</MudButton>
@@ -86,9 +88,17 @@
                 <MudGrid Spacing="5" Class="p-0">
                     <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">                            
-                            <MudSelect T="UserDefinedCodeDTO" @bind-Value="_selectedEmployeeStatus" Variant="Variant.Outlined" Margin="Margin.Dense" Label="Employee Status" 
-                                    Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
-                                       HelperText="Filter by employment status" HelperTextOnFocus="true" Clearable="true" Immediate="true" Typo="Typo.subtitle2">
+                            <MudSelect T="UserDefinedCodeDTO" 
+                                @bind-Value="_selectedEmployeeStatus"
+                                Variant="Variant.Text"
+                                Margin="Margin.Dense" 
+                                Label="Employee Status" 
+                                Placeholder="Please Select" 
+                                AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                HelperText="Filter by employment status" HelperTextOnFocus="true" 
+                                Clearable="true" 
+                                Immediate="true" 
+                                Typo="Typo.subtitle2">
                                 @foreach (var status in _employeeStatusList)
                                 {
                                     <MudSelectItem Value="status">@status.UDCDesc1</MudSelectItem>
@@ -98,9 +108,13 @@
                     </MudItem>
                     <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudSelect T="UserDefinedCodeDTO" @bind-Value="_selectedEmploymentType" Variant="Variant.Outlined" Margin="Margin.Dense" Label="Employement Type"
-                                        Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
-                                       HelperText="Filter by employment type" HelperTextOnFocus="true" Clearable="true" Immediate="true" Typo="Typo.subtitle2">
+                            <MudSelect T="UserDefinedCodeDTO" 
+                                @bind-Value="_selectedEmploymentType" 
+                                Variant="Variant.Text" 
+                                Margin="Margin.Dense" 
+                                Label="Employement Type"
+                                Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                HelperText="Filter by employment type" HelperTextOnFocus="true" Clearable="true" Immediate="true" Typo="Typo.subtitle2">
                                 @foreach (var empType in _employmentTypeList)
                                 {
                                     <MudSelectItem Value="empType">@empType.UDCDesc1</MudSelectItem>
@@ -112,7 +126,7 @@
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="_selectedDepartment"
                                 SearchFunc="SearchDepartment!"
-                                             Variant="Variant.Outlined"
+                                             Variant="Variant.Text"
                                 Label="Department"
                                 Margin="Margin.Dense"
                                 Dense="true"
@@ -128,7 +142,7 @@
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="_selectedManager"
                                              SearchFunc="SearchReportingManager!"
-                                             Variant="Variant.Outlined"
+                                             Variant="Variant.Text"
                                              Label="Reporting Manager"
                                              Margin="Margin.Dense"
                                              Dense="true"

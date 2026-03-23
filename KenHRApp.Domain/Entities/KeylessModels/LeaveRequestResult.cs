@@ -50,6 +50,8 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public string? StatusDesc { get; set; } = null;
         public string? ApprovalFlagDesc { get; set; } = null;
         public string? CreatedByName { get; set; } = null;
+        public string? DepartmentCode { get; set; } = null;
+        public string? DepartmentName { get; set; } = null;
         public List<LeaveAttachment> AttachmentList { get; set; } = new();
         #endregion
     }

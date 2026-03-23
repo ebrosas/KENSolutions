@@ -87,96 +87,7 @@ namespace KenHRApp.Infrastructure.Repositories
         }
         #endregion
 
-        #region Abstract methods
-        /// <summary>
-        /// Get leave request details
-        /// </summary>
-        /// <param name="leaveRequestNo"></param>
-        /// <returns></returns>
-        public async Task<Result<LeaveRequestResult>> GetLeaveRequestAsync(long leaveRequestNo)
-        {
-            LeaveRequestResult leaveRequest = new();
-
-            try
-            {
-                var model = await _db.Set<LeaveRequestResult>()
-                    .FromSqlRaw("EXEC kenuser.Pr_GetLeaveRequestDetail @leaveNo = {0}",
-                    leaveRequestNo)
-                    .ToListAsync();
-                if (model != null && model.Any())
-                {
-                    leaveRequest.LeaveRequestId = model[0].LeaveRequestId;
-                    leaveRequest.LeaveAttachmentId = model[0].LeaveAttachmentId;
-                    leaveRequest.WorkflowId = model[0].WorkflowId;
-                    leaveRequest.LeaveInstanceID = model[0].LeaveInstanceID;
-                    leaveRequest.LeaveType = model[0].LeaveType;
-                    leaveRequest.LeaveEmpNo = model[0].LeaveEmpNo;
-                    leaveRequest.LeaveEmpName = model[0].LeaveEmpName; 
-                    leaveRequest.LeaveEmpEmail = model[0].LeaveEmpEmail; 
-                    leaveRequest.LeaveStartDate = model[0].LeaveStartDate;
-                    leaveRequest.LeaveEndDate = model[0].LeaveEndDate;
-                    leaveRequest.LeaveResumeDate = model[0].LeaveResumeDate;
-                    leaveRequest.LeaveEmpCostCenter = model[0].LeaveEmpCostCenter; 
-                    leaveRequest.LeaveRemarks = model[0].LeaveRemarks; 
-                    leaveRequest.LeaveConstraints = model[0].LeaveConstraints; 
-                    leaveRequest.LeaveStatusCode = model[0].LeaveStatusCode; 
-                    leaveRequest.LeaveApprovalFlag = model[0].LeaveApprovalFlag;
-                    leaveRequest.LeaveVisaRequired = model[0].LeaveVisaRequired; 
-                    leaveRequest.LeavePayAdv = model[0].LeavePayAdv; 
-                    leaveRequest.LeaveIsFTMember = model[0].LeaveIsFTMember; 
-                    leaveRequest.LeaveBalance = model[0].LeaveBalance;
-                    leaveRequest.LeaveDuration = model[0].LeaveDuration;
-                    leaveRequest.NoOfHolidays = model[0].NoOfHolidays;
-                    leaveRequest.NoOfWeekends = model[0].NoOfWeekends;
-                    leaveRequest.PlannedLeave = model[0].PlannedLeave;
-                    leaveRequest.LeavePlannedNo = model[0].LeavePlannedNo;
-                    leaveRequest.HalfDayLeaveFlag = model[0].HalfDayLeaveFlag;
-                    leaveRequest.LeaveCreatedDate = model[0].LeaveCreatedDate;
-                    leaveRequest.LeaveCreatedBy = model[0].LeaveCreatedBy;
-                    leaveRequest.LeaveCreatedUserID = model[0].LeaveCreatedUserID; 
-                    leaveRequest.LeaveCreatedEmail = model[0].LeaveCreatedEmail; 
-                    leaveRequest.LeaveUpdatedDate = model[0].LeaveUpdatedDate;
-                    leaveRequest.LeaveUpdatedBy = model[0].LeaveUpdatedBy;
-                    leaveRequest.LeaveUpdatedUserID = model[0].LeaveType; 
-                    leaveRequest.LeaveUpdatedEmail = model[0].LeaveUpdatedEmail;
-                    leaveRequest.LeaveStatusID = model[0].LeaveStatusID;
-                    leaveRequest.StatusHandlingCode = model[0].StatusHandlingCode; 
-                    leaveRequest.StartDayMode = model[0].StartDayMode; 
-                    leaveRequest.EndDayMode = model[0].EndDayMode; 
-                    leaveRequest.StatusDesc = model[0].StatusDesc;
-                    leaveRequest.ApprovalFlagDesc = model[0].ApprovalFlagDesc;
-                    leaveRequest.CreatedByName = model[0].CreatedByName;
-
-                    #region Get the file attachments
-                    List<LeaveAttachment> attachments = new();
-
-                    var attachModel = await (from attach in _db.LeaveAttachments
-                                            where attach.LeaveAttachmentId == leaveRequest.LeaveAttachmentId
-                                            select attach).ToListAsync();
-                    if (attachModel != null)
-                    {
-                        leaveRequest.AttachmentList = attachModel.Select(e => new LeaveAttachment
-                        {
-                            Id = e.Id,
-                            LeaveAttachmentId = e.LeaveAttachmentId,
-                            FileName = e.FileName,
-                            StoredFileName = e.StoredFileName,
-                            ContentType = e.ContentType,
-                            FileSize = e.FileSize
-                        }).ToList();
-                    }
-                    #endregion
-                }
-
-                return Result<LeaveRequestResult>.SuccessResult(leaveRequest);
-            }
-            catch (Exception ex)
-            {
-                // Log error here if needed (Serilog, NLog, etc.)
-                return Result<LeaveRequestResult>.Failure($"Database error: {ex.Message}");
-            }
-        }
-
+        #region Abstract methods        
         /// <summary>
         /// Add new leave request
         /// </summary>
@@ -429,6 +340,206 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 // Log error here if needed (Serilog, NLog, etc.)
                 return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get leave request details
+        /// </summary>
+        /// <param name="leaveRequestNo"></param>
+        /// <returns></returns>
+        public async Task<Result<LeaveRequestResult>> GetLeaveRequestAsync(long leaveRequestNo)
+        {
+            LeaveRequestResult leaveRequest = new();
+
+            try
+            {
+                var model = await _db.Set<LeaveRequestResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetLeaveRequestDetail @leaveNo = {0}",
+                    leaveRequestNo)
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    leaveRequest.LeaveRequestId = model[0].LeaveRequestId;
+                    leaveRequest.LeaveAttachmentId = model[0].LeaveAttachmentId;
+                    leaveRequest.WorkflowId = model[0].WorkflowId;
+                    leaveRequest.LeaveInstanceID = model[0].LeaveInstanceID;
+                    leaveRequest.LeaveType = model[0].LeaveType;
+                    leaveRequest.LeaveEmpNo = model[0].LeaveEmpNo;
+                    leaveRequest.LeaveEmpName = model[0].LeaveEmpName;
+                    leaveRequest.LeaveEmpEmail = model[0].LeaveEmpEmail;
+                    leaveRequest.LeaveStartDate = model[0].LeaveStartDate;
+                    leaveRequest.LeaveEndDate = model[0].LeaveEndDate;
+                    leaveRequest.LeaveResumeDate = model[0].LeaveResumeDate;
+                    leaveRequest.LeaveEmpCostCenter = model[0].LeaveEmpCostCenter;
+                    leaveRequest.LeaveRemarks = model[0].LeaveRemarks;
+                    leaveRequest.LeaveConstraints = model[0].LeaveConstraints;
+                    leaveRequest.LeaveStatusCode = model[0].LeaveStatusCode;
+                    leaveRequest.LeaveApprovalFlag = model[0].LeaveApprovalFlag;
+                    leaveRequest.LeaveVisaRequired = model[0].LeaveVisaRequired;
+                    leaveRequest.LeavePayAdv = model[0].LeavePayAdv;
+                    leaveRequest.LeaveIsFTMember = model[0].LeaveIsFTMember;
+                    leaveRequest.LeaveBalance = model[0].LeaveBalance;
+                    leaveRequest.LeaveDuration = model[0].LeaveDuration;
+                    leaveRequest.NoOfHolidays = model[0].NoOfHolidays;
+                    leaveRequest.NoOfWeekends = model[0].NoOfWeekends;
+                    leaveRequest.PlannedLeave = model[0].PlannedLeave;
+                    leaveRequest.LeavePlannedNo = model[0].LeavePlannedNo;
+                    leaveRequest.HalfDayLeaveFlag = model[0].HalfDayLeaveFlag;
+                    leaveRequest.LeaveCreatedDate = model[0].LeaveCreatedDate;
+                    leaveRequest.LeaveCreatedBy = model[0].LeaveCreatedBy;
+                    leaveRequest.LeaveCreatedUserID = model[0].LeaveCreatedUserID;
+                    leaveRequest.LeaveCreatedEmail = model[0].LeaveCreatedEmail;
+                    leaveRequest.LeaveUpdatedDate = model[0].LeaveUpdatedDate;
+                    leaveRequest.LeaveUpdatedBy = model[0].LeaveUpdatedBy;
+                    leaveRequest.LeaveUpdatedUserID = model[0].LeaveType;
+                    leaveRequest.LeaveUpdatedEmail = model[0].LeaveUpdatedEmail;
+                    leaveRequest.LeaveStatusID = model[0].LeaveStatusID;
+                    leaveRequest.StatusHandlingCode = model[0].StatusHandlingCode;
+                    leaveRequest.StartDayMode = model[0].StartDayMode;
+                    leaveRequest.EndDayMode = model[0].EndDayMode;
+                    leaveRequest.StatusDesc = model[0].StatusDesc;
+                    leaveRequest.ApprovalFlagDesc = model[0].ApprovalFlagDesc;
+                    leaveRequest.CreatedByName = model[0].CreatedByName;
+
+                    #region Get the file attachments
+                    List<LeaveAttachment> attachments = new();
+
+                    var attachModel = await (from attach in _db.LeaveAttachments
+                                             where attach.LeaveAttachmentId == leaveRequest.LeaveAttachmentId
+                                             select attach).ToListAsync();
+                    if (attachModel != null)
+                    {
+                        leaveRequest.AttachmentList = attachModel.Select(e => new LeaveAttachment
+                        {
+                            Id = e.Id,
+                            LeaveAttachmentId = e.LeaveAttachmentId,
+                            FileName = e.FileName,
+                            StoredFileName = e.StoredFileName,
+                            ContentType = e.ContentType,
+                            FileSize = e.FileSize
+                        }).ToList();
+                    }
+                    #endregion
+                }
+
+                return Result<LeaveRequestResult>.SuccessResult(leaveRequest);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<LeaveRequestResult>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get leave request details
+        /// </summary>
+        /// <param name="leaveRequestNo"></param>
+        /// <returns></returns>
+        public async Task<Result<List<LeaveRequestResult>>> SearchLeaveRequestAsync(
+            long? leaveRequestNo,
+            int? empNo,
+            string? costCenter,
+            string? leaveType,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate)
+        {
+            List<LeaveRequestResult> leaveRequestList = new();
+
+            try
+            {
+                var model = await _db.Set<LeaveRequestResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetLeaveRequestDetail @leaveNo = {0}, @empNo = {1}, @costCenter = {2}, @leaveType = {3}, @status = {4}, @startDate = {5}, @endDate = {6}",
+                    leaveRequestNo!,
+                    empNo!,
+                    costCenter!,
+                    leaveType!,
+                    status!,
+                    startDate!,
+                    endDate!)
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    leaveRequestList = model.Select(e => new LeaveRequestResult
+                    {
+                        LeaveRequestId = e.LeaveRequestId,
+                        LeaveAttachmentId = e.LeaveAttachmentId,
+                        WorkflowId = e.WorkflowId,
+                        LeaveInstanceID = e.LeaveInstanceID,
+                        LeaveType = e.LeaveType,
+                        LeaveEmpNo = e.LeaveEmpNo,
+                        LeaveEmpName = e.LeaveEmpName,
+                        LeaveEmpEmail = e.LeaveEmpEmail,
+                        LeaveStartDate = e.LeaveStartDate,
+                        LeaveEndDate = e.LeaveEndDate,
+                        LeaveResumeDate = e.LeaveResumeDate,
+                        LeaveEmpCostCenter = e.LeaveEmpCostCenter,
+                        LeaveRemarks = e.LeaveRemarks,
+                        LeaveConstraints = e.LeaveConstraints,
+                        LeaveStatusCode = e.LeaveStatusCode,
+                        LeaveApprovalFlag = e.LeaveApprovalFlag,
+                        LeaveVisaRequired = e.LeaveVisaRequired,
+                        LeavePayAdv = e.LeavePayAdv,
+                        LeaveIsFTMember = e.LeaveIsFTMember,
+                        LeaveBalance = e.LeaveBalance,
+                        LeaveDuration = e.LeaveDuration,
+                        NoOfHolidays = e.NoOfHolidays,
+                        NoOfWeekends = e.NoOfWeekends,
+                        PlannedLeave = e.PlannedLeave,
+                        LeavePlannedNo = e.LeavePlannedNo,
+                        HalfDayLeaveFlag = e.HalfDayLeaveFlag,
+                        LeaveCreatedDate = e.LeaveCreatedDate,
+                        LeaveCreatedBy = e.LeaveCreatedBy,
+                        LeaveCreatedUserID = e.LeaveCreatedUserID,
+                        LeaveCreatedEmail = e.LeaveCreatedEmail,
+                        LeaveUpdatedDate = e.LeaveUpdatedDate,
+                        LeaveUpdatedBy = e.LeaveUpdatedBy,
+                        LeaveUpdatedUserID = e.LeaveType,
+                        LeaveUpdatedEmail = e.LeaveUpdatedEmail,
+                        LeaveStatusID = e.LeaveStatusID,
+                        StatusHandlingCode = e.StatusHandlingCode,
+                        StartDayMode = e.StartDayMode,
+                        EndDayMode = e.EndDayMode,
+                        StatusDesc = e.StatusDesc,
+                        ApprovalFlagDesc = e.ApprovalFlagDesc,
+                        CreatedByName = e.CreatedByName,
+                        DepartmentCode = e.DepartmentCode,
+                        DepartmentName = e.DepartmentName
+                    }).ToList();
+
+                    if (leaveRequestList.Any())
+                    {
+                        foreach (var item in leaveRequestList)
+                        {
+                            #region Get the file attachments
+                            var attachModel = await (from attach in _db.LeaveAttachments
+                                                     where attach.LeaveAttachmentId == item.LeaveAttachmentId
+                                                     select attach).ToListAsync();
+                            if (attachModel != null)
+                            {
+                                item.AttachmentList = attachModel.Select(e => new LeaveAttachment
+                                {
+                                    Id = e.Id,
+                                    LeaveAttachmentId = e.LeaveAttachmentId,
+                                    FileName = e.FileName,
+                                    StoredFileName = e.StoredFileName,
+                                    ContentType = e.ContentType,
+                                    FileSize = e.FileSize
+                                }).ToList();
+                            }
+                            #endregion
+                        }
+                    }
+                }
+
+                return Result<List<LeaveRequestResult>>.SuccessResult(leaveRequestList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<LeaveRequestResult>>.Failure($"Database error: {ex.Message}");
             }
         }
         #endregion
