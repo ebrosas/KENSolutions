@@ -72,10 +72,6 @@
 
 
 <MudNavMenu Color="Color.Primary" Margin="Margin.Dense" Dense="true" Style="font-size: 14px;">
-    @* <MudNavLink Href="/" Match="NavLinkMatch.All" Class="ms-0 ps-0">
-        <MudIcon Icon="fas fa-chart-pie" Class="navMenu navlink-icon-sm ps-0 me-1" Title="Homepage" />
-        Dashboard
-    </MudNavLink> *@
     <MudNavGroup Title="Core HR" Icon="fas fa-user-friends" Expanded="true" Class="navMenu navlink-icon-sm">
         <MudNavLink Icon="fas fa-user-cog" Class="navMenu navlink-icon-sm" OnClick="ShowEmployeeMaster">Employee Master</MudNavLink>
         <MudNavLink Icon="fas fa-sitemap" Class="navMenu navlink-icon-sm" OnClick="ShowDepartmentMaster">Department Master</MudNavLink>
@@ -109,7 +105,8 @@
         <MudNavLink Href="/EmployeeSeparation" Icon="@Icons.Material.TwoTone.AreaChart" Class="navMenu navlink-icon-sm">Employee Separation</MudNavLink>
     </MudNavGroup>
     <MudNavGroup Title="Leave Management" Icon="fas fa-user-cog" Class="navMenu navlink-icon-sm">
-        <MudNavLink Icon="@Icons.Material.TwoTone.Security" Class="navMenu navlink-icon-sm" OnClick="OpenLeaveRequest">Leave Request</MudNavLink>
+        <MudNavLink Icon="@Icons.Material.Filled.TimeToLeave" Class="navMenu navlink-icon-sm" OnClick="OpenLeaveRequest">Leave Request</MudNavLink>
+        <MudNavLink Icon="@Icons.Material.Filled.PersonSearch" Class="navMenu navlink-icon-sm" OnClick="OpenLeaveInquiry">Leave Inquiry</MudNavLink>
         <MudNavLink Href="/users" Icon="far fa-thumbs-up" Class="navMenu navlink-icon-sm">Leave Approval</MudNavLink>
         <MudNavLink Href="/users" Icon="@Icons.Material.TwoTone.People" Class="navMenu navlink-icon-sm">Leave Entitlement</MudNavLink>
         <MudNavLink Href="/users" Icon="@Icons.Material.TwoTone.People" Class="navMenu navlink-icon-sm">Leave Cancellation</MudNavLink>
@@ -233,6 +230,12 @@
     private void OpenLeaveRequest()
     {
         NavigationManager.NavigateTo("/TimeAttendance/leaverequest");
+        Actions.InvokeShowHideDrawer();
+    }
+
+    private void OpenLeaveInquiry()
+    {
+        NavigationManager.NavigateTo("/TimeAttendance/leaveinquiry");
         Actions.InvokeShowHideDrawer();
     }
     #endregion

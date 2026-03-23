@@ -1,0 +1,172 @@
+﻿@page "/TimeAttendance/leaveinquiry"
+
+<MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
+     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Leave Inquiry</MudText>
+    <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserName</MudText>
+</MudStack>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="px-4">
+    @if (_showErrorAlert)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
+                  ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
+            @_errorMessage
+        </MudAlert>
+    }
+
+    <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
+        <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
+            CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
+
+        <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-5 mb-0">
+            <MudPaper Elevation="0" Square="true" Class="w-100">
+                <MudGrid Spacing="5">
+                    <MudItem xs="6" sm="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="_leaveNo"
+                                          Variant="Variant.Text"
+                                          Label="Leave No." 
+                                          HelperText="Enter leave request no. to search"
+                                          HelperTextOnFocus="true" 
+                                          MaxLength="20"
+                                          Clearable="true" 
+                                          Immediate="true" 
+                                          Margin="Margin.Dense" 
+                                          Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="_empNo"
+                                          Variant="Variant.Text"
+                                          Label="Employee No."
+                                          HelperText="Enter employee no. to search"
+                                          HelperTextOnFocus="true"
+                                          MaxLength="20"
+                                          Clearable="true"
+                                          Immediate="true"
+                                          Margin="Margin.Dense"
+                                          Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="_selectedDepartment"
+                                             SearchFunc="SearchDepartment!"
+                                             Variant="Variant.Text"
+                                             Label="Department"
+                                             Margin="Margin.Dense"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for department"
+                                             HelperTextOnFocus="true"
+                                             Clearable="true" Typo="Typo.subtitle2"
+                                             MaxItems="@(_departmentList != null ? _departmentList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="_selectedLeaveType"
+                                             FullWidth="true"
+                                             Label="Leave Type"
+                                             SearchFunc="SearchLeaveTypes!"
+                                             Variant="Variant.Text"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for value"
+                                             HelperTextOnFocus="true"
+                                             Clearable="true"
+                                             Typo="Typo.subtitle2"
+                                             MaxItems="@(_leaveTypeList != null ? _leaveTypeList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="5">
+                    <MudItem xs="6" sm="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="_selectedStatus"
+                                             FullWidth="true"
+                                             Label="Status"
+                                             SearchFunc="SearchLeaveStatus!"
+                                             Variant="Variant.Text"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for value"
+                                             HelperTextOnFocus="true"
+                                             Clearable="true"
+                                             Typo="Typo.subtitle2"
+                                             MaxItems="@(_leaveStatusList != null ? _leaveStatusList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudDatePicker @bind-Value="_selectedStartDate"
+                                           Label="Start Date" Editable="true" AutoClose="true"
+                                           Margin="Margin.Dense"
+                                           HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true"
+                                           Clearable="false" 
+                                           Color="Color.Surface"
+                                           Mask="@(new DateMask("dd/MM/yyyy"))"
+                                           DateFormat="dd/MM/yyyy"
+                                           Placeholder="dd/MM/yyyy"
+                                           Variant="Variant.Text">
+                                <PickerActions Context="dateContext">
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _selectedStartDate = DateTime.Today))">Today</MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _selectedStartDate = null))">Clear</MudButton>
+                                </PickerActions>
+                            </MudDatePicker>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudDatePicker @bind-Value="_selectedEndDate"
+                                           Label="Start Date" Editable="true" AutoClose="true"
+                                           Margin="Margin.Dense"
+                                           HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true"
+                                           Clearable="false"
+                                           Color="Color.Surface"
+                                           Mask="@(new DateMask("dd/MM/yyyy"))"
+                                           DateFormat="dd/MM/yyyy"
+                                           Placeholder="dd/MM/yyyy"
+                                           Variant="Variant.Text">
+                                <PickerActions Context="dateContext">
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _selectedEndDate = DateTime.Today))">Today</MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _selectedEndDate = null))">Clear</MudButton>
+                                </PickerActions>
+                            </MudDatePicker>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+
+            <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
+                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LIST OF LEAVE REQUESTS</MudText>
+                <MudSpacer />
+                <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply New Leave" OnClick="OpenLeaveRequest" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
+                 </MudMenu>
+             </MudAppBar>
+
+            <MudScrollToTop TopOffset="100"
+                            Selector="#mainPanel"
+                            VisibleCssClass="visible absolute"
+                            HiddenCssClass="hidden absolute">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+            </MudScrollToTop>
+        </MudStack>
+    </div>
+</MudContainer>
+
+<!-- Full-screen overlay -->
+@if (_isRunning)
+{
+    <div class="fullscreen-overlay">
+        <MudProgressCircular Indeterminate="true" Size="Size.Medium" Color="Color.Info" />
+        <MudText Typo="Typo.h6" Class="mt-2 text-white">@overlayMessage</MudText>
+        </div>
+}
