@@ -18,7 +18,7 @@
         <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
             CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
 
-        <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-5 mb-0">
+        <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-4 mb-0">
             <MudPaper Elevation="0" Square="true" Class="w-100">
                 <MudGrid Spacing="5">
                     <MudItem xs="6" sm="3">
@@ -144,14 +144,85 @@
             </MudPaper>
 
             <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
-                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LIST OF LEAVE REQUESTS</MudText>
+                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LEAVE REQUISITION LIST</MudText>
                 <MudSpacer />
                 <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply New Leave" OnClick="OpenLeaveRequest" />
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
                  </MudMenu>
-             </MudAppBar>
-
+            </MudAppBar>
+            <MudPaper Elevation="5" Square="true" Class="w-100 mb-3">
+                 <MudDataGrid T="LeaveRequestResultDTO" Items="@_leaveRequestList" Hover="true" Striped="true" Class="department-master-grid"
+                    Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                    QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                    EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                    EditDialogOptions="new DialogOptions 
+                    { 
+                        MaxWidth = MaxWidth.Small, 
+                        FullWidth = true,
+                        BackdropClick = false,
+                        CloseOnEscapeKey = false
+                    }"
+                    StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
+                    TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                    <ToolBarContent>
+                        <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                            <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
+                                        Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"
+                                        AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                            </MudTextField>
+                        </MudPaper>
+                        <MudSpacer />
+                        <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                            <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
+                            <MudPaper Class="ms-3" Elevation="0">
+                                <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new leave request" OnClick="OpenLeaveRequest" />
+                            </MudPaper>
+                        </MudPaper>
+                    </ToolBarContent>
+                    <Columns>
+                         <PropertyColumn Property="x => x.LeaveRequestId" Hidden Editable="false">
+                             <EditTemplate>
+                                 @* Empty to prevent rendering *@
+                             </EditTemplate>
+                         </PropertyColumn>
+                         <PropertyColumn Property="x => x.LeaveType" Title="Department Code" Class="col-dept-code">
+                             <EditTemplate>
+                                 <MudTextField @bind-Value="context.Item.DepartmentCode" Label="Department Name" HelperText="Maximum input is 20 chars."
+                                               Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="20" MaxLength="20"
+                                                            Required RequiredError="Department Code is required"
+                                               Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                             </EditTemplate>
+                         </PropertyColumn>
+                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                             <CellTemplate Context="row">
+                                 <MudIconButton title="View and edit employee information"
+                                                Class="show-btn fa-icon-btn"
+                                                Style="color:#004165;"
+                                                OnClick="@row.Actions.StartEditingItemAsync">
+                                     <ChildContent>
+                                         <i class="fas fa-edit fa-1x"></i>
+                                     </ChildContent>
+                                 </MudIconButton>
+                                 <MudIconButton Color="Color.Error" title="Delete department record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
+                                     <ChildContent>
+                                         <i class="fas fa-trash-alt fa-1x"></i>
+                                     </ChildContent>
+                                 </MudIconButton>
+                             </CellTemplate>
+                         </TemplateColumn>
+                    </Columns>
+                     <NoRecordsContent>
+                         <div class="no-data-box">
+                             <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
+                             <span>No data found</span>
+                         </div>
+                     </NoRecordsContent>
+                     <PagerContent>
+                         <MudDataGridPager T="LeaveRequestResultDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                     </PagerContent>
+                </MudDataGrid>
+            </MudPaper>
             <MudScrollToTop TopOffset="100"
                             Selector="#mainPanel"
                             VisibleCssClass="visible absolute"

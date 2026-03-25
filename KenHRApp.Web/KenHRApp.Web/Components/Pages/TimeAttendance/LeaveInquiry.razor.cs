@@ -60,6 +60,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Objects and collections
+        private List<LeaveRequestResultDTO> _leaveRequestList = new List<LeaveRequestResultDTO>();
+
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
@@ -135,6 +137,78 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                     //BeginLoadComboboxTask();
                 }
+            }
+        }
+        #endregion
+
+        #region Grid Events 
+        private Func<LeaveRequestResultDTO, bool> _quickFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(_searchString))
+                return true;
+
+            //if (!string.IsNullOrEmpty(x.DepartmentCode) && x.DepartmentCode.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            //if (!string.IsNullOrEmpty(x.DepartmentName) && x.DepartmentName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            //if (!string.IsNullOrEmpty(x.Description) && x.Description!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            //if (!string.IsNullOrEmpty(x.GroupName) && x.GroupName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            //if (!string.IsNullOrEmpty(x.SuperintendentName) && x.SuperintendentName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            //if (!string.IsNullOrEmpty(x.ManagerName) && x.ManagerName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            return false;
+        };
+
+        private void StartedEditingItem(LeaveRequestResultDTO item)
+        {
+            _events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+        }
+
+        private void CanceledEditingItem(LeaveRequestResultDTO item)
+        {
+            _events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+        }
+
+        private void CommittedItemChanges(LeaveRequestResultDTO item)
+        {
+
+        }
+
+        private async Task ConfirmDelete(LeaveRequestResultDTO leaveRequest)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to delete leave requisition no. '{leaveRequest.LeaveRequestId}'?" },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error },
+                { "DialogIconColor", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Confirmation", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                //BeginDeleteDepartment(leaveRequest);
             }
         }
         #endregion
