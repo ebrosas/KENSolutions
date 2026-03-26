@@ -1,5 +1,5 @@
-﻿/* #region Grid Stylesheets  */
-.leave-grid .no-data-box {
+﻿/* #region Leave Requisition Grid Stylesheets  */
+.leave-grid-local .no-data-box {
     display: flex;
     justify-content: flex-start; /* align content to the LEFT */
     align-items: center;
@@ -45,7 +45,7 @@
 }
 
 /* Grid Column widths */
-.leave-grid .col-leave-type {
+.leave-grid .col-LeaveTypeDesc {
     width: 100px !important;
     text-align: left;
 }
@@ -64,45 +64,56 @@
     text-overflow: ellipsis;
 }
 
-.leave-grid .col-description {
-    width: 300px !important;
-    text-align: left;
-}
-
-.leave-grid .col-parent-dept {
-    width: 130px !important;
-    text-align: left;
-}
-
-.leave-grid .col-superintendent {
-    width: 180px !important;
-    text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.leave-grid .col-manager {
-    width: 280px !important;
-    text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.leave-grid .col-created-date {
+.leave-grid .col-LeaveStartDate {
     width: 100px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.leave-grid .col-updated-date {
+.leave-grid .col-LeaveResumeDate {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.leave-grid .col-DepartmentFullName {
+    width: 200px !important;
+    text-align: left;
+}
+
+.leave-grid .col-LeaveBalance {
     width: 100px !important;
     text-align: left;
 }
 
-.leave-grid .col-active {
+.leave-grid .col-LeaveDuration {
     width: 100px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.leave-grid .col-StartDayModeDesc {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.leave-grid .col-EndDayModeDesc {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.leave-grid .col-StatusFullDescription {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .leave-grid .flex-column {

@@ -51,5 +51,7 @@ To-do List (As of 22-Mar-2026):
 1. Create the Leave Inquiry page
 2. Implement code to load file attachment once clicked the mudchip item
 
-Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo=9");
+To-do List (As of 26-Mar-2026):
+1. Fix bug in the Leave Inquiry page where Start Date and Resume Date fields are not filtering the search results
+
 

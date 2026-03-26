@@ -52,6 +52,7 @@ BEGIN
 			a.WorkflowId,
 			a.LeaveInstanceID,
 			a.LeaveType,
+			lt.LeaveTypeDesc,
 			a.LeaveEmpNo,
 			a.LeaveEmpName,
 			a.LeaveEmpEmail,
@@ -84,7 +85,9 @@ BEGIN
 			a.LeaveStatusID,
 			a.StatusHandlingCode,
 			a.StartDayMode,
+			sdm.StartDayModeDesc,
 			a.EndDayMode,
+			edm.EndDayModeDesc,
 			RTRIM(b.UDCDesc1) as StatusDesc,
 			RTRIM(c.UDCDesc1) as ApprovalFlagDesc,
 			RTRIM(d.FirstName) + ' ' + RTRIM(d.MiddleName) + ' ' + RTRIM(d.LastName) AS CreatedByName,
@@ -95,6 +98,27 @@ BEGIN
 		INNER JOIN kenuser.DepartmentMaster dep WITH (NOLOCK) ON RTRIM(emp.DepartmentCode) = RTRIM(dep.DepartmentCode)
 		LEFT JOIN kenuser.UserDefinedCode b WITH (NOLOCK) ON RTRIM(a.LeaveStatusCode) = RTRIM(b.UDCCOde)
 		LEFT JOIN kenuser.UserDefinedCode c WITH (NOLOCK) ON RTRIM(a.LeaveApprovalFlag) = RTRIM(c.UDCCOde)
+		OUTER APPLY
+		(
+			SELECT RTRIM(x.UDCCode) as LeaveTypeCode, RTRIM(x.UDCDesc1) AS LeaveTypeDesc
+			FROM kenuser.UserDefinedCode x WITH (NOLOCK)
+			WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'LEAVETYPES')
+				AND RTRIM(x.UDCCode) = RTRIM(a.LeaveType)
+		) lt
+		OUTER APPLY
+		(
+			SELECT RTRIM(x.UDCCode) as StartDayMode, RTRIM(x.UDCDesc1) AS StartDayModeDesc
+			FROM kenuser.UserDefinedCode x WITH (NOLOCK)
+			WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'LEAVEAPORTION')
+				AND RTRIM(x.UDCCode) = RTRIM(a.StartDayMode)
+		) sdm
+		OUTER APPLY
+		(
+			SELECT RTRIM(x.UDCCode) as EndDayMode, RTRIM(x.UDCDesc1) AS EndDayModeDesc
+			FROM kenuser.UserDefinedCode x WITH (NOLOCK)
+			WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'LEAVEAPORTION')
+				AND RTRIM(x.UDCCode) = RTRIM(a.EndDayMode)
+		) edm
 		LEFT JOIN kenuser.Employee d WITH (NOLOCK) ON a.LeaveCreatedBy = d.EmployeeNo
 	WHERE 
 		(a.LeaveRequestId = @leaveNo OR @leaveNo IS NULL)
@@ -128,11 +152,11 @@ PARAMETERS:
 
 	EXEC kenuser.Pr_GetLeaveRequestDetail
 	EXEC kenuser.Pr_GetLeaveRequestDetail 11
-	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 10003632
+	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 10003633
 	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '7600'
 	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '', 'AL'
 	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '', '', 'Open'
-	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '', '', '', '03/01/2026', '03/31/2026'
+	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '', '', '', '04/01/2026', '04/30/2026'
 
 */
 

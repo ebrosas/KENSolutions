@@ -15,6 +15,7 @@ namespace KenHRApp.Application.DTOs
         public Guid WorkflowId { get; set; } = Guid.NewGuid();
         public string? LeaveInstanceID { get; set; } = null;
         public string LeaveType { get; set; } = null!;
+        public string? LeaveTypeDesc { get; set; } = null;
         public int LeaveEmpNo { get; set; }
         public string? LeaveEmpName { get; set; } = null;
         public string? LeaveEmpEmail { get; set; } = null;
@@ -29,10 +30,10 @@ namespace KenHRApp.Application.DTOs
         public bool? LeaveVisaRequired { get; set; } = null;
         public bool? LeavePayAdv { get; set; } = null;
         public bool? LeaveIsFTMember { get; set; } = null;
-        public double? LeaveBalance { get; set; }
-        public double? LeaveDuration { get; set; }
-        public int? NoOfHolidays { get; set; }
-        public int? NoOfWeekends { get; set; }
+        public double LeaveBalance { get; set; } = 0;
+        public double LeaveDuration { get; set; } = 0;
+        public int NoOfHolidays { get; set; } = 0;
+        public int NoOfWeekends { get; set; } = 0;
         public char? PlannedLeave { get; set; }
         public int? LeavePlannedNo { get; set; }
         public char? HalfDayLeaveFlag { get; set; }
@@ -47,13 +48,33 @@ namespace KenHRApp.Application.DTOs
         public int? LeaveStatusID { get; set; }
         public string? StatusHandlingCode { get; set; } = null;
         public string? StartDayMode { get; set; } = null;
+        public string? StartDayModeDesc { get; set; } = null;
         public string? EndDayMode { get; set; } = null;
+        public string? EndDayModeDesc { get; set; } = null;
         public string? StatusDesc { get; set; } = null;
         public string? ApprovalFlagDesc { get; set; } = null;
         public string? CreatedByName { get; set; } = null;
         public string? DepartmentCode { get; set; } = null;
         public string? DepartmentName { get; set; } = null;
         public List<LeaveAttachment> AttachmentList { get; set; } = new();
+        #endregion
+
+        #region Extended Properties
+        public string DepartmentFullName 
+        { 
+            get
+            {
+                return $"{DepartmentCode} - {DepartmentName}";
+            }
+        }
+
+        public string StatusFullDescription
+        {
+            get
+            {
+                return $"{StatusHandlingCode} - {StatusDesc}";
+            }
+        }
         #endregion
     }
 }

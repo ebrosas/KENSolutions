@@ -1,7 +1,7 @@
 ﻿@page "/TimeAttendance/leaveinquiry"
 
 <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
-     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Leave Inquiry</MudText>
+    <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Leave Inquiry</MudText>
     <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserName</MudText>
 </MudStack>
 
@@ -18,35 +18,35 @@
         <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
             CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
 
-        <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-4 mb-0">
+        <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-2 mb-0">
             <MudPaper Elevation="0" Square="true" Class="w-100">
                 <MudGrid Spacing="5">
                     <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudTextField @bind-Value="_leaveNo"
-                                          Variant="Variant.Text"
-                                          Label="Leave No." 
-                                          HelperText="Enter leave request no. to search"
-                                          HelperTextOnFocus="true" 
-                                          MaxLength="20"
-                                          Clearable="true" 
-                                          Immediate="true" 
-                                          Margin="Margin.Dense" 
-                                          Typo="Typo.subtitle2" />
+                            <MudNumericField HideSpinButtons="true"
+                                @bind-Value="_leaveNo"
+                                Label="Leave No."  
+                                Variant="Variant.Text" 
+                                HelperText="Enter numeric value only"
+                                HelperTextOnFocus="true"  
+                                MaxLength="10"
+                                Clearable="true" 
+                                Immediate="true" 
+                                Min="0" />
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudTextField @bind-Value="_empNo"
-                                          Variant="Variant.Text"
-                                          Label="Employee No."
-                                          HelperText="Enter employee no. to search"
-                                          HelperTextOnFocus="true"
-                                          MaxLength="20"
-                                          Clearable="true"
-                                          Immediate="true"
-                                          Margin="Margin.Dense"
-                                          Typo="Typo.subtitle2" />
+                            <MudNumericField HideSpinButtons="true"
+                                @bind-Value="_empNo"
+                                Label="Employee No."  
+                                Variant="Variant.Text" 
+                                HelperText="Enter numeric value only"
+                                HelperTextOnFocus="true"  
+                                MaxLength="10"
+                                Clearable="true" 
+                                Immediate="true" 
+                                Min="0" />
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="6" sm="3">
@@ -123,8 +123,8 @@
                     </MudItem>
                     <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudDatePicker @bind-Value="_selectedEndDate"
-                                           Label="Start Date" Editable="true" AutoClose="true"
+                            <MudDatePicker @bind-Value="_selectedResumeDate"
+                                           Label="Resume Date" Editable="true" AutoClose="true"
                                            Margin="Margin.Dense"
                                            HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true"
                                            Clearable="false"
@@ -134,14 +134,46 @@
                                            Placeholder="dd/MM/yyyy"
                                            Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
-                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _selectedEndDate = DateTime.Today))">Today</MudButton>
-                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _selectedEndDate = null))">Clear</MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _selectedResumeDate = DateTime.Today))">Today</MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _selectedResumeDate = null))">Clear</MudButton>
                                 </PickerActions>
                             </MudDatePicker>
                         </MudPaper>
                     </MudItem>
                 </MudGrid>
             </MudPaper>
+            <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full mt-0" Spacing="2">
+                 <MudButton Variant="Variant.Filled"
+                            Color="Color.Primary"
+                            Style="background-color:#004165;"
+                            Class="mt-1 px-4"
+                            FullWidth="false"
+                            Size="Size.Small"
+                            StartIcon="@Icons.Material.Filled.PersonSearch"
+                            OnClick="@(() => BeginSearchLeaveTask(true))"
+                            Disabled="@_isRunning">
+                     @if (_isRunning)
+                    {
+                        <span>Searching...</span>
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+                    }
+                    else
+                    {
+                        <span>Search</span>
+                    }
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           ButtonType="ButtonType.Reset"
+                           Color="Color.Warning"
+                           FullWidth="false"
+                           Class="mt-1 px-4"
+                           Size="Size.Small"
+                           Disabled="@_isRunning"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           OnClick="HandleRefreshButton">
+                    Reset
+                </MudButton>
+            </MudStack>
 
             <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
                 <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LEAVE REQUISITION LIST</MudText>
@@ -181,14 +213,22 @@
                         </MudPaper>
                     </ToolBarContent>
                     <Columns>
-                         <PropertyColumn Property="x => x.LeaveRequestId" Hidden Editable="false">
+                         <PropertyColumn Property="x => x.LeaveRequestId" Title="Leave Request No." Class="col-LeaveRequestId" 
+                             StickyLeft="true" Editable="false">
+                            <CellTemplate Context="row">
+                                <MudChip T="long" Size=Size.Small Color="Color.Primary" Label="true" Class="fw-bold" Style="font-size: 14px;">
+                                        @row.Item.LeaveRequestId
+                                </MudChip>
+                            </CellTemplate>
+                         </PropertyColumn>
+                         <PropertyColumn Property="x => x.LeaveType" Hidden Editable="false">
                              <EditTemplate>
                                  @* Empty to prevent rendering *@
                              </EditTemplate>
                          </PropertyColumn>
-                        <PropertyColumn Property="x => x.LeaveType" Title="Leave Type" Class="col-leave-type" Editable="false">
+                         <PropertyColumn Property="x => x.LeaveTypeDesc" Title="Leave Type" Class="col-LeaveTypeDesc" Editable="false">
                              <CellTemplate>
-                                 @context.Item.LeaveType
+                                 @context.Item.LeaveTypeDesc
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.LeaveEmpNo" Title="Employee No." Class="col-LeaveEmpNo" Editable="false">
@@ -201,17 +241,75 @@
                                 @context.Item.LeaveEmpName
                             </CellTemplate>
                         </PropertyColumn>
-                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                        <PropertyColumn Property="x => x.DepartmentFullName" Title="Department" Class="col-DepartmentFullName" Editable="false">
+                            <CellTemplate>
+                                @context.Item.DepartmentFullName
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.LeaveStartDate" Title="Leave Start Date" Class="col-LeaveStartDate" Editable="false">
+                            <CellTemplate>
+                                @context.Item.LeaveStartDate.ToString("dd-MMM-yyyy")
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.StartDayModeDesc" Title="Start Day Mode" Class="col-StartDayModeDesc" Editable="false">
+                            <CellTemplate>
+                                @context.Item.StartDayModeDesc
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.LeaveResumeDate" Title="Leave Resume Date" Class="col-LeaveResumeDate" Editable="false">
+                            <CellTemplate>
+                                @context.Item.LeaveResumeDate.ToString("dd-MMM-yyyy")
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.EndDayModeDesc" Title="Resume Day Mode" Class="col-EndDayModeDesc" Editable="false">
+                            <CellTemplate>
+                                @context.Item.EndDayModeDesc
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.LeaveBalance" Title="Leave Balance" Class="col-LeaveBalance" Editable="false">
+                            <CellTemplate>
+                                @context.Item.LeaveBalance.ToString("N2")
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.LeaveDuration" Title="Duration" Class="col-LeaveDuration" Editable="false">
+                            <CellTemplate>
+                                @context.Item.LeaveDuration.ToString("N2")
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.NoOfHolidays" Title="No. of Holidays" Class="col-NoOfHolidays" Editable="false">
+                            <CellTemplate>
+                                @context.Item.NoOfHolidays
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.NoOfWeekends" Title="No. of Weekends" Class="col-NoOfWeekends" Editable="false">
+                            <CellTemplate>
+                                @context.Item.NoOfWeekends
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.StatusFullDescription" Title="Current Status" Class="col-StatusFullDescription">
+                            <CellTemplate Context="row">
+                                <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" 
+                                    Color="@(row.Item.StatusHandlingCode == "Open" ? Color.Primary
+                                     : row.Item.StatusHandlingCode == "Closed" ? Color.Tertiary 
+                                     : row.Item.StatusHandlingCode == "Rejected" ? Color.Error
+                                     : row.Item.StatusHandlingCode == "Cancelled" ? Color.Warning
+                                     : row.Item.StatusHandlingCode == "Approved" ? Color.Success
+                                     : Color.Surface)">
+                                    @row.Item.StatusFullDescription
+                                </MudChip>
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                              <CellTemplate Context="row">
-                                 <MudIconButton title="View and edit employee information"
+                                 <MudIconButton title="View leave details"
                                                 Class="show-btn fa-icon-btn"
                                                 Style="color:#004165;"
                                                 OnClick="@row.Actions.StartEditingItemAsync">
                                      <ChildContent>
-                                         <i class="fas fa-edit fa-1x"></i>
+                                        <i class="fas fa-share-square"></i>
                                      </ChildContent>
                                  </MudIconButton>
-                                 <MudIconButton Color="Color.Error" title="Delete department record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
+                                 <MudIconButton Color="Color.Error" hidden title="Delete department record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
                                      <ChildContent>
                                          <i class="fas fa-trash-alt fa-1x"></i>
                                      </ChildContent>

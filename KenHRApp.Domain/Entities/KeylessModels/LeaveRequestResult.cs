@@ -14,6 +14,7 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public Guid WorkflowId { get; set; } = Guid.NewGuid();
         public string? LeaveInstanceID { get; set; } = null;
         public string LeaveType { get; set; } = null!;
+        public string? LeaveTypeDesc { get; set; } = null;
         public int LeaveEmpNo { get; set; }
         public string? LeaveEmpName { get; set; } = null;
         public string? LeaveEmpEmail { get; set; } = null;
@@ -46,7 +47,9 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public int? LeaveStatusID { get; set; }
         public string? StatusHandlingCode { get; set; } = null;
         public string? StartDayMode { get; set; } = null;
+        public string? StartDayModeDesc { get; set; } = null;
         public string? EndDayMode { get; set; } = null;
+        public string? EndDayModeDesc { get; set; } = null;
         public string? StatusDesc { get; set; } = null;
         public string? ApprovalFlagDesc { get; set; } = null;
         public string? CreatedByName { get; set; } = null;
