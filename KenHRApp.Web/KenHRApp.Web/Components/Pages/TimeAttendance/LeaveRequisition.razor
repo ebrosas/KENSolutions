@@ -239,23 +239,6 @@
                     </MudItem>
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            @* <MudAutocomplete @bind-Value="_leaveRequest.LeaveEmpName"
-                                             For="@(() => _leaveRequest.LeaveEmpName)"
-                                             SearchFunc="SearchEmployee!"
-                                             Variant="Variant.Text"
-                                             Label="Employee"
-                                             Margin="Margin.Dense"
-                                             Dense="true"
-                                             Placeholder="Please Select"
-                                             HelperText="Type a key to search for value"
-                                             HelperTextOnFocus="true"
-                                             Clearable="true"
-                                             Typo="Typo.subtitle2"
-                                             Disabled="@_isDisabled"
-                                             MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
-                                              Required="true" RequiredError="Employee is required"
-                                             Modal="true" /> *@
-
                             <MudSelect T="int"
                                        Value="_leaveRequest.LeaveEmpNo"
                                        ValueChanged="@((v) => OnEmployeeChanged(v))"

@@ -152,7 +152,7 @@
                  </MudMenu>
             </MudAppBar>
             <MudPaper Elevation="5" Square="true" Class="w-100 mb-3">
-                 <MudDataGrid T="LeaveRequestResultDTO" Items="@_leaveRequestList" Hover="true" Striped="true" Class="department-master-grid"
+                 <MudDataGrid T="LeaveRequestResultDTO" Items="@_leaveRequestList" Hover="true" Striped="true" Class="leave-grid"
                     Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                     QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
                     EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
@@ -186,14 +186,21 @@
                                  @* Empty to prevent rendering *@
                              </EditTemplate>
                          </PropertyColumn>
-                         <PropertyColumn Property="x => x.LeaveType" Title="Department Code" Class="col-dept-code">
-                             <EditTemplate>
-                                 <MudTextField @bind-Value="context.Item.DepartmentCode" Label="Department Name" HelperText="Maximum input is 20 chars."
-                                               Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="20" MaxLength="20"
-                                                            Required RequiredError="Department Code is required"
-                                               Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                             </EditTemplate>
-                         </PropertyColumn>
+                        <PropertyColumn Property="x => x.LeaveType" Title="Leave Type" Class="col-leave-type" Editable="false">
+                             <CellTemplate>
+                                 @context.Item.LeaveType
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.LeaveEmpNo" Title="Employee No." Class="col-LeaveEmpNo" Editable="false">
+                            <CellTemplate>
+                                @context.Item.LeaveEmpNo
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.LeaveEmpName" Title="Employee Name" Class="col-LeaveEmpName" Editable="false">
+                            <CellTemplate>
+                                @context.Item.LeaveEmpName
+                            </CellTemplate>
+                        </PropertyColumn>
                          <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                              <CellTemplate Context="row">
                                  <MudIconButton title="View and edit employee information"

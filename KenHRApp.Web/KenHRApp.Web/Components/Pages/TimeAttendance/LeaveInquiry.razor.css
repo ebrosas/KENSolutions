@@ -1,0 +1,115 @@
+﻿/* #region Grid Stylesheets  */
+.leave-grid .no-data-box {
+    display: flex;
+    justify-content: flex-start; /* align content to the LEFT */
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    background-color: #f8f9fa; /* light gray */
+    border: 1px solid #FBE9E7;
+    border-radius: 6px;
+    color: #856404; /* dark yellow-brown */
+    font-weight: 600;
+}
+
+.leave-grid .no-data-icon {
+    font-size: 20px;
+    color: #6c757d; /* muted gray */
+}
+
+.leave-grid .mud-table {
+    table-layout: fixed;
+    width: 100%;
+    text-align: left;
+}
+
+/* Format table header */
+.leave-grid .mud-table-head {
+    background-color: #BBDEFB;
+    font-weight: bold;
+    text-align: center !important;
+    font-size: 14px !important;
+    text-decoration: underline;
+    height: 20px;
+    line-height: 20px;
+}
+
+/* Format table cell */
+.leave-grid .mud-table-cell {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
+    font-size: 14px;
+}
+
+/* Grid Column widths */
+.leave-grid .col-leave-type {
+    width: 100px !important;
+    text-align: left;
+}
+
+.leave-grid .col-LeaveEmpNo {
+    width: 500px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.leave-grid .col-LeaveEmpName {
+    width: 150px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.leave-grid .col-description {
+    width: 300px !important;
+    text-align: left;
+}
+
+.leave-grid .col-parent-dept {
+    width: 130px !important;
+    text-align: left;
+}
+
+.leave-grid .col-superintendent {
+    width: 180px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.leave-grid .col-manager {
+    width: 280px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.leave-grid .col-created-date {
+    width: 100px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.leave-grid .col-updated-date {
+    width: 100px !important;
+    text-align: left;
+}
+
+.leave-grid .col-active {
+    width: 100px !important;
+    text-align: left;
+}
+
+.leave-grid .flex-column {
+    width: auto; /* allow flex growth */
+    flex: 1; /* take remaining space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* adds ... if too long */
+}
+/* #endregion */
