@@ -25,10 +25,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Parameter]
         [SupplyParameterFromQuery]
         public bool ForceLoad { get; set; } = false;
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public int? LeaveEmpNo { get; set; } = null;
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public DateTime? LeaveStartDate { get; set; } = null;
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public DateTime? LeaveEndDate { get; set; } = null;
         #endregion
 
         #region Fields
-        private MudDatePicker _dojPicker;
         private StringBuilder _errorMessage = new StringBuilder();
         private int? _empNo = null;
         private int? _leaveNo = null;
@@ -59,10 +70,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _enableFilter = false;
         private bool _isActive = true;
         private bool _redirected;
+        private bool _hasValidationError = false;
         #endregion
 
         #region Objects and collections
+        private MudDatePicker _startDatePicker;
+        private MudDatePicker _resumeDatePicker;
         private List<LeaveRequestResultDTO> _leaveRequestList = new List<LeaveRequestResultDTO>();
+        private List<string> _validationMessages = new();
 
         private List<BreadcrumbItem> _breadcrumbItems =
         [
@@ -121,6 +136,18 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Page Events
+        protected override void OnInitialized()
+        {
+            if (LeaveEmpNo.HasValue && LeaveEmpNo > 0)
+                _empNo = LeaveEmpNo;
+
+            if (LeaveStartDate.HasValue)
+                _selectedStartDate = LeaveStartDate;
+
+            if (LeaveEndDate.HasValue)
+                _selectedResumeDate = LeaveEndDate;
+        }
+
         protected override void OnAfterRender(bool firstRender)
         {
             if (firstRender)
@@ -305,7 +332,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         public void OpenLeaveRequest()
         {
-            Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=Add&CallerForm=TNADashboard");
+            Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=Add&CallerForm=LeaveInquiry");
         }
 
         private async Task<IEnumerable<string>> SearchLeaveTypes(string value, CancellationToken token)
@@ -373,6 +400,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
+
+                if (ForceLoad)
+                {
+                    BeginSearchLeaveTask(ForceLoad);
+                }
             });
         }
 
@@ -392,10 +424,30 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             
             // Clear datagrid datasource
             _leaveRequestList = new();
+
+            // Reset validation error messages
+            _hasValidationError = false;
+            _validationMessages.Clear();
         }
 
         private void BeginSearchLeaveTask(bool forceLoad = false)
         {
+            // Reset validation errors
+            _hasValidationError = false;
+            _validationMessages.Clear();
+
+            #region Check if date period is valid
+            if (_selectedStartDate.HasValue && _selectedResumeDate.HasValue &&
+                _selectedStartDate > _selectedResumeDate)
+            {
+                _hasValidationError = true;
+                _validationMessages.Add("Start Date cannot be greater than End Date.");
+            }
+            #endregion
+
+            if (_hasValidationError && _validationMessages.Any())
+                return;
+
             _isTaskFinished = false;
             _isRunning = true;
 

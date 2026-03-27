@@ -50,7 +50,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string _searchString = string.Empty;
         private StringBuilder _errorMessage = new StringBuilder();
         private decimal _leaveDuration = 0;
-        private string _pageTitle = "Leave Request";
+        private string _pageTitle = "Apply Leave";
         #endregion
                 
         #region Flags
@@ -125,7 +125,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Leave Request", href: null, disabled: true, @Icons.Material.Filled.CardTravel)
+            new("Apply Leave", href: null, disabled: true, @Icons.Material.Filled.CardTravel)
         ];
 
         private string[]? _leaveTypeArray = null;
@@ -481,7 +481,25 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private void CancelAddingLeaveRequest()
         {
-            Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+            if (!string.IsNullOrEmpty(CallerForm))
+            {
+                switch(CallerForm)
+                {
+                    case "TNADashboard":
+                        Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+                        break;
+
+                    case "LeaveInquiry":
+                        Navigation.NavigateTo("/TimeAttendance/leaveinquiry");
+                        break;
+
+                    default:
+                        Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+                        break;
+                }
+            }
+            else
+                Navigation.NavigateTo("/TimeAttendance/tnadashboard");
         }
 
         private void ShowNotification(string message, NotificationType type)

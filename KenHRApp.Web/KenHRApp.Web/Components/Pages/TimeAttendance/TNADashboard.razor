@@ -373,9 +373,11 @@
                                             <MudAvatar Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
                                                 <MudIcon Icon="@Icons.Material.Filled.TimeToLeave" />
                                             </MudAvatar>
-                                                <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_attendanceSummary.TotalLeave.ToString("F2")</MudText>
+                                            <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_attendanceSummary.TotalLeave.ToString("F2")</MudText>
                                         </MudStack>
-                                        <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Success">On Leave</MudText>
+                                        <MudLink OnClick="OpenLeaveInquiry">
+                                            <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Success">On Leave</MudText>
+                                        </MudLink>
                                     </MudStack>
                                     <MudStack Justify="Justify.Center" Spacing="0">
                                         <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceEvenly" Spacing="1">

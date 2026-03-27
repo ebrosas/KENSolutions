@@ -48,10 +48,13 @@ To-do List (As of 21-Mar-2026):
 4. Add panel to display leave status and workflow.	-Done
 
 To-do List (As of 22-Mar-2026):
-1. Create the Leave Inquiry page
-2. Implement code to load file attachment once clicked the mudchip item
+1. Create the Leave Inquiry page	-Done
+2. Implement code to load file attachment once clicked the mudchip item	-Done
 
 To-do List (As of 26-Mar-2026):
-1. Fix bug in the Leave Inquiry page where Start Date and Resume Date fields are not filtering the search results
+1. Fix bug in the Leave Inquiry page where Start Date and Resume Date fields are not filtering the search results	-Done
+
+To-do List (As of 27-Mar-2026):
+1. Implement code in Leave Inquiry page to open the Leave Requisition page upon clicking the view link in the datagrid 
 
 

@@ -152,11 +152,11 @@ PARAMETERS:
 
 	EXEC kenuser.Pr_GetLeaveRequestDetail
 	EXEC kenuser.Pr_GetLeaveRequestDetail 11
-	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 10003633
+	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 10003632 
 	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '7600'
 	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '', 'AL'
 	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '', '', 'Open'
-	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '', '', '', '04/01/2026', '04/30/2026'
+	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 10003632, '', '', '', '03/16/2026', '04/15/2026'
 
 */
 
@@ -167,6 +167,10 @@ PARAMETERS:
 	UPDATE kenuser.LeaveRequisitionWF 
 	SET StatusHandlingCode = 'Cancelled'
 	WHERE LeaveRequestId = 9
+
+	UPDATE kenuser.LeaveRequisitionWF 
+	SET LeaveApprovalFlag = 'W'
+	WHERE LeaveRequestId = 7
 
 	COMMIT TRAN T1
 

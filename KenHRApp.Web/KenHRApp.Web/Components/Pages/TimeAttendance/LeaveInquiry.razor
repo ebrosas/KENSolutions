@@ -6,6 +6,21 @@
 </MudStack>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
+     @if (_hasValidationError && _validationMessages.Any())
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
+            <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
+            <ul style="margin:0; padding-left:20px;">
+                @foreach (var msg in _validationMessages)
+                {
+                    <li>
+                        <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
+                        </li>
+                }
+            </ul>
+        </MudAlert>
+    }
+
     @if (_showErrorAlert)
     {
         <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
@@ -103,39 +118,35 @@
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="6" sm="3">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudDatePicker @bind-Value="_selectedStartDate"
-                                           Label="Start Date" Editable="true" AutoClose="true"
-                                           Margin="Margin.Dense"
-                                           HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true"
-                                           Clearable="false" 
-                                           Color="Color.Surface"
-                                           Mask="@(new DateMask("dd/MM/yyyy"))"
-                                           DateFormat="dd/MM/yyyy"
-                                           Placeholder="dd/MM/yyyy"
+                        <MudPaper Elevation="0" Class="p-0 w-100">                         
+                             <MudDatePicker @ref="_startDatePicker"
+                                           Label="Start Date" Editable="true"
+                                           @bind-Date="_selectedStartDate"
+                                           Margin="Margin.Dense" Color="Color.Primary"
+                                           HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" AutoClose="true"
+                                           Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy"
                                            Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
+                                    <MudButton Class="mr-auto align-self-start" OnClick="@(() => _startDatePicker.ClearAsync())">Clear</MudButton>
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _selectedStartDate = DateTime.Today))">Today</MudButton>
-                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _selectedStartDate = null))">Clear</MudButton>
+                                    <MudButton Color="Color.Primary" OnClick="@(() => _startDatePicker.CloseAsync())">OK</MudButton>
                                 </PickerActions>
                             </MudDatePicker>
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="6" sm="3">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudDatePicker @bind-Value="_selectedResumeDate"
-                                           Label="Resume Date" Editable="true" AutoClose="true"
-                                           Margin="Margin.Dense"
-                                           HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true"
-                                           Clearable="false"
-                                           Color="Color.Surface"
-                                           Mask="@(new DateMask("dd/MM/yyyy"))"
-                                           DateFormat="dd/MM/yyyy"
-                                           Placeholder="dd/MM/yyyy"
+                        <MudPaper Elevation="0" Class="p-0 w-100">                          
+                            <MudDatePicker @ref="_resumeDatePicker"
+                                           Label="End Date" Editable="true"
+                                           @bind-Date="_selectedResumeDate"
+                                           Margin="Margin.Dense" Color="Color.Primary"
+                                           HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" AutoClose="true"
+                                           Mask="@(new DateMask("dd/MM/yyyy"))" DateFormat="dd/MM/yyyy" Placeholder="dd/MM/yyyy"
                                            Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
+                                    <MudButton Class="mr-auto align-self-start" OnClick="@(() => _resumeDatePicker.ClearAsync())">Clear</MudButton>
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _selectedResumeDate = DateTime.Today))">Today</MudButton>
-                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _selectedResumeDate = null))">Clear</MudButton>
+                                    <MudButton Color="Color.Primary" OnClick="@(() => _resumeDatePicker.CloseAsync())">OK</MudButton>
                                 </PickerActions>
                             </MudDatePicker>
                         </MudPaper>
@@ -178,7 +189,7 @@
             <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
                 <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LEAVE REQUISITION LIST</MudText>
                 <MudSpacer />
-                <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
+                <MudMenu Dense Variant="Variant.Text" hidden Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply New Leave" OnClick="OpenLeaveRequest" />
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
                  </MudMenu>
@@ -286,7 +297,7 @@
                                 @context.Item.NoOfWeekends
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.StatusFullDescription" Title="Current Status" Class="col-StatusFullDescription">
+                        <PropertyColumn Property="x => x.StatusFullDescription" Title="Current Status" Class="col-StatusFullDescription" Editable="false">
                             <CellTemplate Context="row">
                                 <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" 
                                     Color="@(row.Item.StatusHandlingCode == "Open" ? Color.Primary

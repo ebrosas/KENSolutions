@@ -53,20 +53,25 @@ BEGIN
 		LEFT JOIN kenuser.LeaveEntitlement c WITH (NOLOCK) ON a.EmployeeNo = c.EmployeeNo
 		OUTER APPLY
 		(
-			SELECT SUM(x.LeaveDuration) AS TotalLeave 
+			SELECT COUNT(*) AS TotalLeave 
 			FROM kenuser.LeaveRequisitionWF x WITH (NOLOCK)
-			WHERE RTRIM(x.LeaveApprovalFlag) NOT IN ('C', 'R', 'D')
-				AND x.LeaveEmpNo = a.EmployeeNo
-				AND x.LeaveStartDate BETWEEN @startDate AND @endDate
+			WHERE x.LeaveEmpNo = a.EmployeeNo
+				--AND RTRIM(x.LeaveApprovalFlag) NOT IN ('C', 'R', 'D')
+				AND (x.LeaveStartDate >= @startDate AND x.LeaveStartDate <= @endDate)
 		) d
 		OUTER APPLY
 		(
 			SELECT COUNT(x.LeaveRequestId) AS TotalHalfDay
 			FROM kenuser.LeaveRequisitionWF x WITH (NOLOCK)
 			WHERE RTRIM(x.LeaveApprovalFlag) NOT IN ('C', 'R', 'D')
-				AND ISNULL(x.HalfDayLeaveFlag, 0) > 0
+				AND 
+				(
+					RTRIM(x.EndDayMode) IN ('LEAVEFH', 'LEAVESH')
+					OR RTRIM(x.StartDayMode) IN ('LEAVEFH', 'LEAVESH')
+				)
 				AND x.LeaveEmpNo = a.EmployeeNo
-				AND x.LeaveStartDate BETWEEN @startDate AND @endDate
+				--AND x.LeaveStartDate BETWEEN @startDate AND @endDate
+				AND (x.LeaveStartDate >= @startDate AND x.LeaveStartDate <= @endDate)
 		) e
 		OUTER APPLY	
 		(
@@ -118,7 +123,7 @@ PARAMETERS:
 	@startDate			DATETIME,
 	@endDate			DATETIME
 
-	EXEC kenuser.Pr_GetAttendanceSummary 10003632, '02/01/2026', '02/28/2026'
+	EXEC kenuser.Pr_GetAttendanceSummary 10003632, '03/16/2026', '04/15/2026'
 	EXEC kenuser.Pr_GetAttendanceSummary 10003636, '01/16/2026', '02/15/2026'
 	EXEC kenuser.Pr_GetAttendanceSummary 10003632, '02/16/2026', '03/15/2026'
 

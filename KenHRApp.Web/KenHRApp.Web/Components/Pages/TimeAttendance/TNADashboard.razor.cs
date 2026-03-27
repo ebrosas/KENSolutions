@@ -398,6 +398,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo=9&CallerForm=TNADashboard");
         }
+
+        public void OpenLeaveInquiry()
+        {
+            Navigation.NavigateTo($"/TimeAttendance/leaveinquiry?ForceLoad=true&LeaveEmpNo={UserEmpNo}&LeaveStartDate={_payrollStartDate}&LeaveEndDate={_payrollEndDate}&CallerForm=TNADashboard");
+        }
         #endregion
 
         #region Database Methods
@@ -594,6 +599,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     if (activePeriod != null)
                     {
                         _payrollPeriodKey = activePeriod.PayrollPeriodKey;
+
+                        if (!string.IsNullOrWhiteSpace(_payrollPeriodKey))
+                        {
+                            _payrollStartDate = _payrollPeriodList.Where(x => x.PayrollPeriodKey == _payrollPeriodKey).Select(x => x.PayrollStartDate).FirstOrDefault();
+                            _payrollEndDate = _payrollPeriodList.Where(x => x.PayrollPeriodKey == _payrollPeriodKey).Select(x => x.PayrollEndDate).FirstOrDefault();
+                        }
                     }
                 }
             }

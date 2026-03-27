@@ -12,10 +12,27 @@ DECLARE @leaveNo	BIGINT = 9
 		WHERE x.LeaveRequestId = @leaveNo
 	)
 
-	SELECT a.LeaveApprovalFlag, * 
+	SELECT a.LeaveApprovalFlag, a.LeaveDuration, a.HalfDayLeaveFlag, * 
 	FROM kenuser.LeaveRequisitionWF a
 	WHERE a.LeaveEmpNo = 10003632
 	ORDER BY a.LeaveVisaRequired
+
+	SELECT SUM(x.LeaveDuration) AS TotalLeave 
+	FROM kenuser.LeaveRequisitionWF x WITH (NOLOCK)
+	WHERE RTRIM(x.LeaveApprovalFlag) NOT IN ('C', 'R', 'D')
+		AND x.LeaveEmpNo = 10003632
+		AND (x.LeaveStartDate >= '04/16/2026' AND x.LeaveStartDate <= '05/15/2026')
+
+	SELECT COUNT(x.LeaveRequestId) AS TotalHalfDay
+	FROM kenuser.LeaveRequisitionWF x WITH (NOLOCK)
+	WHERE RTRIM(x.LeaveApprovalFlag) NOT IN ('C', 'R', 'D')
+		AND 
+		(
+			RTRIM(x.EndDayMode) IN ('LEAVEFH', 'LEAVESH')
+			OR RTRIM(x.StartDayMode) IN ('LEAVEFH', 'LEAVESH')
+		)
+		AND x.LeaveEmpNo = 10003632
+		AND (x.LeaveStartDate >= '04/16/2026' AND x.LeaveStartDate <= '05/15/2026')
 
 	
 /*	Remove records:
