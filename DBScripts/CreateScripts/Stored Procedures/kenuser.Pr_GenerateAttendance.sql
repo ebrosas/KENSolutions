@@ -292,7 +292,7 @@ END
 
 /*	Testing:
 
-	EXEC kenuser.Pr_GenerateAttendance '01/15/2026'
+	EXEC kenuser.Pr_GenerateAttendance '03/10/2026'
 	EXEC kenuser.Pr_GenerateAttendance '01/16/2026'
 	EXEC kenuser.Pr_GenerateAttendance '01/17/2026'
 	EXEC kenuser.Pr_GenerateAttendance '02/01/2026'

@@ -9,6 +9,7 @@ using KenHRApp.Web.Components.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
+using MudBlazor.Utilities;
 using System.Globalization;
 using System.Text;
 
@@ -301,16 +302,31 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private Color GetLegendColor(string legendCode)
+        private MudColor GetLegendColor(string legendCode)
         {
+            //return legendCode switch
+            //{
+            //    "ALABSENT" => Color.Error,
+            //    "ALPRESENT" => Color.Success,
+            //    "ALLATE" => Color.Warning,
+            //    "ALLEAVE" => Color.Info,
+            //    "ALBUSTRIP" => Color.Tertiary,
+            //    _ => Color.Default
+            //};
+
             return legendCode switch
             {
-                "ALABSENT" => Color.Error,
-                "ALPRESENT" => Color.Success,
-                "ALLATE" => Color.Warning,
-                "ALLEAVE" => Color.Info,
-                "ALBUSTRIP" => Color.Tertiary,
-                _ => Color.Default
+                "ALABSENT" => new MudColor("#e53935"),
+                "ALPRESENT" => new MudColor("#43a047"),
+                "ALLATE" => new MudColor("#fb8c00"),
+                "ALLEFTEARLY" => new MudColor("#8e24aa"),
+                "ALLEAVE" => new MudColor("#1e88e5"),
+                "ALSICK" => new MudColor("#6d4c41"),
+                "ALINJURY" => new MudColor("#5e35b1"),
+                "ALBUSTRIP" => new MudColor("#00897b"),
+                "ALEXCUSE" => new MudColor("#757575"),
+                "ALOTHERS" => new MudColor("#c0ca33"),
+                _ => new MudColor("#bdbdbd")
             };
         }
 

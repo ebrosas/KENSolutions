@@ -80,7 +80,7 @@ PARAMETERS:
 	@empNo				INT,
 	@attendanceDate		DATETIME
 
-	EXEC kenuser.Pr_GetAttendanceDetail 10003632, '01/31/2026'
+	EXEC kenuser.Pr_GetAttendanceDetail 10003632, '03/28/2026'
 	EXEC kenuser.Pr_GetAttendanceDetail 10003632, '02/01/2026'
 	EXEC kenuser.Pr_GetAttendanceDetail 10003632, '02/07/2026'
 

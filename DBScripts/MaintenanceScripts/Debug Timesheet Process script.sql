@@ -15,7 +15,7 @@
 	ORDER BY a.EmpNo, a.AttendanceDate
 
 	SELECT * FROM [kenuser].[AttendanceTimesheet] a
-	WHERE a.EmpNo = 10003633
+	WHERE a.EmpNo = 10003632
 	ORDER BY a.EmpNo, a.AttendanceDate
 
 	SELECT * FROM [kenuser].[AttendanceSwipeLog] a
