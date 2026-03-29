@@ -11,6 +11,7 @@ using Mono.TextTemplating;
 using KenHRApp.Application.Services;
 using KenHRApp.Application.DTOs.TNA;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
@@ -412,10 +413,22 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private void HandleBackButton()
         {
-            if (!string.IsNullOrEmpty(CallerForm) &&
-                CallerForm == "TNADashboard")
+            if (string.IsNullOrEmpty(CallerForm))
+                return;
+
+            switch(CallerForm)
             {
-                Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+                case "TNADashboard":
+                    Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+                    break;
+
+                case "LeaveInquiry":
+                    Navigation.NavigateTo("/TimeAttendance/leaveinquiry");
+                    break;
+
+                default:
+                    Navigation.NavigateTo("/home");
+                    break;
             }
         }
         #endregion

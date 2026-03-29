@@ -24,10 +24,20 @@ BEGIN
 	SELECT	a.EmpNo,
 			a.AttendanceDate,
 			CASE WHEN RTRIM(a.RemarkCode) = 'A' THEN 'ALABSENT'
-				ELSE ''
+				WHEN RTRIM(a.LeaveType) = 'AL' THEN 'ALLEAVE'
+				WHEN RTRIM(a.LeaveType) = 'SL' THEN 'ALSICK'
+				WHEN RTRIM(a.LeaveType) = 'IL' THEN 'ALINJURY'
+				WHEN RTRIM(a.AbsenceReasonCode) = 'BT' THEN 'ALBUSTRIP'
+				WHEN ISNULL(a.AbsenceReasonCode, '') <> '' AND RTRIM(a.AbsenceReasonCode) <> 'BT' THEN 'ALEXCUSE'
+				ELSE 'ALPRESENT'
 			END AS LegendCode,
-			CASE WHEN RTRIM(a.RemarkCode) = 'A' THEN 'ALABSENT'
-				ELSE ''
+			CASE WHEN RTRIM(a.RemarkCode) = 'A' THEN 'Absent'
+				WHEN RTRIM(a.LeaveType) = 'AL' THEN 'On-leave'
+				WHEN RTRIM(a.LeaveType) = 'SL' THEN 'Sick Leave'
+				WHEN RTRIM(a.LeaveType) = 'IL' THEN 'Injury Leave'
+				WHEN RTRIM(a.AbsenceReasonCode) = 'BT' THEN 'Business Trip'
+				WHEN ISNULL(a.AbsenceReasonCode, '') <> '' AND RTRIM(a.AbsenceReasonCode) <> 'BT' THEN 'Excused'
+				ELSE 'Present'
 			END AS LegendDesc
 	FROM kenuser.AttendanceTimesheet a WITH (NOLOCK)
 	WHERE a.EmpNo = @empNo
@@ -40,10 +50,11 @@ END
 /*	Debug:
 
 PARAMETERS:
-	@empNo				INT,
-	@attendanceDate		DATETIME
+	@empNo		INT,
+	@year		INT,
+	@month		INT 
 
-	EXEC kenuser.Pr_GetAttendanceLegend 10003632, '03/28/2026'
+	EXEC kenuser.Pr_GetAttendanceLegend 10003632, 2026, 3
 	EXEC kenuser.Pr_GetAttendanceLegend 10003632, '02/01/2026'
 	EXEC kenuser.Pr_GetAttendanceLegend 10003632, '02/07/2026'
 

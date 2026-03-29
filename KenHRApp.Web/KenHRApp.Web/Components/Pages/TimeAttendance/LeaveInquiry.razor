@@ -163,7 +163,7 @@
                             StartIcon="@Icons.Material.Filled.PersonSearch"
                             OnClick="@(() => BeginSearchLeaveTask(true))"
                             Disabled="@_isRunning">
-                     @if (_isRunning)
+                    @if (_isRunning)
                     {
                         <span>Searching...</span>
                         <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
@@ -190,7 +190,7 @@
                 <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LEAVE REQUISITION LIST</MudText>
                 <MudSpacer />
                 <MudMenu Dense Variant="Variant.Text" hidden Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply New Leave" OnClick="OpenLeaveRequest" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply New Leave" OnClick="ApplyLeave" />
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
                  </MudMenu>
             </MudAppBar>
@@ -219,7 +219,7 @@
                         <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
                             <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
                             <MudPaper Class="ms-3" Elevation="0">
-                                <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new leave request" OnClick="OpenLeaveRequest" />
+                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new leave request" OnClick="ApplyLeave" />
                             </MudPaper>
                         </MudPaper>
                     </ToolBarContent>
@@ -227,8 +227,14 @@
                          <PropertyColumn Property="x => x.LeaveRequestId" Title="Leave Request No." Class="col-LeaveRequestId" 
                              StickyLeft="true" Editable="false">
                             <CellTemplate Context="row">
-                                <MudChip T="long" Size=Size.Small Color="Color.Primary" Label="true" Class="fw-bold" Style="font-size: 14px;">
-                                        @row.Item.LeaveRequestId
+                                <MudChip T="long" 
+                                    Size=Size.Small 
+                                    Color="Color.Primary" 
+                                    Label="true" 
+                                    Class="fw-bold" 
+                                    Style="font-size: 14px;"
+                                    OnClick="@(()=>OpenLeaveRequest(row.Item))">
+                                    @row.Item.LeaveRequestId
                                 </MudChip>
                             </CellTemplate>
                          </PropertyColumn>
@@ -297,16 +303,16 @@
                                 @context.Item.NoOfWeekends
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.StatusFullDescription" Title="Current Status" Class="col-StatusFullDescription" Editable="false">
+                        <PropertyColumn Property="x => x.StatusDesc" Title="Current Status" Class="col-StatusDesc" Editable="false">
                             <CellTemplate Context="row">
-                                <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" 
-                                    Color="@(row.Item.StatusHandlingCode == "Open" ? Color.Primary
+                                <MudChip T="string" Size=Size.Small Variant="Variant.Filled" 
+                                    Color="@(row.Item.StatusHandlingCode == "Open" ? Color.Info
                                      : row.Item.StatusHandlingCode == "Closed" ? Color.Tertiary 
                                      : row.Item.StatusHandlingCode == "Rejected" ? Color.Error
                                      : row.Item.StatusHandlingCode == "Cancelled" ? Color.Warning
                                      : row.Item.StatusHandlingCode == "Approved" ? Color.Success
                                      : Color.Surface)">
-                                    @row.Item.StatusFullDescription
+                                    @row.Item.StatusDesc
                                 </MudChip>
                             </CellTemplate>
                         </PropertyColumn>
