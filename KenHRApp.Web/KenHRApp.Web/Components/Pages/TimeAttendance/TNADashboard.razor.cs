@@ -81,6 +81,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private AttendanceSwipeDTO _swipeLog = new AttendanceSwipeDTO();
         private AttendanceDurationDTO _attendanceDuration = new AttendanceDurationDTO();
         private List<ShiftPatternMasterDTO> _shiftRosterList = new List<ShiftPatternMasterDTO>();
+        private List<AttendanceCalendarDTO> _calendarAttendance = new();
+        private Dictionary<DateTime, string> _calendarColors = new();
+
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),

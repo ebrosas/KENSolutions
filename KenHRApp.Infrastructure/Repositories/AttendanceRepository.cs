@@ -165,7 +165,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     #region Get Shift Timing Sequence
                     var shiftTimingSeqModel = await (from msp in _db.MasterShiftPatterns
                                                      where msp.ShiftPatternCode.Trim() == shiftRoster.ShiftPatternCode.Trim()
-                                                       select msp).ToListAsync();
+                                                     select msp).ToListAsync();
                     if (shiftTimingSeqModel != null)
                     {
                         foreach (var item in shiftTimingSeqModel)
@@ -338,7 +338,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     foreach (var shiftPointer in dto.ShiftPointerList)
                     {
                         var existingShiftPointer = await _db.MasterShiftPatterns
-                            .FirstOrDefaultAsync(st => st.ShiftPatternCode == dto.ShiftPatternCode 
+                            .FirstOrDefaultAsync(st => st.ShiftPatternCode == dto.ShiftPatternCode
                                 && st.ShiftCode == shiftPointer.ShiftCode
                                 && st.ShiftPointer == shiftPointer.ShiftPointer, cancellationToken);
 
@@ -568,7 +568,7 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        public async Task<Result<List<ShiftPatternChange>?>> GetShiftRosterChangeLogAsync(int? autoID, int? empNo, string? changeType, 
+        public async Task<Result<List<ShiftPatternChange>?>> GetShiftRosterChangeLogAsync(int? autoID, int? empNo, string? changeType,
             string? shiftPatternCode, DateTime? startDate, DateTime? endDate)
         {
             List<ShiftPatternChange> rosterChangeList = new List<ShiftPatternChange>();
@@ -728,7 +728,7 @@ namespace KenHRApp.Infrastructure.Repositories
                                         (hol.HolidayType == holidayType || (holidayType == null || holidayType == 0))
                                    )
                                    select hol).ToListAsync();
-                                   
+
                 if (model != null)
                 {
                     holidayList = model.Select(e => new Holiday
@@ -745,7 +745,7 @@ namespace KenHRApp.Infrastructure.Repositories
                         LastUpdateDate = e.LastUpdateDate,
                         LastUpdateEmpNo = e.LastUpdateEmpNo,
                         LastUpdateUserID = e.LastUpdateUserID,
-                        LastUpdatedByName = e.LastUpdatedByName                        
+                        LastUpdatedByName = e.LastUpdatedByName
                     }).ToList();
                 }
 
@@ -760,11 +760,11 @@ namespace KenHRApp.Infrastructure.Repositories
 
         public async Task<Result<List<UserDefinedCode>>> GetUserDefinedCodeAsync(string? udcCode)
         {
-            List<UserDefinedCode> udcList = new();  
+            List<UserDefinedCode> udcList = new();
             try
             {
                 var model = await (from grp in _db.UserDefinedCodeGroups
-                                   join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID 
+                                   join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
                                    where
                                    (
                                         (grp.UDCGCode == udcCode || string.IsNullOrEmpty(udcCode))
@@ -978,7 +978,7 @@ namespace KenHRApp.Infrastructure.Repositories
                 {
                     payrollPeriodList = model.Select(e => new PayrollPeriodResult
                     {
-                        PayrollPeriodId = e.PayrollPeriodId,    
+                        PayrollPeriodId = e.PayrollPeriodId,
                         FiscalYear = e.FiscalYear,
                         FiscalMonth = e.FiscalMonth,
                         PayrollStartDate = e.PayrollStartDate,
@@ -994,6 +994,42 @@ namespace KenHRApp.Infrastructure.Repositories
                 // Log error here if needed (Serilog, NLog, etc.)
                 return Result<List<PayrollPeriodResult>>.Failure($"Database error: {ex.Message}");
             }
+        }
+
+        public async Task<Result<List<AttendanceTimesheet>>> GetMonthlyAttendanceAsync(int empNo, int year, int month, CancellationToken cancellationToken)
+        {
+            List<AttendanceTimesheet> attendanceList = new();
+
+            try
+            {
+                var model = await _db.AttendanceTimesheets
+                                .Where(x => x.EmpNo == empNo &&
+                                            x.AttendanceDate.Year == year &&
+                                            x.AttendanceDate.Month == month)
+                                .ToListAsync(cancellationToken);
+                if (model != null && model.Any())
+                {
+                    attendanceList = model.Select(e => new AttendanceTimesheet
+                    {
+                        AttendanceDate = e.AttendanceDate
+                    }).ToList();
+                }
+
+                return Result<List<AttendanceTimesheet>>.SuccessResult(attendanceList);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<List<AttendanceTimesheet>>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<List<AttendanceTimesheet>>.Failure($"Database error: {ex.Message}");
+            }
+
+            
         }
         #endregion
     }
