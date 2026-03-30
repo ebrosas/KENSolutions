@@ -30,6 +30,7 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<int>> AddAttendanceSwipeLogAsync(AttendanceSwipeLog dto, CancellationToken cancellationToken = default);
         Task<Result<AttendanceDurationResult>> GetAttendanceDurationAsync(int empNo, DateTime attendanceDate);
         Task<Result<List<PayrollPeriodResult>>> GetPayrollPeriodAsync(int fiscalYear = 0);
+        Task<Result<List<AttendanceCalendarResult>>> GetAttendanceCalendarAsync(int empNo, int year, int month, CancellationToken cancellationToken);
         #endregion
     }
 }

@@ -29,6 +29,7 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<int>> SaveSwipeDataAsync(AttendanceSwipeDTO swipeData, CancellationToken cancellationToken = default);
         Task<Result<AttendanceDurationDTO>> GetAttendanceDurationAsync(int empNo, DateTime attendanceDate);
         Task<Result<List<PayrollPeriodResultDTO>>> GetPayrollPeriodAsync(int fiscalYear = 0);
+        Task<Result<List<AttendanceCalendarDTO>>> GetAttendanceCalendarAsync(int empNo, int year, int month, CancellationToken cancellationToken = default);
         #endregion
     }
 }

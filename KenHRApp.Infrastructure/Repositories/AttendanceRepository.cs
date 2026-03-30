@@ -996,40 +996,35 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        public async Task<Result<List<AttendanceTimesheet>>> GetMonthlyAttendanceAsync(int empNo, int year, int month, CancellationToken cancellationToken)
+        public async Task<Result<List<AttendanceCalendarResult>>> GetAttendanceCalendarAsync(int empNo, int year, int month, CancellationToken cancellationToken)
         {
-            List<AttendanceTimesheet> attendanceList = new();
+            List<AttendanceCalendarResult> attendanceList = new();
 
             try
             {
-                var model = await _db.AttendanceTimesheets
-                                .Where(x => x.EmpNo == empNo &&
-                                            x.AttendanceDate.Year == year &&
-                                            x.AttendanceDate.Month == month)
-                                .ToListAsync(cancellationToken);
+                var model = await _db.Set<AttendanceCalendarResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetAttendanceLegend @empNo = {0}, @year = {1}, @month = {2}",
+                    empNo, year, month)
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken);
                 if (model != null && model.Any())
                 {
-                    attendanceList = model.Select(e => new AttendanceTimesheet
+                    attendanceList = model.Select(e => new AttendanceCalendarResult
                     {
-                        AttendanceDate = e.AttendanceDate
+                        EmpNo = e.EmpNo,
+                        AttendanceDate = e.AttendanceDate,
+                        LegendCode = e.LegendCode,
+                        LegendDesc = e.LegendDesc
                     }).ToList();
                 }
 
-                return Result<List<AttendanceTimesheet>>.SuccessResult(attendanceList);
-            }
-            catch (InvalidOperationException invEx)
-            {
-                throw new Exception(invEx.Message.ToString());
+                return Result<List<AttendanceCalendarResult>>.SuccessResult(attendanceList);
             }
             catch (Exception ex)
             {
-                if (ex.InnerException != null)
-                    return Result<List<AttendanceTimesheet>>.Failure($"Database error: {ex.InnerException.Message}");
-                else
-                    return Result<List<AttendanceTimesheet>>.Failure($"Database error: {ex.Message}");
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<AttendanceCalendarResult>>.Failure($"Database error: {ex.Message}");
             }
-
-            
         }
         #endregion
     }

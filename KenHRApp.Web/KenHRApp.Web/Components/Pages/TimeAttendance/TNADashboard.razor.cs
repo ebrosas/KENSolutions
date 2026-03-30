@@ -1,4 +1,5 @@
-﻿using KenHRApp.Application.Common.Interfaces;
+﻿using KenHRApp.Application.Common.Helpers;
+using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Application.Services;
@@ -307,16 +308,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private MudColor GetLegendColor(string legendCode)
         {
-            //return legendCode switch
-            //{
-            //    "ALABSENT" => Color.Error,
-            //    "ALPRESENT" => Color.Success,
-            //    "ALLATE" => Color.Warning,
-            //    "ALLEAVE" => Color.Info,
-            //    "ALBUSTRIP" => Color.Tertiary,
-            //    _ => Color.Default
-            //};
-
             return legendCode switch
             {
                 "ALABSENT" => new MudColor("#e53935"),
@@ -422,6 +413,29 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             Navigation.NavigateTo($"/TimeAttendance/leaveinquiry?ForceLoad=true&LeaveEmpNo={UserEmpNo}&LeaveStartDate={_payrollStartDate}&LeaveEndDate={_payrollEndDate}&CallerForm=TNADashboard");
         }
+
+        private RenderFragment<DateTime> CalendarDayTemplate => (day) => (__builder) =>
+        {
+            string color = _calendarColors.ContainsKey(day.Date)
+                ? _calendarColors[day.Date]
+                : "transparent";
+
+            bool isToday = day.Date == DateTime.Today.Date;
+
+            __builder.OpenComponent<MudPaper>(0);
+            __builder.AddAttribute(1, "Style",
+                $"height:38px;width:38px;border-radius:6px;" +
+                $"background-color:{color};" +
+                $"border:{(isToday ? "2px solid black" : "1px solid #ccc")};" +
+                $"display:flex;align-items:center;justify-content:center;");
+
+            __builder.AddAttribute(2, "ChildContent", (RenderFragment)((__builder2) =>
+            {
+                __builder2.AddContent(3, day.Day);
+            }));
+
+            __builder.CloseComponent();
+        };
         #endregion
 
         #region Database Methods
@@ -523,9 +537,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set calandar to today's date
                 _selectedDate = DateTime.Now;
 
+                await LoadCalendarMonthAsync();
+
                 // Invoke the event handler to get the attendance detail for today's date
                 OnDateChanged(_selectedDate);
-
+                
             }, UserEmpNo, _payrollStartDate, _payrollEndDate);
         }
 
@@ -780,6 +796,51 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     // Hide the spinner overlay
                     await callback.Invoke();
                 }
+            }
+            catch (Exception ex)
+            {
+                // Set the error message
+                _errorMessage.Append(ex.Message.ToString());
+
+                ShowHideError(true);
+            }
+        }
+
+        private async Task LoadCalendarMonthAsync()
+        {
+            try
+            {
+                var d = _selectedDate ?? DateTime.Today;
+
+                // Wait for 1 second then gives control back to the runtime
+                await Task.Delay(500);
+
+                // Initialize the cancellation token
+                _cts = new CancellationTokenSource();
+
+                // Reset collections
+                //_errorMessage.Clear();
+                //_attendanceChips.Clear();
+
+                var repoResult = await AttendanceService.GetAttendanceCalendarAsync(UserEmpNo, d.Year, d.Month, _cts.Token);
+                if (repoResult.Success)
+                {
+                    _calendarAttendance = repoResult.Value!;
+
+                    _calendarColors = _calendarAttendance
+                        .ToDictionary(
+                            x => x.AttendanceDate,
+                            x => AttendanceLegendColorMap.GetColor(x.LegendCode)
+                        );
+                }
+                else
+                    _errorMessage.Append(repoResult.Error);
+
+                //if (callback != null)
+                //{
+                //    // Hide the spinner overlay
+                //    await callback.Invoke();
+                //}
             }
             catch (Exception ex)
             {

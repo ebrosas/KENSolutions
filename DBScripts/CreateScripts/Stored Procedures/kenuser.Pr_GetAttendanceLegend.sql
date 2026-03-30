@@ -29,6 +29,8 @@ BEGIN
 				WHEN RTRIM(a.LeaveType) = 'IL' THEN 'ALINJURY'
 				WHEN RTRIM(a.AbsenceReasonCode) = 'BT' THEN 'ALBUSTRIP'
 				WHEN ISNULL(a.AbsenceReasonCode, '') <> '' AND RTRIM(a.AbsenceReasonCode) <> 'BT' THEN 'ALEXCUSE'
+				WHEN (a.TimeIn IS NOT NULL AND b.ArrivalTo IS NOT NULL AND DATEDIFF(MINUTE, b.ArrivalTo, CAST(a.TimeIn AS TIME)) > 5) THEN 'ALLATE'
+				WHEN (a.[TimeOut] IS NOT NULL AND b.DepartFrom IS NOT NULL AND DATEDIFF(MINUTE, CAST(a.[TimeOut] AS TIME), b.DepartFrom) > 5) THEN 'ALLEFTEARLY'
 				ELSE 'ALPRESENT'
 			END AS LegendCode,
 			CASE WHEN RTRIM(a.RemarkCode) = 'A' THEN 'Absent'
@@ -37,9 +39,12 @@ BEGIN
 				WHEN RTRIM(a.LeaveType) = 'IL' THEN 'Injury Leave'
 				WHEN RTRIM(a.AbsenceReasonCode) = 'BT' THEN 'Business Trip'
 				WHEN ISNULL(a.AbsenceReasonCode, '') <> '' AND RTRIM(a.AbsenceReasonCode) <> 'BT' THEN 'Excused'
+				WHEN (a.TimeIn IS NOT NULL AND b.ArrivalTo IS NOT NULL AND DATEDIFF(MINUTE, b.ArrivalTo, CAST(a.TimeIn AS TIME)) > 5) THEN 'Late'
+				WHEN (a.[TimeOut] IS NOT NULL AND b.DepartFrom IS NOT NULL AND DATEDIFF(MINUTE, CAST(a.[TimeOut] AS TIME), b.DepartFrom) > 5) THEN 'Left Early'
 				ELSE 'Present'
 			END AS LegendDesc
 	FROM kenuser.AttendanceTimesheet a WITH (NOLOCK)
+		LEFT JOIN kenuser.MasterShiftTime b WITH (NOLOCK) ON RTRIM(a.ShiftPatCode) = RTRIM(b.ShiftPatternCode)
 	WHERE a.EmpNo = @empNo
 		AND YEAR(a.AttendanceDate) = @year
 		AND MONTH(a.AttendanceDate) = @month
@@ -55,7 +60,5 @@ PARAMETERS:
 	@month		INT 
 
 	EXEC kenuser.Pr_GetAttendanceLegend 10003632, 2026, 3
-	EXEC kenuser.Pr_GetAttendanceLegend 10003632, '02/01/2026'
-	EXEC kenuser.Pr_GetAttendanceLegend 10003632, '02/07/2026'
 
 */

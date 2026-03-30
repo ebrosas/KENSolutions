@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KenHRApp.Application.DTOs
+namespace KenHRApp.Domain.Entities.KeylessModels
 {
-    public class AttendanceCalendarDTO
+    public class AttendanceCalendarResult
     {
         #region Properties
         public int EmpNo { get; set; }

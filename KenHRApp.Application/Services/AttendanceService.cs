@@ -1,4 +1,5 @@
 ﻿using KenHRApp.Application.DTOs;
+using KenHRApp.Application.DTOs.TNA;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Domain.Entities;
 using KenHRApp.Domain.Entities.KeylessModels;
@@ -782,6 +783,42 @@ namespace KenHRApp.Application.Services
             catch (Exception ex)
             {
                 return Result<List<PayrollPeriodResultDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the attendance duration from the database.");
+            }
+        }
+
+        public async Task<Result<List<AttendanceCalendarDTO>>> GetAttendanceCalendarAsync(
+            int empNo, 
+            int year, 
+            int month, 
+            CancellationToken cancellationToken = default)
+        {
+            List<AttendanceCalendarDTO> attendanceList = new();
+
+            try
+            {
+                var repoResult = await _repository.GetAttendanceCalendarAsync(empNo, year, month, cancellationToken);
+                if (!repoResult.Success)
+                {
+                    return Result<List<AttendanceCalendarDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null && model.Any())
+                {
+                    attendanceList = model.Select(e => new AttendanceCalendarDTO
+                    {
+                        EmpNo = e.EmpNo,
+                        AttendanceDate = e.AttendanceDate,
+                        LegendCode = e.LegendCode,
+                        LegendDesc = e.LegendDesc
+                    }).ToList();
+                }
+
+                return Result<List<AttendanceCalendarDTO>>.SuccessResult(attendanceList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<AttendanceCalendarDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching attendance calendar data from the database.");
             }
         }
         #endregion
