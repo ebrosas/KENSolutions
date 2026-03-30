@@ -102,17 +102,19 @@
                         <MudStack AlignItems="AlignItems.Baseline">                            
                             <MudPaper Elevation="0" Class="pa-0 w-100">
                                 <MudBreakpointProvider OnBreakpointChanged="OnBreakpointChanged">
-                                    <MudDatePicker PickerVariant="PickerVariant.Static" 
-                                        @ref="_picker"
-                                        Color="Color.Dark" 
-                                        Rounded="true"
-                                        Elevation="0"
-                                        Orientation="@_calOrientation" 
-                                        Date="@_selectedDate"
-                                        DateChanged="OnDateChanged"
-                                        Style="@_pickerStyle"
-                                        PickerDayContent="CalendarDayTemplate">
-                                    </MudDatePicker>
+                                    <div @key="_calendarRenderKey">
+                                        <MudDatePicker PickerVariant="PickerVariant.Static" 
+                                            @ref="_picker"
+                                            Color="Color.Dark" 
+                                            Rounded="true"
+                                            Elevation="0"
+                                            Orientation="@_calOrientation" 
+                                            Date="@_selectedDate"
+                                            DateChanged="OnDateChanged"
+                                            Style="@_pickerStyle"
+                                            PickerDayContent="CalendarDayTemplate">
+                                        </MudDatePicker>
+                                    </div>
                                 </MudBreakpointProvider>
                             </MudPaper>
                         </MudStack>

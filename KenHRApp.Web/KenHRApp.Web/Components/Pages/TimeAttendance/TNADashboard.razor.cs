@@ -84,6 +84,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<ShiftPatternMasterDTO> _shiftRosterList = new List<ShiftPatternMasterDTO>();
         private List<AttendanceCalendarDTO> _calendarAttendance = new();
         private Dictionary<DateTime, string> _calendarColors = new();
+        private Guid _calendarRenderKey = Guid.NewGuid();
 
         private List<BreadcrumbItem> _breadcrumbItems =
         [
@@ -394,8 +395,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 //_isRunning = false;
                 
                 // Shows the spinner overlay
-                await InvokeAsync(StateHasChanged);
-
+                await InvokeAsync(StateHasChanged);                                
             }, date);
         }
 
@@ -537,6 +537,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set calandar to today's date
                 _selectedDate = DateTime.Now;
 
+                // Load attendance legends
                 await LoadCalendarMonthAsync();
 
                 // Invoke the event handler to get the attendance detail for today's date
@@ -818,10 +819,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Initialize the cancellation token
                 _cts = new CancellationTokenSource();
 
-                // Reset collections
-                //_errorMessage.Clear();
-                //_attendanceChips.Clear();
-
                 var repoResult = await AttendanceService.GetAttendanceCalendarAsync(UserEmpNo, d.Year, d.Month, _cts.Token);
                 if (repoResult.Success)
                 {
@@ -841,6 +838,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 //    // Hide the spinner overlay
                 //    await callback.Invoke();
                 //}
+
+                _calendarRenderKey = Guid.NewGuid();
+                await InvokeAsync(StateHasChanged);
             }
             catch (Exception ex)
             {
