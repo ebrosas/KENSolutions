@@ -2422,6 +2422,30 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 		
 	*/
 
+	/*	Populate AL and SL Renewal Types
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'RENEWTYPE'
+
+		SELECT	@UDCCode					= 'RENEWYEARLY',
+				@UDCDesc1					= 'Renewal yearly',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'RENEW3MANIV',
+				@UDCDesc1					= 'Renewal 3 months before anniversarry',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+	*/
+
 	IF @actionType = 0
 	BEGIN
 

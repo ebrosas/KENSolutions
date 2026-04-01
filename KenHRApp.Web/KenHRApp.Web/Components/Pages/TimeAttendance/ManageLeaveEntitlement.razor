@@ -1,0 +1,125 @@
+﻿@page "/TimeAttendance/leaveentitlement"
+
+<MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
+     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Leave Inquiry</MudText>
+     <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserName</MudText>
+</MudStack>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="px-4">
+        @if (_hasValidationError && _validationMessages.Any())
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
+            <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
+            <ul style="margin:0; padding-left:20px;">
+                @foreach (var msg in _validationMessages)
+                {
+                    <li>
+                        <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
+                        </li>
+                }
+            </ul>
+        </MudAlert>
+    }
+
+    @if (_showErrorAlert)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
+                  ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
+            @_errorMessage
+        </MudAlert>
+    }
+
+    <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
+        <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
+            CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
+
+        <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-2 mb-0">
+            <MudPaper Elevation="0" Square="true" Class="w-100">
+            </MudPaper>
+
+            <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full mt-0" Spacing="2">
+                 <MudButton Variant="Variant.Filled"
+                            Color="Color.Primary"
+                            Style="background-color:#004165;"
+                            Class="mt-1 px-4"
+                            FullWidth="false"
+                            Size="Size.Small"
+                            StartIcon="@Icons.Material.Filled.PersonSearch"
+                            OnClick="@(() => BeginLoadEntitlementTask(true))"
+                            Disabled="@_isRunning">
+                     @if (_isRunning)
+                    {
+                        <span>Searching...</span>
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+                    }
+                    else
+                    {
+                        <span>Search</span>
+                    }
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           ButtonType="ButtonType.Reset"
+                           Color="Color.Warning"
+                           FullWidth="false"
+                           Class="mt-1 px-4"
+                           Size="Size.Small"
+                           Disabled="@_isRunning"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           OnClick="HandleRefreshButton">
+                    Reset
+                </MudButton>
+            </MudStack>
+
+            <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
+                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LEAVE ENTITLEMENT LIST</MudText>
+                <MudSpacer />
+                <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply New Entitlement" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
+                 </MudMenu>
+            </MudAppBar>
+
+            <MudPaper Elevation="5" Square="true" Class="w-100 mb-3">
+                 <MudDataGrid T="LeaveEntitlementDTO" Items="@_leaveEntitlementList" Hover="true" Striped="true" Class="leave-grid"
+                    Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                    QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                    EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                    EditDialogOptions="new DialogOptions 
+                    { 
+                        MaxWidth = MaxWidth.Small, 
+                        FullWidth = true,
+                        BackdropClick = false,
+                        CloseOnEscapeKey = false
+                    }"
+                    StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
+                    TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                     <NoRecordsContent>
+                         <div class="no-data-box">
+                             <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
+                             <span>No data found</span>
+                         </div>
+                     </NoRecordsContent>
+                     <PagerContent>
+                         <MudDataGridPager T="LeaveEntitlementDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                     </PagerContent>
+                </MudDataGrid>
+            </MudPaper>
+
+             <MudScrollToTop TopOffset="100"
+                             Selector="#mainPanel"
+                             VisibleCssClass="visible absolute"
+                             HiddenCssClass="hidden absolute">
+                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+             </MudScrollToTop>
+        </MudStack>
+    </div>
+</MudContainer>
+
+<!-- Full-screen overlay -->
+@if (_isRunning)
+{
+    <div class="fullscreen-overlay">
+        <MudProgressCircular Indeterminate="true" Size="Size.Medium" Color="Color.Info" />
+        <MudText Typo="Typo.h6" Class="mt-2 text-white">@overlayMessage</MudText>
+        </div>
+}

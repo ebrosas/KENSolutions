@@ -488,7 +488,7 @@ namespace KenHRApp.Infrastructure.Data
                      .UseIdentityColumn(1, 1); // seed = 1, increment = 1
                 entity.Property(a => a.CreatedDate)
                         .HasDefaultValue(DateTime.Now);
-                entity.HasIndex(e => new { e.EmployeeNo, e.LeaveEntitlemnt, e.LeaveUOM })
+                entity.HasIndex(e => new { e.EmployeeNo, e.EffectiveDate })
                      .HasDatabaseName("IX_LeaveEntitlement_CompoKeys")
                      .IsUnique();
             });

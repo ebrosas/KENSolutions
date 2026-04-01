@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using KenHRApp.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,60 +7,43 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KenHRApp.Domain.Entities
+namespace KenHRApp.Application.DTOs
 {
-    public class LeaveEntitlement
+    public class LeaveEntitlementDTO
     {
         #region Properties
         public int LeaveEntitlementId { get; set; }     // Identity column  
+        public int EmployeeNo { get; set; }
 
-        [Column(TypeName = "datetime"), Comment("Part of composite unique key index")]
         public DateTime EffectiveDate { get; set; }
 
-        [Comment("Part of composite unique key index")]
         public double ALEntitlementCount { get; set; }
 
         public double? SLEntitlementCount { get; set; }
 
-        [Column(TypeName = "varchar(20)")]
         public string? ALRenewalType { get; set; } = null;
 
-        [Column(TypeName = "varchar(20)")]
         public string? SLRenewalType { get; set; } = null;
 
-        [Column(TypeName = "varchar(20)")]
         public string LeaveUOM { get; set; } = null!;
 
-        [Column(TypeName = "varchar(20)")]
         public string? SickLeaveUOM { get; set; } = null;
 
         public double? LeaveBalance { get; set; }
         public double? SLBalance { get; set; }
         public double? DILBalance { get; set; }
 
-        [Column(TypeName = "datetime")]
         public DateTime? CreatedDate { get; set; }
 
         public int? LeaveCreatedBy { get; set; }
 
-        [Column(TypeName = "varchar(50)")]
         public string? CreatedUserID { get; set; } = null;
 
-        [Column(TypeName = "datetime")]
         public DateTime? LastUpdatedDate { get; set; }
 
         public int? LastUpdatedBy { get; set; }
 
-        [Column(TypeName = "varchar(50)")]
-        public string? LastUpdatedUserID { get; set; } = null;                
-        #endregion
-
-        #region Reference Navigation to Employee   
-        [Comment("Foreign key that references alternate key: Employee.EmployeeNo")]
-        public int EmployeeNo { get; set; }
-
-        // Navigation back to Employee
-        public Employee Employee { get; set; } = null!;
+        public string? LastUpdatedUserID { get; set; } = null;
         #endregion
     }
 }

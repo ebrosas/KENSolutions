@@ -251,6 +251,12 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	--		@UDCGDesc2					= NULL,
 	--		@UDCGSpecialHandlingCode	= NULL
 
+	--Add AL and SL Renewal Types
+	--SELECT	@UDCGCode					= 'RENEWTYPE',
+	--		@UDCGDesc1					= 'AL and SL Renewal Types ',
+	--		@UDCGDesc2					= NULL,
+	--		@UDCGSpecialHandlingCode	= NULL
+
 	IF @actionType = 0
 	BEGIN
 
