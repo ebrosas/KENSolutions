@@ -168,7 +168,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("SwipeLogDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 4, 1, 16, 0, 49, 723, DateTimeKind.Local).AddTicks(8220));
+                        .HasDefaultValue(new DateTime(2026, 4, 1, 21, 59, 23, 27, DateTimeKind.Local).AddTicks(4515));
 
                     b.Property<DateTime?>("SwipeTime")
                         .HasColumnType("datetime");
@@ -223,7 +223,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 4, 1, 16, 0, 49, 724, DateTimeKind.Local).AddTicks(4472));
+                        .HasDefaultValue(new DateTime(2026, 4, 1, 21, 59, 23, 27, DateTimeKind.Local).AddTicks(9927));
 
                     b.Property<string>("DIL_Entitlement")
                         .HasColumnType("varchar(10)");
@@ -347,7 +347,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 4, 1, 13, 0, 49, 711, DateTimeKind.Utc).AddTicks(4200));
+                        .HasDefaultValue(new DateTime(2026, 4, 1, 18, 59, 23, 15, DateTimeKind.Utc).AddTicks(4640));
 
                     b.Property<string>("DepartmentCode")
                         .IsRequired()
@@ -1172,7 +1172,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 4, 1, 16, 0, 49, 723, DateTimeKind.Local).AddTicks(2195));
+                        .HasDefaultValue(new DateTime(2026, 4, 1, 21, 59, 23, 26, DateTimeKind.Local).AddTicks(9254));
 
                     b.Property<DateTime>("HolidayDate")
                         .HasColumnType("datetime");
@@ -1716,7 +1716,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 4, 1, 16, 0, 49, 728, DateTimeKind.Local).AddTicks(1740));
+                        .HasDefaultValue(new DateTime(2026, 4, 1, 21, 59, 23, 33, DateTimeKind.Local).AddTicks(5840));
 
                     b.Property<string>("CreatedUserID")
                         .HasColumnType("varchar(50)");
@@ -1725,7 +1725,9 @@ namespace KenHRApp.Infrastructure.Migrations
                         .HasColumnType("float");
 
                     b.Property<DateTime>("EffectiveDate")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
+                        .HasDefaultValue(new DateTime(2026, 4, 1, 21, 59, 23, 33, DateTimeKind.Local).AddTicks(6851))
                         .HasComment("Part of composite unique key index");
 
                     b.Property<int>("EmployeeNo")
@@ -1808,7 +1810,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("LeaveCreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 4, 1, 16, 0, 49, 725, DateTimeKind.Local).AddTicks(8325));
+                        .HasDefaultValue(new DateTime(2026, 4, 1, 21, 59, 23, 30, DateTimeKind.Local).AddTicks(1607));
 
                     b.Property<string>("LeaveCreatedEmail")
                         .HasColumnType("varchar(50)");
@@ -1962,7 +1964,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 4, 1, 16, 0, 49, 718, DateTimeKind.Local).AddTicks(4565));
+                        .HasDefaultValue(new DateTime(2026, 4, 1, 21, 59, 23, 21, DateTimeKind.Local).AddTicks(9453));
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -2155,7 +2157,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 4, 1, 16, 0, 49, 728, DateTimeKind.Local).AddTicks(7152));
+                        .HasDefaultValue(new DateTime(2026, 4, 1, 21, 59, 23, 34, DateTimeKind.Local).AddTicks(1303));
 
                     b.Property<int>("FiscalMonth")
                         .HasColumnType("int");
@@ -2289,7 +2291,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 4, 1, 16, 0, 49, 711, DateTimeKind.Local).AddTicks(8626));
+                        .HasDefaultValue(new DateTime(2026, 4, 1, 21, 59, 23, 15, DateTimeKind.Local).AddTicks(9937));
 
                     b.Property<string>("DepartmentCode")
                         .IsRequired()
@@ -2360,7 +2362,7 @@ namespace KenHRApp.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
-                        .HasDefaultValue(new DateTime(2026, 4, 1, 16, 0, 49, 713, DateTimeKind.Local).AddTicks(9497));
+                        .HasDefaultValue(new DateTime(2026, 4, 1, 21, 59, 23, 17, DateTimeKind.Local).AddTicks(7740));
 
                     b.Property<int?>("DailySalaryRange")
                         .HasColumnType("int");

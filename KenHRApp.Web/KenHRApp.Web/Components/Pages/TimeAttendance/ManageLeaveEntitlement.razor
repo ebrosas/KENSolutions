@@ -1,7 +1,7 @@
 ﻿@page "/TimeAttendance/leaveentitlement"
 
 <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
-     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Leave Inquiry</MudText>
+     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Manage Leave Entitlement</MudText>
      <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserName</MudText>
 </MudStack>
 
@@ -93,7 +93,194 @@
                     }"
                     StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
                     TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
-                     <NoRecordsContent>
+                    <ToolBarContent>
+                         <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                             <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
+                                           Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"
+                                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                             </MudTextField>
+                         </MudPaper>
+                         <MudSpacer />
+                         <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                             <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
+                             <MudPaper Class="ms-3" Elevation="0">
+                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new leave entitlement" />
+                             </MudPaper>
+                         </MudPaper>
+                    </ToolBarContent>
+                    <Columns>
+                         <PropertyColumn Property="x => x.LeaveEntitlementId" Hidden Editable="false">
+                             <EditTemplate>
+                                 @* Empty to prevent rendering *@
+                             </EditTemplate>
+                         </PropertyColumn>
+                         <PropertyColumn Property="x => x.EmployeeNo" Hidden Required="false">
+                             <EditTemplate>
+                                 @* Empty to prevent rendering *@
+                             </EditTemplate>
+                         </PropertyColumn>
+                         <PropertyColumn Property="x => x.EmployeeName" Title="Department Head" Class="col-superintendent" Required="true">
+                             <EditTemplate>
+                                 <MudAutocomplete @bind-Value="context.Item.EmployeeName"
+                                                  SearchFunc="SearchEmployee!"
+                                                  Variant="Variant.Text"
+                                                  Label="Department Head"
+                                                  Margin="Margin.Normal"
+                                                  Dense="true"
+                                                  Placeholder="Please Select"
+                                                  HelperText="Type a key to search for employee"
+                                                  HelperTextOnFocus="true"
+                                                  Clearable="true" Typo="Typo.subtitle2"
+                                                  MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
+                                                  Modal="true" />
+                             </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.ALEntitlementCount" Title="Leave Entitlement" Class="col-head-count">
+                             <EditTemplate Context="row">
+                                 <MudNumericField @bind-Value="row.Item.ALEntitlementCount" Label="Leave Entitlement"
+                                        For="@(() => row.Item.ALEntitlementCount)"
+                                        Variant="Variant.Outlined"
+                                        HelperText="Enter leave entitlement" HelperTextOnFocus="true" MaxLength="3" Min="0" Max="100"
+                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                             </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.LeaveUOMDesc" Title="Leave UOM" Class="col-group-name">
+                             <EditTemplate>
+                                 <MudSelect @bind-Value="context.Item.LeaveUOM" Variant="Variant.Text" Margin="Margin.Dense" Label="Group Name"
+                                    Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                    HelperText="Filter by employment status" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
+                                     @foreach (var unit in _uomList)
+                                    {
+                                        <MudSelectItem Value="unit.UDCCode">@unit.UDCDesc1</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.ALRenewalTypeDesc" Title="Leave Renewal Type" Class="col-group-name">
+                            <EditTemplate>
+                                <MudSelect @bind-Value="context.Item.ALRenewalType" Variant="Variant.Text" Margin="Margin.Dense" Label="Group Name"
+                                           Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                           HelperText="Select leave renewal type" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
+                                    @foreach (var renewal in _renewalList)
+                                    {
+                                        <MudSelectItem Value="renewal.UDCCode">@renewal.UDCDesc1</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.SLEntitlementCount" Title="Sick Leave Entitlement" Class="col-head-count">
+                             <EditTemplate Context="row">
+                                 <MudNumericField @bind-Value="row.Item.SLEntitlementCount" Label="Sick Leave Entitlement"
+                                                  For="@(() => row.Item.SLEntitlementCount)"
+                                                  Variant="Variant.Outlined"
+                                                  HelperText="Enter sick leave entitlement" HelperTextOnFocus="true" MaxLength="3" Min="0" Max="100"
+                                                  Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                             </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.SickLeaveUOMDesc" Title="Sick Leave UOM" Class="col-group-name">
+                            <EditTemplate>
+                                <MudSelect @bind-Value="context.Item.SickLeaveUOM" Variant="Variant.Text" Margin="Margin.Dense" Label="Group Name"
+                                           Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                           HelperText="Filter by employment status" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
+                                    @foreach (var unit in _uomList)
+                                    {
+                                        <MudSelectItem Value="unit.UDCCode">@unit.UDCDesc1</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.SLRenewalTypeDesc" Title="Sick Leave Renewal Type" Class="col-group-name">
+                            <EditTemplate>
+                                <MudSelect @bind-Value="context.Item.SLRenewalType" Variant="Variant.Text" Margin="Margin.Dense" Label="Group Name"
+                                           Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                           HelperText="Select leave renewal type" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
+                                    @foreach (var renewal in _renewalList)
+                                    {
+                                        <MudSelectItem Value="renewal.UDCCode">@renewal.UDCDesc1</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.EffectiveDate" Title="Effective Date" Class="col-effective-date">
+                            <CellTemplate>
+                                @context.Item.EffectiveDate?.ToString("dd-MMM-yyyy")
+                            </CellTemplate>
+                            <EditTemplate Context="row">
+                                <MudDatePicker Color="Color.Info" Editable="true"
+                                                @bind-Date="row.Item.EffectiveDate"
+                                                For="@(() => row.Item.EffectiveDate)"
+                                                Required RequiredError="Effective Date is required"
+                                                MinDate="DateTime.Today"
+                                                Clearable="true"
+                                                Placeholder="Select Date" />
+                                </EditTemplate>
+                            </PropertyColumn>
+                        <PropertyColumn Property="x => x.LeaveBalance" Title="Leave Balance" Class="col-head-count">
+                            <EditTemplate Context="row">
+                                <MudNumericField @bind-Value="row.Item.LeaveBalance" Label="Leave Balance"
+                                    For="@(() => row.Item.LeaveBalance)"
+                                    Variant="Variant.Outlined"
+                                    HelperText="Enter leave balance" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                    Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.SLBalance" Title="Sick Leave Balance" Class="col-head-count">
+                            <EditTemplate Context="row">
+                                <MudNumericField @bind-Value="row.Item.SLBalance" Label="Leave Balance"
+                                                 For="@(() => row.Item.SLBalance)"
+                                                 Variant="Variant.Outlined"
+                                                 HelperText="Enter leave balance" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                 Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.DILBalance" Title="Sick Leave Balance" Class="col-head-count">
+                            <EditTemplate Context="row">
+                                <MudNumericField @bind-Value="row.Item.DILBalance" Label="DIL Balance"
+                                                 For="@(() => row.Item.DILBalance)"
+                                                 Variant="Variant.Outlined"
+                                                 HelperText="Enter leave balance" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                 Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                            </EditTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.CreatedUserID" Title="Created By" Class="col-EndDayModeDesc" Editable="false">
+                            <CellTemplate>
+                                @context.Item.CreatedUserID
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.CreatedDate" Title="Created Date" Class="col-created-date" Editable="false">
+                                <CellTemplate Context="row">
+                                    @row.Item.CreatedDate?.ToString("dd-MMM-yyyy")
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.LastUpdatedUserID" Title="Last Updated By" Class="col-EndDayModeDesc" Editable="false">
+                            <CellTemplate>
+                                @context.Item.LastUpdatedUserID
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.LastUpdatedDate" Title="Last Updated Date" Class="col-updated-date" Editable="false">
+                            <CellTemplate Context="row">
+                                @row.Item.LastUpdatedDate?.ToString("dd-MMM-yyyy")
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                            <CellTemplate Context="row">
+                                <MudIconButton title="View and edit entitlement information"
+                                               Class="show-btn fa-icon-btn"
+                                               Style="color:#004165;"
+                                               OnClick="@row.Actions.StartEditingItemAsync">
+                                    <ChildContent>
+                                        <i class="fas fa-edit fa-1x"></i>
+                                    </ChildContent>
+                                </MudIconButton>
+                                <MudIconButton Color="Color.Error" title="Delete department record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
+                                    <ChildContent>
+                                        <i class="fas fa-trash-alt fa-1x"></i>
+                                    </ChildContent>
+                                </MudIconButton>
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                    <NoRecordsContent>
                          <div class="no-data-box">
                              <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
                              <span>No data found</span>
@@ -104,13 +291,12 @@
                      </PagerContent>
                 </MudDataGrid>
             </MudPaper>
-
-             <MudScrollToTop TopOffset="100"
+            <MudScrollToTop TopOffset="100"
                              Selector="#mainPanel"
                              VisibleCssClass="visible absolute"
                              HiddenCssClass="hidden absolute">
                  <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
-             </MudScrollToTop>
+            </MudScrollToTop>
         </MudStack>
     </div>
 </MudContainer>

@@ -33,7 +33,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    table: "RecruitmentRequest",
             //    type: "datetime",
             //    nullable: true,
-            //    defaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 713, DateTimeKind.Local).AddTicks(9497),
+            //    defaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 17, DateTimeKind.Local).AddTicks(7740),
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
@@ -45,7 +45,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    table: "RecruitmentBudget",
             //    type: "datetime",
             //    nullable: true,
-            //    defaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 711, DateTimeKind.Local).AddTicks(8626),
+            //    defaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 15, DateTimeKind.Local).AddTicks(9937),
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
@@ -57,7 +57,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    table: "PayrollPeriod",
             //    type: "datetime",
             //    nullable: true,
-            //    defaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 728, DateTimeKind.Local).AddTicks(7152),
+            //    defaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 34, DateTimeKind.Local).AddTicks(1303),
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
@@ -69,7 +69,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    table: "MasterShiftPatternTitle",
             //    type: "datetime",
             //    nullable: true,
-            //    defaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 718, DateTimeKind.Local).AddTicks(4565),
+            //    defaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 21, DateTimeKind.Local).AddTicks(9453),
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
@@ -81,7 +81,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    table: "LeaveRequisitionWF",
             //    type: "datetime",
             //    nullable: true,
-            //    defaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 725, DateTimeKind.Local).AddTicks(8325),
+            //    defaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 30, DateTimeKind.Local).AddTicks(1607),
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
@@ -103,7 +103,7 @@ namespace KenHRApp.Infrastructure.Migrations
                 table: "LeaveEntitlement",
                 type: "datetime",
                 nullable: true,
-                defaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 728, DateTimeKind.Local).AddTicks(1740),
+                defaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 33, DateTimeKind.Local).AddTicks(5840),
                 oldClrType: typeof(DateTime),
                 oldType: "datetime",
                 oldNullable: true,
@@ -122,7 +122,7 @@ namespace KenHRApp.Infrastructure.Migrations
                 table: "LeaveEntitlement",
                 type: "datetime",
                 nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                defaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 33, DateTimeKind.Local).AddTicks(6851),
                 comment: "Part of composite unique key index");
 
             migrationBuilder.AddColumn<double>(
@@ -152,7 +152,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    table: "Holiday",
             //    type: "datetime",
             //    nullable: true,
-            //    defaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 723, DateTimeKind.Local).AddTicks(2195),
+            //    defaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 26, DateTimeKind.Local).AddTicks(9254),
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
@@ -164,7 +164,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    table: "DepartmentMaster",
             //    type: "datetime",
             //    nullable: false,
-            //    defaultValue: new DateTime(2026, 4, 1, 13, 0, 49, 711, DateTimeKind.Utc).AddTicks(4200),
+            //    defaultValue: new DateTime(2026, 4, 1, 18, 59, 23, 15, DateTimeKind.Utc).AddTicks(4640),
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldDefaultValue: new DateTime(2026, 3, 18, 13, 9, 22, 306, DateTimeKind.Utc).AddTicks(4015));
@@ -175,7 +175,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    table: "AttendanceTimesheet",
             //    type: "datetime",
             //    nullable: true,
-            //    defaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 724, DateTimeKind.Local).AddTicks(4472),
+            //    defaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 27, DateTimeKind.Local).AddTicks(9927),
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
@@ -187,7 +187,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    table: "AttendanceSwipeLog",
             //    type: "datetime",
             //    nullable: true,
-            //    defaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 723, DateTimeKind.Local).AddTicks(8220),
+            //    defaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 27, DateTimeKind.Local).AddTicks(4515),
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
@@ -250,7 +250,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
-            //    oldDefaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 713, DateTimeKind.Local).AddTicks(9497));
+            //    oldDefaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 17, DateTimeKind.Local).AddTicks(7740));
 
             //migrationBuilder.AlterColumn<DateTime>(
             //    name: "CreatedDate",
@@ -262,7 +262,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
-            //    oldDefaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 711, DateTimeKind.Local).AddTicks(8626));
+            //    oldDefaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 15, DateTimeKind.Local).AddTicks(9937));
 
             //migrationBuilder.AlterColumn<DateTime>(
             //    name: "CreatedDate",
@@ -274,7 +274,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
-            //    oldDefaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 728, DateTimeKind.Local).AddTicks(7152));
+            //    oldDefaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 34, DateTimeKind.Local).AddTicks(1303));
 
             //migrationBuilder.AlterColumn<DateTime>(
             //    name: "CreatedDate",
@@ -286,7 +286,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
-            //    oldDefaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 718, DateTimeKind.Local).AddTicks(4565));
+            //    oldDefaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 21, DateTimeKind.Local).AddTicks(9453));
 
             //migrationBuilder.AlterColumn<DateTime>(
             //    name: "LeaveCreatedDate",
@@ -298,7 +298,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
-            //    oldDefaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 725, DateTimeKind.Local).AddTicks(8325));
+            //    oldDefaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 30, DateTimeKind.Local).AddTicks(1607));
 
             migrationBuilder.AlterColumn<string>(
                 name: "LeaveUOM",
@@ -320,7 +320,7 @@ namespace KenHRApp.Infrastructure.Migrations
                 oldClrType: typeof(DateTime),
                 oldType: "datetime",
                 oldNullable: true,
-                oldDefaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 728, DateTimeKind.Local).AddTicks(1740));
+                oldDefaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 33, DateTimeKind.Local).AddTicks(5840));
 
             migrationBuilder.AddColumn<double>(
                 name: "SickLeaveEntitlemnt",
@@ -340,7 +340,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
-            //    oldDefaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 723, DateTimeKind.Local).AddTicks(2195));
+            //    oldDefaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 26, DateTimeKind.Local).AddTicks(9254));
 
             //migrationBuilder.AlterColumn<DateTime>(
             //    name: "CreatedAt",
@@ -351,7 +351,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    defaultValue: new DateTime(2026, 3, 18, 13, 9, 22, 306, DateTimeKind.Utc).AddTicks(4015),
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
-            //    oldDefaultValue: new DateTime(2026, 4, 1, 13, 0, 49, 711, DateTimeKind.Utc).AddTicks(4200));
+            //    oldDefaultValue: new DateTime(2026, 4, 1, 18, 59, 23, 15, DateTimeKind.Utc).AddTicks(4640));
 
             //migrationBuilder.AlterColumn<DateTime>(
             //    name: "CreatedDate",
@@ -363,7 +363,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
-            //    oldDefaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 724, DateTimeKind.Local).AddTicks(4472));
+            //    oldDefaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 27, DateTimeKind.Local).AddTicks(9927));
 
             //migrationBuilder.AlterColumn<DateTime>(
             //    name: "SwipeLogDate",
@@ -375,7 +375,7 @@ namespace KenHRApp.Infrastructure.Migrations
             //    oldClrType: typeof(DateTime),
             //    oldType: "datetime",
             //    oldNullable: true,
-            //    oldDefaultValue: new DateTime(2026, 4, 1, 16, 0, 49, 723, DateTimeKind.Local).AddTicks(8220));
+            //    oldDefaultValue: new DateTime(2026, 4, 1, 21, 59, 23, 27, DateTimeKind.Local).AddTicks(4515));
 
             migrationBuilder.CreateIndex(
                 name: "IX_LeaveEntitlement_CompoKeys",

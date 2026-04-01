@@ -61,6 +61,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         ];
 
         private List<LeaveEntitlementDTO> _leaveEntitlementList = new List<LeaveEntitlementDTO>();
+        private IReadOnlyList<EmployeeDTO> _employeeList = new List<EmployeeDTO>();
+        private string[]? _employeeArray = null;
+
+        private List<UserDefinedCodeDTO> _uomList = new List<UserDefinedCodeDTO>();
+        private string[]? _uomArray = null;
+
+        private List<UserDefinedCodeDTO> _renewalList = new List<UserDefinedCodeDTO>();
+        private string[]? _renewalArray = null;
         #endregion
 
         #endregion
@@ -138,54 +146,69 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Grid Events 
-        private Func<LeaveRequestResultDTO, bool> _quickFilter => x =>
+        private Func<LeaveEntitlementDTO, bool> _quickFilter => x =>
         {
             if (string.IsNullOrWhiteSpace(_searchString))
                 return true;
 
-            //if (!string.IsNullOrEmpty(x.DepartmentCode) && x.DepartmentCode.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
+            if (x.EmployeeNo > 0 && x.EmployeeNo.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
 
-            //if (!string.IsNullOrEmpty(x.DepartmentName) && x.DepartmentName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
+            if (x.ALEntitlementCount > 0 && x.ALEntitlementCount.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
 
-            //if (!string.IsNullOrEmpty(x.Description) && x.Description!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
+            if (x.SLEntitlementCount > 0 && x.SLEntitlementCount!.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
 
-            //if (!string.IsNullOrEmpty(x.GroupName) && x.GroupName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
+            if (x.LeaveBalance > 0 && x.LeaveBalance!.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
 
-            //if (!string.IsNullOrEmpty(x.SuperintendentName) && x.SuperintendentName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
+            if (x.SLBalance > 0 && x.SLBalance!.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
 
-            //if (!string.IsNullOrEmpty(x.ManagerName) && x.ManagerName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
+            if (x.DILBalance > 0 && x.DILBalance.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.EmployeeName) && x.EmployeeName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.ALRenewalTypeDesc) && x.ALRenewalTypeDesc!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.SLRenewalTypeDesc) && x.SLRenewalTypeDesc!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.CreatedUserID) && x.CreatedUserID!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.LastUpdatedUserID) && x.LastUpdatedUserID!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
 
             return false;
         };
 
-        private void StartedEditingItem(LeaveRequestResultDTO item)
+        private void StartedEditingItem(LeaveEntitlementDTO item)
         {
             _events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
         }
 
-        private void CanceledEditingItem(LeaveRequestResultDTO item)
+        private void CanceledEditingItem(LeaveEntitlementDTO item)
         {
             _events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
         }
 
-        private void CommittedItemChanges(LeaveRequestResultDTO item)
+        private void CommittedItemChanges(LeaveEntitlementDTO item)
         {
 
         }
 
-        private async Task ConfirmDelete(LeaveRequestResultDTO leaveRequest)
+        private async Task ConfirmDelete(LeaveEntitlementDTO entitlement)
         {
             var parameters = new DialogParameters
             {
                 { "DialogTitle", "Confirm Delete"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to delete leave requisition no. '{leaveRequest.LeaveRequestId}'?" },
+                { "ContentText", $"Are you sure you want to delete entitlement information for employee '{entitlement.EmployeeName}'?" },
                 { "ConfirmText", "Delete" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -204,7 +227,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                //BeginDeleteDepartment(leaveRequest);
+                //BeginDeleteDepartment(entitlement);
             }
         }
         #endregion
@@ -356,6 +379,20 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             //    await InvokeAsync(StateHasChanged);
             //}, forceLoad);
         }
+        private async Task<IEnumerable<string>> SearchEmployee(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _employeeArray!;
+            }
+
+            return _employeeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
         #endregion
     }
 }
