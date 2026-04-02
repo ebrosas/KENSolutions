@@ -572,6 +572,64 @@ namespace KenHRApp.Application.Services
                 return Result<List<LeaveRequestResultDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the leave requisition records from the database.");
             }
         }
+
+        public async Task<Result<List<LeaveEntitlementDTO>>> GetLeaveEntitlementAsync(
+            int? entitlementId,
+            int? empNo,
+            string? costCenter,
+            DateTime? startDate,
+            DateTime? endDate)
+        {
+            List<LeaveEntitlementDTO> leaveEntitlementList = new();
+
+            try
+            {
+                var repoResult = await _repository.GetLeaveEntitlementAsync(entitlementId, empNo, costCenter, startDate, endDate);
+                if (!repoResult.Success)
+                {
+                    return Result<List<LeaveEntitlementDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null && model.Any())
+                {
+                    leaveEntitlementList = model.Select(e => new LeaveEntitlementDTO
+                    {
+                        LeaveEntitlementId = e.LeaveEntitlementId,
+                        EmployeeNo = e.EmployeeNo,
+                        EmployeeName = e.EmployeeName,
+                        DepartmentCode = e.DepartmentCode,
+                        DepartmentName = e.DepartmentName,
+                        EffectiveDate = e.EffectiveDate,
+                        ALEntitlementCount = e.ALEntitlementCount,
+                        SLEntitlementCount = e.SLEntitlementCount,
+                        ALRenewalType = e.ALRenewalType,
+                        ALRenewalTypeDesc = e.ALRenewalTypeDesc,
+                        SLRenewalType = e.SLRenewalType,
+                        SLRenewalTypeDesc = e.SLRenewalTypeDesc,
+                        LeaveUOM = e.LeaveUOM,
+                        LeaveUOMDesc = e.LeaveUOMDesc,
+                        SickLeaveUOM = e.SickLeaveUOM,
+                        SickLeaveUOMDesc = e.SickLeaveUOMDesc,
+                        LeaveBalance = e.LeaveBalance,
+                        SLBalance = e.SLBalance,
+                        DILBalance = e.DILBalance,
+                        CreatedDate = e.CreatedDate,
+                        LeaveCreatedBy = e.LeaveCreatedBy,
+                        CreatedUserID = e.CreatedUserID,
+                        LastUpdatedDate = e.LastUpdatedDate,
+                        LastUpdatedBy = e.LastUpdatedBy,
+                        LastUpdatedUserID = e.LastUpdatedUserID
+                    }).ToList();
+                }
+
+                return Result<List<LeaveEntitlementDTO>>.SuccessResult(leaveEntitlementList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<LeaveEntitlementDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the leave entitlement records from the database.");
+            }
+        }
         #endregion
     }
 }

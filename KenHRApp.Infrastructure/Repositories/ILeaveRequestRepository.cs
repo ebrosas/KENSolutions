@@ -18,6 +18,7 @@ namespace KenHRApp.Infrastructure.Repositories
         #endregion
 
         #region Abstract methods
+
         Task<Result<long>> AddLeaveRequestAsync(LeaveRequisitionWF leaveRequest, CancellationToken cancellationToken);
         Task<Result<int>> UpdateLeaveRequestAsync(LeaveRequisitionWF leaveRequest, CancellationToken cancellationToken = default);
         Task<Result<int>> CancelLeaveRequestAsync(LeaveRequisitionWF leaveRequest, CancellationToken cancellationToken = default);
@@ -32,6 +33,14 @@ namespace KenHRApp.Infrastructure.Repositories
             string? status,
             DateTime? startDate,
             DateTime? endDate);
+
+        Task<Result<List<LeaveEntitlementResult>>> GetLeaveEntitlementAsync(
+            int? entitlementId,
+            int? empNo,
+            string? costCenter,
+            DateTime? startDate,
+            DateTime? endDate);
+        
         #endregion
     }
 }

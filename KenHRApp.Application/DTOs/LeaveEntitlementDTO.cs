@@ -83,6 +83,26 @@ namespace KenHRApp.Application.DTOs
         public int? LastUpdatedBy { get; set; }
 
         public string? LastUpdatedUserID { get; set; } = null;
+        public string? DepartmentCode { get; set; } = null;
+        public string? DepartmentName { get; set; } = null;
+        #endregion
+
+        #region Extended Properties
+        public string DepartmentFullName
+        {
+            get
+            {
+                return $"{DepartmentCode} - {DepartmentName}";
+            }
+        }
+
+        public string EmployeeFullName
+        {
+            get
+            {
+                return $"{EmployeeNo} - {EmployeeName}";
+            }
+        }
         #endregion
     }
 }

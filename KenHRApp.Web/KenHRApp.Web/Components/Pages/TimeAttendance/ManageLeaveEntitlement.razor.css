@@ -1,0 +1,130 @@
+﻿/* #region Leave Entitlement Grid Stylesheets  */
+.entitlement-grid-local .no-data-box {
+    display: flex;
+    justify-content: flex-start; /* align content to the LEFT */
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    background-color: #f8f9fa; /* light gray */
+    border: 1px solid #FBE9E7;
+    border-radius: 6px;
+    color: #856404; /* dark yellow-brown */
+    font-weight: 600;
+}
+
+.entitlement-grid-local .no-data-icon {
+    font-size: 20px;
+    color: #6c757d; /* muted gray */
+}
+
+.entitlement-grid-local .mud-table {
+    table-layout: fixed;
+    width: 100%;
+    text-align: left;
+}
+
+/* Format table header */
+.entitlement-grid-local .mud-table-head {
+    background-color: #BBDEFB;
+    font-weight: bold;
+    text-align: center !important;
+    font-size: 14px !important;
+    text-decoration: underline;
+    height: 20px;
+    line-height: 20px;
+}
+
+/* Format table cell */
+.entitlement-grid-local .mud-table-cell {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
+    font-size: 14px;
+}
+
+/* Grid Column widths */
+.entitlement-grid-local .col-EmployeeName {
+    width: 200px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-ALEntitlementCount {
+    width: 120px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-LeaveUOMDesc {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-ALRenewalTypeDesc {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-SLEntitlementCount {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-SickLeaveUOMDesc {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-SLRenewalTypeDesc {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-EffectiveDate {
+    width: 110px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-LeaveBalance {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-SLBalance {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-DILBalance {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-CreatedUserID {
+    width: 120px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-CreatedDate {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-LastUpdatedUserID {
+    width: 120px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .col-LastUpdatedDate {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid-local .flex-column {
+    width: auto; /* allow flex growth */
+    flex: 1; /* take remaining space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* adds ... if too long */
+}
+/* #endregion */

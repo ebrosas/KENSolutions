@@ -545,6 +545,74 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<List<LeaveRequestResult>>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Get leave entitlement details
+        /// </summary>
+        /// <param name="entitlementId"></param>
+        /// <param name="empNo"></param>
+        /// <param name="costCenter"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        public async Task<Result<List<LeaveEntitlementResult>>> GetLeaveEntitlementAsync(
+            int? entitlementId,
+            int? empNo,
+            string? costCenter,
+            DateTime? startDate,
+            DateTime? endDate)
+        {
+            List<LeaveEntitlementResult> leaveEntitlementList = new();
+            try
+            {
+                var model = await _db.Set<LeaveEntitlementResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetLeaveEntitlement @entitlementId = {0}, @empNo = {1}, @costCenter = {2}, @startDate = {3}, @endDate = {4}",
+                    entitlementId!,
+                    empNo!,
+                    costCenter!,
+                    startDate!,
+                    endDate!)
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    leaveEntitlementList = model.Select(e => new LeaveEntitlementResult
+                    {
+                        LeaveEntitlementId = e.LeaveEntitlementId,
+                        EmployeeNo = e.EmployeeNo,
+                        EmployeeName = e.EmployeeName,
+                        DepartmentCode = e.DepartmentCode,
+                        DepartmentName = e.DepartmentName,
+                        EffectiveDate = e.EffectiveDate,
+                        ALEntitlementCount = e.ALEntitlementCount,
+                        SLEntitlementCount = e.SLEntitlementCount,
+                        ALRenewalType = e.ALRenewalType,
+                        ALRenewalTypeDesc = e.ALRenewalTypeDesc,
+                        SLRenewalType = e.SLRenewalType,
+                        SLRenewalTypeDesc = e.SLRenewalTypeDesc,
+                        LeaveUOM = e.LeaveUOM,
+                        LeaveUOMDesc = e.LeaveUOMDesc,
+                        SickLeaveUOM = e.SickLeaveUOM,
+                        SickLeaveUOMDesc = e.SickLeaveUOMDesc,
+                        LeaveBalance = e.LeaveBalance,
+                        SLBalance = e.SLBalance,
+                        DILBalance = e.DILBalance,
+                        CreatedDate = e.CreatedDate,
+                        LeaveCreatedBy = e.LeaveCreatedBy,
+                        CreatedUserID = e.CreatedUserID,
+                        LastUpdatedDate = e.LastUpdatedDate,
+                        LastUpdatedBy = e.LastUpdatedBy,
+                        LastUpdatedUserID = e.LastUpdatedUserID
+                    }).ToList();
+                }
+
+                return Result<List<LeaveEntitlementResult>>.SuccessResult(leaveEntitlementList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<LeaveEntitlementResult>>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

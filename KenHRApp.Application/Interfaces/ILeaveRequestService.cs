@@ -29,6 +29,7 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<List<EmployeeResultDTO>>> GetEmployeeAsync(int? empNo = 0, string costCenter = "");
         Task<bool> CheckIfLeaveDateIsHolidayAsync(DateTime leaveDate);
         Task<bool> CheckIfLeavePeriodExistAsync(int employeeNo, DateTime leaveDate);
+
         Task<decimal> CalculateAsync(
             int empNo,
             DateTime start,
@@ -36,6 +37,7 @@ namespace KenHRApp.Application.Interfaces
             string? startDay,
             string? endDay);
         Task<Result<LeaveRequisitionDTO?>> GetLeaveRequestAsync(long leaveRequestNo);
+
         Task<Result<List<LeaveRequestResultDTO>>> SearchLeaveRequestAsync(
             long? leaveRequestNo,
             int? empNo,
@@ -44,6 +46,14 @@ namespace KenHRApp.Application.Interfaces
             string? status,
             DateTime? startDate,
             DateTime? endDate);
+
+        Task<Result<List<LeaveEntitlementDTO>>> GetLeaveEntitlementAsync(
+            int? entitlementId,
+            int? empNo,
+            string? costCenter,
+            DateTime? startDate,
+            DateTime? endDate);
+
         #endregion
     }
 }

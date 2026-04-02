@@ -6,60 +6,36 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KenHRApp.Domain.Entities
+namespace KenHRApp.Domain.Entities.KeylessModels
 {
-    public class LeaveEntitlement
+    public class LeaveEntitlementResult
     {
         #region Properties
-        public int LeaveEntitlementId { get; set; }     // Identity column  
-
-        [Comment("Foreign key that references alternate key: Employee.EmployeeNo")]
+        public int LeaveEntitlementId { get; set; }     
         public int EmployeeNo { get; set; }
-
-        [Column(TypeName = "datetime"), Comment("Part of composite unique key index")]
+        public string EmployeeName { get; set; } = null!;
         public DateTime EffectiveDate { get; set; }
-
-        [Comment("Part of composite unique key index")]
         public double ALEntitlementCount { get; set; }
-
         public double? SLEntitlementCount { get; set; }
-
-        [Column(TypeName = "varchar(20)")]
         public string? ALRenewalType { get; set; } = null;
-
-        [Column(TypeName = "varchar(20)")]
+        public string? ALRenewalTypeDesc { get; set; } = null;
         public string? SLRenewalType { get; set; } = null;
-
-        [Column(TypeName = "varchar(20)")]
+        public string? SLRenewalTypeDesc { get; set; } = null;
         public string LeaveUOM { get; set; } = null!;
-
-        [Column(TypeName = "varchar(20)")]
+        public string LeaveUOMDesc { get; set; } = null!;
         public string? SickLeaveUOM { get; set; } = null;
-
+        public string? SickLeaveUOMDesc { get; set; } = null;
         public double? LeaveBalance { get; set; }
         public double? SLBalance { get; set; }
         public double? DILBalance { get; set; }
-
-        [Column(TypeName = "datetime")]
         public DateTime? CreatedDate { get; set; }
-
         public int? LeaveCreatedBy { get; set; }
-
-        [Column(TypeName = "varchar(50)")]
         public string? CreatedUserID { get; set; } = null;
-
-        [Column(TypeName = "datetime")]
         public DateTime? LastUpdatedDate { get; set; }
-
         public int? LastUpdatedBy { get; set; }
-
-        [Column(TypeName = "varchar(50)")]
-        public string? LastUpdatedUserID { get; set; } = null;                
-        #endregion
-
-        #region Reference Navigation to Employee           
-        // Navigation back to Employee
-        public Employee Employee { get; set; } = null!;
+        public string? LastUpdatedUserID { get; set; } = null;
+        public string? DepartmentCode { get; set; } = null;
+        public string? DepartmentName { get; set; } = null;
         #endregion
     }
 }

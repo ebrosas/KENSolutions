@@ -2426,7 +2426,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	
 		SELECT @GroupID = a.UDCGroupId 
 		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
-		WHERE RTRIM(a.UDCGCode) = 'RENEWTYPE'
+		WHERE RTRIM(a.UDCGCode) = 'LEAVEUOM'
 
 		SELECT	@UDCCode					= 'RENEWYEARLY',
 				@UDCDesc1					= 'Renewal yearly',
@@ -2441,6 +2441,38 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
 				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+	*/
+
+	/*	Populate Leave Entitlement Unit of Measure
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'LEAVEUOM'
+
+		SELECT	@UDCCode					= 'LVUOMDAY',
+				@UDCDesc1					= 'Day',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'LVUOMHOUR',
+				@UDCDesc1					= 'Hour',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'LVUOMMONTH',
+				@UDCDesc1					= 'Month',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 3,
 				@IsActive					= 1,
 				@Amount						= NULL 
 

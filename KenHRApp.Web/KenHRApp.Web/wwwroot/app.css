@@ -2157,6 +2157,146 @@ h1:focus {
 }
 /* #endregion */
 
+/* #region Leave Entitlement Grid Stylesheets  */
+.entitlement-grid .no-data-box {
+    display: flex;
+    justify-content: flex-start; /* align content to the LEFT */
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    background-color: #f8f9fa; /* light gray */
+    border: 1px solid #FBE9E7;
+    border-radius: 6px;
+    color: #856404; /* dark yellow-brown */
+    font-weight: 600;
+}
+
+.entitlement-grid .no-data-icon {
+    font-size: 20px;
+    color: #6c757d; /* muted gray */
+}
+
+.entitlement-grid .mud-table {
+    table-layout: fixed;
+    width: 100%;
+    text-align: left;
+}
+
+/* Format table header */
+.entitlement-grid .mud-table-head {
+    background-color: #BBDEFB;
+    font-weight: bold;
+    text-align: center !important;
+    font-size: 14px !important;
+    text-decoration: underline;
+    height: 20px;
+    line-height: 20px;
+}
+
+/* Format table cell */
+.entitlement-grid .mud-table-cell {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
+    font-size: 14px;
+}
+
+/* Grid Column widths */
+.entitlement-grid .col-EmployeeName {
+    width: 200px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.entitlement-grid .col-DepartmentFullName {
+    width: 200px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.entitlement-grid .col-ALEntitlementCount {
+    width: 120px !important;
+    text-align: left;
+}
+
+.entitlement-grid .col-LeaveUOMDesc {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid .col-ALRenewalTypeDesc {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid .col-SLEntitlementCount {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid .col-SickLeaveUOMDesc {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid .col-SLRenewalTypeDesc {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid .col-EffectiveDate {
+    width: 110px !important;
+    text-align: left;    
+}
+
+.entitlement-grid .col-LeaveBalance {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid .col-SLBalance {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid .col-DILBalance {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid .col-CreatedUserID {
+    width: 120px !important;
+    text-align: left;
+}
+
+.entitlement-grid .col-CreatedDate {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid .col-LastUpdatedUserID {
+    width: 120px !important;
+    text-align: left;
+}
+
+.entitlement-grid .col-LastUpdatedDate {
+    width: 100px !important;
+    text-align: left;
+}
+
+.entitlement-grid .flex-column {
+    width: auto; /* allow flex growth */
+    flex: 1; /* take remaining space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* adds ... if too long */
+}
+/* #endregion */
+
 /* #region <ToolBarContent> styling within MudDataGrid */
 .shift-grid .mud-datagrid-toolbar {
     height: 150px;

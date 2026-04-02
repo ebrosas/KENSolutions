@@ -32,6 +32,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string _searchString = string.Empty;
         private string overlayMessage = "Please wait...";
         private CancellationTokenSource? _cts;
+        private int? _empNo = null;
+        private string _selectedDepartment = string.Empty;
+        private DateTime? _selectedStartDate = null;
+        private DateTime? _selectedEndDate = null;
+        private MudDatePicker _startDatePicker;
+        private MudDatePicker _endDatePicker;
 
         #region Dialog Box Button Icons
         private readonly string _iconDelete = "fas fa-trash-alt";
@@ -69,6 +75,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private List<UserDefinedCodeDTO> _renewalList = new List<UserDefinedCodeDTO>();
         private string[]? _renewalArray = null;
+                
+        private IReadOnlyList<DepartmentDTO> _departmentList = new List<DepartmentDTO>();
+        private string[]? _departmentArray = null;
         #endregion
 
         #endregion
@@ -76,8 +85,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Enums
         private enum UDCKeys
         {
-            LEAVETYPES,     // Leave Types
-            STATUS,  // Leave Modes
+            RENEWTYPE,      // Renewal Types
+            LEAVEUOM,       // Leave Entitlement Unit of Measure
             DEPARTMENT      // Departments
         }
 
@@ -139,7 +148,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     UserEmail = State.AuthenticatedUser!.OfficialEmail;
                     UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
 
-                    //BeginLoadComboboxTask();
+                    LoadComboboxTask();
                 }
             }
         }
@@ -342,43 +351,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _hasValidationError = false;
             _validationMessages.Clear();
         }
-
-        private void BeginLoadEntitlementTask(bool forceLoad = false)
-        {
-            // Reset validation errors
-            _hasValidationError = false;
-            _validationMessages.Clear();
-
-            #region Check if date period is valid
-            //if (_selectedStartDate.HasValue && _selectedResumeDate.HasValue &&
-            //    _selectedStartDate > _selectedResumeDate)
-            //{
-            //    _hasValidationError = true;
-            //    _validationMessages.Add("Start Date cannot be greater than End Date.");
-            //}
-            #endregion
-
-            if (_hasValidationError && _validationMessages.Any())
-                return;
-
-            _isTaskFinished = false;
-            _isRunning = true;
-
-            // Set the overlay message
-            if (!State.IsAuthenticated)
-                overlayMessage = "Authentication required. Redirecting to login page...";
-            else
-                overlayMessage = "Loading leave requisitions, please wait...";
-
-            //_ = SearchLeaveRequestAsync(async () =>
-            //{
-            //    _isTaskFinished = true;
-            //    _isRunning = false;
-
-            //    // Shows the spinner overlay
-            //    await InvokeAsync(StateHasChanged);
-            //}, forceLoad);
-        }
+                
         private async Task<IEnumerable<string>> SearchEmployee(string value, CancellationToken token)
         {
             // In real life use an asynchronous function for fetching data from an api.
@@ -393,6 +366,255 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             return _employeeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
 
+        private async Task<IEnumerable<string>> SearchDepartment(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _departmentArray!;
+            }
+
+            return _departmentArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+        #endregion
+
+        #region Asynchronous Tasks
+        private void LoadComboboxTask()
+        {
+            _isTaskFinished = false;
+            _isRunning = true;
+
+            // Set the overlay message
+            if (!State.IsAuthenticated)
+                overlayMessage = "Authentication required. Redirecting to login page...";
+            else
+                overlayMessage = "Initializing form, please wait...";
+
+            _ = GetDepartmentMasterAsync(async () =>
+            {
+                _isTaskFinished = true;
+                _isRunning = false;
+
+                if (_errorMessage.Length > 0)
+                    ShowHideError(true);
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+
+                LoadLeaveEntitlementTask();
+            });
+        }
+
+        //private void BeginLoadEntitlementTask(bool forceLoad = false)
+        //{
+        //    // Reset validation errors
+        //    _hasValidationError = false;
+        //    _validationMessages.Clear();
+
+        //    #region Check if date period is valid
+        //    if (_selectedStartDate.HasValue && _selectedEndDate.HasValue &&
+        //        _selectedStartDate > _selectedEndDate)
+        //    {
+        //        _hasValidationError = true;
+        //        _validationMessages.Add("Start Date cannot be greater than End Date.");
+        //    }
+        //    #endregion
+
+        //    if (_hasValidationError && _validationMessages.Any())
+        //        return;
+
+        //    _isTaskFinished = false;
+        //    _isRunning = true;
+
+        //    // Set the overlay message
+        //    if (!State.IsAuthenticated)
+        //        overlayMessage = "Authentication required. Redirecting to login page...";
+        //    else
+        //        overlayMessage = "Loading leave requisitions, please wait...";
+
+        //    _ = GetLeaveEntitlementAsync(async () =>
+        //    {
+        //        _isTaskFinished = true;
+        //        _isRunning = false;
+
+        //        // Shows the spinner overlay
+        //        await InvokeAsync(StateHasChanged);
+        //    }, forceLoad);
+        //}
+
+        private void LoadLeaveEntitlementTask()
+        {
+            // Reset validation errors
+            _hasValidationError = false;
+            _validationMessages.Clear();
+
+            #region Check if date period is valid
+            if (_selectedStartDate.HasValue && _selectedEndDate.HasValue &&
+                _selectedStartDate > _selectedEndDate)
+            {
+                _hasValidationError = true;
+                _validationMessages.Add("Start Date cannot be greater than End Date.");
+            }
+            #endregion
+
+            if (_hasValidationError && _validationMessages.Any())
+                return;
+
+            _isTaskFinished = false;
+            _isRunning = true;
+
+            // Set the overlay message
+            if (!State.IsAuthenticated)
+                overlayMessage = "Authentication required. Redirecting to login page...";
+            else
+                overlayMessage = "Loading leave entitlements, please wait...";
+
+            _ = GetLeaveEntitlementAsync(async () =>
+            {
+                _isTaskFinished = true;
+                _isRunning = false;
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            });
+        }
+        #endregion
+
+        #region Database Methods
+        private async Task GetDepartmentMasterAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(300);
+
+            #region Get Department list
+            var deptResult = await LookupCache.GetDepartmentMasterAsync();
+            if (deptResult.Success)
+            {
+                _departmentList = deptResult.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(deptResult.Error);
+            }
+
+            if (_departmentList != null)
+            {
+                _departmentArray = _departmentList
+                    .OrderBy(d => d.DepartmentCode)
+                    .Select(d => d.DepartmentFullName).ToArray();
+            }
+            #endregion
+
+            #region Get all UDC group codes
+            List<UserDefinedCodeGroupDTO>? udcGroupList = new();
+            int groupID = 0;
+
+            var resultUDC = await EmployeeService.GetUserDefinedCodeGroupAsync();
+            if (resultUDC.Success)
+            {
+                udcGroupList = resultUDC!.Value;
+            }
+            else
+                _errorMessage.Append(resultUDC.Error);
+            #endregion
+
+            // Get UDC dataset
+            var result = await EmployeeService.GetUserDefinedCodeAllAsync();
+            if (result.Success)
+            {
+                var udcData = result.Value;
+                if (udcData!.Any() && udcGroupList!.Any())
+                {
+                    #region Get Leave Renewal Types
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.RENEWTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Renewal Type group id: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _renewalList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_renewalList != null)
+                            _renewalArray = _renewalList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Leave Unit of Measure
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.LEAVEUOM.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Leave UOM group id: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _uomList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_uomList != null)
+                            _uomArray = _uomList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task GetLeaveEntitlementAsync(Func<Task> callback)
+        {
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            #region Get the selected Department 
+            string costCenter = string.Empty;
+            if (!string.IsNullOrEmpty(_selectedDepartment))
+            {
+                DepartmentDTO? deptDTO = _departmentList.Where(d => d.DepartmentFullName == _selectedDepartment).FirstOrDefault();
+                if (deptDTO != null)
+                    costCenter = deptDTO.DepartmentCode;
+            }
+            #endregion
+
+            var repoResult = await LeaveService.GetLeaveEntitlementAsync(
+                null,
+                _empNo,
+                costCenter,
+                _selectedStartDate,
+                _selectedEndDate);
+            if (repoResult.Success)
+            {
+                _leaveEntitlementList = repoResult.Value!;
+            }
+            else
+            {
+                // Show error message
+                _errorMessage.AppendLine(repoResult.Error);
+
+                ShowHideError(true);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
         #endregion
     }
 }
