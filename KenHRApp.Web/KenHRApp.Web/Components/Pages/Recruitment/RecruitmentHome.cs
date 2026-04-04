@@ -158,7 +158,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
         //private async Task OnStartedEditingItem(MudDataGridRowEditEventArgs<RecruitmentBudgetDTO> e)
         //{
         //    var item = e.Item;
-        //    await EditBudgetAsync(item);
+        //    await EditEntitlementAsync(item);
         //    e.Cancel = true; // Prevent the DataGrid's internal edit form from appearing
         //}
 

@@ -1,13 +1,16 @@
-﻿using KenHRApp.Application.Common.Interfaces;
+﻿using Humanizer;
+using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Application.Services;
+using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Web.Components.Common.Interface;
 using KenHRApp.Web.Components.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using System.Text;
+using static MudBlazor.CategoryTypes;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
@@ -148,7 +151,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     UserEmail = State.AuthenticatedUser!.OfficialEmail;
                     UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
 
-                    LoadComboboxTask();
+                    BeginLoadComboboxTask();
                 }
             }
         }
@@ -163,19 +166,22 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (x.EmployeeNo > 0 && x.EmployeeNo.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (x.ALEntitlementCount > 0 && x.ALEntitlementCount.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
+            //if (x.ALEntitlementCount > 0 && x.ALEntitlementCount.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
 
-            if (x.SLEntitlementCount > 0 && x.SLEntitlementCount!.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
+            //if (x.SLEntitlementCount > 0 && x.SLEntitlementCount!.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
 
-            if (x.LeaveBalance > 0 && x.LeaveBalance!.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
+            //if (x.LeaveBalance > 0 && x.LeaveBalance!.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
 
-            if (x.SLBalance > 0 && x.SLBalance!.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
+            //if (x.SLBalance > 0 && x.SLBalance!.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
 
-            if (x.DILBalance > 0 && x.DILBalance.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //if (x.DILBalance > 0 && x.DILBalance.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            if (!string.IsNullOrEmpty(x.DepartmentFullName) && x.DepartmentFullName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             if (!string.IsNullOrEmpty(x.EmployeeName) && x.EmployeeName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
@@ -196,9 +202,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             return false;
         };
 
-        private void StartedEditingItem(LeaveEntitlementDTO item)
+        private async Task StartedEditingItem(LeaveEntitlementDTO item)
         {
-            _events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+            //_events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+            await EditEntitlementAsync(item);
         }
 
         private void CanceledEditingItem(LeaveEntitlementDTO item)
@@ -208,7 +215,80 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private void CommittedItemChanges(LeaveEntitlementDTO item)
         {
+            try
+            {
+                if (item == null) return;
+                                
+                #region Get the selected employee
+                if (!string.IsNullOrEmpty(item.EmployeeName))
+                {
+                    EmployeeDTO? employee = _employeeList.Where(d => d.EmployeeFullName == item.EmployeeName).FirstOrDefault();
+                    if (employee != null)
+                        item.EmployeeNo = employee.EmployeeNo;
+                }
+                #endregion
 
+                #region Get the selected Leave UOM
+                if (!string.IsNullOrEmpty(item.LeaveUOMDesc))
+                {
+                    UserDefinedCodeDTO? udc = _uomList.Where(d => d.UDCCode == item.LeaveUOMDesc).FirstOrDefault();
+                    if (udc != null)
+                        item.LeaveUOM = udc.UDCCode;
+                }
+                #endregion
+
+                #region Get the selected Leave Renewal Type
+                if (!string.IsNullOrEmpty(item.ALRenewalTypeDesc))
+                {
+                    UserDefinedCodeDTO? udc = _renewalList.Where(d => d.UDCCode == item.ALRenewalTypeDesc).FirstOrDefault();
+                    if (udc != null)
+                        item.ALRenewalType = udc.UDCCode;
+                }
+                #endregion
+
+                #region Get the selected Sick Leave UOM
+                if (!string.IsNullOrEmpty(item.SickLeaveUOMDesc))
+                {
+                    UserDefinedCodeDTO? udc = _uomList.Where(d => d.UDCCode == item.SickLeaveUOMDesc).FirstOrDefault();
+                    if (udc != null)
+                        item.SickLeaveUOM = udc.UDCCode;
+                }
+                #endregion
+
+                #region Get the selected Sick Leave Renewal Type
+                if (!string.IsNullOrEmpty(item.SLRenewalTypeDesc))
+                {
+                    UserDefinedCodeDTO? udc = _renewalList.Where(d => d.UDCCode == item.SLRenewalTypeDesc).FirstOrDefault();
+                    if (udc != null)
+                        item.SLRenewalType = udc.UDCCode;
+                }
+                #endregion
+
+                // Set the Update Date
+                //item.UpdatedAt = DateTime.Today;
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Saving changes, please wait...";
+
+                _ = SaveChangeAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+                }, item);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Save cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
         }
 
         private async Task ConfirmDelete(LeaveEntitlementDTO entitlement)
@@ -236,7 +316,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                //BeginDeleteDepartment(entitlement);
+                BeginDeleteEntitlementTask(entitlement);
             }
         }
         #endregion
@@ -382,7 +462,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Asynchronous Tasks
-        private void LoadComboboxTask()
+        private void BeginLoadComboboxTask()
         {
             _isTaskFinished = false;
             _isRunning = true;
@@ -393,7 +473,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             else
                 overlayMessage = "Initializing form, please wait...";
 
-            _ = GetDepartmentMasterAsync(async () =>
+            _ = LoadComboboxAsync(async () =>
             {
                 _isTaskFinished = true;
                 _isRunning = false;
@@ -404,48 +484,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
 
-                LoadLeaveEntitlementTask();
+                if (ForceLoad)
+                    BeginLoadEntitlementTask();
             });
         }
-
-        //private void BeginLoadEntitlementTask(bool forceLoad = false)
-        //{
-        //    // Reset validation errors
-        //    _hasValidationError = false;
-        //    _validationMessages.Clear();
-
-        //    #region Check if date period is valid
-        //    if (_selectedStartDate.HasValue && _selectedEndDate.HasValue &&
-        //        _selectedStartDate > _selectedEndDate)
-        //    {
-        //        _hasValidationError = true;
-        //        _validationMessages.Add("Start Date cannot be greater than End Date.");
-        //    }
-        //    #endregion
-
-        //    if (_hasValidationError && _validationMessages.Any())
-        //        return;
-
-        //    _isTaskFinished = false;
-        //    _isRunning = true;
-
-        //    // Set the overlay message
-        //    if (!State.IsAuthenticated)
-        //        overlayMessage = "Authentication required. Redirecting to login page...";
-        //    else
-        //        overlayMessage = "Loading leave requisitions, please wait...";
-
-        //    _ = GetLeaveEntitlementAsync(async () =>
-        //    {
-        //        _isTaskFinished = true;
-        //        _isRunning = false;
-
-        //        // Shows the spinner overlay
-        //        await InvokeAsync(StateHasChanged);
-        //    }, forceLoad);
-        //}
-
-        private void LoadLeaveEntitlementTask()
+        
+        private void BeginLoadEntitlementTask()
         {
             // Reset validation errors
             _hasValidationError = false;
@@ -481,13 +525,205 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 await InvokeAsync(StateHasChanged);
             });
         }
+
+        private void BeginDeleteEntitlementTask(LeaveEntitlementDTO dto)
+        {
+            try
+            {
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Deleting entitlement, please wait...";
+
+                _ = DeleteEntitlementAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    // Remove locally from the list so UI updates immediately
+                    _leaveEntitlementList.Remove(dto);
+
+                    StateHasChanged();
+
+                }, dto);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Delete cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task EditEntitlementAsync(LeaveEntitlementDTO entitlement)
+        {
+            try
+            {
+                // Clone the object so the dialog can edit without affecting the grid until Save
+                var editableCopy = new LeaveEntitlementDTO
+                {
+                    LeaveEntitlementId = entitlement.LeaveEntitlementId,
+                    EmployeeNo = entitlement.EmployeeNo,
+                    EmployeeName = entitlement.EmployeeName,
+                    EffectiveDate = Convert.ToDateTime(entitlement.EffectiveDate).Date,
+                    ALEntitlementCount = entitlement.ALEntitlementCount,
+                    SLEntitlementCount = entitlement.SLEntitlementCount,
+                    ALRenewalType = entitlement.ALRenewalType,
+                    SLRenewalType = entitlement.SLRenewalType,
+                    LeaveUOM = entitlement.LeaveUOM,
+                    SickLeaveUOM = entitlement.SickLeaveUOM,
+                    LeaveBalance = entitlement.LeaveBalance,
+                    SLBalance = entitlement.SLBalance,
+                    DILBalance = entitlement.DILBalance,
+                    LastUpdatedDate = entitlement.LastUpdatedDate,
+                    LastUpdatedBy = entitlement.LastUpdatedBy,
+                    LastUpdatedUserID = entitlement.LastUpdatedUserID
+                };
+
+                var parameters = new DialogParameters
+                {
+                    ["LeaveEntitlement"] = editableCopy,
+                    ["EmployeeList"] = _employeeList,
+                    ["UOMList"] = _uomList,
+                    ["RenewalList"] = _renewalList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = true
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                var dialog = await DialogService.ShowAsync<LeaveEntitlementDialog>("Edit Entitlement Details", parameters, options);
+                var result = await dialog.Result;
+
+                if (result != null && !result.Canceled)
+                {
+                    var updated = (LeaveEntitlementDTO)result.Data!;
+
+                    #region Get the selected employee
+                    if (!string.IsNullOrEmpty(updated.EmployeeName))
+                    {
+                        EmployeeDTO? employee = _employeeList.Where(d => d.EmployeeFullName == updated.EmployeeName).FirstOrDefault();
+                        if (employee != null)
+                            updated.EmployeeNo = employee.EmployeeNo;
+                    }
+                    #endregion
+
+                    #region Get the selected Leave UOM
+                    if (!string.IsNullOrEmpty(updated.LeaveUOMDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _uomList.Where(d => d.UDCCode == updated.LeaveUOMDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.LeaveUOM = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get the selected Leave Renewal Type
+                    if (!string.IsNullOrEmpty(updated.ALRenewalTypeDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _renewalList.Where(d => d.UDCCode == updated.ALRenewalTypeDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.ALRenewalType = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get the selected Sick Leave UOM
+                    if (!string.IsNullOrEmpty(updated.SickLeaveUOMDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _uomList.Where(d => d.UDCCode == updated.SickLeaveUOMDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.SickLeaveUOM = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get the selected Sick Leave Renewal Type
+                    if (!string.IsNullOrEmpty(updated.SLRenewalTypeDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _renewalList.Where(d => d.UDCCode == updated.SLRenewalTypeDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.SLRenewalType = udc.UDCCode;
+                    }
+                    #endregion
+
+                    // Update in-memory grid updated
+                    var index = _leaveEntitlementList.FindIndex(x => x.LeaveEntitlementId == updated.LeaveEntitlementId);
+                    if (index >= 0)
+                    {
+                        _leaveEntitlementList[index] = updated;
+                        await InvokeAsync(StateHasChanged);
+                    }
+
+                    #region Persist changes to DB
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Saving entitlement changes, please wait...";
+
+                    _ = SaveChangeAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, updated);
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
         #endregion
 
         #region Database Methods
-        private async Task GetDepartmentMasterAsync(Func<Task> callback)
+        private async Task LoadComboboxAsync(Func<Task> callback)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(300);
+
+            #region Get employee list
+            var repoResult = await LookupCache.GetEmployeeAsync();
+            if (repoResult.Success)
+            {
+                _employeeList = repoResult.Value!.Select(e => new EmployeeDTO
+                {
+                    EmployeeId = e.EmployeeId,
+                    EmployeeNo = e.EmployeeNo,
+                    FirstName = e.FirstName!,
+                    MiddleName = e.MiddleName,
+                    LastName = e.LastName!,
+                    HireDate = e.HireDate,
+                    DOB = e.DOB,
+                    ReportingManager = e.ReportingManager!,
+                    DepartmentCode = e.DepartmentCode!,
+                    DepartmentName = e.DepartmentName!,
+                }).ToList();
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(repoResult.Error);
+            }
+
+            if (_employeeList != null)
+            {
+                _employeeArray = _employeeList.Select(d => d.EmployeeFullName).OrderBy(d => d).ToArray();
+            }
+            #endregion
 
             #region Get Department list
             var deptResult = await LookupCache.GetDepartmentMasterAsync();
@@ -607,6 +843,122 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _errorMessage.AppendLine(repoResult.Error);
 
                 ShowHideError(true);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task SaveChangeAsync(Func<Task> callback, LeaveEntitlementDTO entitlement)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            if (entitlement.LeaveEntitlementId == 0)
+            {
+                // Set the created by and created date fields for new record
+                entitlement.CreatedDate = DateTime.Now;
+                entitlement.LeaveCreatedBy = UserEmpNo;
+                entitlement.CreatedUserID = UserID;
+
+                var addResult = await LeaveService.AddLeaveEntitlementAsync(entitlement, _cts.Token);
+                isSuccess = addResult.Success;
+                if (!isSuccess)
+                    errorMsg = addResult.Error!;
+                else
+                {
+                    // Get the new identity seed
+                    entitlement.LeaveEntitlementId = addResult.Value;
+
+                    // Add locally to the list so UI updates immediately
+                    _leaveEntitlementList.Add(entitlement);
+
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                // Set the created by and created date fields for new record
+                entitlement.LastUpdatedDate = DateTime.Now;
+                entitlement.LastUpdatedBy = UserEmpNo;
+                entitlement.LastUpdatedUserID = UserID;
+
+                var updateResult = await LeaveService.UpdateLeaveEntitlementAsync(entitlement, _cts.Token);
+                isSuccess = updateResult.Success;
+                if (!isSuccess)
+                    errorMsg = updateResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Show notification
+                ShowNotification("Leave entitlement saved successfully!", NotificationType.Success);
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(errorMsg);
+                ShowHideError(true);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task DeleteEntitlementAsync(Func<Task> callback, LeaveEntitlementDTO dto)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            if (dto.LeaveEntitlementId == 0)
+            {
+                errorMsg = "Leave Entitlement ID is not defined.";
+            }
+            else
+            {
+                var deleteResult = await LeaveService.DeleteLeaveEntitlementAsync(dto.LeaveEntitlementId, _cts.Token);
+                isSuccess = deleteResult.Success;
+                if (!isSuccess)
+                    errorMsg = deleteResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Show notification
+                ShowNotification("The selected entitlement has been deleted successfully!", NotificationType.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(errorMsg);
+                    ShowHideError(true);
+                }
             }
 
             if (callback != null)

@@ -325,6 +325,20 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             };
         }
 
+        private Color GetLegendIconColor(string legendCode)
+        {
+            return legendCode switch
+            {
+                "ALABSENT" => Color.Error,
+                "ALLEAVE" => Color.Success,
+                "ALPRESENT" => Color.Surface,
+                "ALLATE" => Color.Warning,
+                "ALSICK" => Color.Secondary,
+                "ALBUSTRIP" => Color.Tertiary,
+                _ => Color.Default
+            };
+        }
+
         private void OnPageChanged(int page)
         {
             currentPage = page;

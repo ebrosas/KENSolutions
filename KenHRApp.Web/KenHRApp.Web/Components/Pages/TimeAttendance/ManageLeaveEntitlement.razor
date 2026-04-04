@@ -108,7 +108,7 @@
                             FullWidth="false"
                             Size="Size.Small"
                             StartIcon="@Icons.Material.Filled.PersonSearch"
-                            OnClick="LoadLeaveEntitlementTask"
+                            OnClick="BeginLoadEntitlementTask"
                             Disabled="@_isRunning">
                      @if (_isRunning)
                     {
@@ -143,18 +143,13 @@
             </MudAppBar>
 
             <MudPaper Elevation="5" Square="true" Class="w-100 mb-3">
-                 <MudDataGrid T="LeaveEntitlementDTO" Items="@_leaveEntitlementList" Hover="true" Striped="true" Class="entitlement-grid"
+                 <MudDataGrid T="LeaveEntitlementDTO" Items="@_leaveEntitlementList" Hover="true" Striped="true" 
+                    Class="entitlement-grid"
                     Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                     QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
                     EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
-                    EditDialogOptions="new DialogOptions 
-                    { 
-                        MaxWidth = MaxWidth.Small, 
-                        FullWidth = true,
-                        BackdropClick = false,
-                        CloseOnEscapeKey = false
-                    }"
-                    StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
+                    StartedEditingItem="@StartedEditingItem" 
+                    CommittedItemChanges="@CommittedItemChanges"
                     TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
                     <ToolBarContent>
                          <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
@@ -182,21 +177,26 @@
                                  @* Empty to prevent rendering *@
                              </EditTemplate>
                          </PropertyColumn>
-                         <PropertyColumn Property="x => x.EmployeeName" Title="Employee Name" Class="col-EmployeeName" Required="true">
-                             <EditTemplate>
-                                 <MudAutocomplete @bind-Value="context.Item.EmployeeName"
-                                                  SearchFunc="SearchEmployee!"
-                                                  Variant="Variant.Text"
-                                                  Label="Employee Name"
-                                                  Margin="Margin.Normal"
-                                                  Dense="true"
-                                                  Placeholder="Please Select"
-                                                  HelperText="Type a key to search for employee"
-                                                  HelperTextOnFocus="true"
-                                                  Clearable="true" Typo="Typo.subtitle2"
-                                                  MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
-                                                  Modal="true" />
-                             </EditTemplate>
+                         <PropertyColumn Property="x => x.EmployeeName" Title="Department" Class="col-EmployeeName" Editable="false" StickyLeft="true">
+                             <CellTemplate Context="row">
+                                 <MudChip T="string" Size=Size.Small Color="Color.Primary" Label="true" Class="fw-bold" Style="font-size: 14px;">
+                                     @row.Item.EmployeeName
+                                </MudChip>
+                            </CellTemplate>
+                            <EditTemplate>
+                                <MudAutocomplete @bind-Value="context.Item.EmployeeName"
+                                                 SearchFunc="SearchEmployee!"
+                                                 Variant="Variant.Text"
+                                                 Label="Employee Name"
+                                                 Margin="Margin.Normal"
+                                                 Dense="true"
+                                                 Placeholder="Please Select"
+                                                 HelperText="Type a key to search for employee"
+                                                 HelperTextOnFocus="true"
+                                                 Clearable="true" Typo="Typo.subtitle2"
+                                                 MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
+                                                 Modal="true" />
+                            </EditTemplate>
                         </PropertyColumn>
                          <PropertyColumn Property="x => x.DepartmentFullName" Title="Department" Class="col-DepartmentFullName" Editable="false">
                              <CellTemplate>
@@ -302,7 +302,7 @@
                                                  Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                             </EditTemplate>
                         </PropertyColumn>
-                         <PropertyColumn Property="x => x.DILBalance" Title="Sick Leave Balance" Class="col-DILBalance">
+                         <PropertyColumn Property="x => x.DILBalance" Title="Sick Leave Balance" Class="col-DILBalance" Editable="false" hidden>
                             <EditTemplate Context="row">
                                 <MudNumericField @bind-Value="row.Item.DILBalance" Label="DIL Balance"
                                                  For="@(() => row.Item.DILBalance)"
@@ -317,13 +317,13 @@
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.CreatedDate" Title="Created Date" Class="col-CreatedDate" Editable="false">
-                                <CellTemplate Context="row">
-                                    @row.Item.CreatedDate?.ToString("dd-MMM-yyyy")
+                            <CellTemplate Context="row">
+                                @row.Item.CreatedDate?.ToString("dd-MMM-yyyy")
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.LastUpdatedUserID" Title="Last Updated By" Class="col-LastUpdatedUserID" Editable="false">
-                            <CellTemplate>
-                                @context.Item.LastUpdatedUserID
+                            <CellTemplate Context="row">
+                                @row.Item.LastUpdatedUserID
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.LastUpdatedDate" Title="Last Updated Date" Class="col-LastUpdatedDate" Editable="false">
@@ -333,17 +333,20 @@
                         </PropertyColumn>
                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                             <CellTemplate Context="row">
-                                <MudIconButton title="View and edit entitlement information"
-                                               Class="show-btn fa-icon-btn"
-                                               Style="color:#004165;"
-                                               OnClick="@row.Actions.StartEditingItemAsync">
+                                <MudIconButton title="Edit leave entitlement"
+                                    Color="Color.Info"
+                                    Icon="@Icons.Material.Rounded.Edit"
+                                    OnClick="@row.Actions.StartEditingItemAsync">
                                     <ChildContent>
-                                        <i class="fas fa-edit fa-1x"></i>
+                                        <i class="fas fa-edit fa-sm"></i>
                                     </ChildContent>
                                 </MudIconButton>
-                                <MudIconButton Color="Color.Error" title="Delete department record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
+                                <MudIconButton Color="Color.Error" 
+                                    title="Delete leeve entitlement"
+                                    Icon="@Icons.Material.Rounded.DeleteForever"
+                                    OnClick="() => ConfirmDelete(row.Item)">
                                     <ChildContent>
-                                        <i class="fas fa-trash-alt fa-1x"></i>
+                                        <i class="fas fa-trash-alt fa-sm"></i>
                                     </ChildContent>
                                 </MudIconButton>
                             </CellTemplate>

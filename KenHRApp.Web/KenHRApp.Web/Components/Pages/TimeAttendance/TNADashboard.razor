@@ -124,13 +124,26 @@
                                 {
                                     <MudChip
                                         Icon="@Icons.Material.Filled.Circle"
-                                        Style="@($"background-color:{GetLegendColor(legend.UDCCode)}; color:white")"
-                                        Size="Size.Small"
+                                        Class="opacity-50"
+                                        Style="@($"background-color:{GetLegendColor(legend.UDCCode)}; color:white;")"
+                                        Size="Size.Small"  
                                         Variant="Variant.Text">
                                         @legend.UDCDesc1
                                     </MudChip>
                                 }
                             </MudChipSet>
+                            @* <MudChipSet T="string" Class="mt-0" ReadOnly="true" Size="Size.Small">
+                                @foreach (var legend in _attendanceLegends)
+                                {
+                                    <MudChip
+                                        Icon="@Icons.Material.Filled.Circle"
+                                        IconColor="@GetLegendIconColor(legend.UDCCode)"
+                                        Size="Size.Small"
+                                        Variant="Variant.Text">
+                                        @legend.UDCDesc1
+                                    </MudChip>
+                                }
+                            </MudChipSet> *@
                         </MudStack>                    
                     </MudStack>                           
                     <MudPaper Elevation="0">
@@ -254,9 +267,9 @@
                                     </MudPaper>
                                 </MudStack>
                                 <MudStack Justify="Justify.Center" Spacing="2">
-                                    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" DropShadow="true" OnClick="GoToLeaveRequest">Apply Leave</MudButton>
-                                    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" DropShadow="true" OnClick="OpenLeaveRequest">Regularize</MudButton>
-                                    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" DropShadow="true">Outdoor</MudButton>
+                                    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" DropShadow="true" Style="background-color:#004165;" OnClick="GoToLeaveRequest">Apply Leave</MudButton>
+                                    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" DropShadow="true" Style="background-color:#004165;" OnClick="OpenLeaveRequest">Regularize</MudButton>
+                                    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" DropShadow="true" Style="background-color:#004165;">Outdoor</MudButton>
                                 </MudStack>
                             </MudStack>
                         </MudPaper>
@@ -317,7 +330,8 @@
                                             }
                                         </MudChipSet>
                                     </MudStack>
-                                <MudButton Variant="Variant.Filled" title="Enabled only if selected date is today" 
+                                <MudButton Variant="Variant.Filled" title="Enabled only if selected date is today"
+                                           Style="background-color:#004165;"
                                     Disabled="@(_btnProcessing || (_selectedDate!.Value.Date != DateTime.Today))"
                                     EndIcon="@(!_isPunchedIn ? "fas fa-angle-double-down" : "fas fa-angle-double-up")"
                                     FullWidth="true" Color="Color.Info"

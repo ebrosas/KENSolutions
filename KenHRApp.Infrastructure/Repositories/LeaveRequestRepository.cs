@@ -613,6 +613,127 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<List<LeaveEntitlementResult>>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Add new leave entitlement
+        /// </summary>
+        /// <param name="entitlement"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public async Task<Result<int>> AddLeaveEntitlementAsync(LeaveEntitlement entitlement, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                if (entitlement == null)
+                    throw new ArgumentNullException(nameof(entitlement));
+
+                // Save to database
+                await _db.LeaveEntitlements.AddAsync(entitlement);
+                await _db.SaveChangesAsync(cancellationToken);
+
+                // ✅ EF Core automatically populates identity after SaveChanges
+                int generatedId = entitlement.LeaveEntitlementId;
+
+                return Result<int>.SuccessResult(generatedId);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Update leave entitlement
+        /// </summary>
+        /// <param name="entitlement"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public async Task<Result<int>> UpdateLeaveEntitlementAsync(LeaveEntitlement entitlement, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (entitlement == null)
+                    throw new ArgumentNullException(nameof(entitlement));
+
+                var existing = await _db.LeaveEntitlements
+                    .FirstOrDefaultAsync(e =>
+                        e.LeaveEntitlementId == entitlement.LeaveEntitlementId,
+                        cancellationToken);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        $"Could not find leave entitlement record for employee '{entitlement.Employee}'.");
+
+                #region Update leave request information
+                existing.LeaveUOM = entitlement.LeaveUOM;
+                existing.DILBalance = entitlement.DILBalance;
+                existing.LeaveBalance = entitlement.LeaveBalance;
+                existing.ALEntitlementCount = entitlement.ALEntitlementCount;
+                existing.ALRenewalType = entitlement.ALRenewalType;
+                existing.SLBalance = entitlement.SLBalance;
+                existing.SLEntitlementCount = entitlement.SLEntitlementCount;
+                existing.SLRenewalType = entitlement.SLRenewalType;
+                existing.SickLeaveUOM = entitlement.SickLeaveUOM;
+                existing.EffectiveDate = entitlement.EffectiveDate;
+                existing.LastUpdatedBy = entitlement.LastUpdatedBy;
+                existing.LastUpdatedUserID = entitlement.LastUpdatedUserID;
+                existing.LastUpdatedDate = entitlement.LastUpdatedDate;
+                #endregion
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<bool>> DeleteLeaveEntitlementAsync(int entitlementID, CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var recordToDelete = await _db.LeaveEntitlements.FindAsync(entitlementID);
+                if (recordToDelete == null)
+                    throw new Exception("Unable to delete because no matching record was found in the database.");
+
+                _db.LeaveEntitlements.Remove(recordToDelete);
+
+                int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
+                if (rowsDeleted > 0)
+                    isSuccess = true;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

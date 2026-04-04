@@ -2457,8 +2457,9 @@ employee-autocomplete .mud-input-adornment .mud-icon-button {
     color: yellow !important; /* or use a theme variable */
     font-weight: 500; /* optional */
 }
-/**/
+/* #endregion*/
 
+/*#region Login Stylesheet */
 .login-wrapper {
     min-height: 100vh;
     display: flex;
@@ -2479,5 +2480,14 @@ employee-autocomplete .mud-input-adornment .mud-icon-button {
 .mud-theme-dark .login-background {
     background-image: linear-gradient(rgba(18, 18, 18, 0.92), rgba(18, 18, 18, 0.92)), url('/images/hr-background.jpg');
 }
+/* #endregion*/
+
+/* #region Miscelenous Stylesheets */
+.ken-button {
+    background-color:#004165;
+}
+/* #endrgion*/
+
+
 
 

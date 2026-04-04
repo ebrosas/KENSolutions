@@ -630,6 +630,111 @@ namespace KenHRApp.Application.Services
                 return Result<List<LeaveEntitlementDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the leave entitlement records from the database.");
             }
         }
+
+        public async Task<Result<int>> AddLeaveEntitlementAsync(LeaveEntitlementDTO dto, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Initialize entity
+                LeaveEntitlement entitlement = new LeaveEntitlement()
+                {
+                    EmployeeNo = dto.EmployeeNo,
+                    EffectiveDate = Convert.ToDateTime(dto.EffectiveDate).Date,
+                    ALEntitlementCount = dto.ALEntitlementCount,
+                    SLEntitlementCount = dto.SLEntitlementCount,
+                    ALRenewalType = dto.ALRenewalType,
+                    SLRenewalType = dto.SLRenewalType,
+                    LeaveUOM = dto.LeaveUOM,
+                    SickLeaveUOM = dto.SickLeaveUOM,
+                    LeaveBalance = dto.LeaveBalance,
+                    SLBalance = dto.SLBalance,
+                    DILBalance = dto.DILBalance,
+                    CreatedDate = dto.CreatedDate,
+                    LeaveCreatedBy = dto.LeaveCreatedBy,
+                    CreatedUserID = dto.CreatedUserID
+                };
+                #endregion
+
+                var result = await _repository.AddLeaveEntitlementAsync(entitlement, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to commit data changes to the database. Please try saving again.");
+                }
+
+                return Result<int>.SuccessResult(result.Value);
+
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<int>> UpdateLeaveEntitlementAsync(LeaveEntitlementDTO dto, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Initialize entity
+                LeaveEntitlement entitlement = new LeaveEntitlement()
+                {
+                    LeaveEntitlementId = dto.LeaveEntitlementId,
+                    EmployeeNo = dto.EmployeeNo,
+                    EffectiveDate = Convert.ToDateTime(dto.EffectiveDate).Date,
+                    ALEntitlementCount = dto.ALEntitlementCount,
+                    SLEntitlementCount = dto.SLEntitlementCount,
+                    ALRenewalType = dto.ALRenewalType,
+                    SLRenewalType = dto.SLRenewalType,
+                    LeaveUOM = dto.LeaveUOM,
+                    SickLeaveUOM = dto.SickLeaveUOM,
+                    LeaveBalance = dto.LeaveBalance,
+                    SLBalance = dto.SLBalance,
+                    DILBalance = dto.DILBalance,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedUserID = dto.LastUpdatedUserID
+                };
+                #endregion
+
+                var result = await _repository.UpdateLeaveEntitlementAsync(entitlement, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to commit data changes to the database. Please try saving again.");
+                }
+
+                return Result<int>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<bool>> DeleteLeaveEntitlementAsync(int entitlementID, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _repository.DeleteLeaveEntitlementAsync(entitlementID, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to delete the selected leave entitlement due to unknown error. Please refresh the page then try to delete again.");
+                }
+
+                return Result<bool>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString());
+            }
+        }
         #endregion
     }
 }

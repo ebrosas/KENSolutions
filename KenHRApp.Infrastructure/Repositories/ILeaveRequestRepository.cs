@@ -40,7 +40,10 @@ namespace KenHRApp.Infrastructure.Repositories
             string? costCenter,
             DateTime? startDate,
             DateTime? endDate);
-        
+
+        Task<Result<int>> AddLeaveEntitlementAsync(LeaveEntitlement entitlement, CancellationToken cancellationToken = default);
+        Task<Result<int>> UpdateLeaveEntitlementAsync(LeaveEntitlement entitlement, CancellationToken cancellationToken = default);
+        Task<Result<bool>> DeleteLeaveEntitlementAsync(int entitlementID, CancellationToken cancellationToken = default);
         #endregion
     }
 }

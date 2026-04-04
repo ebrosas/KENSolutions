@@ -300,7 +300,7 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
 
         private async Task StartedEditingItem(RecruitmentRequestDTO item)
         {
-            //await EditBudgetAsync(item);
+            //await EditEntitlementAsync(item);
         }
 
         private void CommittedItemChanges(RecruitmentRequestDTO item)

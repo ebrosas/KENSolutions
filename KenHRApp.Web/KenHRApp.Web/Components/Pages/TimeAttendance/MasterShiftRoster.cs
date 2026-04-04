@@ -305,18 +305,18 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         //private async Task OnStartedEditingItem(MudDataGridRowEditEventArgs<RecruitmentBudgetDTO> e)
         //{
         //    var item = e.Item;
-        //    await EditBudgetAsync(item);
+        //    await EditEntitlementAsync(item);
         //    e.Cancel = true; // Prevent the DataGrid's internal edit form from appearing
         //}
 
         private async Task StartedEditingShiftTimingItem(ShiftTimingDTO item)
         {
-            //await EditBudgetAsync(item);
+            //await EditEntitlementAsync(item);
         }
 
         private async Task StartedEditingShiftPointerItem(ShiftPointerDTO item)
         {
-            //await EditBudgetAsync(item);
+            //await EditEntitlementAsync(item);
         }
 
         private void CommittedShiftTimingItemChanges(ShiftTimingDTO item)

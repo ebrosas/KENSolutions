@@ -1,0 +1,253 @@
+﻿@using KenHRApp.Web.Components.Common
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@DialogIcon" Class="mr-1 mb-n1" Size="Size.Medium" Color="@DialogIconColor" />
+            @DialogTitle
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudGrid Spacing="5">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudAutocomplete @bind-Value="LeaveEntitlement.EmployeeName"
+                            SearchFunc="SearchEmployee!"
+                            Variant="Variant.Text"
+                            Label="Employee Name"
+                            Margin="Margin.Normal"
+                            Dense="true"
+                            Placeholder="Please Select"
+                            Disabled="@IsDisabled"
+                            HelperText="Type a key to search for employee"
+                            HelperTextOnFocus="true"
+                            Clearable="true" Typo="Typo.subtitle2"
+                            MaxItems="@(EmployeeList != null ? EmployeeList.Count : 10)"
+                            Required RequiredError="Employee Name is required"
+                            Modal="true" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudDatePicker Label="Effective Date" Editable="true" AutoClose="true"
+                                        @bind-Date="LeaveEntitlement.EffectiveDate"
+                                        For="@(() => LeaveEntitlement.EffectiveDate)"
+                                        Margin="Margin.Dense"
+                                        HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true"
+                                        Clearable="false" 
+                                        Color="Color.Surface"
+                                        Disabled="@IsDisabled"
+                                        Required="true" RequiredError="Effective Date is required"
+                                        Mask="@(new DateMask("dd/MM/yyyy"))"
+                                        DateFormat="dd/MM/yyyy"
+                                        Placeholder="dd/MM/yyyy"
+                                        Variant="Variant.Text">
+                             <PickerActions Context="dateContext">
+                                 <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => LeaveEntitlement.EffectiveDate = DateTime.Today))">Today</MudButton>
+                                 <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => LeaveEntitlement.EffectiveDate = null))">Clear</MudButton>
+                             </PickerActions>
+                         </MudDatePicker>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+            <MudGrid Spacing="5">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudNumericField Label="Leave Entitlement"
+                            @bind-Value="LeaveEntitlement.ALEntitlementCount"
+                            For="@(() => LeaveEntitlement.ALEntitlementCount)"
+                            Variant="Variant.Text"
+                            HelperText="Enter leave entitlement" HelperTextOnFocus="true" MaxLength="3" Min="0" Max="100"
+                            Required RequiredError="Leave Entitlement is required"
+                            Clearable="false" Disabled="@IsDisabled"
+                            Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudSelect @bind-Value="LeaveEntitlement.LeaveUOM"
+                            Variant="Variant.Text" Margin="Margin.Dense" Label="Leave UOM"
+                            Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                            HelperText="Select unit of measure" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
+                             @foreach (var unit in UOMList)
+                            {
+                                <MudSelectItem Value="unit.UDCCode">@unit.UDCDesc1</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+            <MudGrid Spacing="5">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudNumericField Label="Sick Leave Entitlement"
+                            @bind-Value="LeaveEntitlement.SLEntitlementCount"
+                            For="@(() => LeaveEntitlement.SLEntitlementCount)"
+                            Variant="Variant.Text"
+                            HelperText="Enter sick leave entitlement" HelperTextOnFocus="true" MaxLength="3" Min="0" Max="100"
+                            Clearable="false" Disabled="@IsDisabled"
+                            Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                     </MudPaper>
+                 </MudItem>
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100">
+                         <MudSelect @bind-Value="LeaveEntitlement.SickLeaveUOM"
+                                    Variant="Variant.Text" Margin="Margin.Dense" Label="Leave UOM"
+                                    Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                    HelperText="Select unit of measure" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
+                             @foreach (var unit in UOMList)
+                            {
+                                <MudSelectItem Value="unit.UDCCode">@unit.UDCDesc1</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+            <MudGrid Spacing="5">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudNumericField Label="Leave Balance"
+                                         @bind-Value="LeaveEntitlement.LeaveBalance"
+                                         For="@(() => LeaveEntitlement.LeaveBalance)"
+                                         Variant="Variant.Text"
+                                         HelperText="Enter leave balance" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                         Clearable="false" Disabled="@IsDisabled"
+                                         Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>
+                </MudItem>
+                 <MudItem xs="6">
+                     <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudNumericField Label="Sick Leave Balance"
+                                         @bind-Value="LeaveEntitlement.SLBalance"
+                                         For="@(() => LeaveEntitlement.SLBalance)"
+                                         Variant="Variant.Text"
+                                         HelperText="Enter sick leave balance" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                         Clearable="false" Disabled="@IsDisabled"
+                                         Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                     </MudPaper>
+                 </MudItem>
+            </MudGrid>
+            <MudGrid Spacing="5">
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudSelect @bind-Value="LeaveEntitlement.ALRenewalType" Variant="Variant.Text" Margin="Margin.Dense" Label="Renewal Type"
+                                   Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                   HelperText="Select leave renewal type" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
+                            @foreach (var renewal in RenewalList)
+                            {
+                                <MudSelectItem Value="renewal.UDCCode">@renewal.UDCDesc1</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudSelect @bind-Value="LeaveEntitlement.SLRenewalType" Variant="Variant.Text" Margin="Margin.Dense" Label="Renewal Type"
+                                   Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
+                                   HelperText="Select SL renewal type" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
+                            @foreach (var renewal in RenewalList)
+                            {
+                                <MudSelectItem Value="renewal.UDCCode">@renewal.UDCDesc1</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+
+    <DialogActions>         
+         <MudButton Color="Color.Default" Variant="Variant.Text" Size="Size.Medium" OnClick="Cancel">Cancel</MudButton>
+         <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+ @code {
+    #region Fields
+    private MudForm _form = new();
+    private string[]? _employeeArray = null;
+    private string[]? _uomArray = null;
+    private string[]? _renewalArray = null;
+    #endregion
+
+    #region Parameters and Injections
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    // [Parameter]
+    // public string DialogTitle { get; set; } = "Confirmation";
+
+    // [Parameter]
+    // public string DialogIcon { get; set; } = "fas fa-trash-alt";
+
+    // [Parameter]
+    // public Color DialogIconColor { get; set; } = Color.Error;
+
+    [Parameter]
+    public LeaveEntitlementDTO LeaveEntitlement { get; set; } = new();
+
+    [Parameter]
+    public IReadOnlyList<EmployeeDTO> EmployeeList { get; set; } = new List<EmployeeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> UOMList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> RenewalList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public bool IsClearable { get; set; } = true;
+
+    [Parameter]
+    public bool IsDisabled { get; set; } = true;
+
+    [Parameter] 
+    public bool IsEditMode { get; set; }
+
+    // Optional UI helpers
+    protected string DialogTitle => IsEditMode ? "Edit Entitlement Details" : "Add New Entitlement";
+    protected string DialogIcon => IsEditMode ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add;
+    protected Color DialogIconColor => IsEditMode ? Color.Info : Color.Success;
+    #endregion
+
+    #region Page Methods
+    protected override void OnInitialized()
+    {
+        if (EmployeeList != null)
+            _employeeArray = EmployeeList.Select(d => d.EmployeeFullName).OrderBy(d => d).ToArray();
+
+        if (UOMList != null)
+            _uomArray = UOMList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (RenewalList != null)
+            _renewalArray = RenewalList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+    }
+    #endregion
+
+    #region Private Methods
+    private async Task Save()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        MudDialog.Close(DialogResult.Ok(LeaveEntitlement));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task<IEnumerable<string>> SearchEmployee(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _employeeArray!;
+        }
+
+        return _employeeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    #endregion
+}

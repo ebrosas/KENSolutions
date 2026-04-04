@@ -1665,7 +1665,7 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 var department = await _db.DepartmentMasters.FindAsync(departmentID);
                 if (department == null)
-                    throw new Exception("Could not perform deletion because department employee record is not found in the database.");
+                    throw new Exception("Could not perform deletion because department record is not found in the database.");
 
                 _db.DepartmentMasters.Remove(department);
 

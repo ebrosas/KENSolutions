@@ -271,7 +271,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private async Task StartedEditingGridItem(EmployeeRosterDTO item)
         {
-            //await EditBudgetAsync(item);
+            //await EditEntitlementAsync(item);
         }
 
         private void CommittedGridItemChanges(EmployeeRosterDTO item)

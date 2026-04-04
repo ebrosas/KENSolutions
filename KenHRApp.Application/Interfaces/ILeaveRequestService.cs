@@ -54,6 +54,9 @@ namespace KenHRApp.Application.Interfaces
             DateTime? startDate,
             DateTime? endDate);
 
+        Task<Result<int>> AddLeaveEntitlementAsync(LeaveEntitlementDTO dto, CancellationToken cancellationToken = default);
+        Task<Result<int>> UpdateLeaveEntitlementAsync(LeaveEntitlementDTO dto, CancellationToken cancellationToken = default);
+        Task<Result<bool>> DeleteLeaveEntitlementAsync(int entitlementID, CancellationToken cancellationToken = default);
         #endregion
     }
 }
