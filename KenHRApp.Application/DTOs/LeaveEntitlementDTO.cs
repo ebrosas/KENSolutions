@@ -1,4 +1,5 @@
-﻿using KenHRApp.Domain.Entities;
+﻿using KenHRApp.Application.Common.Validations;
+using KenHRApp.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,8 @@ namespace KenHRApp.Application.DTOs
 
         [Required(ErrorMessage = "Leave Entitlement is required")]
         [Display(Name = "Leave Entitlement")]
-        public double ALEntitlementCount { get; set; }
+        [CheckIfZeroValidation] // ✅ custom validation
+        public double? ALEntitlementCount { get; set; }
 
         [Display(Name = "Sick Leave Entitlement")]
         public double? SLEntitlementCount { get; set; }

@@ -5,6 +5,8 @@
 	FROM [kenuser].[LeaveEntitlement] a WITH (NOLOCK)
 		INNER JOIN kenuser.Employee b WITH (NOLOCK)  ON a.EmployeeNo = b.EmployeeNo
 
+	SELECT a.EmployeeNo, * FROM kenuser.Employee a WITH (NOLOCK)
+
 	--Leave Renewal Types
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)

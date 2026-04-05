@@ -36,6 +36,7 @@
                                         Margin="Margin.Dense"
                                         HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true"
                                         Clearable="false" 
+                                        MinDate="@DateTime.Today"
                                         Color="Color.Surface"
                                         Disabled="@IsDisabled"
                                         Required="true" RequiredError="Effective Date is required"
@@ -131,6 +132,17 @@
             <MudGrid Spacing="5">
                 <MudItem xs="6">
                     <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudNumericField Label="DIL Balance"
+                                         @bind-Value="LeaveEntitlement.DILBalance"
+                                         For="@(() => LeaveEntitlement.DILBalance)"
+                                         Variant="Variant.Text"
+                                         HelperText="Enter sick leave balance" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                         Clearable="false" Disabled="@IsDisabled"
+                                         Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudPaper>                    
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="0" Class="p-0 w-100">
                         <MudSelect @bind-Value="LeaveEntitlement.ALRenewalType" Variant="Variant.Text" Margin="Margin.Dense" Label="Renewal Type"
                                    Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
                                    HelperText="Select leave renewal type" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
@@ -140,9 +152,7 @@
                             }
                         </MudSelect>
                     </MudPaper>
-                </MudItem>
-                <MudItem xs="6">
-                    <MudPaper Elevation="0" Class="p-0 w-100">
+                    @* <MudPaper Elevation="0" Class="p-0 w-100">
                         <MudSelect @bind-Value="LeaveEntitlement.SLRenewalType" Variant="Variant.Text" Margin="Margin.Dense" Label="Renewal Type"
                                    Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.ArrowDropDown" AdornmentColor="Color.Default"
                                    HelperText="Select SL renewal type" HelperTextOnFocus="true" Clearable="false" Immediate="true" Typo="Typo.subtitle2">
@@ -151,7 +161,7 @@
                                 <MudSelectItem Value="renewal.UDCCode">@renewal.UDCDesc1</MudSelectItem>
                             }
                         </MudSelect>
-                    </MudPaper>
+                    </MudPaper> *@
                 </MudItem>
             </MudGrid>
         </MudForm>

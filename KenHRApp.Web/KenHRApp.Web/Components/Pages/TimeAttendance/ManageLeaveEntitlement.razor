@@ -137,8 +137,8 @@
                 <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LEAVE ENTITLEMENT LIST</MudText>
                 <MudSpacer />
                 <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply New Entitlement" />
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply New Entitlement" OnClick="AddEntitlementAsync" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" hidden />
                  </MudMenu>
             </MudAppBar>
 
@@ -146,10 +146,7 @@
                  <MudDataGrid T="LeaveEntitlementDTO" Items="@_leaveEntitlementList" Hover="true" Striped="true" 
                     Class="entitlement-grid"
                     Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
-                    QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
-                    EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
-                    StartedEditingItem="@StartedEditingItem" 
-                    CommittedItemChanges="@CommittedItemChanges"
+                    QuickFilter="@_quickFilter" Hideable="true" PageSize="5" ReadOnly="true"
                     TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
                     <ToolBarContent>
                          <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
@@ -162,7 +159,7 @@
                          <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
                              <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
                              <MudPaper Class="ms-3" Elevation="0">
-                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new leave entitlement" />
+                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new entitlement" OnClick="AddEntitlementAsync" />
                              </MudPaper>
                          </MudPaper>
                     </ToolBarContent>
@@ -172,14 +169,14 @@
                                  @* Empty to prevent rendering *@
                              </EditTemplate>
                          </PropertyColumn>
-                         <PropertyColumn Property="x => x.EmployeeNo" Hidden Required="false">
+                         <PropertyColumn Property="x => x.EmployeeNo" Hidden Editable="false">
                              <EditTemplate>
                                  @* Empty to prevent rendering *@
                              </EditTemplate>
                          </PropertyColumn>
                          <PropertyColumn Property="x => x.EmployeeName" Title="Department" Class="col-EmployeeName" Editable="false" StickyLeft="true">
                              <CellTemplate Context="row">
-                                 <MudChip T="string" Size=Size.Small Color="Color.Primary" Label="true" Class="fw-bold" Style="font-size: 14px;">
+                                 <MudChip T="string" Size=Size.Small Color="Color.Info" Label="true" Class="fw-bold" Style="font-size: 14px;">
                                      @row.Item.EmployeeName
                                 </MudChip>
                             </CellTemplate>
@@ -336,7 +333,7 @@
                                 <MudIconButton title="Edit leave entitlement"
                                     Color="Color.Info"
                                     Icon="@Icons.Material.Rounded.Edit"
-                                    OnClick="@row.Actions.StartEditingItemAsync">
+                                    OnClick="() => EditEntitlementAsync(row.Item)">
                                     <ChildContent>
                                         <i class="fas fa-edit fa-sm"></i>
                                     </ChildContent>

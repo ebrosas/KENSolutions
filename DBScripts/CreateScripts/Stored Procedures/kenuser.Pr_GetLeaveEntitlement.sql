@@ -35,7 +35,7 @@ BEGIN
 
 	SELECT	a.LeaveEntitlementId,
 			a.EmployeeNo,
-			RTRIM(b.FirstName) + ' ' + RTRIM(b.MiddleName) + ' ' + RTRIM(b.LastName) AS EmployeeName,
+			RTRIM(ISNULL(b.FirstName, '')) + ' ' + RTRIM(ISNULL(b.MiddleName, '')) + ' ' + RTRIM(ISNULL(b.LastName, '')) AS EmployeeName,
 			b.DepartmentCode,
 			c.DepartmentName,
 			a.EffectiveDate,

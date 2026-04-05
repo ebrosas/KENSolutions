@@ -2221,71 +2221,99 @@ h1:focus {
 .entitlement-grid .col-ALEntitlementCount {
     width: 120px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-LeaveUOMDesc {
     width: 100px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-ALRenewalTypeDesc {
     width: 100px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-SLEntitlementCount {
     width: 100px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-SickLeaveUOMDesc {
     width: 100px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-SLRenewalTypeDesc {
     width: 100px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-EffectiveDate {
     width: 110px !important;
-    text-align: left;    
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-LeaveBalance {
     width: 100px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-SLBalance {
     width: 100px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-DILBalance {
     width: 100px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-CreatedUserID {
     width: 120px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-CreatedDate {
     width: 100px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-LastUpdatedUserID {
     width: 120px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-LastUpdatedDate {
     width: 100px !important;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .entitlement-grid .flex-column {

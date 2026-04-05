@@ -640,7 +640,7 @@ namespace KenHRApp.Application.Services
                 {
                     EmployeeNo = dto.EmployeeNo,
                     EffectiveDate = Convert.ToDateTime(dto.EffectiveDate).Date,
-                    ALEntitlementCount = dto.ALEntitlementCount,
+                    ALEntitlementCount = Convert.ToDouble(dto.ALEntitlementCount),
                     SLEntitlementCount = dto.SLEntitlementCount,
                     ALRenewalType = dto.ALRenewalType,
                     SLRenewalType = dto.SLRenewalType,
@@ -683,7 +683,7 @@ namespace KenHRApp.Application.Services
                     LeaveEntitlementId = dto.LeaveEntitlementId,
                     EmployeeNo = dto.EmployeeNo,
                     EffectiveDate = Convert.ToDateTime(dto.EffectiveDate).Date,
-                    ALEntitlementCount = dto.ALEntitlementCount,
+                    ALEntitlementCount = Convert.ToDouble(dto.ALEntitlementCount),
                     SLEntitlementCount = dto.SLEntitlementCount,
                     ALRenewalType = dto.ALRenewalType,
                     SLRenewalType = dto.SLRenewalType,

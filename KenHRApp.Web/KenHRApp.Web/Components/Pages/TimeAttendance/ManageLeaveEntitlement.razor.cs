@@ -3,6 +3,7 @@ using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Application.Services;
+using KenHRApp.Domain.Entities;
 using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Web.Components.Common.Interface;
 using KenHRApp.Web.Components.Shared;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static MudBlazor.CategoryTypes;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
@@ -534,7 +536,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _isRunning = true;
 
                 // Set the overlay message
-                overlayMessage = "Deleting entitlement, please wait...";
+                overlayMessage = "Deleting leave entitlement, please wait...";
 
                 _ = DeleteEntitlementAsync(async () =>
                 {
@@ -678,8 +680,125 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                         // Shows the spinner overlay
                         await InvokeAsync(StateHasChanged);
+
+                        // Reload data in the grid
+                        BeginLoadEntitlementTask();
+
                     }, updated);
                     #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task AddEntitlementAsync()
+        {
+            try
+            {
+                var parameters = new DialogParameters
+                {
+                    ["LeaveEntitlement"] = new LeaveEntitlementDTO(),
+                    ["EmployeeList"] = _employeeList,
+                    ["UOMList"] = _uomList,
+                    ["RenewalList"] = _renewalList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = false
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                // Show the dialog box
+                var dialog = await DialogService.ShowAsync<LeaveEntitlementDialog>("Add Leave Entitlement", parameters, options);
+                var result = await dialog.Result;
+
+                if (result != null && !result.Canceled)
+                {
+                    var newEntitlement = (LeaveEntitlementDTO)result.Data!;
+                    newEntitlement.LeaveEntitlementId = 0;
+
+                    #region Get the selected employee
+                    if (!string.IsNullOrEmpty(newEntitlement.EmployeeName))
+                    {
+                        EmployeeDTO? employee = _employeeList.Where(d => d.EmployeeFullName == newEntitlement.EmployeeName).FirstOrDefault();
+                        if (employee != null)
+                            newEntitlement.EmployeeNo = employee.EmployeeNo;
+                    }
+                    #endregion
+
+                    #region Get the selected Leave UOM
+                    if (!string.IsNullOrEmpty(newEntitlement.LeaveUOMDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _uomList.Where(d => d.UDCCode == newEntitlement.LeaveUOMDesc).FirstOrDefault();
+                        if (udc != null)
+                            newEntitlement.LeaveUOM = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get the selected Leave Renewal Type
+                    if (!string.IsNullOrEmpty(newEntitlement.ALRenewalTypeDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _renewalList.Where(d => d.UDCCode == newEntitlement.ALRenewalTypeDesc).FirstOrDefault();
+                        if (udc != null)
+                            newEntitlement.ALRenewalType = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get the selected Sick Leave UOM
+                    if (!string.IsNullOrEmpty(newEntitlement.SickLeaveUOMDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _uomList.Where(d => d.UDCCode == newEntitlement.SickLeaveUOMDesc).FirstOrDefault();
+                        if (udc != null)
+                            newEntitlement.SickLeaveUOM = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get the selected Sick Leave Renewal Type
+                    if (!string.IsNullOrEmpty(newEntitlement.SLRenewalTypeDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _renewalList.Where(d => d.UDCCode == newEntitlement.SLRenewalTypeDesc).FirstOrDefault();
+                        if (udc != null)
+                            newEntitlement.SLRenewalType = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Check for duplicate entries
+                    var duplicateRecord = _leaveEntitlementList.FirstOrDefault(e => e.EmployeeNo == newEntitlement.EmployeeNo && e.EffectiveDate == newEntitlement.EffectiveDate);
+                    if (duplicateRecord != null)
+                    {
+                        // Show error
+                        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified eand effective date already exists. Please enter a different value in these fields then try to save again.");
+                        return;
+                    }
+                    #endregion
+
+                    // Set the Update Date
+                    newEntitlement.CreatedDate = DateTime.Now;
+
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Adding leave entitlement, please wait...";
+
+                    _ = SaveChangeAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+
+                    }, newEntitlement);
                 }
             }
             catch (Exception ex)
