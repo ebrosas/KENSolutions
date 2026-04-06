@@ -225,7 +225,8 @@
 
     // Optional UI helpers
     protected string DialogTitle => IsEditMode ? "Edit Entitlement Details" : "Add New Entitlement";
-    protected string DialogIcon => IsEditMode ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add;
+    // protected string DialogIcon => IsEditMode ? @Icons.Material.Filled.AddCircle : @Icons.Material.Filled.AddCircle;
+    protected string DialogIcon => IsEditMode ? "fas fa-edit fa-lg" : "fas fa-plus-circle fa-lg";
     protected Color DialogIconColor => IsEditMode ? Color.Info : Color.Success;
     #endregion
 

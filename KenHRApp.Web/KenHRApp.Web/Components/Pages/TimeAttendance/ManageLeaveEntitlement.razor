@@ -46,7 +46,7 @@
                                              HelperTextOnFocus="true"
                                              MaxLength="10"
                                              Clearable="true"
-                                             Immediate="true"
+                                             Immediate="true" 
                                              Min="0" />
                         </MudPaper>
                     </MudItem>
@@ -149,17 +149,17 @@
                     QuickFilter="@_quickFilter" Hideable="true" PageSize="5" ReadOnly="true"
                     TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
                     <ToolBarContent>
-                        <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Class="mud-width-full"
-                            Breakpoint="Breakpoint.Xs">
+                        <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Class="mud-width-full" Breakpoint="Breakpoint.None">
                              <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
-                                 <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
-                                    Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"
+                                 <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start" 
+                                    Immediate="true" Style="width:400px;" Typo="Typo.subtitle1" 
                                     AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
                                  </MudTextField>
                              </MudPaper>
-                             <MudSpacer />
                              <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
-                                 <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
+                                 <MudSwitch @bind-Value="_enableFilter" 
+                                    ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" 
+                                    ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
                                  <MudPaper Class="ms-3" Elevation="0">
                                      <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new entitlement" OnClick="AddEntitlementAsync" />
                                  </MudPaper>

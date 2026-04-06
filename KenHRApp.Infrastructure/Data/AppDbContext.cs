@@ -48,6 +48,7 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
         public DbSet<SupportTicketAttachment> SupportTicketAttachments => Set<SupportTicketAttachment>();
         public DbSet<LeaveAttachment> LeaveAttachments => Set<LeaveAttachment>();
+        public DbSet<RequestApproval> RequestApprovals => Set<RequestApproval>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -66,6 +67,7 @@ namespace KenHRApp.Infrastructure.Data
             #region Custom Entity Configurations
             //new EmployeeEntityConfig().Configure(modelBuilder.Entity<Employee>());
             new LeaveAttachmentConfig().Configure(modelBuilder.Entity<LeaveAttachment>());
+            new RequestApprovalConfig().Configure(modelBuilder.Entity<RequestApproval>());
             #endregion
 
             #region Configure keyless models that are mapped to views or stored procedures
