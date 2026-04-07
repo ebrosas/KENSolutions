@@ -2475,7 +2475,61 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@SequenceNo					= 3,
 				@IsActive					= 1,
 				@Amount						= NULL 
+	*/
 
+	/*	Populate Request Types
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'REQTYPE'
+
+		SELECT	@UDCCode					= 'RTYPELEAVE',
+				@UDCDesc1					= 'Leave Requisition',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'RTYPEOT',
+				@UDCDesc1					= 'Overtime',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'RTYPEREGULAR',
+				@UDCDesc1					= 'Regularization',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 3,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'RTYPETRAVEL',
+				@UDCDesc1					= 'Travel Request',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 4,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'RTYPEEXPENSE',
+				@UDCDesc1					= 'Expense Claim',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 5,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'RTYPERECRUIT',
+				@UDCDesc1					= 'Recruitment Offer',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 6,
+				@IsActive					= 1,
+				@Amount						= NULL 
 	*/
 
 	IF @actionType = 0
@@ -2548,9 +2602,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	DELETE FROM kenuser.UserDefinedCode
 	WHERE UDCId IN
 	(
-		2967,
-		2968,
-		2969
+		4403
 	)
 
 	--Disable UDC items

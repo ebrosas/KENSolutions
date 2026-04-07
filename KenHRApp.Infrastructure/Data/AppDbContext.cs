@@ -65,7 +65,8 @@ namespace KenHRApp.Infrastructure.Data
             modelBuilder.UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             #region Custom Entity Configurations
-            //new EmployeeEntityConfig().Configure(modelBuilder.Entity<Employee>());
+            new SupportTicketConfiguration().Configure(modelBuilder.Entity<SupportTicket>());
+            new SupportTicketAttachmentConfig().Configure(modelBuilder.Entity<SupportTicketAttachment>());
             new LeaveAttachmentConfig().Configure(modelBuilder.Entity<LeaveAttachment>());
             new RequestApprovalConfig().Configure(modelBuilder.Entity<RequestApproval>());
             #endregion

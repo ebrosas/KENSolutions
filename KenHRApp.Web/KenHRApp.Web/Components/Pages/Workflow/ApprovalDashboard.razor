@@ -1,0 +1,84 @@
+﻿@page "/Workflow/ApprovalDashboard"
+
+<MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
+     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Pending Requests Dashboard</MudText>
+     <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserName</MudText>
+</MudStack>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="px-4">
+        @if (_hasValidationError && _validationMessages.Any())
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
+            <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
+            <ul style="margin:0; padding-left:20px;">
+                @foreach (var msg in _validationMessages)
+                {
+                    <li>
+                        <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
+                        </li>
+                }
+            </ul>
+        </MudAlert>
+    }
+
+    @if (_showErrorAlert)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
+                  ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
+            @_errorMessage
+        </MudAlert>
+    }
+
+    <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
+        <MudBreadcrumbs Items="@_breadcrumbItems" 
+            SeparatorIcon="@Icons.Material.Filled.ChevronRight"
+            CollapseIcon="@Icons.Material.Filled.MoreHoriz" 
+            MaxItems="4" 
+            Class="mud-breadcrumbs" />
+
+        <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-2 mb-0">
+            <MudPaper Elevation="0" Class="p-0 w-100">
+                <MudGrid Spacing="3">
+                    <MudItem xs="3">
+                        <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
+                            <MudAppBar Class="rounded-l-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
+                                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Request Types</MudText>
+                                <MudSpacer />
+                            </MudAppBar>
+                            <MudPaper Elevation="5" Class="p-0 w-100">
+                                <MudList T="RequestTypeDTO" Dense="true" Elevation="1" SelectionMode="SelectionMode.SingleSelection" Color="Color.Info">
+                                    @foreach (var request in _requestTypeList)
+                                    {
+                                        <MudListItem Icon="@Icons.Material.Filled.Inbox">
+                                            <MudStack Direction="Column" Spacing="1">
+                                                <MudIconButton @bind-icon="request.IconName" />
+
+                                                <!-- Request Type -->
+                                                <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="fw-bold">
+                                                    @request.RequestTypeName
+                                                </MudText>
+
+                                                <MudChip T="string" Variant="Variant.Filled" @bind-Text="request.AssignedCountString" Size="Size.Small" />
+                                            </MudStack>
+                                        </MudListItem>
+                                    }
+                                </MudList>
+                            </MudPaper>
+                        </MudStack>
+                    </MudItem>
+                    <MudItem xs="9">
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudStack>
+    </div>
+</MudContainer>
+
+<!-- Full-screen overlay -->
+@if (_isRunning)
+{
+    <div class="fullscreen-overlay">
+        <MudProgressCircular Indeterminate="true" Size="Size.Medium" Color="Color.Info" />
+        <MudText Typo="Typo.h6" Class="mt-2 text-white">@overlayMessage</MudText>
+        </div>
+}

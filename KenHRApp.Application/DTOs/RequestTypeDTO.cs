@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace KenHRApp.Application.DTOs
+{
+    public class RequestTypeDTO
+    {
+        #region Properties
+        public string RequestTypeCode { get; set; } = null!;
+        public string RequestTypeName { get; set; } = null!;
+        public string? RequestTypeDesc { get; set; } = null;
+        public string? IconName { get; set; } = null;
+        public int AssignedCount { get; set; }
+        #endregion
+
+        #region Extended Properties
+        public string AssignedCountString 
+        {
+            get { return AssignedCount > 0 ? AssignedCount.ToString() : string.Empty; }
+            set { /* No setter needed as this is a computed property */ }
+        }
+        #endregion
+    }
+}

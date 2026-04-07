@@ -23,7 +23,7 @@ namespace KenHRApp.Infrastructure.EntityConfiguration
             builder.Property(a => a.CreatedDate)
                 .HasDefaultValue(DateTime.Now);
 
-            builder.HasIndex(e => new { e.RequestTypeCode, e.RequisitionNo })
+            builder.HasIndex(e => new { e.RequestTypeCode, e.RequisitionNo, e.AssignedEmpNo, e.ActionRole })
                 .HasDatabaseName("IX_RequestApproval_CompoKeys")
                 .IsUnique(false);
         }

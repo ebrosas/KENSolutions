@@ -16,4 +16,8 @@
     <ProjectReference Include="..\KenHRApp.Infrastructure\KenHRApp.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\Workflow\" />
+  </ItemGroup>
+
 </Project>

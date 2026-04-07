@@ -427,7 +427,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             //_selectedResumeDate = null;
 
             // Clear datagrid datasource
-            //_leaveRequestList = new();
+            //_approvalList = new();
 
             // Reset validation error messages
             _hasValidationError = false;
