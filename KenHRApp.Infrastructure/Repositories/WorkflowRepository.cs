@@ -25,7 +25,7 @@ namespace KenHRApp.Infrastructure.Repositories
 
         #region Public methods     
         public async Task<Result<List<RequestTypeResult>>> GetPendingRequestAsync(
-            int? empNo,
+            int empNo,
             string? requestType,
             byte? periodType,
             DateTime? startDate,
@@ -37,7 +37,7 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 var model = await _db.Set<RequestTypeResult>()
                     .FromSqlRaw("EXEC kenuser.Pr_GetPendingRequest @empNo = {0}, @requestType = {1}, @periodType = {2}, @startDate = {3}, @endDate = {4}",
-                    empNo!,
+                    empNo,
                     requestType!,
                     periodType!,
                     startDate!,

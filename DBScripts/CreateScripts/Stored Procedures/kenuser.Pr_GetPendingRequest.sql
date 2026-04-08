@@ -11,7 +11,7 @@
 
 ALTER PROCEDURE kenuser.Pr_GetPendingRequest
 (   
-	@empNo				INT = 0,
+	@empNo				INT,
 	@requestType		VARCHAR(20) = NULL,
 	@periodType			TINYINT = NULL,
 	@startDate			DATETIME = NULL,
@@ -32,6 +32,12 @@ BEGIN
 
 	IF ISNULL(@periodType, 0) = 0			--(Notes: 0 = Current Year, 1 = Last Year, 2 = Custom Period)
 		SET @periodType = 0
+
+	IF ISNULL(@startDate, '') = '' OR CAST(@startDate AS DATETIME) = CAST('' AS DATETIME)
+		SET @startDate = NULL
+
+	IF ISNULL(@endDate, '') = '' OR CAST(@endDate AS DATETIME) = CAST('' AS DATETIME)
+		SET @endDate = NULL
 
 	SELECT	RTRIM(a.UDCCode) AS RequestTypeCode,
 			RTRIM(a.UDCDesc1) AS RequestTypeName,
@@ -60,8 +66,7 @@ PARAMETERS:
 	@startDate			DATETIME = NULL,
 	@endDate			DATETIME = NULL
 
-	EXEC kenuser.Pr_GetPendingRequest
-	EXEC kenuser.Pr_GetPendingRequest 0, 10003632
+	EXEC kenuser.Pr_GetPendingRequest 10003632
 	EXEC kenuser.Pr_GetPendingRequest 0, 0, '7600'
 	EXEC kenuser.Pr_GetPendingRequest 0, 0, '', '03/01/2026', '03/31/2026'
 

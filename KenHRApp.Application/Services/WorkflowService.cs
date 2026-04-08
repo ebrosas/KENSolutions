@@ -25,7 +25,7 @@ namespace KenHRApp.Application.Services
 
         #region Public Methods     
         public async Task<Result<List<RequestTypeDTO>>> GetPendingRequestAsync(
-            int? empNo,
+            int empNo,
             string? requestType,
             byte? periodType,
             DateTime? startDate,

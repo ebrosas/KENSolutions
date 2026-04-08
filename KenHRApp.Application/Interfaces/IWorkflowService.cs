@@ -11,7 +11,7 @@ namespace KenHRApp.Application.Interfaces
     public interface IWorkflowService
     {
         Task<Result<List<RequestTypeDTO>>> GetPendingRequestAsync(
-            int? empNo,
+            int empNo,
             string? requestType,
             byte? periodType,
             DateTime? startDate,

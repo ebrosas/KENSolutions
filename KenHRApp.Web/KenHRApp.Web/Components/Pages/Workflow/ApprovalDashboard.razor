@@ -39,7 +39,7 @@
         <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-2 mb-0">
             <MudPaper Elevation="0" Class="p-0 w-100">
                 <MudGrid Spacing="3">
-                    <MudItem xs="3">
+                    <MudItem xs="5" sm="3">
                         <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
                             <MudAppBar Class="rounded-l-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
                                 <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Request Types</MudText>
@@ -49,24 +49,33 @@
                                 <MudList T="RequestTypeDTO" Dense="true" Elevation="1" SelectionMode="SelectionMode.SingleSelection" Color="Color.Info">
                                     @foreach (var request in _requestTypeList)
                                     {
-                                        <MudListItem Icon="@Icons.Material.Filled.Inbox">
-                                            <MudStack Direction="Column" Spacing="1">
-                                                <MudIconButton @bind-icon="request.IconName" />
+                                        <MudListItem>
+                                            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Spacing="3">
+                                                <MudIconButton @bind-icon="request.IconName" Size="Size.Small" />
 
                                                 <!-- Request Type -->
-                                                <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="fw-bold">
+                                                 <MudText Typo="Typo.subtitle2" Style="color: #004165;" Class="fw-bold">
                                                     @request.RequestTypeName
                                                 </MudText>
 
-                                                <MudChip T="string" Variant="Variant.Filled" @bind-Text="request.AssignedCountString" Size="Size.Small" />
+                                                <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexEnd">
+                                                    <MudChip T="string" Variant="Variant.Filled" @bind-Text="request.AssignedCountString" hidden="@(request.AssignedCount == 0 ? true : false)" Color="@(request.AssignedCount > 0 ? Color.Info : Color.Transparent)" Size="Size.Small" />
+                                                </MudStack>
                                             </MudStack>
                                         </MudListItem>
+                                        <MudDivider />
                                     }
                                 </MudList>
                             </MudPaper>
                         </MudStack>
                     </MudItem>
-                    <MudItem xs="9">
+                    <MudItem xs="7" sm="9">
+                        <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
+                            <MudAppBar Class="rounded-r-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
+                                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Assign the Requisition</MudText>
+                                <MudSpacer />
+                            </MudAppBar>
+                        </MudStack>
                     </MudItem>
                 </MudGrid>
             </MudPaper>

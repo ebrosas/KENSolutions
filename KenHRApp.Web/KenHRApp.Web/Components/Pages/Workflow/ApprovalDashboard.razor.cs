@@ -13,6 +13,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
     {
         #region Parameters and Injections
         [Inject] private IEmployeeService EmployeeService { get; set; } = default!;
+        [Inject] private IWorkflowService WorkflowService { get; set; } = default!;
         [Inject] private IDialogService DialogService { get; set; } = default!;
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
@@ -56,6 +57,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
         #endregion
 
         #region Objects and collections
+        private List<RequestTypeDTO> _requestTypeList = new List<RequestTypeDTO>();
         private List<RequestApprovalDTO> _approvalList = new List<RequestApprovalDTO>();
         private List<string> _validationMessages = new();
 
@@ -64,8 +66,6 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
             new("Pending Requests Dashboard", href: null, icon: @Icons.Material.Filled.AccountBalance, disabled: true)
         ];
-
-        private List<RequestTypeDTO> _requestTypeList = new List<RequestTypeDTO>();
         #endregion
 
         #endregion
@@ -244,9 +244,44 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
                 //if (ForceLoad)
                 //{
-                //    BeginSearchLeaveTask(ForceLoad);
+                BeginGetPendingRequestTask(ForceLoad);
                 //}
             });
+        }
+
+        private void BeginGetPendingRequestTask(bool forceLoad = false)
+        {
+            // Reset validation errors
+            _hasValidationError = false;
+            _validationMessages.Clear();
+
+            #region Check if date period is valid
+            //if (_selectedStartDate.HasValue && _selectedResumeDate.HasValue &&
+            //    _selectedStartDate > _selectedResumeDate)
+            //{
+            //    _hasValidationError = true;
+            //    _validationMessages.Add("Start Date cannot be greater than End Date.");
+            //}
+            #endregion
+
+            if (_hasValidationError && _validationMessages.Any())
+                return;
+                        
+            _isRunning = true;
+
+            // Set the overlay message
+            if (!State.IsAuthenticated)
+                overlayMessage = "Authentication required. Redirecting to login page...";
+            else
+                overlayMessage = "Loading leave requisitions, please wait...";
+
+            _ = GetPendingRequestAsync(async () =>
+            {
+                _isRunning = false;
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+            }, forceLoad);
         }
         #endregion
 
@@ -297,14 +332,14 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 if (udcData!.Any() && udcGroupList!.Any())
                 {
                     #region Get Request Types
-                    try
-                    {
-                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.LEAVETYPES.ToString()).FirstOrDefault()!.UDCGroupId;
-                    }
-                    catch (Exception ex)
-                    {
-                        _errorMessage.Append($"Error getting Leave Types group id: {ex.Message}");
-                    }
+                    //try
+                    //{
+                    //    groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.LEAVETYPES.ToString()).FirstOrDefault()!.UDCGroupId;
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    _errorMessage.Append($"Error getting Leave Types group id: {ex.Message}");
+                    //}
 
                     //if (groupID > 0)
                     //{
@@ -314,6 +349,63 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                     //}
                     #endregion
                 }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task GetPendingRequestAsync(Func<Task> callback, bool forceLoad = false)
+        {
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            #region Get the selected Department 
+            //string costCenter = string.Empty;
+            //if (!string.IsNullOrEmpty(_selectedDepartment))
+            //{
+            //    DepartmentDTO? deptDTO = _departmentList.Where(d => d.DepartmentFullName == _selectedDepartment).FirstOrDefault();
+            //    if (deptDTO != null)
+            //        costCenter = deptDTO.DepartmentCode;
+            //}
+            #endregion
+
+            #region Get the selected Leave Type
+            //string leaveType = string.Empty;
+            //if (!string.IsNullOrEmpty(_selectedLeaveType))
+            //{
+            //    UserDefinedCodeDTO? leaveTypeUDC = _leaveTypeList.Where(d => d.UDCDesc1 == _selectedLeaveType).FirstOrDefault();
+            //    if (leaveTypeUDC != null)
+            //        leaveType = leaveTypeUDC.UDCCode;
+            //}
+            #endregion
+
+            #region Get the selected status
+            //string status = string.Empty;
+            //if (!string.IsNullOrEmpty(_selectedStatus))
+            //{
+            //    UserDefinedCodeDTO? statusUDC = _leaveStatusList.Where(d => d.UDCSpecialHandlingCode == _selectedStatus).FirstOrDefault();
+            //    if (statusUDC != null)
+            //        status = statusUDC.UDCCode;
+            //}
+            #endregion
+
+            var repoResult = await WorkflowService.GetPendingRequestAsync(UserEmpNo, string.Empty, 0, null, null);
+            if (repoResult.Success)
+            {
+                _requestTypeList = repoResult.Value!;
+            }
+            else
+            {
+                // Show error message
+                _errorMessage.AppendLine(repoResult.Error);
+
+                ShowHideError(true);
             }
 
             if (callback != null)

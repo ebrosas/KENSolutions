@@ -46,6 +46,7 @@ GO
 /*	Test:
 
 	SELECT  kenuser.fnGetAssignedRequestCount('RTYPELEAVE', 10003632, '', '')
+	SELECT  kenuser.fnGetAssignedRequestCount('RTYPERECRUIT', 10003632, '', '')
 	SELECT  kenuser.fnGetAssignedRequestCount(10003632, '02/01/2026', '02/28/2026', NULL)
 
 */
