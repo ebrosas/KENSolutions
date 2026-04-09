@@ -8,6 +8,7 @@ using KenHRApp.Domain.Entities;
 using System.Reflection.Metadata;
 using KenHRApp.Infrastructure.EntityConfiguration;
 using KenHRApp.Domain.Entities.KeylessModels;
+using KenHRApp.Domain.Entities.Workflow;
 
 namespace KenHRApp.Infrastructure.Data
 {
@@ -49,6 +50,12 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<SupportTicketAttachment> SupportTicketAttachments => Set<SupportTicketAttachment>();
         public DbSet<LeaveAttachment> LeaveAttachments => Set<LeaveAttachment>();
         public DbSet<RequestApproval> RequestApprovals => Set<RequestApproval>();
+        public DbSet<WorkflowDefinition> WorkflowDefinitions => Set<WorkflowDefinition>();
+        public DbSet<WorkflowStepDefinition> WorkflowStepDefinitions => Set<WorkflowStepDefinition>();
+        public DbSet<WorkflowCondition> WorkflowConditions => Set<WorkflowCondition>();
+        public DbSet<WorkflowInstance> WorkflowInstances => Set<WorkflowInstance>();
+        public DbSet<WorkflowStepInstance> WorkflowStepInstances => Set<WorkflowStepInstance>();
+        public DbSet<WorkflowApprovalRole> WorkflowApprovalRoles => Set<WorkflowApprovalRole>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -69,6 +76,12 @@ namespace KenHRApp.Infrastructure.Data
             new SupportTicketAttachmentConfig().Configure(modelBuilder.Entity<SupportTicketAttachment>());
             new LeaveAttachmentConfig().Configure(modelBuilder.Entity<LeaveAttachment>());
             new RequestApprovalConfig().Configure(modelBuilder.Entity<RequestApproval>());
+            new WorkflowDefinitionConfig().Configure(modelBuilder.Entity<WorkflowDefinition>());
+            new WorkflowStepDefinitionConfig().Configure(modelBuilder.Entity<WorkflowStepDefinition>());    
+            new WorkflowConditionConfig().Configure(modelBuilder.Entity<WorkflowCondition>());  
+            new WorkflowInstanceConfig().Configure(modelBuilder.Entity<WorkflowInstance>());    
+            new WorkflowStepInstanceConfig().Configure(modelBuilder.Entity<WorkflowStepInstance>());
+            new WorkflowApprovalRoleConfig().Configure(modelBuilder.Entity<WorkflowApprovalRole>());    
             #endregion
 
             #region Configure keyless models that are mapped to views or stored procedures
