@@ -1,4 +1,6 @@
-﻿using KenHRApp.Domain.Entities.KeylessModels;
+﻿using KenHRApp.Domain.Entities;
+using KenHRApp.Domain.Entities.KeylessModels;
+using KenHRApp.Domain.Entities.Workflow;
 using KenHRApp.Domain.Models.Common;
 using System;
 using System.Collections.Generic;
@@ -9,12 +11,24 @@ using System.Threading.Tasks;
 namespace KenHRApp.Infrastructure.Repositories
 {
     public interface IWorkflowRepository
-    {
+    {        
+        #region Workflow Abstract Methods
+        Task<int> StartWorkflowAsync(string entityName, long entityId);
+        Task ApproveStepAsync(int stepInstanceId, int userId, string? comments);
+        Task RejectStepAsync(int stepInstanceId, int userId, string comments);
+        #endregion
+
+        #region Database Access Abstract Methods
         Task<Result<List<RequestTypeResult>>> GetPendingRequestAsync(
             int empNo,
             string? requestType,
             byte? periodType,
             DateTime? startDate,
             DateTime? endDate);
+
+        Task<Result<Employee?>> GetEmployeeInfoAsync(
+            int? empNo,
+            CancellationToken cancellationToken = default);
+        #endregion
     }
 }

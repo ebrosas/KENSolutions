@@ -24,6 +24,12 @@ namespace KenHRApp.Infrastructure.EntityConfiguration
             builder.HasIndex(e => new { e.EntityName })
                 .HasDatabaseName("IX_WorkflowDefinition_UniqueKey")
                 .IsUnique(false);
+
+            // ✅ RELATIONSHIP: WorkflowDefinition → Steps
+            builder.HasMany(x => x.Steps)
+                .WithOne()
+                .HasForeignKey(x => x.WorkflowDefinitionId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

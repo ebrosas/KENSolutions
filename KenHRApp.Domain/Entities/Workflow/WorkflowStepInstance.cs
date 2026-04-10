@@ -27,5 +27,10 @@ namespace KenHRApp.Domain.Entities.Workflow
         [Column(TypeName = "varchar(300)")]
         public string? Comments { get; set; } = null;
         #endregion
+
+        #region Navigation Properties
+        public WorkflowInstance WorkflowInstance { get; set; } = default!;
+        public WorkflowStepDefinition StepDefinition { get; set; } = default!;
+        #endregion
     }
 }

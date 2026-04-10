@@ -23,6 +23,12 @@ namespace KenHRApp.Infrastructure.EntityConfiguration
             builder.HasIndex(e => new { e.WorkflowDefinitionId, e.StepOrder, e.ApprovalRole })
                 .HasDatabaseName("IX_WorkflowStepDefinition_CompoKeys")
                 .IsUnique();
+
+            // ✅ RELATIONSHIP: StepDefinition → Conditions
+            builder.HasMany(x => x.Conditions)
+                .WithOne()
+                .HasForeignKey(x => x.StepDefinitionId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

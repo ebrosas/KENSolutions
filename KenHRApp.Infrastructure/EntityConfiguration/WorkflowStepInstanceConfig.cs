@@ -21,11 +21,24 @@ namespace KenHRApp.Infrastructure.EntityConfiguration
                 .UseIdentityColumn(1, 1); // seed = 1, increment = 1
 
             builder.Property(a => a.ActionDate)
-                .HasDefaultValue(DateTime.Now);
+                //.HasDefaultValue(DateTime.Now);
+                .HasDefaultValueSql("GETDATE()");
 
             builder.HasIndex(e => new { e.WorkflowInstanceId, e.StepDefinitionId, e.ApproverEmpNo, e.ApproverRole })
                 .HasDatabaseName("IX_WorkflowStepInstance_CompoKeys")
                 .IsUnique();
+
+            // ✅ RELATIONSHIP: StepInstance → WorkflowInstance
+            builder.HasOne(x => x.WorkflowInstance)
+                .WithMany(x => x.Steps)
+                .HasForeignKey(x => x.WorkflowInstanceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ✅ RELATIONSHIP: StepInstance → StepDefinition
+            builder.HasOne(x => x.StepDefinition)
+                .WithMany()
+                .HasForeignKey(x => x.StepDefinitionId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

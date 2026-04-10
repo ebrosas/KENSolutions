@@ -12,7 +12,7 @@ namespace KenHRApp.Domain.Entities.Workflow
         #region Properties
         public int WorkflowInstanceId { get; set; }         // Identity column  
         public int WorkflowDefinitionId { get; set; }       // Foreign Key to WorkflowDefinition
-        public long EntityId { get; set; }   // LeaveRequestId
+        public long EntityId { get; set; }                  // Ex. LeaveRequestId
 
         [Column(TypeName = "varchar(50)")]
         public string Status { get; set; } = "Running";

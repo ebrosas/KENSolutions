@@ -13,16 +13,28 @@ namespace KenHRApp.Infrastructure.EntityConfiguration
     {
         public void Configure(EntityTypeBuilder<WorkflowCondition> builder)
         {
-            builder.HasKey(x => x.WorkflowInstanceId)
-                .HasName("PK_WorkflowCondition_WorkflowInstanceId");
+            builder.HasKey(x => x.ConditionId)
+                .HasName("PK_WorkflowCondition_ConditionId");
 
-            builder.Property(a => a.WorkflowInstanceId)
+            builder.Property(a => a.ConditionId)
                 .ValueGeneratedOnAdd()
                 .UseIdentityColumn(1, 1); // seed = 1, increment = 1
 
-            builder.HasIndex(e => new { e.WorkflowDefinitionId, e.EntityId })
+            builder.HasIndex(e => new { e.StepDefinitionId, e.FieldName })
                 .HasDatabaseName("IX_WorkflowCondition_CompoKeys")
-                .IsUnique();
+                .IsUnique(false);
+
+            // ✅ FK → StepDefinition (owner)
+            builder.HasOne<WorkflowStepDefinition>()
+                .WithMany(x => x.Conditions)
+                .HasForeignKey(x => x.StepDefinitionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ✅ SELF-REFERENCE: Next Step
+            builder.HasOne<WorkflowStepDefinition>()
+                .WithMany()
+                .HasForeignKey(x => x.NextStepDefinitionId)
+                .OnDelete(DeleteBehavior.Restrict); // VERY IMPORTANT
         }
     }
 }
