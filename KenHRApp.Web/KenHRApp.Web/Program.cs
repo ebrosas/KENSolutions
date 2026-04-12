@@ -17,6 +17,7 @@ using KenHRApp.Domain.Interfaces;
 using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.Common.Services;
 using KenHRApp.Infrastructure.Settings;
+using KenHRApp.Infrastructure.Persistence.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -141,5 +142,23 @@ app.MapRazorComponents<App>()
 
 // Add additional endpoints required by the Identity /Account Razor components.
 //app.MapAdditionalIdentityEndpoints();
+
+#region RUN SEEDING HERE
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        //await db.Database.MigrateAsync();
+        await WorkflowSeedData.SeedAsync(db);
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Error during database seeding");
+    }
+}
+#endregion
 
 app.Run();

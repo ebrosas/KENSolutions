@@ -244,7 +244,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
                 //if (ForceLoad)
                 //{
-                BeginGetPendingRequestTask(ForceLoad);
+                BeginGetPendingRequestTask(ForceLoad);                                
                 //}
             });
         }
@@ -281,6 +281,12 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
+
+                #region Test the workflow
+                //await InitializeWorkflowAsync();
+                await ApproveWorkflowAsync(2, 10003634, "Test Approval Leave #2");
+                #endregion                
+
             }, forceLoad);
         }
         #endregion
@@ -412,6 +418,58 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             {
                 // Hide the spinner overlay
                 await callback.Invoke();
+            }
+        }
+
+        private async Task InitializeWorkflowAsync()
+        {
+            int workflowInstanceID = 0;
+
+            try
+            {
+                var repoResult = await WorkflowService.StartWorkflowAsync("LeaveRequisitionWF", 10);
+                if (repoResult.Success)
+                {
+                    workflowInstanceID = repoResult.Value;
+                }
+                else
+                {
+                    // Show error message
+                    _errorMessage.AppendLine(repoResult.Error);
+
+                    ShowHideError(true);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private async Task ApproveWorkflowAsync(int stepInstanceId, int userId, string? comments)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var repoResult = await WorkflowService.ApproveStepAsync(stepInstanceId, userId, comments);
+                if (repoResult.Success)
+                {
+                    isSuccess = repoResult.Value;
+                }
+                else
+                {
+                    // Show error message
+                    _errorMessage.AppendLine(repoResult.Error);
+
+                    ShowHideError(true);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
         #endregion

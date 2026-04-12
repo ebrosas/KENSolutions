@@ -31,8 +31,8 @@ namespace KenHRApp.Infrastructure.Repositories
             try
             {
                 var definition = await _db.WorkflowDefinitions
-                .Include(x => x.Steps.OrderBy(s => s.StepOrder))
-                .FirstAsync(x => x.EntityName == entityName && x.IsActive);
+                    .Include(x => x.Steps.OrderBy(s => s.StepOrder))
+                    .FirstAsync(x => x.EntityName == entityName && x.IsActive);
 
                 var instance = new WorkflowInstance
                 {
@@ -61,9 +61,9 @@ namespace KenHRApp.Infrastructure.Repositories
             try
             {
                 var step = await _db.WorkflowStepInstances
-                .Include(x => x.WorkflowInstance)
-                .ThenInclude(w => w.Steps)
-                .FirstAsync(x => x.StepInstanceId == stepInstanceId);
+                    .Include(x => x.WorkflowInstance)
+                    .ThenInclude(w => w.Steps)
+                    .FirstAsync(x => x.StepInstanceId == stepInstanceId);
 
                 if (step == null)
                     throw new InvalidOperationException($"StepInstanceId {stepInstanceId} not found.");
@@ -117,37 +117,6 @@ namespace KenHRApp.Infrastructure.Repositories
             }
             
         }
-
-        //private async Task TryAdvanceWorkflow(WorkflowInstance instance)
-        //{
-        //    var steps = await _db.WorkflowStepInstances
-        //        .Where(x => x.WorkflowInstanceId == instance.WorkflowInstanceId)
-        //        .ToListAsync();
-
-        //    var current = steps.Where(x => x.Status == "Pending").ToList();
-
-        //    if (current.Any())
-        //    {
-        //        // if parallel group - wait for all
-        //        var groupId = current.First().StepDefinition.ParallelGroupId;
-
-        //        if (groupId != null)
-        //        {
-        //            bool allApproved = current.All(x => x.Status == "Approved");
-
-        //            if (!allApproved) return;
-        //        }
-        //        else
-        //        {
-        //            // sequential step, only 1 approver needed
-        //            if (current.First().Status != "Approved")
-        //                return;
-        //        }
-        //    }
-
-        //    // evaluate next step based on conditions
-        //    await AdvanceNextStep(instance);
-        //}
 
         private async Task CreateNextStepInstance(WorkflowInstance instance, WorkflowStepDefinition stepDef)
         {

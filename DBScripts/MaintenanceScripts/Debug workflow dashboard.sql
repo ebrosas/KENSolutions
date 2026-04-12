@@ -10,3 +10,9 @@
 
 	SELECT a.EmployeeNo, * FROM kenuser.Employee a
 	ORDER BY a.EmployeeNo
+
+	SELECT * FROM [kenuser].[WorkflowApprovalRoles] a WITH (NOLOCK)
+	SELECT * FROM kenuser.WorkflowDefinitions a
+	SELECT * FROM kenuser.WorkflowStepDefinitions a
+	SELECT * FROM kenuser.WorkflowInstances a
+	SELECT * FROM kenuser.WorkflowStepInstances a
