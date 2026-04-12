@@ -26,67 +26,96 @@ namespace KenHRApp.Infrastructure.Repositories
         #endregion
 
         #region Workflow Methods       
-        public async Task<int> StartWorkflowAsync(string entityName, long entityId)
+        public async Task<Result<int>> StartWorkflowAsync(string entityName, long entityId)
         {
-            var definition = await _db.WorkflowDefinitions
+            try
+            {
+                var definition = await _db.WorkflowDefinitions
                 .Include(x => x.Steps.OrderBy(s => s.StepOrder))
                 .FirstAsync(x => x.EntityName == entityName && x.IsActive);
 
-            var instance = new WorkflowInstance
+                var instance = new WorkflowInstance
+                {
+                    WorkflowDefinitionId = definition.WorkflowDefinitionId,
+                    EntityId = entityId,
+                    Status = "Running"
+                };
+
+                _db.WorkflowInstances.Add(instance);
+                await _db.SaveChangesAsync();
+
+                //await InitializeFirstStepAsync(instance, definition);
+
+                await CreateNextStepInstance(instance, definition.Steps.First());
+                return Result<int>.SuccessResult(instance.WorkflowInstanceId);
+            }
+            catch (Exception ex)
             {
-                WorkflowDefinitionId = definition.WorkflowDefinitionId,
-                EntityId = entityId,
-                Status = "Running"
-            };
-
-            _db.WorkflowInstances.Add(instance);
-            await _db.SaveChangesAsync();
-
-            //await InitializeFirstStepAsync(instance, definition);
-
-            await CreateNextStepInstance(instance, definition.Steps.First());
-            return instance.WorkflowInstanceId;
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<int>.Failure($"Database error: {ex.Message}");
+            }
         }
 
-        public async Task ApproveStepAsync(int stepInstanceId, int userId, string? comments)
+        public async Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int userId, string? comments)
         {
-            var step = await _db.WorkflowStepInstances
+            try
+            {
+                var step = await _db.WorkflowStepInstances
                 .Include(x => x.WorkflowInstance)
                 .ThenInclude(w => w.Steps)
                 .FirstAsync(x => x.StepInstanceId == stepInstanceId);
 
-            if (step == null)
-                throw new InvalidOperationException($"StepInstanceId {stepInstanceId} not found.");
+                if (step == null)
+                    throw new InvalidOperationException($"StepInstanceId {stepInstanceId} not found.");
 
-            if (step.Status != "Pending")
-                throw new InvalidOperationException("This step is already processed.");
+                if (step.Status != "Pending")
+                    throw new InvalidOperationException("This step is already processed.");
 
-            if (step.ApproverEmpNo != userId)
-                throw new UnauthorizedAccessException("You are not allowed to approve this step.");
+                if (step.ApproverEmpNo != userId)
+                    throw new UnauthorizedAccessException("You are not allowed to approve this step.");
 
-            step.Status = "Approved";
-            step.ActionDate = DateTime.UtcNow;
-            step.Comments = comments;
+                step.Status = "Approved";
+                step.ActionDate = DateTime.UtcNow;
+                step.Comments = comments;
 
-            await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync();
 
-            await AdvanceWorkflow(step.WorkflowInstance);
+                await AdvanceWorkflow(step.WorkflowInstance);
+
+                return Result<bool>.SuccessResult(true);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
         }
 
-        public async Task RejectStepAsync(int stepInstanceId, int userId, string comments)
+        public async Task<Result<bool>> RejectStepAsync(int stepInstanceId, int userId, string comments)
         {
-            var step = await _db.WorkflowStepInstances
+            try
+            {
+                var step = await _db.WorkflowStepInstances
                 .Include(x => x.WorkflowInstance)
                 .FirstAsync(x => x.StepInstanceId == stepInstanceId);
 
-            step.Status = "Rejected";
-            step.ActionDate = DateTime.UtcNow;
-            step.Comments = comments;
+                step.Status = "Rejected";
+                step.ActionDate = DateTime.UtcNow;
+                step.Comments = comments;
 
-            step.WorkflowInstance.Status = "Rejected";
-            await _db.SaveChangesAsync();
+                step.WorkflowInstance.Status = "Rejected";
+                await _db.SaveChangesAsync();
 
-            //await _notify.SendRejectionAsync(step.WorkflowInstance.EntityId);
+                //await _notify.SendRejectionAsync(step.WorkflowInstance.EntityId);
+
+                return Result<bool>.SuccessResult(true);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
+            
         }
 
         //private async Task TryAdvanceWorkflow(WorkflowInstance instance)
@@ -122,54 +151,68 @@ namespace KenHRApp.Infrastructure.Repositories
 
         private async Task CreateNextStepInstance(WorkflowInstance instance, WorkflowStepDefinition stepDef)
         {
-            var approver = await _db.WorkflowApprovalRoles.FirstAsync(x => x.ApprovalGroupCode == stepDef.ApprovalRole);
-
-            var step = new WorkflowStepInstance
+            try
             {
-                WorkflowInstanceId = instance.WorkflowInstanceId,
-                StepDefinitionId = stepDef.StepDefinitionId,
-                ApproverEmpNo = approver.AssigneeEmpNo,
-                ApproverRole = stepDef.ApprovalRole,
-                Status = "Pending"
-            };
+                var approver = await _db.WorkflowApprovalRoles.FirstAsync(x => x.ApprovalGroupCode == stepDef.ApprovalRole);
 
-            _db.WorkflowStepInstances.Add(step);
-            await _db.SaveChangesAsync();
+                var step = new WorkflowStepInstance
+                {
+                    WorkflowInstanceId = instance.WorkflowInstanceId,
+                    StepDefinitionId = stepDef.StepDefinitionId,
+                    ApproverEmpNo = approver.AssigneeEmpNo,
+                    ApproverRole = stepDef.ApprovalRole,
+                    Status = "Pending"
+                };
 
-            //await _notify.SendPendingApprovalAsync(step);
+                _db.WorkflowStepInstances.Add(step);
+                await _db.SaveChangesAsync();
+
+                //await _notify.SendPendingApprovalAsync(step);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         private async Task AdvanceWorkflow(WorkflowInstance instance)
         {
-            var definition = await _db.WorkflowDefinitions
+            try
+            {
+                var definition = await _db.WorkflowDefinitions
                 .Include(x => x.Steps)
                 .FirstAsync(x => x.WorkflowDefinitionId == instance.WorkflowDefinitionId);
 
-            var latest = instance.Steps
-                .OrderByDescending(x => x.StepInstanceId)
-                .FirstOrDefault();
+                var latest = instance.Steps
+                    .OrderByDescending(x => x.StepInstanceId)
+                    .FirstOrDefault();
 
-            if (latest == null)
-                throw new InvalidOperationException("No workflow steps found.");
+                if (latest == null)
+                    throw new InvalidOperationException("No workflow steps found.");
 
-            // ✅ Ensure StepDefinition is loaded
-            await _db.Entry(latest)
-                .Reference(x => x.StepDefinition)
-                .LoadAsync();
+                // ✅ Ensure StepDefinition is loaded
+                await _db.Entry(latest)
+                    .Reference(x => x.StepDefinition)
+                    .LoadAsync();
 
-            var nextStep = definition.Steps
-                .FirstOrDefault(x => x.StepOrder == latest.StepDefinition.StepOrder + 1);
+                var nextStep = definition.Steps
+                    .FirstOrDefault(x => x.StepOrder == latest.StepDefinition.StepOrder + 1);
 
-            if (nextStep == null)
-            {
-                instance.Status = "Completed";
-                await _db.SaveChangesAsync();
+                if (nextStep == null)
+                {
+                    instance.Status = "Completed";
+                    await _db.SaveChangesAsync();
 
-                //await _notify.SendCompletedAsync(instance.EntityId);
-                return;
+                    //await _notify.SendCompletedAsync(instance.EntityId);
+                    return;
+                }
+
+                await CreateNextStepInstance(instance, nextStep);
             }
-
-            await CreateNextStepInstance(instance, nextStep);
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
         #endregion
 

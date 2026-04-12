@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 namespace KenHRApp.Infrastructure.Repositories
 {
     public interface IWorkflowRepository
-    {        
+    {
         #region Workflow Abstract Methods
-        Task<int> StartWorkflowAsync(string entityName, long entityId);
-        Task ApproveStepAsync(int stepInstanceId, int userId, string? comments);
-        Task RejectStepAsync(int stepInstanceId, int userId, string comments);
+        Task<Result<int>> StartWorkflowAsync(string entityName, long entityId);
+        Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int userId, string? comments);
+        Task<Result<bool>> RejectStepAsync(int stepInstanceId, int userId, string comments);
         #endregion
 
         #region Database Access Abstract Methods

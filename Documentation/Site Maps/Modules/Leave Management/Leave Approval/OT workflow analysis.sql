@@ -17,10 +17,13 @@
 	SELECT * FROM [tas].[OvertimeWFActivityTemplate] a WITH (NOLOCK)
 	WHERE RTRIM(a.WFModuleCode) = 'OTENG'
 	ORDER BY a.SequenceNo
-
+		
 	SELECT * FROM [tas].[OvertimeWFTransactionActivity] a
 	WHERE a.OTRequestNo = 405664
 	ORDER BY a.SequenceNo
+
+	SELECT * FROM [tas].[OvertimeDistributionMember] a WITH (NOLOCK)
+	WHERE a.OTRequestNo = 405664
 
 	SELECT * FROM [tas].[OvertimeWFEmailDelivery] a WITH (NOLOCK)
 	WHERE a.OTRequestNo = 405664
