@@ -8,11 +8,13 @@
 
 	SELECT * FROM [kenuser].[LeaveRequisitionWF] a
 
-	SELECT a.EmployeeNo, * FROM kenuser.Employee a
+	SELECT a.EmployeeNo, a.ReportingManagerCode, a.SecondReportingManagerCode, 
+	* FROM kenuser.Employee a
 	ORDER BY a.EmployeeNo
 
 	SELECT * FROM [kenuser].[WorkflowApprovalRoles] a WITH (NOLOCK)
 	SELECT * FROM kenuser.WorkflowDefinitions a
+	SELECT * FROM [kenuser].[WorkflowConditions] A
 	SELECT * FROM kenuser.WorkflowStepDefinitions a
 	SELECT * FROM kenuser.WorkflowInstances a
 	SELECT * FROM kenuser.WorkflowStepInstances a

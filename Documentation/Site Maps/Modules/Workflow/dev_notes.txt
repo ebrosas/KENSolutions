@@ -1,0 +1,13 @@
+
+Workflow Status:
+Skipped
+Completed
+
+
+Option 4 — Complex (Multi-conditional + Parallel)
+Step 1: Supervisor
+Step 2: Parallel (HR + Cost Center Manager)
+Step 3:
+If LeaveType == "Sick" → Auto-close
+If LeaveDuration > 10 → GM
+Step 4: Payroll (if unpaid leave)

@@ -23,6 +23,9 @@ namespace KenHRApp.Domain.Entities.Workflow
         public string CompareValue { get; set; } = default!;
 
         public int NextStepDefinitionId { get; set; }
+
+        [Column(TypeName = "varchar(500)")]
+        public string? Expression { get; set; }
         #endregion
     }
 }

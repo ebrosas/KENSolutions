@@ -34,7 +34,7 @@ namespace KenHRApp.Application.Services
             DateTime? endDate)
         {
             List<RequestTypeDTO> requestTypeList = new();
-
+            
             try
             {
                 var repoResult = await _repository.GetPendingRequestAsync(empNo, requestType, periodType, startDate, endDate);

@@ -284,7 +284,8 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
                 #region Test the workflow
                 //await InitializeWorkflowAsync();
-                await ApproveWorkflowAsync(2, 10003634, "Test Approval Leave #2");
+                //await ApproveWorkflowAsync(1, 10003632, "Test Approval Level #1");
+                await ApproveWorkflowAsync(2, 10003634, "Test Approval Level #2");
                 #endregion                
 
             }, forceLoad);
@@ -427,7 +428,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
             try
             {
-                var repoResult = await WorkflowService.StartWorkflowAsync("LeaveRequisitionWF", 10);
+                var repoResult = await WorkflowService.StartWorkflowAsync("RTYPELEAVE", 10);
                 if (repoResult.Success)
                 {
                     workflowInstanceID = repoResult.Value;

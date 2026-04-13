@@ -1,4 +1,5 @@
-﻿using KenHRApp.Domain.Entities;
+﻿using Azure.Core;
+using KenHRApp.Domain.Entities;
 using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Domain.Entities.Workflow;
 using KenHRApp.Domain.Models.Common;
@@ -7,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +18,29 @@ namespace KenHRApp.Infrastructure.Repositories
     {
         #region Fields
         private readonly AppDbContext _db;
+
+        private enum WorkflowStatus
+        {
+            Running,
+            Pending,
+            InProgress,
+            Approved,
+            Rejected,
+            Cancelled,
+            Skipped,
+            Completed
+        }
+
+        private enum WorkflowRequestType
+        {
+            NotDefined,
+            LeaveRequisition,
+            Overtime,
+            Regularization,
+            TravelRequest,
+            ExpenseClaim,
+            RecruitmentOffer
+        }
         #endregion
 
         #region Constructors                
@@ -38,13 +63,12 @@ namespace KenHRApp.Infrastructure.Repositories
                 {
                     WorkflowDefinitionId = definition.WorkflowDefinitionId,
                     EntityId = entityId,
-                    Status = "Running"
+                    //Status = "Running"
+                    Status = WorkflowStatus.Running.ToString()
                 };
 
                 _db.WorkflowInstances.Add(instance);
                 await _db.SaveChangesAsync();
-
-                //await InitializeFirstStepAsync(instance, definition);
 
                 await CreateNextStepInstance(instance, definition.Steps.First());
                 return Result<int>.SuccessResult(instance.WorkflowInstanceId);
@@ -52,7 +76,7 @@ namespace KenHRApp.Infrastructure.Repositories
             catch (Exception ex)
             {
                 // Log error here if needed (Serilog, NLog, etc.)
-                return Result<int>.Failure($"Database error: {ex.Message}");
+                return Result<int>.Failure($"Workflow Engine Error: {ex.Message}");
             }
         }
 
@@ -68,13 +92,13 @@ namespace KenHRApp.Infrastructure.Repositories
                 if (step == null)
                     throw new InvalidOperationException($"StepInstanceId {stepInstanceId} not found.");
 
-                if (step.Status != "Pending")
+                if (step.Status != WorkflowStatus.Pending.ToString())   
                     throw new InvalidOperationException("This step is already processed.");
 
                 if (step.ApproverEmpNo != userId)
                     throw new UnauthorizedAccessException("You are not allowed to approve this step.");
 
-                step.Status = "Approved";
+                step.Status = WorkflowStatus.Approved.ToString();
                 step.ActionDate = DateTime.UtcNow;
                 step.Comments = comments;
 
@@ -87,7 +111,7 @@ namespace KenHRApp.Infrastructure.Repositories
             catch (Exception ex)
             {
                 // Log error here if needed (Serilog, NLog, etc.)
-                return Result<bool>.Failure($"Database error: {ex.Message}");
+                return Result<bool>.Failure($"Workflow Engine Error: {ex.Message}");
             }
         }
 
@@ -99,11 +123,11 @@ namespace KenHRApp.Infrastructure.Repositories
                 .Include(x => x.WorkflowInstance)
                 .FirstAsync(x => x.StepInstanceId == stepInstanceId);
 
-                step.Status = "Rejected";
+                step.Status = WorkflowStatus.Rejected.ToString();
                 step.ActionDate = DateTime.UtcNow;
                 step.Comments = comments;
 
-                step.WorkflowInstance.Status = "Rejected";
+                step.WorkflowInstance.Status = WorkflowStatus.Rejected.ToString();
                 await _db.SaveChangesAsync();
 
                 //await _notify.SendRejectionAsync(step.WorkflowInstance.EntityId);
@@ -113,7 +137,7 @@ namespace KenHRApp.Infrastructure.Repositories
             catch (Exception ex)
             {
                 // Log error here if needed (Serilog, NLog, etc.)
-                return Result<bool>.Failure($"Database error: {ex.Message}");
+                return Result<bool>.Failure($"Workflow Engine Error: {ex.Message}");
             }
             
         }
@@ -130,7 +154,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     StepDefinitionId = stepDef.StepDefinitionId,
                     ApproverEmpNo = approver.AssigneeEmpNo,
                     ApproverRole = stepDef.ApprovalRole,
-                    Status = "Pending"
+                    Status = WorkflowStatus.Pending.ToString()
                 };
 
                 _db.WorkflowStepInstances.Add(step);
@@ -144,7 +168,7 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        private async Task AdvanceWorkflow(WorkflowInstance instance)
+        private async Task AdvanceWorkflowV1(WorkflowInstance instance)
         {
             try
             {
@@ -164,12 +188,13 @@ namespace KenHRApp.Infrastructure.Repositories
                     .Reference(x => x.StepDefinition)
                     .LoadAsync();
 
+                // Get next step(s)
                 var nextStep = definition.Steps
                     .FirstOrDefault(x => x.StepOrder == latest.StepDefinition.StepOrder + 1);
 
                 if (nextStep == null)
                 {
-                    instance.Status = "Completed";
+                    instance.Status = WorkflowStatus.Completed.ToString();
                     await _db.SaveChangesAsync();
 
                     //await _notify.SendCompletedAsync(instance.EntityId);
@@ -181,6 +206,362 @@ namespace KenHRApp.Infrastructure.Repositories
             catch (Exception ex)
             {
                 throw;
+            }
+        }
+
+        private async Task AdvanceWorkflowV2(WorkflowInstance instance)
+        {
+            try
+            {
+                // Load instance with steps + step definitions
+                var dbInstance = await _db.WorkflowInstances
+                    .Include(x => x.Steps)
+                        .ThenInclude(s => s.StepDefinition)
+                    .FirstAsync(x => x.WorkflowInstanceId == instance.WorkflowInstanceId);
+
+                var definition = await _db.WorkflowDefinitions
+                    .Include(x => x.Steps)
+                    .FirstAsync(x => x.WorkflowDefinitionId == dbInstance.WorkflowDefinitionId);
+
+                var latest = dbInstance.Steps
+                    .OrderByDescending(x => x.StepInstanceId)
+                    .FirstOrDefault();
+
+                if (latest == null)
+                    throw new InvalidOperationException("No workflow steps found.");
+
+                var currentStepDef = latest.StepDefinition;
+
+                // 🔥 GET ALL STEP INSTANCES FOR CURRENT STEP (IMPORTANT FOR PARALLEL)
+                var currentStepInstances = dbInstance.Steps
+                    .Where(x => x.StepDefinitionId == currentStepDef.StepDefinitionId)
+                    .ToList();
+
+                // ============================================
+                // ✅ PARALLEL APPROVAL CHECK
+                // ============================================
+                if (currentStepDef.IsParallelGroup)
+                {
+                    if (currentStepDef.RequiresAllParallel)
+                    {
+                        // ✔ ALL must approve
+                        bool allApproved = currentStepInstances
+                            .All(x => x.Status == WorkflowStatus.Approved.ToString());
+
+                        if (!allApproved)
+                        {
+                            // ⛔ WAIT — do not advance yet
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        // ✔ ANY ONE can approve
+                        bool anyApproved = currentStepInstances
+                            .Any(x => x.Status == WorkflowStatus.Approved.ToString());
+
+                        if (!anyApproved)
+                        {
+                            // ⛔ WAIT — no approval yet
+                            return;
+                        }
+
+                        // OPTIONAL: auto-close remaining pending approvals
+                        foreach (var pending in currentStepInstances
+                            .Where(x => x.Status == WorkflowStatus.Pending.ToString()))
+                        {
+                            pending.Status = WorkflowStatus.Skipped.ToString();
+                            pending.ActionDate = DateTime.UtcNow;
+                        }
+                    }
+                }
+                else
+                {
+                    // ============================================
+                    // ✅ SEQUENTIAL STEP (DEFAULT)
+                    // ============================================
+                    if (latest.Status != WorkflowStatus.Approved.ToString())
+                    {
+                        // ⛔ Not approved yet → do not proceed
+                        return;
+                    }
+                }
+
+                // ============================================
+                // ✅ MOVE TO NEXT STEP
+                // ============================================
+                var nextStepOrder = currentStepDef.StepOrder + 1;
+
+                var nextSteps = definition.Steps
+                    .Where(x => x.StepOrder == nextStepOrder)
+                    .ToList();
+
+                if (!nextSteps.Any())
+                {
+                    // ✅ WORKFLOW COMPLETED
+                    dbInstance.Status = WorkflowStatus.Completed.ToString();
+                    await _db.SaveChangesAsync();
+
+                    // await _notify.SendCompletedAsync(dbInstance.EntityId);
+                    return;
+                }
+
+                // ============================================
+                // ✅ CREATE NEXT STEP INSTANCES
+                // ============================================
+                foreach (var nextStep in nextSteps)
+                {
+                    await CreateNextStepInstance(dbInstance, nextStep);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private async Task AdvanceWorkflow(WorkflowInstance instance)
+        {
+            try
+            {
+                var dbInstance = await _db.WorkflowInstances
+                    .Include(x => x.Steps)
+                        .ThenInclude(s => s.StepDefinition)
+                            .ThenInclude(sd => sd.Conditions)
+                    .FirstAsync(x => x.WorkflowInstanceId == instance.WorkflowInstanceId);
+
+                var definition = await _db.WorkflowDefinitions
+                    .Include(x => x.Steps)
+                    .FirstAsync(x => x.WorkflowDefinitionId == dbInstance.WorkflowDefinitionId);
+
+                var latest = dbInstance.Steps
+                    .OrderByDescending(x => x.StepInstanceId)
+                    .FirstOrDefault();
+
+                if (latest == null)
+                    throw new InvalidOperationException("No workflow steps found.");
+
+                var currentStepDef = latest.StepDefinition;
+
+                var currentStepInstances = dbInstance.Steps
+                    .Where(x => x.StepDefinitionId == currentStepDef.StepDefinitionId)
+                    .ToList();
+
+                // ============================================
+                // ✅ PARALLEL HANDLING (GROUP-BASED)
+                // ============================================
+                if (currentStepDef.IsParallelGroup && currentStepDef.ParallelGroupId != null)
+                {
+                    var groupSteps = dbInstance.Steps
+                        .Where(x => x.StepDefinition.ParallelGroupId == currentStepDef.ParallelGroupId)
+                        .ToList();
+
+                    if (currentStepDef.RequiresAllParallel)
+                    {
+                        bool allApproved = groupSteps.All(x => x.Status == WorkflowStatus.Approved.ToString());
+
+                        if (!allApproved)
+                            return;
+                    }
+                    else
+                    {
+                        bool anyApproved = groupSteps.Any(x => x.Status == WorkflowStatus.Approved.ToString());
+
+                        if (!anyApproved)
+                            return;
+
+                        // Auto-skip remaining
+                        foreach (var pending in groupSteps.Where(x => x.Status == WorkflowStatus.Pending.ToString()))
+                        {
+                            pending.Status = WorkflowStatus.Skipped.ToString();
+                            pending.ActionDate = DateTime.UtcNow;
+                        }
+                    }
+                }
+                else
+                {
+                    // Sequential
+                    if (latest.Status != WorkflowStatus.Approved.ToString())
+                        return;
+                }
+
+                // ============================================
+                // ✅ MULTI-CONDITIONAL ROUTING
+                // ============================================
+                var nextStepIds = new List<int>();
+
+                WorkflowRequestType requestType = WorkflowRequestType.NotDefined;
+
+                foreach (var condition in currentStepDef.Conditions)
+                {
+                    var currentWF = _db.WorkflowDefinitions
+                                    .Where(w => w.WorkflowDefinitionId == dbInstance.WorkflowDefinitionId)
+                                    .FirstOrDefault();
+                    if (currentWF != null)
+                    {
+                        switch(currentWF.EntityName.ToUpper())
+                        {
+                            case "RTYPELEAVE":
+                                requestType = WorkflowRequestType.LeaveRequisition;
+                                break;
+                        }
+                    }
+
+                    if (EvaluateCondition(condition, dbInstance.EntityId, requestType))
+                    {
+                        nextStepIds.Add(condition.NextStepDefinitionId);
+                    }
+                }
+
+                // Fallback to StepOrder if no condition matched
+                if (!nextStepIds.Any())
+                {
+                    var nextOrder = currentStepDef.StepOrder + 1;
+
+                    nextStepIds = definition.Steps
+                        .Where(x => x.StepOrder == nextOrder)
+                        .Select(x => x.StepDefinitionId)
+                        .ToList();
+                }
+
+                if (!nextStepIds.Any())
+                {
+                    dbInstance.Status = WorkflowStatus.Completed.ToString();
+                    await _db.SaveChangesAsync();
+
+                    // await _notify.SendCompletedAsync(dbInstance.EntityId);
+                    return;
+                }
+
+                // ============================================
+                // ✅ LOAD NEXT STEPS
+                // ============================================
+                var nextSteps = definition.Steps
+                    .Where(x => nextStepIds.Contains(x.StepDefinitionId))
+                    .ToList();
+
+                // ============================================
+                // ✅ CREATE NEXT STEP INSTANCES
+                // ============================================
+                foreach (var nextStep in nextSteps)
+                {
+                    await CreateNextStepInstance(dbInstance, nextStep);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private bool EvaluateCondition(WorkflowCondition condition, long entityId, WorkflowRequestType requestType)
+        {
+            try
+            {
+                //dynamic entity = null;
+
+                //if (requestType == WorkflowRequestType.LeaveRequisition)
+                //{
+                    
+                //}
+
+                var entity = _db.LeaveRequisitionWFs
+                        .AsNoTracking()
+                        .FirstOrDefault(x => x.LeaveRequestId == entityId);
+
+                if (entity == null)
+                    return false;
+
+                // Case-insensitive property lookup
+                var property = entity.GetType()
+                    .GetProperties()
+                    .FirstOrDefault(p => p.Name.Equals(condition.FieldName, StringComparison.OrdinalIgnoreCase));
+
+                if (property == null)
+                    throw new InvalidOperationException($"Field '{condition.FieldName}' not found.");
+
+                var actualValue = property.GetValue(entity);
+
+                if (actualValue == null)
+                    return false;
+
+                string actualString = actualValue.ToString() ?? string.Empty;
+                string expectedString = condition.CompareValue ?? string.Empty;
+
+                // ============================================
+                // ✅ NUMERIC PARSING (FIXED)
+                // ============================================
+                bool actualIsNumber = double.TryParse(actualString, out double actualNumber);
+                bool expectedIsNumber = double.TryParse(expectedString, out double expectedNumber);
+
+                bool isNumeric = actualIsNumber && expectedIsNumber;
+
+                // ============================================
+                // ✅ DATE PARSING
+                // ============================================
+                bool actualIsDate = DateTime.TryParse(actualString, out DateTime actualDate);
+                bool expectedIsDate = DateTime.TryParse(expectedString, out DateTime expectedDate);
+
+                bool isDate = actualIsDate && expectedIsDate;
+
+                var op = condition.Operator.ToLower();
+
+                // ============================================
+                // ✅ DATE COMPARISON
+                // ============================================
+                if (isDate)
+                {
+                    return op switch
+                    {
+                        ">" => actualDate > expectedDate,
+                        "<" => actualDate < expectedDate,
+                        ">=" => actualDate >= expectedDate,
+                        "<=" => actualDate <= expectedDate,
+                        "=" => actualDate == expectedDate,
+                        "!=" => actualDate != expectedDate,
+                        _ => false
+                    };
+                }
+
+                // ============================================
+                // ✅ NUMERIC COMPARISON
+                // ============================================
+                if (isNumeric)
+                {
+                    return op switch
+                    {
+                        ">" => actualNumber > expectedNumber,
+                        "<" => actualNumber < expectedNumber,
+                        ">=" => actualNumber >= expectedNumber,
+                        "<=" => actualNumber <= expectedNumber,
+                        "=" => actualNumber == expectedNumber,
+                        "!=" => actualNumber != expectedNumber,
+                        _ => false
+                    };
+                }
+
+                // ============================================
+                // ✅ STRING COMPARISON
+                // ============================================
+                return op switch
+                {
+                    "=" => string.Equals(actualString, expectedString, StringComparison.OrdinalIgnoreCase),
+
+                    "!=" => !string.Equals(actualString, expectedString, StringComparison.OrdinalIgnoreCase),
+
+                    "contains" => actualString.Contains(expectedString, StringComparison.OrdinalIgnoreCase),
+
+                    "startswith" => actualString.StartsWith(expectedString, StringComparison.OrdinalIgnoreCase),
+
+                    "endswith" => actualString.EndsWith(expectedString, StringComparison.OrdinalIgnoreCase),
+
+                    _ => throw new NotSupportedException($"Operator '{condition.Operator}' is not supported.")
+                };
+            }
+            catch (Exception)
+            {
+                // TODO: log error in production
+                return false;
             }
         }
         #endregion
