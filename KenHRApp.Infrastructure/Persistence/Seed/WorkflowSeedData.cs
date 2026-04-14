@@ -51,92 +51,132 @@ namespace KenHRApp.Infrastructure.Persistence.Seed
 
         public static async Task SeedLeaveWorkflowAsync(AppDbContext db)
         {
-            if (await db.WorkflowDefinitions
-                .AnyAsync(x => x.Name == "Leave Workflow"))
-                return;
+            /*  Workflow Outline:
+              
+                Step 1 → Approval by Supervisor
 
-            var parallelGroupId = Guid.NewGuid();
+                Step 2 → Parallel Group Approval
+                    - Head of HR
+                    - Cost Center Manager
 
-            var workflow = new WorkflowDefinition
+                Step 3 → Conditional Routing
+                    - If Sick Leave → Auto Close
+                    - If Annual Leave + Duration > 15 → GM Operations 
+             
+             */
+            try
             {
-                Name = "Leave Workflow",
-                EntityName = "LeaveRequisitionWF",
-                IsActive = true,
-                Steps = new List<WorkflowStepDefinition>
-            {
+                if (await db.WorkflowDefinitions.AnyAsync(x => x.Name == "Leave Workflow"))
+                    return;
+
+                var parallelGroupId = Guid.NewGuid();
+
+                var workflow = new WorkflowDefinition
+                {
+                    Name = "Leave Workflow",
+                    EntityName = "RTYPELEAVE",      // Refers to the Request Type Code
+                    IsActive = true
+                };
+
+                db.WorkflowDefinitions.Add(workflow);
+                await db.SaveChangesAsync();
+
                 // ============================================
                 // STEP 1: SUPERVISOR
                 // ============================================
-                new WorkflowStepDefinition
+                var step1 = new WorkflowStepDefinition
                 {
+                    WorkflowDefinitionId = workflow.WorkflowDefinitionId,
                     StepOrder = 1,
                     StepName = "Supervisor Approval",
                     ApprovalRole = "SUPERVISOR",
                     IsParallelGroup = false
-                },
+                };
 
                 // ============================================
-                // STEP 2: PARALLEL (HR + COST CENTER MANAGER)
+                // STEP 2: PARALLEL (HR + CC MANAGER)
                 // ============================================
-                new WorkflowStepDefinition
+                var step2HR = new WorkflowStepDefinition
                 {
+                    WorkflowDefinitionId = workflow.WorkflowDefinitionId,
                     StepOrder = 2,
                     StepName = "HR Approval",
-                    ApprovalRole = "HRADMIN",
+                    ApprovalRole = "HRHEAD",
                     IsParallelGroup = true,
                     ParallelGroupId = parallelGroupId,
                     RequiresAllParallel = true
-                },
-                new WorkflowStepDefinition
+                };
+
+                var step2CC = new WorkflowStepDefinition
                 {
+                    WorkflowDefinitionId = workflow.WorkflowDefinitionId,
                     StepOrder = 2,
                     StepName = "Cost Center Manager Approval",
                     ApprovalRole = "CCMANAGER",
                     IsParallelGroup = true,
                     ParallelGroupId = parallelGroupId,
                     RequiresAllParallel = true
-                },
+                };
 
                 // ============================================
-                // STEP 3: GM (CONDITIONAL)
+                // STEP 3: GM
                 // ============================================
-                new WorkflowStepDefinition
+                var step3GM = new WorkflowStepDefinition
                 {
+                    WorkflowDefinitionId = workflow.WorkflowDefinitionId,
                     StepOrder = 3,
                     StepName = "General Manager Approval",
                     ApprovalRole = "GMOPS",
-                    IsParallelGroup = false,
+                    IsParallelGroup = false
+                };
 
-                    Conditions = new List<WorkflowCondition>
+                db.WorkflowStepDefinitions.AddRange(step1, step2HR, step2CC, step3GM);
+                await db.SaveChangesAsync();
+
+                // ============================================
+                // ✅ CONDITIONS
+                // ============================================
+
+                var conditions = new List<WorkflowCondition>
+                {
+                    // --------------------------------------------
+                    // ✅ CONDITION 1: Sick → Auto Close
+                    // --------------------------------------------
+                    new WorkflowCondition
                     {
-                        new WorkflowCondition
-                        {
-                            // Annual Leave > 15 days → GM approval
-                            Expression = "LeaveType == \"AnnualLeave\" AND LeaveDuration > 15"
-                        }
+                        StepDefinitionId = step2HR.StepDefinitionId, // attach to Step 2
+                        FieldName = "LeaveType",
+                        Operator = "=",
+                        CompareValue = "SL",
+                        Expression = "LeaveType == \"SL\"",
+                        NextStepDefinitionId = null,
+                        IsTerminal = true     // 🔥 AUTO CLOSE
+                    },
+
+                    // --------------------------------------------
+                    // ✅ CONDITION 2: AnnualLeave > 15 → GM
+                    // --------------------------------------------
+                    new WorkflowCondition
+                    {
+                        StepDefinitionId = step2HR.StepDefinitionId, // attach to Step 2
+                        FieldName = "LeaveDuration",
+                        Operator = ">",
+                        CompareValue = "15",
+                        Expression = "LeaveType == \"AL\" AND LeaveDuration > 15",
+                        NextStepDefinitionId = step3GM.StepDefinitionId
                     }
-                }
+                };
+
+                db.WorkflowConditions.AddRange(conditions);
+
+                await db.SaveChangesAsync();
+
             }
-            };
-
-            db.WorkflowDefinitions.Add(workflow);
-            await db.SaveChangesAsync();
-
-            // ============================================
-            // ✅ AUTO-CLOSE CONDITION (ATTACHED TO STEP 2)
-            // ============================================
-            var step2 = await db.WorkflowStepDefinitions
-                .Include(x => x.Conditions)
-                .FirstAsync(x => x.StepName == "HR Approval");
-
-            step2.Conditions.Add(new WorkflowCondition
+            catch (Exception ex)
             {
-                // Sick leave → auto close (no Step 3)
-                Expression = "LeaveType == \"Sick\"",
-                NextStepDefinitionId = 0 // 🔥 SPECIAL FLAG → AUTO COMPLETE
-            });
-
-            await db.SaveChangesAsync();
+                throw;
+            }
+            
         }
     }        
 }

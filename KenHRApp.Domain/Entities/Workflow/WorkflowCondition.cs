@@ -22,10 +22,13 @@ namespace KenHRApp.Domain.Entities.Workflow
         [Column(TypeName = "varchar(50)")]
         public string CompareValue { get; set; } = default!;
 
-        public int NextStepDefinitionId { get; set; }
+        public int? NextStepDefinitionId { get; set; }
 
         [Column(TypeName = "varchar(500)")]
         public string? Expression { get; set; }
+
+        [Column(TypeName = "bit")]
+        public bool IsTerminal { get; set; }
         #endregion
     }
 }

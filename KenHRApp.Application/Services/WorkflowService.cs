@@ -88,13 +88,13 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int userId, string? comments)
+        public async Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string? comments)
         {
             bool isSuccess = false;
 
             try
             {
-                var repoResult = await _repository.ApproveStepAsync(stepInstanceId, userId, comments);
+                var repoResult = await _repository.ApproveStepAsync(stepInstanceId, approverEmpNo, approverUserID, comments);
                 if (!repoResult.Success)
                 {
                     return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
@@ -112,13 +112,13 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<Result<bool>> RejectStepAsync(int stepInstanceId, int userId, string comments)
+        public async Task<Result<bool>> RejectStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string comments)
         {
             bool isSuccess = false;
 
             try
             {
-                var repoResult = await _repository.RejectStepAsync(stepInstanceId, userId, comments);
+                var repoResult = await _repository.RejectStepAsync(stepInstanceId, approverEmpNo, approverUserID, comments);
                 if (!repoResult.Success)
                 {
                     return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");

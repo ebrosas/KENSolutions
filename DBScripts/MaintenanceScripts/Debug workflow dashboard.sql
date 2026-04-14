@@ -6,15 +6,60 @@
 
 	SELECT * FROM kenuser.RequestApprovals a WITH (NOLOCK)
 
-	SELECT * FROM [kenuser].[LeaveRequisitionWF] a
+	
 
-	SELECT a.EmployeeNo, a.ReportingManagerCode, a.SecondReportingManagerCode, 
+	SELECT a.EmployeeNo, a.UserID, a.ReportingManagerCode, a.SecondReportingManagerCode, 
 	* FROM kenuser.Employee a
 	ORDER BY a.EmployeeNo
 
+	SELECT a.LeaveType, a.LeaveDuration, * FROM [kenuser].[LeaveRequisitionWF] a
 	SELECT * FROM [kenuser].[WorkflowApprovalRoles] a WITH (NOLOCK)
+
+	SELECT * FROM [kenuser].[LeaveRequisitionWF] a
+	WHERE a.LeaveRequestId = 15
+
 	SELECT * FROM kenuser.WorkflowDefinitions a
-	SELECT * FROM [kenuser].[WorkflowConditions] A
+	SELECT * FROM kenuser.WorkflowConditions a
 	SELECT * FROM kenuser.WorkflowStepDefinitions a
 	SELECT * FROM kenuser.WorkflowInstances a
 	SELECT * FROM kenuser.WorkflowStepInstances a
+
+/*
+
+	TRUNCATE TABLE kenuser.WorkflowDefinitions
+	TRUNCATE TABLE kenuser.WorkflowStepDefinitions
+	TRUNCATE TABLE kenuser.WorkflowInstances
+	TRUNCATE TABLE kenuser.WorkflowStepInstances
+
+	DELETE FROM kenuser.WorkflowDefinitions 	
+	DELETE  FROM kenuser.WorkflowStepDefinitions 
+	DELETE FROM kenuser.WorkflowInstances 
+	DELETE FROM kenuser.WorkflowStepInstances
+
+	BEGIN TRAN T1
+
+	UPDATE kenuser.WorkflowDefinitions
+	SET EntityName = 'RTYPELEAVE'
+	WHERE WorkflowDefinitionId = 7 
+
+	UPDATE kenuser.Employee
+	SET UserID = 'anne'
+	WHERE EmployeeNo = 10003633
+
+	UPDATE kenuser.Employee
+	SET UserID = 'abdulla'
+	WHERE EmployeeNo = 10003635
+
+	DELETE FROM kenuser.WorkflowStepInstances
+	WHERE StepInstanceId IN (3, 4)
+
+	UPDATE kenuser.WorkflowStepInstances
+	SET ApproverUserID = NULL,
+		Status = 'Pending',
+		ActionDate = null,
+		Comments = null
+	WHERE StepInstanceId = 2
+
+	COMMIT TRAN T1
+
+*/

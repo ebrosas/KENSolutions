@@ -1,16 +1,11 @@
-﻿using Azure.Core;
-using KenHRApp.Domain.Entities;
+﻿using KenHRApp.Domain.Entities;
 using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Domain.Entities.Workflow;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
+using NCalc;
+using System.Text.RegularExpressions;
 
 namespace KenHRApp.Infrastructure.Repositories
 {
@@ -80,7 +75,7 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        public async Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int userId, string? comments)
+        public async Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string? comments)
         {
             try
             {
@@ -93,14 +88,15 @@ namespace KenHRApp.Infrastructure.Repositories
                     throw new InvalidOperationException($"StepInstanceId {stepInstanceId} not found.");
 
                 if (step.Status != WorkflowStatus.Pending.ToString())   
-                    throw new InvalidOperationException("This step is already processed.");
+                    throw new InvalidOperationException("This request is already processed.");
 
-                if (step.ApproverEmpNo != userId)
-                    throw new UnauthorizedAccessException("You are not allowed to approve this step.");
+                if (step.ApproverEmpNo != approverEmpNo)
+                    throw new UnauthorizedAccessException("You are not allowed to approve this request.");
 
                 step.Status = WorkflowStatus.Approved.ToString();
                 step.ActionDate = DateTime.UtcNow;
                 step.Comments = comments;
+                step.ApproverUserID = approverUserID;
 
                 await _db.SaveChangesAsync();
 
@@ -115,17 +111,27 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        public async Task<Result<bool>> RejectStepAsync(int stepInstanceId, int userId, string comments)
+        public async Task<Result<bool>> RejectStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string comments)
         {
             try
             {
                 var step = await _db.WorkflowStepInstances
-                .Include(x => x.WorkflowInstance)
-                .FirstAsync(x => x.StepInstanceId == stepInstanceId);
+                    .Include(x => x.WorkflowInstance)
+                    .FirstAsync(x => x.StepInstanceId == stepInstanceId);
+
+                if (step == null)
+                    throw new InvalidOperationException($"StepInstanceId {stepInstanceId} not found.");
+
+                if (step.Status != WorkflowStatus.Pending.ToString())
+                    throw new InvalidOperationException("This request is already processed.");
+
+                if (step.ApproverEmpNo != approverEmpNo)
+                    throw new UnauthorizedAccessException("You are not allowed to reject this request.");
 
                 step.Status = WorkflowStatus.Rejected.ToString();
                 step.ActionDate = DateTime.UtcNow;
                 step.Comments = comments;
+                step.ApproverUserID = approverUserID;
 
                 step.WorkflowInstance.Status = WorkflowStatus.Rejected.ToString();
                 await _db.SaveChangesAsync();
@@ -296,7 +302,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     .Where(x => x.StepOrder == nextStepOrder)
                     .ToList();
 
-                if (!nextSteps.Any())
+                if (nextSteps == null || !nextSteps.Any())
                 {
                     // ✅ WORKFLOW COMPLETED
                     dbInstance.Status = WorkflowStatus.Completed.ToString();
@@ -347,6 +353,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     .Where(x => x.StepDefinitionId == currentStepDef.StepDefinitionId)
                     .ToList();
 
+                #region PARALLEL HANDLING (GROUP-BASED)
                 // ============================================
                 // ✅ PARALLEL HANDLING (GROUP-BASED)
                 // ============================================
@@ -384,7 +391,9 @@ namespace KenHRApp.Infrastructure.Repositories
                     if (latest.Status != WorkflowStatus.Approved.ToString())
                         return;
                 }
+                #endregion
 
+                #region MULTI-CONDITIONAL ROUTING
                 // ============================================
                 // ✅ MULTI-CONDITIONAL ROUTING
                 // ============================================
@@ -407,11 +416,25 @@ namespace KenHRApp.Infrastructure.Repositories
                         }
                     }
 
-                    if (EvaluateCondition(condition, dbInstance.EntityId, requestType))
+                    if (requestType == WorkflowRequestType.LeaveRequisition)
                     {
-                        nextStepIds.Add(condition.NextStepDefinitionId);
+                        var entity = await _db.LeaveRequisitionWFs
+                                    .AsNoTracking()
+                                    .FirstOrDefaultAsync(x => x.LeaveRequestId == dbInstance.EntityId);
+
+                        if (entity != null)
+                        {
+                            foreach (var stepCondition in currentStepDef.Conditions)
+                            {
+                                if (EvaluateCondition(stepCondition, entity))
+                                {
+                                    nextStepIds.Add(stepCondition.NextStepDefinitionId ?? 0);
+                                }
+                            }
+                        }
                     }
                 }
+                #endregion
 
                 // Fallback to StepOrder if no condition matched
                 if (!nextStepIds.Any())
@@ -424,7 +447,7 @@ namespace KenHRApp.Infrastructure.Repositories
                         .ToList();
                 }
 
-                if (!nextStepIds.Any())
+                if (nextStepIds == null || !nextStepIds.Any())
                 {
                     dbInstance.Status = WorkflowStatus.Completed.ToString();
                     await _db.SaveChangesAsync();
@@ -454,7 +477,7 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        private bool EvaluateCondition(WorkflowCondition condition, long entityId, WorkflowRequestType requestType)
+        private bool EvaluateConditionOld(WorkflowCondition condition, long entityId, WorkflowRequestType requestType)
         {
             try
             {
@@ -563,6 +586,149 @@ namespace KenHRApp.Infrastructure.Repositories
                 // TODO: log error in production
                 return false;
             }
+        }
+
+        
+
+        private bool EvaluateConditionHasBug(WorkflowCondition condition, object entity)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(condition.Expression))
+                    return false;
+
+                // ============================================
+                // ✅ NORMALIZE EXPRESSION (FIX HERE)
+                // ============================================
+                var normalizedExpression = NormalizeExpression(condition.Expression);
+
+                if (string.IsNullOrWhiteSpace(normalizedExpression))
+                    return false;
+
+                var exp = new Expression(normalizedExpression, EvaluateOptions.IgnoreCase);
+                //var exp = new Expression(condition.Expression, EvaluateOptions.IgnoreCase);
+
+                // ============================================
+                // ✅ MAP ENTITY PROPERTIES TO EXPRESSION
+                // ============================================
+                var properties = entity.GetType().GetProperties();
+
+                foreach (var prop in properties)
+                {
+                    var value = prop.GetValue(entity);
+
+                    exp.Parameters[prop.Name] = value ?? DBNull.Value;
+                }
+
+                // ============================================
+                // ✅ OPTIONAL: CUSTOM FUNCTIONS
+                // ============================================
+                exp.EvaluateFunction += (name, args) =>
+                {
+                    if (name.Equals("IsNullOrEmpty", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = args.Parameters[0].Evaluate();
+                        args.Result = val == null || string.IsNullOrEmpty(val.ToString());
+                    }
+                };
+
+                // ============================================
+                // ✅ EXECUTE EXPRESSION
+                // ============================================
+                var result = exp.Evaluate();
+
+                return result is bool b && b;
+            }
+            catch (Exception ex)
+            {
+                // TODO: log error
+                //_logger.LogError(ex, "Expression evaluation failed");
+                return false;
+            }
+        }
+
+        private bool EvaluateCondition(WorkflowCondition condition, object entity)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(condition.Expression))
+                    return false;
+
+                var normalizedExpression = NormalizeExpression(condition.Expression);
+
+                if (string.IsNullOrWhiteSpace(normalizedExpression))
+                    return false;
+
+                var exp = new Expression(normalizedExpression, EvaluateOptions.IgnoreCase);
+
+                var properties = entity.GetType().GetProperties();
+
+                // ============================================
+                // ✅ MAP PROPERTIES
+                // ============================================
+                foreach (var prop in properties)
+                {
+                    var value = prop.GetValue(entity);
+                    exp.Parameters[prop.Name] = value ?? DBNull.Value;
+                }
+
+                // ============================================
+                // ✅ HANDLE MISSING PARAMETERS (CRITICAL FIX)
+                // ============================================
+                exp.EvaluateParameter += (name, args) =>
+                {
+                    var prop = properties
+                        .FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+                    if (prop != null)
+                    {
+                        var val = prop.GetValue(entity);
+                        args.Result = val ?? DBNull.Value;
+                    }
+                    else
+                    {
+                        // 🔥 Prevent crash — treat missing fields as NULL
+                        args.Result = DBNull.Value;
+                    }
+                };
+
+                // ============================================
+                // ✅ CUSTOM FUNCTIONS
+                // ============================================
+                exp.EvaluateFunction += (name, args) =>
+                {
+                    if (name.Equals("IsNullOrEmpty", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = args.Parameters[0].Evaluate();
+                        args.Result = val == null || string.IsNullOrEmpty(val?.ToString());
+                    }
+                };
+
+                // ============================================
+                // ✅ EXECUTE
+                // ============================================
+                var result = exp.Evaluate();
+
+                return result is bool b && b;
+            }
+            catch (Exception ex)
+            {
+                // TODO: log properly
+                //_logger.LogError(ex, $"Expression failed: {condition.Expression}");
+                return false;
+            }
+        }
+
+        private string NormalizeExpression(string expression)
+        {
+            if (string.IsNullOrWhiteSpace(expression))
+                return expression;
+
+            // Replace logical operators safely (case-insensitive)
+            expression = Regex.Replace(expression, @"\bAND\b", "&&", RegexOptions.IgnoreCase);
+            expression = Regex.Replace(expression, @"\bOR\b", "||", RegexOptions.IgnoreCase);
+
+            return expression;
         }
         #endregion
 

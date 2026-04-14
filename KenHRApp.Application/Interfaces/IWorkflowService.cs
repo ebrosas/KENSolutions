@@ -18,7 +18,7 @@ namespace KenHRApp.Application.Interfaces
             DateTime? endDate);
 
         Task<Result<int>> StartWorkflowAsync(string entityName, long entityId);
-        Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int userId, string? comments);
-        Task<Result<bool>> RejectStepAsync(int stepInstanceId, int userId, string comments);
+        Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string? comments);
+        Task<Result<bool>> RejectStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string comments);
     }
 }

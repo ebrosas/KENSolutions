@@ -284,8 +284,10 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
                 #region Test the workflow
                 //await InitializeWorkflowAsync();
-                //await ApproveWorkflowAsync(1, 10003632, "Test Approval Level #1");
-                await ApproveWorkflowAsync(2, 10003634, "Test Approval Level #2");
+                //await ApproveWorkflowAsync(1, 10003632, "ervin", "Test Supervisor Approval");
+                await ApproveWorkflowAsync(2, 10003633, "anne", "Test HR Approval");
+                //await ApproveWorkflowAsync(3, 10003636, "nagendra", "Test Cost Center Manager Approval");
+                //await ApproveWorkflowAsync(4, 10003634, "Test General Manager Approval");
                 #endregion                
 
             }, forceLoad);
@@ -428,7 +430,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
             try
             {
-                var repoResult = await WorkflowService.StartWorkflowAsync("RTYPELEAVE", 10);
+                var repoResult = await WorkflowService.StartWorkflowAsync("RTYPELEAVE", 15);
                 if (repoResult.Success)
                 {
                     workflowInstanceID = repoResult.Value;
@@ -448,13 +450,39 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             }
         }
 
-        private async Task ApproveWorkflowAsync(int stepInstanceId, int userId, string? comments)
+        private async Task ApproveWorkflowAsync(int stepInstanceId, int approverNo, string userID, string? comments)
         {
             bool isSuccess = false;
 
             try
             {
-                var repoResult = await WorkflowService.ApproveStepAsync(stepInstanceId, userId, comments);
+                var repoResult = await WorkflowService.ApproveStepAsync(stepInstanceId, approverNo, userID, comments);
+                if (repoResult.Success)
+                {
+                    isSuccess = repoResult.Value;
+                }
+                else
+                {
+                    // Show error message
+                    _errorMessage.AppendLine(repoResult.Error);
+
+                    ShowHideError(true);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private async Task RejectWorkflowAsync(int stepInstanceId, int approverNo, string? userID, string comments)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var repoResult = await WorkflowService.RejectStepAsync(stepInstanceId, approverNo, userID, comments);
                 if (repoResult.Success)
                 {
                     isSuccess = repoResult.Value;

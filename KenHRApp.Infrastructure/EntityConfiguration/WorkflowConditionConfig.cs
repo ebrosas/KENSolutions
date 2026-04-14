@@ -34,7 +34,8 @@ namespace KenHRApp.Infrastructure.EntityConfiguration
             builder.HasOne<WorkflowStepDefinition>()
                 .WithMany()
                 .HasForeignKey(x => x.NextStepDefinitionId)
-                .OnDelete(DeleteBehavior.Restrict); // VERY IMPORTANT
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false); // ✅ VERY IMPORTANT
         }
     }
 }

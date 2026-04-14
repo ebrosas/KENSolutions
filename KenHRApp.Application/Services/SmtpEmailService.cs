@@ -40,19 +40,20 @@ namespace KenHRApp.Application.Services
             {
                 var smtpSection = _configuration.GetSection("Smtp");
 
-                //using var client = new SmtpClient(smtpSection["Host"])
-                //{
-                //    Port = int.Parse(smtpSection["Port"]!),
-                //    Credentials = new NetworkCredential(
-                //        smtpSection["Username"],
-                //        smtpSection["Password"]),
-                //    EnableSsl = true
-                //};
-
                 using var client = new SmtpClient(smtpSection["Host"])
                 {
+                    Port = int.Parse(smtpSection["Port"]!),
+                    Credentials = new NetworkCredential(
+                        smtpSection["Username"],
+                        smtpSection["Password"]),
+                    //EnableSsl = true,
                     UseDefaultCredentials = true
                 };
+
+                //using var client = new SmtpClient(smtpSection["Host"])
+                //{
+                //    UseDefaultCredentials = true
+                //};
 
                 using var message = new MailMessage
                 {
