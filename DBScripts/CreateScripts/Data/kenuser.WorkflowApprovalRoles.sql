@@ -3,7 +3,7 @@
 
 /*	Development DB
 
-    INSERT INTO [kenuser].[WorkflowApprovalRoles]
+     INSERT INTO [kenuser].[WorkflowApprovalRoles]
            ([ApprovalGroupCode]
            ,[ApprovalGroupDesc]
            ,[Remarks]
@@ -23,20 +23,44 @@
             10003632 AS CreatedBy, 
             'ervin' AS CreatedUserID
 
-    UNION
+	UNION
 
-     SELECT  'CCMANAGER' AS ApprovalGroupCode,
+    SELECT  'CCMANAGER' AS ApprovalGroupCode,
             'Department Manager' AS ApprovalGroupDesc, 
-            '2nd Level Approval' AS Remarks, 
-            10003634 AS AssigneeEmpNo, 
-            'ANNE KIRSTEN BROSAS' AS AssigneEmpName, 
-            'kirsten.brosas@yahoo.com' AS AssigneEmail, 
+            '' AS Remarks, 
+            10003636 AS AssigneeEmpNo, 
+            'Fernando Magtanggol Poe' AS AssigneEmpName, 
+            'ervinbrosas22@gmail.com' AS AssigneEmail, 
+            GETDATE() AS CreatedDate, 
+            10003632 AS CreatedBy, 
+            'ervin' AS CreatedUserID
+
+	UNION
+
+    SELECT  'HRHEAD' AS ApprovalGroupCode,
+            'Head of HR' AS ApprovalGroupDesc, 
+            '' AS Remarks, 
+            10003633 AS AssigneeEmpNo, 
+            'Antonina Ramirez Brosas' AS AssigneEmpName, 
+            'antoneth_brosas28@yahoo.com' AS AssigneEmail, 
+            GETDATE() AS CreatedDate, 
+            10003632 AS CreatedBy, 
+            'ervin' AS CreatedUserID
+
+	UNION
+
+    SELECT  'GMOPS' AS ApprovalGroupCode,
+            'GM Operations' AS ApprovalGroupDesc, 
+            '' AS Remarks, 
+            10003635 AS AssigneeEmpNo, 
+            'Katriane Ramirez Brosas' AS AssigneEmpName, 
+            'katriane.brosas@yahoo.com' AS AssigneEmail, 
             GETDATE() AS CreatedDate, 
             10003632 AS CreatedBy, 
             'ervin' AS CreatedUserID
 */
 
---/*	Staging DB
+/*	Staging DB
 
     INSERT INTO [kenuser].[WorkflowApprovalRoles]
            ([ApprovalGroupCode]
@@ -94,7 +118,7 @@
             10003632 AS CreatedBy, 
             'ervin' AS CreatedUserID
 
---*/
+*/
 
     --Check
     SELECT * FROM [kenuser].[WorkflowApprovalRoles] a

@@ -57,4 +57,8 @@ To-do List (As of 26-Mar-2026):
 To-do List (As of 27-Mar-2026):
 1. Implement code in Leave Inquiry page to open the Leave Requisition page upon clicking the view link in the datagrid 
 
+To-do List (As of 15-Apr-2026):
+1. Refactor the code in SendPendingApprovalAsync() method in "WorkflowService" class.
+2. Refactor the code in SendAsync() method in "WorkflowEmailService" class
+
 

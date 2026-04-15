@@ -1,11 +1,16 @@
-﻿using KenHRApp.Application.DTOs;
+﻿using KenHRApp.Application.Common.Interfaces;
+using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Domain.Entities.Workflow;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Repositories;
+using KenHRApp.Infrastructure.Settings;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -16,12 +21,19 @@ namespace KenHRApp.Application.Services
     {
         #region Fields
         private readonly IWorkflowRepository _repository;
+        private readonly IWorkflowEmailService _emailService;
+        private readonly AppSettings _settings;
         #endregion
 
         #region Contructors
-        public WorkflowService(IWorkflowRepository repository)
+        public WorkflowService(
+            IWorkflowRepository repository, 
+            IWorkflowEmailService emailService,
+            IOptions<AppSettings> settings)
         {
             _repository = repository;
+            _emailService = emailService;
+            _settings = settings.Value;
         }
         #endregion
 
@@ -133,6 +145,61 @@ namespace KenHRApp.Application.Services
             catch (Exception ex)
             {
                 return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error while executing RejectStepAsync() method.");
+            }
+        }
+        #endregion
+
+        #region Private Methods
+        public async Task<Result<bool>> SendPendingApprovalAsync(
+            string email,
+            int empNo,
+            DateTime doj,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                int approverEmpNo = 0;
+
+                //var token = await GenerateEmailVerificationTokenAsync(
+                //    empNo,
+                //    doj,
+                //    cancellationToken);
+
+                //if (string.IsNullOrEmpty(token))
+                //    return Result<bool>.Failure("Unable to generate email verification token!");
+
+                var baseUrl = _settings.BaseUrl.TrimEnd('/');
+
+                //return $"{baseUrl}/UserAccount/VerifyEmail?token={Uri.EscapeDataString(token)}";
+                //Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.LeaveRequestId}&CallerForm=LeaveInquiry");
+
+                var requestLink = $"{baseUrl}/TimeAttendance/leaverequest?ActionType=View";
+
+                #region Build the email contents
+                var subject = "Verify your KenHR account";
+
+                var body = $@"
+                    Hello,
+
+                    Thank you for registering with KenHR.
+
+                    Please verify your email by clicking the link below:
+
+                    {requestLink}
+
+                    Note that the verification link is valid for 24 hours only. If you did not initiate this request, please ignore this email.
+
+                    Regards,
+                    KenHR Team";
+                #endregion
+
+                await _emailService.SendAsync(approverEmpNo, subject, body, cancellationToken);
+
+                return Result<bool>.SuccessResult(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in SendVerificationEmailAsync() method.");
             }
         }
         #endregion

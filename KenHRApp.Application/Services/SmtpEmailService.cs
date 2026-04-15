@@ -46,8 +46,7 @@ namespace KenHRApp.Application.Services
                     Credentials = new NetworkCredential(
                         smtpSection["Username"],
                         smtpSection["Password"]),
-                    //EnableSsl = true,
-                    UseDefaultCredentials = true
+                    EnableSsl = true
                 };
 
                 //using var client = new SmtpClient(smtpSection["Host"])

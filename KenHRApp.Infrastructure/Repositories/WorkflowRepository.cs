@@ -898,7 +898,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     _ => throw new NotSupportedException($"Operator '{condition.Operator}' is not supported.")
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // TODO: log error properly
                 return false;

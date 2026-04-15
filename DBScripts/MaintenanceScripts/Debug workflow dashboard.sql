@@ -6,9 +6,10 @@
 
 	SELECT * FROM kenuser.RequestApprovals a WITH (NOLOCK)
 
-	
+	 SELECT * FROM [kenuser].[WorkflowApprovalRoles] a
 
 	SELECT a.EmployeeNo, a.UserID, a.ReportingManagerCode, a.SecondReportingManagerCode, 
+		a.OfficialEmail, a.PersonalEmail, a.HireDate,
 	* FROM kenuser.Employee a
 	ORDER BY a.EmployeeNo
 

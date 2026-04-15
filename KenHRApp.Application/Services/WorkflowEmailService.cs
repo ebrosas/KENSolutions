@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace KenHRApp.Application.Services
 {
-    public class WorkflowEmailService
+    public class WorkflowEmailService : IWorkflowEmailService
     {
         #region Fields
         private readonly IWorkflowRepository _wfRepository;
@@ -59,7 +59,8 @@ namespace KenHRApp.Application.Services
                    user!.OfficialEmail,
                    subject,
                    message,
-                   true);
+                   true,
+                   cancellationToken);
 
                 return Result<bool>.SuccessResult(true);
 
