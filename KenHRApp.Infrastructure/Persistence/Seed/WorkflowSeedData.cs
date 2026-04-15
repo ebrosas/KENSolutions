@@ -144,7 +144,8 @@ namespace KenHRApp.Infrastructure.Persistence.Seed
                     // --------------------------------------------
                     new WorkflowCondition
                     {
-                        StepDefinitionId = step2HR.StepDefinitionId, // attach to Step 2
+                        //StepDefinitionId = step2HR.StepDefinitionId,      // attach to Step 2 - HR Approval
+                        StepDefinitionId = step2CC.StepDefinitionId,        // attach to Step 2 - Cost Center Manager Approval (Notes: Attach to the last step in the parallel group to ensure both HR and CC Manager approvals are completed before evaluating this condition)
                         FieldName = "LeaveType",
                         Operator = "=",
                         CompareValue = "SL",
@@ -158,7 +159,8 @@ namespace KenHRApp.Infrastructure.Persistence.Seed
                     // --------------------------------------------
                     new WorkflowCondition
                     {
-                        StepDefinitionId = step2HR.StepDefinitionId, // attach to Step 2
+                        //StepDefinitionId = step2HR.StepDefinitionId,      // attach to Step 2 - HR Approval
+                        StepDefinitionId = step2CC.StepDefinitionId,        // attach to Step 2 - Cost Center Manager Approval (Notes: Attach to the last step in the parallel group to ensure both HR and CC Manager approvals are completed before evaluating this condition)
                         FieldName = "LeaveDuration",
                         Operator = ">",
                         CompareValue = "15",

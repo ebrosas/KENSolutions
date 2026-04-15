@@ -38,6 +38,9 @@
 
 	BEGIN TRAN T1
 
+	UPDATE kenuser.WorkflowConditions
+	SET StepDefinitionId = 25
+
 	UPDATE kenuser.WorkflowDefinitions
 	SET EntityName = 'RTYPELEAVE'
 	WHERE WorkflowDefinitionId = 7 
@@ -50,6 +53,8 @@
 	SET UserID = 'abdulla'
 	WHERE EmployeeNo = 10003635
 
+	DELETE FROM kenuser.WorkflowInstances
+
 	DELETE FROM kenuser.WorkflowStepInstances
 	WHERE StepInstanceId IN (3, 4)
 
@@ -58,7 +63,7 @@
 		Status = 'Pending',
 		ActionDate = null,
 		Comments = null
-	WHERE StepInstanceId = 2
+	WHERE StepInstanceId = 13
 
 	COMMIT TRAN T1
 

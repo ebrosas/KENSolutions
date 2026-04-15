@@ -6,6 +6,7 @@ using KenHRApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using NCalc;
 using System.Text.RegularExpressions;
+using System.Linq.Dynamic.Core;
 
 namespace KenHRApp.Infrastructure.Repositories
 {
@@ -354,9 +355,6 @@ namespace KenHRApp.Infrastructure.Repositories
                     .ToList();
 
                 #region PARALLEL HANDLING (GROUP-BASED)
-                // ============================================
-                // ✅ PARALLEL HANDLING (GROUP-BASED)
-                // ============================================
                 if (currentStepDef.IsParallelGroup && currentStepDef.ParallelGroupId != null)
                 {
                     var groupSteps = dbInstance.Steps
@@ -394,9 +392,6 @@ namespace KenHRApp.Infrastructure.Repositories
                 #endregion
 
                 #region MULTI-CONDITIONAL ROUTING
-                // ============================================
-                // ✅ MULTI-CONDITIONAL ROUTING
-                // ============================================
                 var nextStepIds = new List<int>();
 
                 WorkflowRequestType requestType = WorkflowRequestType.NotDefined;
@@ -424,12 +419,17 @@ namespace KenHRApp.Infrastructure.Repositories
 
                         if (entity != null)
                         {
-                            foreach (var stepCondition in currentStepDef.Conditions)
+                            //foreach (var stepCondition in currentStepDef.Conditions)
+                            //{
+                            //    if (EvaluateCondition(stepCondition, entity))
+                            //    {
+                            //        nextStepIds.Add(stepCondition.NextStepDefinitionId ?? 0);
+                            //    }
+                            //}
+
+                            if (EvaluateCondition(condition, entity))
                             {
-                                if (EvaluateCondition(stepCondition, entity))
-                                {
-                                    nextStepIds.Add(stepCondition.NextStepDefinitionId ?? 0);
-                                }
+                                nextStepIds.Add(condition.NextStepDefinitionId ?? 0);
                             }
                         }
                     }
@@ -732,7 +732,7 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        private bool EvaluateCondition(WorkflowCondition condition, object entity)
+        private bool EvaluateConditionClassic(WorkflowCondition condition, object entity)
         {
             try
             {
@@ -832,7 +832,80 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        private string NormalizeExpression(string expression)
+        private bool EvaluateCondition(WorkflowCondition condition, object entity)
+        {
+            try
+            {
+                if (entity == null)
+                    return false;
+
+                // ============================================
+                // ✅ USE EXPRESSION FIRST (NEW ENGINE)
+                // ============================================
+                if (!string.IsNullOrWhiteSpace(condition.Expression))
+                {
+                    var normalized = NormalizeExpression(condition.Expression);
+
+                    if (string.IsNullOrWhiteSpace(normalized))
+                        return false;
+
+                    // ============================================
+                    // ✅ CAST TO STRONG TYPE 
+                    // ============================================
+                    if (entity is LeaveRequisitionWF leave)
+                    {
+                        var queryable = new List<LeaveRequisitionWF> { leave }.AsQueryable();
+
+                        return queryable.Any(normalized);
+                    }
+
+                    //throw new InvalidOperationException("Unsupported entity type.");
+
+                    //// Convert single object → IQueryable
+                    //var queryable = new[] { entity }.AsQueryable();
+
+                    //// Execute dynamic LINQ
+                    //return queryable.Any(normalized);
+                }
+
+                // ============================================
+                // ✅ FALLBACK TO FIELD-BASED (LEGACY SUPPORT)
+                // ============================================
+                var property = entity.GetType()
+                    .GetProperties()
+                    .FirstOrDefault(p => p.Name.Equals(condition.FieldName, StringComparison.OrdinalIgnoreCase));
+
+                if (property == null)
+                    throw new InvalidOperationException($"Field '{condition.FieldName}' not found.");
+
+                var actualValue = property.GetValue(entity);
+
+                if (actualValue == null)
+                    return false;
+
+                string actualString = actualValue.ToString() ?? string.Empty;
+                string expectedString = condition.CompareValue ?? string.Empty;
+
+                var op = condition.Operator.ToLower();
+
+                return op switch
+                {
+                    "=" => string.Equals(actualString, expectedString, StringComparison.OrdinalIgnoreCase),
+                    "!=" => !string.Equals(actualString, expectedString, StringComparison.OrdinalIgnoreCase),
+                    "contains" => actualString.Contains(expectedString, StringComparison.OrdinalIgnoreCase),
+                    "startswith" => actualString.StartsWith(expectedString, StringComparison.OrdinalIgnoreCase),
+                    "endswith" => actualString.EndsWith(expectedString, StringComparison.OrdinalIgnoreCase),
+                    _ => throw new NotSupportedException($"Operator '{condition.Operator}' is not supported.")
+                };
+            }
+            catch (Exception)
+            {
+                // TODO: log error properly
+                return false;
+            }
+        }
+
+        private string NormalizeExpressionClassic(string expression)
         {
             if (string.IsNullOrWhiteSpace(expression))
                 return expression;
@@ -842,6 +915,31 @@ namespace KenHRApp.Infrastructure.Repositories
             expression = Regex.Replace(expression, @"\bOR\b", "||", RegexOptions.IgnoreCase);
 
             return expression;
+        }
+
+        private string NormalizeExpression(string expression)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(expression))
+                    return expression;
+
+                // Convert SQL-style to C# style
+                expression = Regex.Replace(expression, @"\bAND\b", "&&", RegexOptions.IgnoreCase);
+                expression = Regex.Replace(expression, @"\bOR\b", "||", RegexOptions.IgnoreCase);
+
+                // Convert "=" to "==" safely
+                expression = Regex.Replace(expression, @"(?<![=!<>])=(?!=)", "==");
+
+                // Convert "<>" to "!="
+                expression = expression.Replace("<>", "!=");
+
+                return expression;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
         #endregion
 
