@@ -11,3 +11,14 @@ Step 3:
 If LeaveType == "Sick" → Auto-close
 If LeaveDuration > 10 → GM
 Step 4: Payroll (if unpaid leave)
+
+Sample Workflow for Leave Request using complex multi-conditional + parallel steps:
+Step 1 → Supervisor
+
+Step 2 → Parallel Group
+    - HR
+    - Cost Center Manager
+
+Step 3 → Conditional Routing
+    - Sick → Auto Close
+    - AnnualLeave + Duration > 15 → GM

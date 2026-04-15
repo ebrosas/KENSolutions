@@ -586,9 +586,7 @@ namespace KenHRApp.Infrastructure.Repositories
                 // TODO: log error in production
                 return false;
             }
-        }
-
-        
+        }        
 
         private bool EvaluateConditionHasBug(WorkflowCondition condition, object entity)
         {
@@ -647,7 +645,7 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        private bool EvaluateCondition(WorkflowCondition condition, object entity)
+        private bool EvaluateConditionNew(WorkflowCondition condition, object entity)
         {
             try
             {
@@ -666,30 +664,45 @@ namespace KenHRApp.Infrastructure.Repositories
                 // ============================================
                 // ✅ MAP PROPERTIES
                 // ============================================
-                foreach (var prop in properties)
-                {
-                    var value = prop.GetValue(entity);
-                    exp.Parameters[prop.Name] = value ?? DBNull.Value;
-                }
+                //foreach (var prop in properties)
+                //{
+                //    var value = prop.GetValue(entity);
+                //    exp.Parameters[prop.Name] = value ?? DBNull.Value;
+                //}
 
                 // ============================================
                 // ✅ HANDLE MISSING PARAMETERS (CRITICAL FIX)
                 // ============================================
                 exp.EvaluateParameter += (name, args) =>
                 {
-                    var prop = properties
-                        .FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                    //var prop = properties
+                    //    .FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 
-                    if (prop != null)
+                    var propertyDict = properties.ToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
+                    if (propertyDict.TryGetValue(name, out var prop))
                     {
-                        var val = prop.GetValue(entity);
-                        args.Result = val ?? DBNull.Value;
+                        if (prop != null)
+                        {
+                            var val = prop.GetValue(entity);
+                            args.Result = val ?? DBNull.Value;
+                        }
+                        else
+                        {
+                            // 🔥 Prevent crash — treat missing fields as NULL
+                            args.Result = DBNull.Value;
+                        }
                     }
-                    else
-                    {
-                        // 🔥 Prevent crash — treat missing fields as NULL
-                        args.Result = DBNull.Value;
-                    }
+
+                    //if (prop != null)
+                    //{
+                    //    var val = prop.GetValue(entity);
+                    //    args.Result = val ?? DBNull.Value;
+                    //}
+                    //else
+                    //{
+                    //     🔥 Prevent crash — treat missing fields as NULL
+                    //    args.Result = DBNull.Value;
+                    //}
                 };
 
                 // ============================================
@@ -715,6 +728,106 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 // TODO: log properly
                 //_logger.LogError(ex, $"Expression failed: {condition.Expression}");
+                return false;
+            }
+        }
+
+        private bool EvaluateCondition(WorkflowCondition condition, object entity)
+        {
+            try
+            {
+                if (entity == null)
+                    return false;
+
+                // Case-insensitive property lookup
+                var property = entity.GetType()
+                    .GetProperties()
+                    .FirstOrDefault(p => p.Name.Equals(condition.FieldName, StringComparison.OrdinalIgnoreCase));
+
+                if (property == null)
+                    throw new InvalidOperationException($"Field '{condition.FieldName}' not found.");
+
+                var actualValue = property.GetValue(entity);
+
+                if (actualValue == null)
+                    return false;
+
+                string actualString = actualValue.ToString() ?? string.Empty;
+                string expectedString = condition.CompareValue ?? string.Empty;
+
+                // ============================================
+                // ✅ NUMERIC PARSING (FIXED)
+                // ============================================
+                bool actualIsNumber = double.TryParse(actualString, out double actualNumber);
+                bool expectedIsNumber = double.TryParse(expectedString, out double expectedNumber);
+
+                bool isNumeric = actualIsNumber && expectedIsNumber;
+
+                // ============================================
+                // ✅ DATE PARSING
+                // ============================================
+                bool actualIsDate = DateTime.TryParse(actualString, out DateTime actualDate);
+                bool expectedIsDate = DateTime.TryParse(expectedString, out DateTime expectedDate);
+
+                bool isDate = actualIsDate && expectedIsDate;
+
+                var op = condition.Operator.ToLower();
+
+                // ============================================
+                // ✅ DATE COMPARISON
+                // ============================================
+                if (isDate)
+                {
+                    return op switch
+                    {
+                        ">" => actualDate > expectedDate,
+                        "<" => actualDate < expectedDate,
+                        ">=" => actualDate >= expectedDate,
+                        "<=" => actualDate <= expectedDate,
+                        "=" => actualDate == expectedDate,
+                        "!=" => actualDate != expectedDate,
+                        _ => false
+                    };
+                }
+
+                // ============================================
+                // ✅ NUMERIC COMPARISON
+                // ============================================
+                if (isNumeric)
+                {
+                    return op switch
+                    {
+                        ">" => actualNumber > expectedNumber,
+                        "<" => actualNumber < expectedNumber,
+                        ">=" => actualNumber >= expectedNumber,
+                        "<=" => actualNumber <= expectedNumber,
+                        "=" => actualNumber == expectedNumber,
+                        "!=" => actualNumber != expectedNumber,
+                        _ => false
+                    };
+                }
+
+                // ============================================
+                // ✅ STRING COMPARISON
+                // ============================================
+                return op switch
+                {
+                    "=" => string.Equals(actualString, expectedString, StringComparison.OrdinalIgnoreCase),
+
+                    "!=" => !string.Equals(actualString, expectedString, StringComparison.OrdinalIgnoreCase),
+
+                    "contains" => actualString.Contains(expectedString, StringComparison.OrdinalIgnoreCase),
+
+                    "startswith" => actualString.StartsWith(expectedString, StringComparison.OrdinalIgnoreCase),
+
+                    "endswith" => actualString.EndsWith(expectedString, StringComparison.OrdinalIgnoreCase),
+
+                    _ => throw new NotSupportedException($"Operator '{condition.Operator}' is not supported.")
+                };
+            }
+            catch (Exception)
+            {
+                // TODO: log error in production
                 return false;
             }
         }
