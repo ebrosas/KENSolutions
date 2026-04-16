@@ -46,9 +46,16 @@ namespace KenHRApp.Infrastructure.Repositories
         }
         #endregion
 
+        #region Properties
+        public List<int> ApproverList { get; set; } = new();
+        #endregion
+
         #region Workflow Methods       
-        public async Task<Result<int>> StartWorkflowAsync(string entityName, long entityId)
+        public async Task<Result<List<int>>> StartWorkflowAsync(string entityName, long entityId)
         {
+            WorkflowRequestType requestType = WorkflowRequestType.NotDefined;
+            object requestEntity = null;
+
             try
             {
                 var definition = await _db.WorkflowDefinitions
@@ -66,13 +73,40 @@ namespace KenHRApp.Infrastructure.Repositories
                 _db.WorkflowInstances.Add(instance);
                 await _db.SaveChangesAsync();
 
-                await CreateNextStepInstance(instance, definition.Steps.First());
-                return Result<int>.SuccessResult(instance.WorkflowInstanceId);
+                #region Get the request entity
+                var currentWF = _db.WorkflowDefinitions
+                            .Where(w => w.WorkflowDefinitionId == instance.WorkflowDefinitionId)
+                            .FirstOrDefault();
+                if (currentWF != null)
+                {
+                    switch (currentWF.EntityName.ToUpper())
+                    {
+                        case "RTYPELEAVE":
+                            requestType = WorkflowRequestType.LeaveRequisition;
+                            break;
+                    }
+                }
+
+                if (requestType == WorkflowRequestType.LeaveRequisition)
+                {
+                    var entity = await _db.LeaveRequisitionWFs
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(x => x.LeaveRequestId == instance.EntityId);
+                    if (entity != null)
+                    {
+                        // Set the request entity
+                        requestEntity = entity;
+                    }
+                }
+                #endregion
+
+                await CreateNextStepInstance(instance, definition.Steps.First(), requestEntity);
+                return Result<List<int>>.SuccessResult(this.ApproverList);
             }
             catch (Exception ex)
             {
                 // Log error here if needed (Serilog, NLog, etc.)
-                return Result<int>.Failure($"Workflow Engine Error: {ex.Message}");
+                return Result<List<int>>.Failure($"Workflow Engine Error: {ex.Message}");
             }
         }
 
@@ -149,17 +183,72 @@ namespace KenHRApp.Infrastructure.Repositories
             
         }
 
-        private async Task CreateNextStepInstance(WorkflowInstance instance, WorkflowStepDefinition stepDef)
+        private async Task CreateNextStepInstance(
+            WorkflowInstance instance, 
+            WorkflowStepDefinition stepDef,
+            object? entity)
         {
+            int assigneeEmpNo = 0;
+
             try
             {
+                // Clear the approvers collection
+                this.ApproverList.Clear();
+
                 var approver = await _db.WorkflowApprovalRoles.FirstAsync(x => x.ApprovalGroupCode == stepDef.ApprovalRole);
+
+                if (approver.GroupType == 1)
+                {
+                    #region Get the Supervior of the Originator employee
+                    if (entity is LeaveRequisitionWF leave)
+                    {
+                        var employeeInfo = await _db.Employees.FirstAsync(x => x.EmployeeNo == leave.LeaveEmpNo);
+                        if (employeeInfo != null && employeeInfo.ReportingManagerCode.HasValue)
+                        {
+                            assigneeEmpNo = Convert.ToInt32(employeeInfo.ReportingManagerCode);
+                        }
+                    }
+                    #endregion
+                }
+                else if (approver.GroupType == 2)
+                {
+                    #region Get the Superintendent of the Originator employee
+                    if (entity is LeaveRequisitionWF leave)
+                    {
+                        var departmentInfo = await _db.DepartmentMasters.FirstAsync(x => x.DepartmentCode == leave.LeaveEmpCostCenter);
+                        if (departmentInfo != null && departmentInfo.SuperintendentEmpNo.HasValue)
+                        {
+                            assigneeEmpNo = Convert.ToInt32(departmentInfo.SuperintendentEmpNo);
+                        }
+                    }
+                    #endregion
+                }
+                else if (approver.GroupType == 3)
+                {
+                    #region Get the Cost Center Manager of the Originator employee
+                    if (entity is LeaveRequisitionWF leave)
+                    {
+                        var departmentInfo = await _db.DepartmentMasters.FirstAsync(x => x.DepartmentCode == leave.LeaveEmpCostCenter);
+                        if (departmentInfo != null && departmentInfo.ManagerEmpNo.HasValue)
+                        {
+                            assigneeEmpNo = Convert.ToInt32(departmentInfo.ManagerEmpNo);
+                        }
+                    }
+                    #endregion
+                }
+                else
+                {
+                    assigneeEmpNo = approver.AssigneeEmpNo;
+                }
+
+                // Store approver to the collection
+                this.ApproverList.Add(assigneeEmpNo);
 
                 var step = new WorkflowStepInstance
                 {
                     WorkflowInstanceId = instance.WorkflowInstanceId,
                     StepDefinitionId = stepDef.StepDefinitionId,
-                    ApproverEmpNo = approver.AssigneeEmpNo,
+                    ApproverEmpNo = assigneeEmpNo,
                     ApproverRole = stepDef.ApprovalRole,
                     Status = WorkflowStatus.Pending.ToString()
                 };
@@ -208,7 +297,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     return;
                 }
 
-                await CreateNextStepInstance(instance, nextStep);
+                await CreateNextStepInstance(instance, nextStep, null);
             }
             catch (Exception ex)
             {
@@ -318,7 +407,7 @@ namespace KenHRApp.Infrastructure.Repositories
                 // ============================================
                 foreach (var nextStep in nextSteps)
                 {
-                    await CreateNextStepInstance(dbInstance, nextStep);
+                    await CreateNextStepInstance(dbInstance, nextStep, null);
                 }
             }
             catch (Exception)
@@ -329,8 +418,11 @@ namespace KenHRApp.Infrastructure.Repositories
 
         private async Task AdvanceWorkflow(WorkflowInstance instance)
         {
+            WorkflowRequestType requestType = WorkflowRequestType.NotDefined;
+
             try
             {
+                object requestEntity = null;
                 var dbInstance = await _db.WorkflowInstances
                     .Include(x => x.Steps)
                         .ThenInclude(s => s.StepDefinition)
@@ -391,46 +483,42 @@ namespace KenHRApp.Infrastructure.Repositories
                 }
                 #endregion
 
+                #region Get the request entity
+                var currentWF = _db.WorkflowDefinitions
+                                   .Where(w => w.WorkflowDefinitionId == dbInstance.WorkflowDefinitionId)
+                                   .FirstOrDefault();
+                if (currentWF != null)
+                {
+                    switch (currentWF.EntityName.ToUpper())
+                    {
+                        case "RTYPELEAVE":
+                            requestType = WorkflowRequestType.LeaveRequisition;
+                            break;
+                    }
+                }
+
+                if (requestType == WorkflowRequestType.LeaveRequisition)
+                {
+                    var entity = await _db.LeaveRequisitionWFs
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(x => x.LeaveRequestId == dbInstance.EntityId);
+                    if (entity != null)
+                    {
+                        // Set the request entity
+                        requestEntity = entity;
+                    }
+                }
+                #endregion
+
                 #region MULTI-CONDITIONAL ROUTING
                 var nextStepIds = new List<int>();
-
-                WorkflowRequestType requestType = WorkflowRequestType.NotDefined;
-
                 foreach (var condition in currentStepDef.Conditions)
                 {
-                    var currentWF = _db.WorkflowDefinitions
-                                    .Where(w => w.WorkflowDefinitionId == dbInstance.WorkflowDefinitionId)
-                                    .FirstOrDefault();
-                    if (currentWF != null)
+                    if (requestEntity != null)
                     {
-                        switch(currentWF.EntityName.ToUpper())
+                        if (EvaluateCondition(condition, requestEntity))
                         {
-                            case "RTYPELEAVE":
-                                requestType = WorkflowRequestType.LeaveRequisition;
-                                break;
-                        }
-                    }
-
-                    if (requestType == WorkflowRequestType.LeaveRequisition)
-                    {
-                        var entity = await _db.LeaveRequisitionWFs
-                                    .AsNoTracking()
-                                    .FirstOrDefaultAsync(x => x.LeaveRequestId == dbInstance.EntityId);
-
-                        if (entity != null)
-                        {
-                            //foreach (var stepCondition in currentStepDef.Conditions)
-                            //{
-                            //    if (EvaluateCondition(stepCondition, entity))
-                            //    {
-                            //        nextStepIds.Add(stepCondition.NextStepDefinitionId ?? 0);
-                            //    }
-                            //}
-
-                            if (EvaluateCondition(condition, entity))
-                            {
-                                nextStepIds.Add(condition.NextStepDefinitionId ?? 0);
-                            }
+                            nextStepIds.Add(condition.NextStepDefinitionId ?? 0);
                         }
                     }
                 }
@@ -468,7 +556,7 @@ namespace KenHRApp.Infrastructure.Repositories
                 // ============================================
                 foreach (var nextStep in nextSteps)
                 {
-                    await CreateNextStepInstance(dbInstance, nextStep);
+                    await CreateNextStepInstance(dbInstance, nextStep, requestEntity);
                 }
             }
             catch (Exception)

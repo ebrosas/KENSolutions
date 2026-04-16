@@ -283,11 +283,11 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 await InvokeAsync(StateHasChanged);
 
                 #region Test the workflow
-                //await InitializeWorkflowAsync();
-                //await ApproveWorkflowAsync(15, 10003632, "ervin", "Test Supervisor Approval");
-                //await ApproveWorkflowAsync(11, 10003633, "anne", "Test HR Approval");
-                //await ApproveWorkflowAsync(12, 10003636, "nagendra", "Test Cost Center Manager Approval");
-                //await ApproveWorkflowAsync(13, 10003635, "Tester", "Test General Manager Approval");
+                await InitializeWorkflowAsync();
+                //await ApproveWorkflowAsync(4, 10003632, "ervin", "Test Supervisor Approval");
+                //await ApproveWorkflowAsync(5, 10003633, "anne", "Test HR Approval");
+                //await ApproveWorkflowAsync(6, 10003636, "nagendra", "Test Cost Center Manager Approval");
+                //await ApproveWorkflowAsync(7, 10003635, "Tester", "Test General Manager Approval");
                 #endregion                
 
             }, forceLoad);
@@ -426,14 +426,14 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
         private async Task InitializeWorkflowAsync()
         {
-            int workflowInstanceID = 0;
+            bool isSuccess = false;
 
             try
             {
                 var repoResult = await WorkflowService.StartWorkflowAsync("RTYPELEAVE", 15);
                 if (repoResult.Success)
                 {
-                    workflowInstanceID = repoResult.Value;
+                    isSuccess = repoResult.Value;
                 }
                 else
                 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -52,6 +53,10 @@ namespace KenHRApp.Domain.Entities.Workflow
 
         [Column(TypeName = "varchar(50)")]
         public string? LastUpdatedUserID { get; set; } = null;
+
+        [Column(TypeName = "tinyint")]
+        [Comment("0 = Assignee Employee; 1 = Supervisor; 2 = Superintendent; 3 = Cost Center Manager")]
+        public byte GroupType { get; set; }
         #endregion
     }
 }

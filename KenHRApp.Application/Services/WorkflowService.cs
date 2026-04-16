@@ -25,6 +25,23 @@ namespace KenHRApp.Application.Services
         private readonly AppSettings _settings;
         #endregion
 
+        #region Enums
+        private enum WorkflowRequestType
+        {
+            NotDefined,
+            LeaveRequisition,
+            Overtime,
+            Regularization,
+            TravelRequest,
+            ExpenseClaim,
+            RecruitmentOffer
+        }
+        #endregion
+
+        #region Properties
+        private WorkflowRequestType RequestType { get; set; } = WorkflowRequestType.NotDefined;
+        #endregion
+
         #region Contructors
         public WorkflowService(
             IWorkflowRepository repository, 
@@ -76,27 +93,61 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<Result<int>> StartWorkflowAsync(string entityName, long entityId)
+        public async Task<Result<bool>> StartWorkflowAsync(
+            string entityName, 
+            long entityId,
+            CancellationToken cancellationToken = default)
         {
-            int workflowInstanceId = 0;
-
             try
             {
+                string baseUrl = _settings.BaseUrl.TrimEnd('/');
+                string subject = "Pending Approval Request";
+                string requestTypeDesc = string.Empty;
+                string requestLink = string.Empty;
+
+                if (!string.IsNullOrWhiteSpace(entityName))
+                {
+                    #region Identity the type of request
+                    switch (entityName)
+                    {
+                        case "RTYPELEAVE":
+                            this.RequestType = WorkflowRequestType.LeaveRequisition;
+                            break;
+                    }
+                    #endregion
+                }
+
                 var repoResult = await _repository.StartWorkflowAsync(entityName, entityId);
                 if (!repoResult.Success)
                 {
-                    return Result<int>.Failure(repoResult.Error ?? "Unknown repository error");
+                    throw new Exception(repoResult.Error ?? "Unknown repository error");
                 }
                 else
                 {
-                    workflowInstanceId = repoResult.Value;
+                    List<int> approverList = repoResult.Value!;
+                    if (approverList != null && approverList.Any())
+                    {
+                        if (this.RequestType == WorkflowRequestType.LeaveRequisition)
+                        {
+                            #region Build the email parameters
+                            subject = "Leave Request for Approval";
+                            requestTypeDesc = "Leave Requisition";
+                            requestLink = $"{baseUrl}/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={entityId}&CallerForm=LeaveInquiry";
+                            #endregion
+
+                            foreach (int approver in approverList)
+                            {
+                                await SendPendingApprovalAsync(approver, subject, requestTypeDesc, requestLink, entityId, cancellationToken);
+                            }
+                        }
+                    }
                 }
                 
-                return Result<int>.SuccessResult(workflowInstanceId);
+                return Result<bool>.SuccessResult(true);
             }
             catch (Exception ex)
             {
-                return Result<int>.Failure(ex.Message.ToString() ?? "Unknown error while executing StartWorkflowAsync() method.");
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error while executing StartWorkflowAsync() method.");
             }
         }
 
@@ -151,55 +202,29 @@ namespace KenHRApp.Application.Services
 
         #region Private Methods
         public async Task<Result<bool>> SendPendingApprovalAsync(
-            string email,
-            int empNo,
-            DateTime doj,
+            int approverEmpNo,
+            string subject,
+            string requestTypeDesc,
+            string requestLink,
+            long requestID,
             CancellationToken cancellationToken = default)
         {
+            bool isSuccess = false;
             try
             {
-                int approverEmpNo = 0;
 
-                //var token = await GenerateEmailVerificationTokenAsync(
-                //    empNo,
-                //    doj,
-                //    cancellationToken);
+                var repoResult = await _emailService.SendAsync(approverEmpNo, subject, requestTypeDesc, 
+                    requestLink, requestID, cancellationToken);
+                if (!repoResult.Success)
+                    return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
+                else
+                    isSuccess = repoResult.Value;
 
-                //if (string.IsNullOrEmpty(token))
-                //    return Result<bool>.Failure("Unable to generate email verification token!");
-
-                var baseUrl = _settings.BaseUrl.TrimEnd('/');
-
-                //return $"{baseUrl}/UserAccount/VerifyEmail?token={Uri.EscapeDataString(token)}";
-                //Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.LeaveRequestId}&CallerForm=LeaveInquiry");
-
-                var requestLink = $"{baseUrl}/TimeAttendance/leaverequest?ActionType=View";
-
-                #region Build the email contents
-                var subject = "Verify your KenHR account";
-
-                var body = $@"
-                    Hello,
-
-                    Thank you for registering with KenHR.
-
-                    Please verify your email by clicking the link below:
-
-                    {requestLink}
-
-                    Note that the verification link is valid for 24 hours only. If you did not initiate this request, please ignore this email.
-
-                    Regards,
-                    KenHR Team";
-                #endregion
-
-                await _emailService.SendAsync(approverEmpNo, subject, body, cancellationToken);
-
-                return Result<bool>.SuccessResult(true);
+                return Result<bool>.SuccessResult(isSuccess);
             }
             catch (Exception ex)
             {
-                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in SendVerificationEmailAsync() method.");
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in SendPendingApprovalAsync() method.");
             }
         }
         #endregion

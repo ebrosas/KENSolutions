@@ -12,7 +12,8 @@
            ,[AssigneEmail]
            ,[CreatedDate]
            ,[CreatedBy]
-           ,[CreatedUserID])
+           ,[CreatedUserID]
+           ,[GroupType])
     SELECT  'SUPERVISOR' AS ApprovalGroupCode,
             'Immediate Supervisor' AS ApprovalGroupDesc, 
             '1st Level Approval' AS Remarks, 
@@ -21,7 +22,8 @@
             'ervin.brosas@garmco.com' AS AssigneEmail, 
             GETDATE() AS CreatedDate, 
             10003632 AS CreatedBy, 
-            'ervin' AS CreatedUserID
+            'ervin' AS CreatedUserID,
+            1 AS GroupType
 
 	UNION
 
@@ -33,7 +35,8 @@
             'ervinbrosas22@gmail.com' AS AssigneEmail, 
             GETDATE() AS CreatedDate, 
             10003632 AS CreatedBy, 
-            'ervin' AS CreatedUserID
+            'ervin' AS CreatedUserID,
+            3 AS GroupType
 
 	UNION
 
@@ -45,7 +48,8 @@
             'antoneth_brosas28@yahoo.com' AS AssigneEmail, 
             GETDATE() AS CreatedDate, 
             10003632 AS CreatedBy, 
-            'ervin' AS CreatedUserID
+            'ervin' AS CreatedUserID,
+            0 AS GroupType
 
 	UNION
 
@@ -57,7 +61,8 @@
             'katriane.brosas@yahoo.com' AS AssigneEmail, 
             GETDATE() AS CreatedDate, 
             10003632 AS CreatedBy, 
-            'ervin' AS CreatedUserID
+            'ervin' AS CreatedUserID,
+            0 AS GroupType
 */
 
 /*	Staging DB
@@ -71,7 +76,8 @@
            ,[AssigneEmail]
            ,[CreatedDate]
            ,[CreatedBy]
-           ,[CreatedUserID])
+           ,[CreatedUserID]
+           ,[GroupType])
     SELECT  'SUPERVISOR' AS ApprovalGroupCode,
             'Immediate Supervisor' AS ApprovalGroupDesc, 
             '1st Level Approval' AS Remarks, 
@@ -80,7 +86,8 @@
             'ervin.brosas@garmco.com' AS AssigneEmail, 
             GETDATE() AS CreatedDate, 
             10003632 AS CreatedBy, 
-            'ervin' AS CreatedUserID
+            'ervin' AS CreatedUserID,
+            1 AS GroupType
 
 	UNION
 
@@ -92,7 +99,8 @@
             'nagendra.seetharam@garmco.com' AS AssigneEmail, 
             GETDATE() AS CreatedDate, 
             10003632 AS CreatedBy, 
-            'ervin' AS CreatedUserID
+            'ervin' AS CreatedUserID,
+            3 AS GroupType
 
 	UNION
 
@@ -104,7 +112,8 @@
             'kirsten.brosas@yahoo.com' AS AssigneEmail, 
             GETDATE() AS CreatedDate, 
             10003632 AS CreatedBy, 
-            'ervin' AS CreatedUserID
+            'ervin' AS CreatedUserID,
+            0 AS GroupType
 
 	UNION
 
@@ -116,7 +125,8 @@
             'ervin.brosas@garmco.com' AS AssigneEmail, 
             GETDATE() AS CreatedDate, 
             10003632 AS CreatedBy, 
-            'ervin' AS CreatedUserID
+            'ervin' AS CreatedUserID,
+            0 AS GroupType
 
 */
 

@@ -13,7 +13,9 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<bool>> SendAsync(
             int userId,
             string subject,
-            string message,
+            string requestTypeDesc,
+            string requestLink,
+            long requestID,
             CancellationToken cancellationToken = default);
 
         Task<Result<bool>> SendAsync(

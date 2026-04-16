@@ -33,8 +33,10 @@ namespace KenHRApp.Application.Services
         #region Public Methods
         public async Task<Result<bool>> SendAsync(
             int userId, 
-            string subject, 
-            string message, 
+            string subject,
+            string requestTypeDesc,
+            string requestLink,
+            long requestID,
             CancellationToken cancellationToken = default)
         {
             try
@@ -52,9 +54,25 @@ namespace KenHRApp.Application.Services
                 }
                 else if (user != null && string.IsNullOrWhiteSpace(user.OfficialEmail))
                 {
-                    throw new Exception("Employee official email is not defined.");
+                    throw new Exception("Employee email is not defined.");
                 }
-               
+
+                #region Build the email contents
+                string message = $@"
+                                Dear {user!.FirstName},
+
+                                {requestTypeDesc} No. {requestID} has been assigned to you for approval. 
+
+                                Please take action on the assigned request by clicking the link below:
+
+                                {requestLink}
+
+                                Note that if you had taken action already on this request, please ignore this email.
+
+                                Regards,
+                                KEN-HR Team";
+                #endregion
+
                 await _emailService.SendAsync(
                    user!.OfficialEmail,
                    subject,

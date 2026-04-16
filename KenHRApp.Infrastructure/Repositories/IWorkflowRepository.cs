@@ -13,7 +13,7 @@ namespace KenHRApp.Infrastructure.Repositories
     public interface IWorkflowRepository
     {
         #region Workflow Abstract Methods
-        Task<Result<int>> StartWorkflowAsync(string entityName, long entityId);
+        Task<Result<List<int>>> StartWorkflowAsync(string entityName, long entityId);
         Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string? comments);
         Task<Result<bool>> RejectStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string comments);
         #endregion

@@ -6,18 +6,24 @@
 
 	SELECT * FROM kenuser.RequestApprovals a WITH (NOLOCK)
 
-	 SELECT * FROM [kenuser].[WorkflowApprovalRoles] a
+	SELECT * FROM [kenuser].[WorkflowApprovalRoles] a
 
 	SELECT a.EmployeeNo, a.UserID, a.ReportingManagerCode, a.SecondReportingManagerCode, 
 		a.OfficialEmail, a.PersonalEmail, a.HireDate,
 	* FROM kenuser.Employee a
 	ORDER BY a.EmployeeNo
 
-	SELECT a.LeaveType, a.LeaveDuration, * FROM [kenuser].[LeaveRequisitionWF] a
+	SELECT a.LeaveType, a.LeaveDuration, a.LeaveEmpCostCenter,
+	* FROM [kenuser].[LeaveRequisitionWF] a
+
+	select * from kenuser.DepartmentMaster a
+
 	SELECT * FROM [kenuser].[WorkflowApprovalRoles] a WITH (NOLOCK)
 
 	SELECT * FROM [kenuser].[LeaveRequisitionWF] a
 	WHERE a.LeaveRequestId = 15
+
+	SELECT * FROM kenuser.Employee a
 
 	SELECT * FROM kenuser.WorkflowDefinitions a
 	SELECT * FROM kenuser.WorkflowConditions a
@@ -57,14 +63,14 @@
 	DELETE FROM kenuser.WorkflowInstances
 
 	DELETE FROM kenuser.WorkflowStepInstances
-	WHERE StepInstanceId IN (3, 4)
+	WHERE StepInstanceId IN (7, 8)
 
 	UPDATE kenuser.WorkflowStepInstances
 	SET ApproverUserID = NULL,
 		Status = 'Pending',
 		ActionDate = null,
 		Comments = null
-	WHERE StepInstanceId = 13
+	WHERE StepInstanceId = 4
 
 	COMMIT TRAN T1
 
