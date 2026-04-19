@@ -1,6 +1,9 @@
-﻿using KenHRApp.Application.Interfaces;
+﻿using KenHRApp.Application.Common.Helpers;
+using KenHRApp.Application.Interfaces;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,17 +19,20 @@ namespace KenHRApp.Application.Services
         private readonly IWorkflowRepository _wfRepository;
         private readonly ILeaveRequestRepository _leaveRepository;
         private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
         #endregion
 
         #region Constructors
         public WorkflowEmailService(
             IWorkflowRepository wfRepository,
             ILeaveRequestRepository leaveRepository,
-            IEmailService emailService)
+            IEmailService emailService,
+            IConfiguration configuration)
         {
             _wfRepository = wfRepository;
             _leaveRepository = leaveRepository;
             _emailService = emailService;
+            _configuration = configuration;
         }
         #endregion
 
@@ -37,8 +43,12 @@ namespace KenHRApp.Application.Services
             string requestTypeDesc,
             string requestLink,
             long requestID,
+            string webRootPath,
             CancellationToken cancellationToken = default)
         {
+            StringBuilder sb = new StringBuilder();
+            string adminName = "System Administrator";
+
             try
             {
                 var repoResult = await _wfRepository.GetEmployeeInfoAsync(userId, cancellationToken);
@@ -55,28 +65,63 @@ namespace KenHRApp.Application.Services
                 else if (user != null && string.IsNullOrWhiteSpace(user.OfficialEmail))
                 {
                     throw new Exception("Employee email is not defined.");
+                }                               
+
+                #region Initialize the file upload path
+                string msgPath = Path.Combine(
+                    webRootPath,
+                    "messages");
+
+                if (!Directory.Exists(msgPath))
+                    Directory.CreateDirectory(msgPath);
+                #endregion
+
+                #region Initialize email sender 
+                var smtpSection = _configuration.GetSection("Smtp");
+                if (smtpSection != null)
+                {
+                    adminName = smtpSection["AdminName"]!.ToString();
                 }
+                #endregion
 
                 #region Build the email contents
-                string message = $@"
-                                Dear {user!.FirstName},
+                //string message = $@"
+                //                Dear {user!.FirstName},
 
-                                {requestTypeDesc} No. {requestID} has been assigned to you for approval. 
+                //                {requestTypeDesc} No. {requestID} has been assigned to you for approval. 
 
-                                Please take action on the assigned request by clicking the link below:
+                //                Please take action on the assigned request by clicking the link below:
 
-                                {requestLink}
+                //                {requestLink}
 
-                                Note that if you had taken action already on this request, please ignore this email.
+                //                Note that if you had taken action already on this request, please ignore this email.
 
-                                Regards,
-                                KEN-HR Team";
+                //                Regards,
+                //                KEN-HR Team";
+
+                sb.Clear();
+                sb.AppendLine($"{requestTypeDesc} No. {requestID} has been assigned to you for approval.");
+                sb.AppendLine(@"<br /> <br />");
+
+                // Build the message body
+                string body = String.Empty;
+                string htmLBody = string.Empty;
+                body = String.Format(ServiceHelper.RetrieveXmlMessage(msgPath),
+                        user!.EmployeeFullName,
+                        sb.ToString(),
+                        requestLink,
+                        adminName
+                        ).Replace("&lt;", "<").Replace("&gt;", ">");
+
+                // Format the message contents
+                htmLBody = string.Format("<HTML><BODY><p>{0}</p></BODY></HTML>", body);
+
                 #endregion
 
                 await _emailService.SendAsync(
                    user!.OfficialEmail,
                    subject,
-                   message,
+                   htmLBody,
                    true,
                    cancellationToken);
 

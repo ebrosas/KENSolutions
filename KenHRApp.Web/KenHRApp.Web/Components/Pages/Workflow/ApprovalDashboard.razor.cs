@@ -19,6 +19,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IAppState State { get; set; } = default!;
+        [Inject] private IWebHostEnvironment Environment { get; set; } = default!;
 
         [Parameter]
         [SupplyParameterFromQuery]
@@ -282,7 +283,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
 
-                #region Test the workflow
+                #region Test the workflow                
                 await InitializeWorkflowAsync();
                 //await ApproveWorkflowAsync(4, 10003632, "ervin", "Test Supervisor Approval");
                 //await ApproveWorkflowAsync(5, 10003633, "anne", "Test HR Approval");
@@ -430,7 +431,10 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
             try
             {
-                var repoResult = await WorkflowService.StartWorkflowAsync("RTYPELEAVE", 15);
+                // Initialize the cancellation token
+                _cts = new CancellationTokenSource();
+
+                var repoResult = await WorkflowService.StartWorkflowAsync("RTYPELEAVE", 15, Environment.WebRootPath, _cts.Token);
                 if (repoResult.Success)
                 {
                     isSuccess = repoResult.Value;

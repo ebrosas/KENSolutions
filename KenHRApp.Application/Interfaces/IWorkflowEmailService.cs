@@ -16,6 +16,7 @@ namespace KenHRApp.Application.Interfaces
             string requestTypeDesc,
             string requestLink,
             long requestID,
+            string webRootPath,
             CancellationToken cancellationToken = default);
 
         Task<Result<bool>> SendAsync(

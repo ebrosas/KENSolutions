@@ -20,6 +20,7 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<bool>> StartWorkflowAsync(
             string entityName,
             long entityId,
+            string webRootPath,
             CancellationToken cancellationToken = default);
 
         Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string? comments);

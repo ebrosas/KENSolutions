@@ -5,6 +5,8 @@ using KenHRApp.Domain.Entities.Workflow;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Repositories;
 using KenHRApp.Infrastructure.Settings;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
 using System;
@@ -13,6 +15,7 @@ using System.Linq;
 using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace KenHRApp.Application.Services
@@ -96,6 +99,7 @@ namespace KenHRApp.Application.Services
         public async Task<Result<bool>> StartWorkflowAsync(
             string entityName, 
             long entityId,
+            string webRootPath,
             CancellationToken cancellationToken = default)
         {
             try
@@ -137,7 +141,7 @@ namespace KenHRApp.Application.Services
 
                             foreach (int approver in approverList)
                             {
-                                await SendPendingApprovalAsync(approver, subject, requestTypeDesc, requestLink, entityId, cancellationToken);
+                                await SendPendingApprovalAsync(approver, subject, requestTypeDesc, requestLink, entityId, webRootPath, cancellationToken);
                             }
                         }
                     }
@@ -201,20 +205,22 @@ namespace KenHRApp.Application.Services
         #endregion
 
         #region Private Methods
-        public async Task<Result<bool>> SendPendingApprovalAsync(
+        private async Task<Result<bool>> SendPendingApprovalAsync(
             int approverEmpNo,
             string subject,
             string requestTypeDesc,
             string requestLink,
             long requestID,
+            string webRootPath,
             CancellationToken cancellationToken = default)
         {
             bool isSuccess = false;
+
             try
             {
 
                 var repoResult = await _emailService.SendAsync(approverEmpNo, subject, requestTypeDesc, 
-                    requestLink, requestID, cancellationToken);
+                    requestLink, requestID, webRootPath, cancellationToken);
                 if (!repoResult.Success)
                     return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
                 else
@@ -226,6 +232,37 @@ namespace KenHRApp.Application.Services
             {
                 return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in SendPendingApprovalAsync() method.");
             }
+        }
+
+        private static string RetrieveXmlMessage(string xmlFile)
+        {
+            string message = String.Empty;
+            XmlTextReader reader = null;
+
+            try
+            {
+                //string appPath = Server.MapPath(UIHelper.CONST_WFCOMPLETION_EMAIL_TEMPLATE);
+
+                // Read the file
+                reader = new XmlTextReader(xmlFile);
+                while (reader.Read())
+                {
+                    if (reader.NodeType == XmlNodeType.Text)
+                        message = reader.Value;
+                }
+            }
+
+            catch
+            {
+            }
+            finally
+            {
+                // Close the file
+                if (reader != null)
+                    reader.Close();
+            }
+
+            return message;
         }
         #endregion
     }
