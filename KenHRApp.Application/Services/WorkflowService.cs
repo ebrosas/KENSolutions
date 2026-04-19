@@ -26,6 +26,11 @@ namespace KenHRApp.Application.Services
         private readonly IWorkflowRepository _repository;
         private readonly IWorkflowEmailService _emailService;
         private readonly AppSettings _settings;
+
+        #region Constants
+        private readonly string CONST_GENERIC_MESSAGE = "GenericMessage.xml";
+        #endregion
+
         #endregion
 
         #region Enums
@@ -215,12 +220,10 @@ namespace KenHRApp.Application.Services
             CancellationToken cancellationToken = default)
         {
             bool isSuccess = false;
-
             try
             {
-
                 var repoResult = await _emailService.SendAsync(approverEmpNo, subject, requestTypeDesc, 
-                    requestLink, requestID, webRootPath, cancellationToken);
+                    requestLink, requestID, webRootPath, CONST_GENERIC_MESSAGE, cancellationToken);
                 if (!repoResult.Success)
                     return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
                 else
@@ -232,37 +235,6 @@ namespace KenHRApp.Application.Services
             {
                 return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in SendPendingApprovalAsync() method.");
             }
-        }
-
-        private static string RetrieveXmlMessage(string xmlFile)
-        {
-            string message = String.Empty;
-            XmlTextReader reader = null;
-
-            try
-            {
-                //string appPath = Server.MapPath(UIHelper.CONST_WFCOMPLETION_EMAIL_TEMPLATE);
-
-                // Read the file
-                reader = new XmlTextReader(xmlFile);
-                while (reader.Read())
-                {
-                    if (reader.NodeType == XmlNodeType.Text)
-                        message = reader.Value;
-                }
-            }
-
-            catch
-            {
-            }
-            finally
-            {
-                // Close the file
-                if (reader != null)
-                    reader.Close();
-            }
-
-            return message;
         }
         #endregion
     }

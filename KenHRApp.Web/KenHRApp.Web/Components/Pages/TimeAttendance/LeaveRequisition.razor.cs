@@ -12,10 +12,11 @@ using KenHRApp.Application.Services;
 using KenHRApp.Application.DTOs.TNA;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using KenHRApp.Web.Components.Common.Helpers;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
-    public partial class LeaveRequisition : IPageAuthorization
+    public partial class LeaveRequisition : IPageAuthorization, IWorkflowProcess
     {
         #region Parameters and Injections
         [Inject] private ILeaveRequestService LeaveService { get; set; } = default!;
@@ -26,6 +27,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IAppState State { get; set; } = default!;
         [Inject] private IWebHostEnvironment Environment { get; set; } = default!;
+        [Inject] private IWorkflowService WorkflowService { get; set; } = default!;
 
         [Parameter]
         [SupplyParameterFromQuery]
@@ -41,7 +43,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Fields
-
+                
         #region General fields
         private EditForm _editForm;
         private EditContext? _editContext;
@@ -181,6 +183,40 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         }
         #endregion
 
+        #region IWorkflowProcess Implementation
+        public async Task InitializeWorkflowAsync(long leaveNo)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                if (leaveNo == 0)
+                    throw new ArgumentException("Leave Requisition No. is not defined!");
+
+                // Initialize the cancellation token
+                _cts = new CancellationTokenSource();
+
+                var repoResult = await WorkflowService.StartWorkflowAsync(WorkflowHelper.CONST_LEAVE_REQUEST, 
+                    leaveNo, Environment.WebRootPath, _cts.Token);
+                if (repoResult.Success)
+                {
+                    isSuccess = repoResult.Value;
+                }
+                else
+                {
+                    // Show error message
+                    _errorMessage.AppendLine(repoResult.Error);
+
+                    ShowHideError(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+        #endregion
+
         #region Page Events
         protected override void OnInitialized()
         {
@@ -291,6 +327,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                     if (_leaveRequest.LeaveRequestId > 0)
                     {
+                        // Initiate the workflow
+                        await InitializeWorkflowAsync(_leaveRequest.LeaveRequestId);
+
                         BeginLoadLeaveRequest(_leaveRequest.LeaveRequestId);
                     }
                 });

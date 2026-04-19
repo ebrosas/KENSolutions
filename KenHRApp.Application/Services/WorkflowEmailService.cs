@@ -44,6 +44,7 @@ namespace KenHRApp.Application.Services
             string requestLink,
             long requestID,
             string webRootPath,
+            string fileName,
             CancellationToken cancellationToken = default)
         {
             StringBuilder sb = new StringBuilder();
@@ -67,13 +68,13 @@ namespace KenHRApp.Application.Services
                     throw new Exception("Employee email is not defined.");
                 }                               
 
-                #region Initialize the file upload path
-                string msgPath = Path.Combine(
+                #region Initialize the physical file path of the message templeate
+                string msgTemplatePath = Path.Combine(
                     webRootPath,
                     "messages");
 
-                if (!Directory.Exists(msgPath))
-                    Directory.CreateDirectory(msgPath);
+                if (!Directory.Exists(msgTemplatePath))
+                    Directory.CreateDirectory(msgTemplatePath);
                 #endregion
 
                 #region Initialize email sender 
@@ -85,37 +86,44 @@ namespace KenHRApp.Application.Services
                 #endregion
 
                 #region Build the email contents
-                //string message = $@"
-                //                Dear {user!.FirstName},
-
-                //                {requestTypeDesc} No. {requestID} has been assigned to you for approval. 
-
-                //                Please take action on the assigned request by clicking the link below:
-
-                //                {requestLink}
-
-                //                Note that if you had taken action already on this request, please ignore this email.
-
-                //                Regards,
-                //                KEN-HR Team";
-
                 sb.Clear();
-                sb.AppendLine($"{requestTypeDesc} No. {requestID} has been assigned to you for approval.");
-                sb.AppendLine(@"<br /> <br />");
+                sb.AppendLine($"{requestTypeDesc} No. <b>{requestID}</b> has been assigned to you for approval. ");
+                sb.Append("Please take necessary action and update the system.");
 
                 // Build the message body
                 string body = String.Empty;
                 string htmLBody = string.Empty;
-                body = String.Format(ServiceHelper.RetrieveXmlMessage(msgPath),
+                string fullPath = string.Empty;
+
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    fullPath = Path.Combine(msgTemplatePath, fileName);
+                    body = String.Format(ServiceHelper.RetrieveXmlMessage(fullPath),
                         user!.EmployeeFullName,
                         sb.ToString(),
                         requestLink,
                         adminName
                         ).Replace("&lt;", "<").Replace("&gt;", ">");
+                }
+                else
+                {
+                    body = $@"
+                            Dear {user!.FirstName},
+
+                            {requestTypeDesc} No. {requestID} has been assigned to you for approval. 
+
+                            Please take action on the assigned request by clicking the link below:
+
+                            {requestLink}
+
+                            Note that if you had taken action already on this request, please ignore this email.
+
+                            Regards,
+                            KEN-HR Team";
+                }
 
                 // Format the message contents
                 htmLBody = string.Format("<HTML><BODY><p>{0}</p></BODY></HTML>", body);
-
                 #endregion
 
                 await _emailService.SendAsync(
