@@ -2517,5 +2517,11 @@ employee-autocomplete .mud-input-adornment .mud-icon-button {
 /* #endrgion*/
 
 
+/* #region MudStepper Stylesheets */
+.leave-stepper .leave-stepper-actions {
+    display: none !important;
+}
+/* #endregion */
+
 
 

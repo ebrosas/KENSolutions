@@ -26,8 +26,8 @@
 	SELECT * FROM kenuser.Employee a
 
 	SELECT * FROM kenuser.WorkflowDefinitions a
-	SELECT * FROM kenuser.WorkflowConditions a
 	SELECT * FROM kenuser.WorkflowStepDefinitions a
+	SELECT * FROM kenuser.WorkflowConditions a	
 	SELECT * FROM kenuser.WorkflowInstances a
 	SELECT * FROM kenuser.WorkflowStepInstances a
 

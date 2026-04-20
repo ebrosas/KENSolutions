@@ -19,7 +19,7 @@ namespace KenHRApp.Domain.Entities.Workflow
         public int StepOrder { get; set; }
 
         [Column(TypeName = "varchar(50)")]
-        public string ApprovalRole { get; set; } = default!;
+        public string ApprovalRole { get; set; } = default!;                
 
         [Column(TypeName = "bit")]
         public bool IsParallelGroup { get; set; }
@@ -29,6 +29,11 @@ namespace KenHRApp.Domain.Entities.Workflow
         [Column(TypeName = "bit")]
         public bool RequiresAllParallel { get; set; }
 
+        [Column(TypeName = "varchar(300)")]
+        public string? ApprovalStageDesc { get; set; } = null;
+        #endregion
+
+        #region Reference Navigation
         public List<WorkflowCondition> Conditions { get; set; } = new();
         #endregion
     }
