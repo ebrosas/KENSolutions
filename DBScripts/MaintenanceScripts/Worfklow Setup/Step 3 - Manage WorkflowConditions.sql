@@ -2,6 +2,7 @@ DECLARE	@actionType				TINYINT = 0,		--(Notes: 0 = Check records, 1 = Create new
 		@isCommitTrans			BIT = 0,
 		@workflowTypeCode		VARCHAR(100) = 'RTYPELEAVE',
 		@approvalRole			VARCHAR(50),
+		@nextApprovalRole		VARCHAR(50),
 		@fieldName				VARCHAR(100),
 		@operator				VARCHAR(20),
 		@compareValue			VARCHAR(50),
@@ -16,14 +17,21 @@ DECLARE	@actionType				TINYINT = 0,		--(Notes: 0 = Check records, 1 = Create new
 	FROM kenuser.WorkflowDefinitions a WITH (NOLOCK)
 	WHERE RTRIM(a.EntityName) = @workflowTypeCode
 
-	--Add Direct Supervisor
+	--Add condition for Leave Requisition
 	SELECT	@approvalRole			= 'CCMANAGER',
+			@nextApprovalRole		= 'HRHEAD',
 			@fieldName				= 'LeaveConstraints',
 			@operator				= '=',
 			@compareValue			= '1',
-			@nextStepDefinitionId	= 36,
-			@expression				= 'LeaveConstraints == "SL"',
+			@expression				= 'LeaveConstraints == "1"',
 			@isTerminal				= 0
+
+	--Get the @nextStepDefinitionId
+	SELECT @nextStepDefinitionId = a.StepDefinitionId
+	FROM kenuser.WorkflowStepDefinitions a WITH (NOLOCK)
+		INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
+	WHERE RTRIM(b.EntityName) = @workflowTypeCode
+		AND RTRIM(a.ApprovalRole) = @nextApprovalRole
 
 	IF @actionType = 0
 	BEGIN
@@ -33,6 +41,20 @@ DECLARE	@actionType				TINYINT = 0,		--(Notes: 0 = Check records, 1 = Create new
 			INNER JOIN kenuser.WorkflowStepDefinitions b WITH (NOLOCK) ON a.StepDefinitionId = b.StepDefinitionId
 			INNER JOIN kenuser.WorkflowDefinitions c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
 		WHERE RTRIM(c.EntityName) = @workflowTypeCode
+
+		--Check records to insert
+		SELECT	DISTINCT
+				a.StepDefinitionId, 
+				@fieldName,
+				@operator,
+				@compareValue,
+				@nextStepDefinitionId,
+				@expression,
+				@isTerminal
+		FROM kenuser.WorkflowStepDefinitions a WITH (NOLOCK)
+			INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
+		WHERE RTRIM(b.EntityName) = @workflowTypeCode
+			AND RTRIM(a.ApprovalRole) = @approvalRole
 	END
 
 	ELSE IF @actionType = 1

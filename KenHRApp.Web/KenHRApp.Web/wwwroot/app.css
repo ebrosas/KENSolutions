@@ -2523,5 +2523,16 @@ employee-autocomplete .mud-input-adornment .mud-icon-button {
 }
 /* #endregion */
 
+/* #region MudScrollToTop Stylesheet */
+.scroll-to-top-center {
+    position: fixed !important;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    right: auto !important;
+    z-index: 2000; /* ensure it's above content */
+}
+/* #endregion */
+
 
 

@@ -20,7 +20,7 @@
 
 	SELECT * FROM [kenuser].[WorkflowApprovalRoles] a WITH (NOLOCK)
 
-	SELECT * FROM [kenuser].[LeaveRequisitionWF] a
+	SELECT a.LeaveConstraints, * FROM [kenuser].[LeaveRequisitionWF] a
 	WHERE a.LeaveRequestId = 15
 
 	SELECT * FROM kenuser.Employee a
@@ -30,7 +30,7 @@
 	SELECT * FROM kenuser.WorkflowConditions a	
 	SELECT * FROM kenuser.WorkflowInstances a
 	SELECT * FROM kenuser.WorkflowStepInstances a
-
+		
 /*
 
 	TRUNCATE TABLE kenuser.WorkflowDefinitions
@@ -49,8 +49,8 @@
 	SET StepDefinitionId = 25
 
 	UPDATE kenuser.WorkflowDefinitions
-	SET EntityName = 'RTYPELEAVE'
-	WHERE WorkflowDefinitionId = 7 
+	SET EntityName = 'RTYPELEAVETEST'
+	WHERE RTRIM(EntityName) = 'RTYPELEAVE'
 
 	UPDATE kenuser.Employee
 	SET UserID = 'anne'
@@ -71,6 +71,10 @@
 		ActionDate = null,
 		Comments = null
 	WHERE StepInstanceId = 4
+
+	UPDATE kenuser.LeaveRequisitionWF
+	SET LeaveConstraints = 1
+	WHERE LeaveRequestId = 15
 
 	COMMIT TRAN T1
 

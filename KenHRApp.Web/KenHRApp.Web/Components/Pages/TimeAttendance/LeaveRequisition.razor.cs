@@ -141,6 +141,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private IReadOnlyList<EmployeeResultDTO> _employeeList = new List<EmployeeResultDTO>();
 
         private List<UserDefinedCodeDTO> _leaveStatusList = new();
+        private List<WorkflowDetailResultDTO> _workflowList = new List<WorkflowDetailResultDTO>();
         #endregion
 
         #region Constants
@@ -227,9 +228,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 ActionType == ActionTypes.View.ToString())
             {
                 _isDisabled = true;
-
-                //if (LeaveRequestNo > 0)
-                //    _pageTitle = $"Submitted Leave Request No. {LeaveRequestNo}";
             }
             else if (ActionType == ActionTypes.Add.ToString())
             {
@@ -1360,6 +1358,22 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
+
+                #region Get the workflow data
+                var result = await WorkflowService.GetWorkflowStatusAsync(WorkflowHelper.CONST_LEAVE_REQUEST, leaveRequestNo);
+                if (result.Success)
+                {
+                    _workflowList = result.Value!;
+                }
+                else
+                {
+                    // Set the error message
+                    _errorMessage.Append(result.Error);
+
+                    ShowHideError(true);
+                }
+                #endregion
+
             }, leaveRequestNo);
         }
 

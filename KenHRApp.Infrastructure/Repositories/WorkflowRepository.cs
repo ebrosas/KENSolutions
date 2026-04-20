@@ -1102,6 +1102,43 @@ namespace KenHRApp.Infrastructure.Repositories
                     return Result<Employee?>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<List<WorkflowDetailResult>>> GetWorkflowStatusAsync(
+            string workflowTypeCode,
+            long requestNo)
+        {
+            List<WorkflowDetailResult> requestTypeList = new();
+
+            try
+            {
+                var model = await _db.Set<WorkflowDetailResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetWorkflowStatus @workflowTypeCode = {0}, @requestNo = {1}",
+                    workflowTypeCode,
+                    requestNo)
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    requestTypeList = model.Select(e => new WorkflowDetailResult
+                    {
+                        RequestNo = e.RequestNo,
+                        WorkflowType = e.WorkflowType,
+                        WorkflowStatus = e.WorkflowStatus,
+                        ActivityID = e.ActivityID,
+                        ActivityName = e.ActivityName,
+                        ActivityOrder = e.ActivityOrder,
+                        ActivityStatus = e.ActivityStatus,
+                        ApproverNo = e.ApproverNo,
+                        ApproverName = e.ApproverName
+                    }).ToList();
+                }
+
+                return Result<List<WorkflowDetailResult>>.SuccessResult(requestTypeList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<WorkflowDetailResult>>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

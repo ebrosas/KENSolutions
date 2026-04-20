@@ -76,7 +76,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Objects and collections
         private MudDatePicker _startDatePicker;
         private MudDatePicker _resumeDatePicker;
-        private List<LeaveRequestResultDTO> _leaveRequestList = new List<LeaveRequestResultDTO>();
+        private List<LeaveRequestResultDTO> _leaveRequestList = new List<LeaveRequestResultDTO>();        
         private List<string> _validationMessages = new();
 
         private List<BreadcrumbItem> _breadcrumbItems =

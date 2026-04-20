@@ -29,6 +29,10 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<Employee?>> GetEmployeeInfoAsync(
             int? empNo,
             CancellationToken cancellationToken = default);
+
+        Task<Result<List<WorkflowDetailResult>>> GetWorkflowStatusAsync(
+            string workflowTypeCode,
+            long requestNo);
         #endregion
     }
 }

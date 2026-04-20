@@ -6,6 +6,7 @@ using KenHRApp.Web.Components.Shared;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Text;
+using KenHRApp.Web.Components.Common.Helpers;
 
 namespace KenHRApp.Web.Components.Pages.Workflow
 {
@@ -284,9 +285,9 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 await InvokeAsync(StateHasChanged);
 
                 #region Test the workflow                
-                await InitializeWorkflowAsync();
-                //await ApproveWorkflowAsync(4, 10003632, "ervin", "Test Supervisor Approval");
-                //await ApproveWorkflowAsync(5, 10003633, "anne", "Test HR Approval");
+                //await InitializeWorkflowAsync();
+                //await ApproveWorkflowAsync(17, 10003632, "ervin", "Test Supervisor Approval");
+                await ApproveWorkflowAsync(18, 10003685, "shahbaz", "Test Department Manager Approval");
                 //await ApproveWorkflowAsync(6, 10003636, "nagendra", "Test Cost Center Manager Approval");
                 //await ApproveWorkflowAsync(7, 10003635, "Tester", "Test General Manager Approval");
                 #endregion                
@@ -434,7 +435,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 // Initialize the cancellation token
                 _cts = new CancellationTokenSource();
 
-                var repoResult = await WorkflowService.StartWorkflowAsync("RTYPELEAVE", 15, Environment.WebRootPath, _cts.Token);
+                var repoResult = await WorkflowService.StartWorkflowAsync(WorkflowHelper.CONST_LEAVE_REQUEST, 15, Environment.WebRootPath, _cts.Token);
                 if (repoResult.Success)
                 {
                     isSuccess = repoResult.Value;

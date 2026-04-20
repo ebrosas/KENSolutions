@@ -515,8 +515,19 @@
                             <ChildContent>
                                 <MudPaper Elevation="0" Square="true" Class="w-100 mt-0 mb-1">                            
                                     <MudStepper NonLinear Ripple="true" Class="leave-stepper"
-                                        CurrentStepColor="Color.Secondary" CompletedStepColor="Color.Success" ErrorStepColor="Color.Error">
-                                        <MudStep Title="Direct Supervisor">
+                                        CurrentStepColor="Color.Secondary" CompletedStepColor="Color.Success" 
+                                        ErrorStepColor="Color.Error">
+                                        @foreach (var wf in _workflowList!)
+                                        {
+                                            <MudStep @bind-Title="@wf.ActivityName" Disabled="true">
+                                                <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
+                                                     <strong>
+                                                        @(wf.ActivityStatus == "Pending" ? $"Currently pending with {wf.ApproverName}" : $"{wf.ActivityStatus}")
+                                                    </strong>
+                                                 </MudText>
+                                            </MudStep>
+                                        }
+                                        @* <MudStep Title="Direct Supervisor">
                                              <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
                                                  <strong>
                                                      Currently pending with Ervin Brosas
@@ -536,7 +547,7 @@
                                                      Note: Requires final approval by the Head of HR
                                                  </strong>
                                              </MudText>
-                                         </MudStep>
+                                         </MudStep> *@
                                     </MudStepper>
                                  </MudPaper>
                             </ChildContent>
@@ -545,6 +556,7 @@
                 }
             </MudPaper>
             <MudScrollToTop TopOffset="100"
+                            Style="position: fixed !important;bottom: 20px;left: 50%;transform: translateX(-50%);right: auto !important;z-index: 2000;"
                             Selector="#mainPanel"
                             VisibleCssClass="visible absolute"
                             HiddenCssClass="hidden absolute">

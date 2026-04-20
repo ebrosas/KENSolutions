@@ -25,5 +25,6 @@ namespace KenHRApp.Application.Interfaces
 
         Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string? comments);
         Task<Result<bool>> RejectStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string comments);
+        Task<Result<List<WorkflowDetailResultDTO>>> GetWorkflowStatusAsync(string workflowTypeCode,long requestNo);
     }
 }

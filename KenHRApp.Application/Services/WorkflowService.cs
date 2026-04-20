@@ -207,6 +207,45 @@ namespace KenHRApp.Application.Services
                 return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error while executing RejectStepAsync() method.");
             }
         }
+
+        public async Task<Result<List<WorkflowDetailResultDTO>>> GetWorkflowStatusAsync(
+            string workflowTypeCode,
+            long requestNo)
+        {
+            List<WorkflowDetailResultDTO> requestTypeList = new();
+
+            try
+            {
+                var repoResult = await _repository.GetWorkflowStatusAsync(workflowTypeCode, requestNo);
+                if (!repoResult.Success)
+                {
+                    return Result<List<WorkflowDetailResultDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null && model.Any())
+                {
+                    requestTypeList = model.Select(e => new WorkflowDetailResultDTO
+                    {
+                        RequestNo = e.RequestNo,
+                        WorkflowType = e.WorkflowType,
+                        WorkflowStatus = e.WorkflowStatus,
+                        ActivityID = e.ActivityID,
+                        ActivityName = e.ActivityName,
+                        ActivityOrder = e.ActivityOrder,
+                        ActivityStatus = e.ActivityStatus,
+                        ApproverNo = e.ApproverNo,
+                        ApproverName = e.ApproverName
+                    }).ToList();
+                }
+
+                return Result<List<WorkflowDetailResultDTO>>.SuccessResult(requestTypeList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<WorkflowDetailResultDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching request types from the database.");
+            }
+        }
         #endregion
 
         #region Private Methods
