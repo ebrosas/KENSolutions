@@ -29,4 +29,13 @@ DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE'
 		INNER JOIN kenuser.WorkflowDefinitions c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
 	WHERE RTRIM(c.EntityName) = @workflowTypeCode
 
-	
+/*
+
+	BEGIN TRAN T1
+
+	DELETE FROM kenuser.WorkflowDefinitions
+	WHERE WorkflowDefinitionId = 11
+
+	COMMIT TRAN T1
+
+*/	

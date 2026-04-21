@@ -15,8 +15,8 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public int ActivityID { get; set; }
         public string ActivityName { get; set; } = null!;
         public int ActivityOrder { get; set; }
-        public string ActivityStatus { get; set; } = null!;
-        public int ApproverNo { get; set; }
+        public string? ActivityStatus { get; set; } = null!;
+        public int? ApproverNo { get; set; }
         public string? ApproverName { get; set; } = null;
         #endregion
     }

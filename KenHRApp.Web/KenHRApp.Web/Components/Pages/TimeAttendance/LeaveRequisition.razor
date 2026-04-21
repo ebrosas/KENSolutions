@@ -430,7 +430,7 @@
                 </MudGrid>
                                
                 <MudExpansionPanels Elevation="0" MultiExpansion="true" Class="p-0 m-0">
-                    <MudExpansionPanel Class="p-0" Dense Gutters Expanded>
+                    <MudExpansionPanel Class="p-0" Dense Gutters Expanded="true">
                         <TitleContent>
                             <div class="d-flex">
                                 <MudIcon Icon="fas fa-briefcase" Style="color: #004165;" class="mr-3 mt-1" Size=Size.Small></MudIcon>
@@ -501,59 +501,58 @@
                             </MudStack>
                         </ChildContent>
                     </MudExpansionPanel>
-                </MudExpansionPanels>
-                @if (ActionType == ActionTypes.View.ToString())
-                {
-                    <MudExpansionPanels Elevation="0" MultiExpansion="true" Class="p-0 m-0">
-                        <MudExpansionPanel Class="p-0" Dense Gutters Expanded>
-                            <TitleContent>
-                                <div class="d-flex">
-                                 <MudIcon Icon="fas fa-user-check" Style="color: #004165;" class="mr-3 mt-1" Size=Size.Small></MudIcon>
-                                    <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Approval Workflow</strong></MudText>
-                                </div>
-                            </TitleContent>
-                            <ChildContent>
-                                <MudPaper Elevation="0" Square="true" Class="w-100 mt-0 mb-1">                            
-                                    <MudStepper NonLinear Ripple="true" Class="leave-stepper"
-                                        CurrentStepColor="Color.Secondary" CompletedStepColor="Color.Success" 
-                                        ErrorStepColor="Color.Error">
+                    @if (ActionType == ActionTypes.View.ToString())
+                    {
+                    <MudExpansionPanel Class="p-0" Dense Gutters>
+                        <TitleContent>
+                            <div class="d-flex">
+                                <MudIcon Icon="fas fa-user-check" Style="color: #004165;" class="mr-3 mt-1" Size=Size.Small></MudIcon>
+                                <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Approval Workflow</strong></MudText>
+                            </div>
+                        </TitleContent>
+                        <ChildContent>
+                            <MudPaper Elevation="0" Square="true" Class="w-100 mt-0 mb-1">
+                                <MudStepper NonLinear Ripple="true" Class="leave-stepper"
+                                    CurrentStepColor="Color.Secondary" CompletedStepColor="Color.Success"
+                                    ErrorStepColor="Color.Error">
                                         @foreach (var wf in _workflowList!)
                                         {
-                                            <MudStep @bind-Title="@wf.ActivityName" Disabled="true">
-                                                <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
-                                                     <strong>
-                                                        @(wf.ActivityStatus == "Pending" ? $"Currently pending with {wf.ApproverName}" : $"{wf.ActivityStatus}")
+                                            <MudStep @bind-Title="@wf.ActivityName" @bind-SecondaryText="@wf.ApprovalDetail" 
+                                                @bind-ActiveIndex="_currentWFIndex" @bind-Disabled="@wf.IsCompleted">
+                                                <MudText Typo="Typo.subtitle2">
+                                                    <strong>
+                                                        @wf.ActivityDetail
                                                     </strong>
-                                                 </MudText>
+                                                </MudText>
                                             </MudStep>
                                         }
                                         @* <MudStep Title="Direct Supervisor">
-                                             <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
-                                                 <strong>
-                                                     Currently pending with Ervin Brosas
-                                                 </strong>
-                                             </MudText>
+                                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
+                                        <strong>
+                                        Currently pending with Ervin Brosas
+                                        </strong>
+                                        </MudText>
                                         </MudStep>
                                         <MudStep Title="Manager" Disabled="true">
-                                             <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
-                                                 <strong>
-                                                     Note: Requires approval of the Department Manager
-                                                 </strong>
-                                             </MudText>
+                                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
+                                        <strong>
+                                        Note: Requires approval of the Department Manager
+                                        </strong>
+                                        </MudText>
                                         </MudStep>
-                                         <MudStep Title="Head of HR" Disabled="true">
-                                             <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
-                                                 <strong>
-                                                     Note: Requires final approval by the Head of HR
-                                                 </strong>
-                                             </MudText>
-                                         </MudStep> *@
-                                    </MudStepper>
-                                 </MudPaper>
-                            </ChildContent>
-                        </MudExpansionPanel>
-                    </MudExpansionPanels>
-                }
+                                        <MudStep Title="Head of HR" Disabled="true">
+                                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
+                                        <strong>
+                                        Note: Requires final approval by the Head of HR
+                                        </strong>
+                                        </MudText>
+                                        </MudStep> *@
+                                </MudStepper>
+                            </MudPaper>
+                        </ChildContent>
+                    </MudExpansionPanel>
+                    }
+                </MudExpansionPanels>
             </MudPaper>
             <MudScrollToTop TopOffset="100"
                             Style="position: fixed !important;bottom: 20px;left: 50%;transform: translateX(-50%);right: auto !important;z-index: 2000;"

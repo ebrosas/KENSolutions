@@ -54,8 +54,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private StringBuilder _errorMessage = new StringBuilder();
         private decimal _leaveDuration = 0;
         private string _pageTitle = "Apply Leave";
+        private int _currentWFIndex = 0;
         #endregion
-                
+
         #region Flags
         private bool _showErrorAlert = false;
         private bool _hasValidationError = false;
@@ -66,49 +67,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _saveBtnEnabled = false;
         private bool _btnProcessing = false;
         private bool _forceLoad = false;
-        #endregion
-
-        #region Enums
-        private enum ActionTypes
-        {
-            View,
-            Edit,
-            Add,
-            Delete
-        }
-
-        private enum NotificationType
-        {
-            Normal,
-            Information,
-            Success,
-            Warning,
-            Error
-        }
-
-        private enum MessageBoxTypes
-        {
-            Info,
-            Confirm,
-            Warning,
-            Error
-        }
-
-        private enum UDCKeys
-        {
-            LEAVETYPES,         // Leave Request Types
-            LEAVEAPVFLAG,       // Leave Approval Flags
-            LEAVEAPORTION,      // Leave Day Portions
-            STATUS              // Leave Statuses
-        }
-
-        public enum LeaveDayMode : byte
-        {
-            NotDefined,
-            FullDay,
-            FirstHalf,
-            SecondHalf
-        }
         #endregion
 
         #region Dialog Box Button Icons
@@ -169,6 +127,49 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         #endregion
 
+        #endregion
+
+        #region Enums
+        private enum ActionTypes
+        {
+            View,
+            Edit,
+            Add,
+            Delete
+        }
+
+        private enum NotificationType
+        {
+            Normal,
+            Information,
+            Success,
+            Warning,
+            Error
+        }
+
+        private enum MessageBoxTypes
+        {
+            Info,
+            Confirm,
+            Warning,
+            Error
+        }
+
+        private enum UDCKeys
+        {
+            LEAVETYPES,         // Leave Request Types
+            LEAVEAPVFLAG,       // Leave Approval Flags
+            LEAVEAPORTION,      // Leave Day Portions
+            STATUS              // Leave Statuses
+        }
+
+        public enum LeaveDayMode : byte
+        {
+            NotDefined,
+            FullDay,
+            FirstHalf,
+            SecondHalf
+        }
         #endregion
 
         #region IPageAuthorization Implementation
@@ -1364,6 +1365,17 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 if (result.Success)
                 {
                     _workflowList = result.Value!;
+
+                    if (_workflowList.Any())
+                    {
+                        #region Find the current pending activity
+                        WorkflowDetailResultDTO currentAct = _workflowList.Where(w => w.IsCurrent == true).FirstOrDefault()!;   
+                        if (currentAct != null)
+                        {
+                            _currentWFIndex = _workflowList.IndexOf(currentAct);
+                        }
+                        #endregion
+                    }
                 }
                 else
                 {

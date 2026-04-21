@@ -286,8 +286,8 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
                 #region Test the workflow                
                 //await InitializeWorkflowAsync();
-                //await ApproveWorkflowAsync(17, 10003632, "ervin", "Test Supervisor Approval");
-                await ApproveWorkflowAsync(18, 10003685, "shahbaz", "Test Department Manager Approval");
+                //await ApproveWorkflowAsync(15, 10003632, "ervin", "Test Supervisor Approval");
+                //await ApproveWorkflowAsync(18, 10003685, "shahbaz", "Test Department Manager Approval");
                 //await ApproveWorkflowAsync(6, 10003636, "nagendra", "Test Cost Center Manager Approval");
                 //await ApproveWorkflowAsync(7, 10003635, "Tester", "Test General Manager Approval");
                 #endregion                

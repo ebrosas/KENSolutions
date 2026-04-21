@@ -38,7 +38,7 @@ BEGIN
 		(
 			SELECT	x.[Status] as ActivityStatus,
 					x.ApproverEmpNo AS ApproverNo,
-					RTRIM(ISNULL(y.FirstName, '')) + RTRIM(ISNULL(y.MiddleName, '')) + RTRIM(ISNULL(y.LastName, '')) AS ApproverName
+					RTRIM(ISNULL(y.FirstName, '')) + ' ' + RTRIM(ISNULL(y.MiddleName, '')) + ' ' + RTRIM(ISNULL(y.LastName, '')) AS ApproverName
 			FROM kenuser.WorkflowStepInstances x WITH (NOLOCK)
 				LEFT JOIN kenuser.Employee y WITH (NOLOCK) ON x.ApproverEmpNo = y.EmployeeNo
 			WHERE x.WorkflowInstanceId = c.WorkflowInstanceId
