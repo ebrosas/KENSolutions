@@ -1,5 +1,11 @@
 ﻿@page "/TimeAttendance/leaverequest"
 
+<style>
+    .my-stepper .mud-stepper-actions {
+        display: none !important;
+    }
+</style>
+
 <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
      <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">@_pageTitle</MudText>
      <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserName</MudText>
@@ -512,41 +518,20 @@
                         </TitleContent>
                         <ChildContent>
                             <MudPaper Elevation="0" Square="true" Class="w-100 mt-0 mb-1">
-                                <MudStepper NonLinear Ripple="true" Class="leave-stepper"
+                                 <MudStepper NonLinear Ripple="true" Class="my-stepper" ShowResetButton="false" @bind-ActiveIndex="_currentWFIndex" 
                                     CurrentStepColor="Color.Secondary" CompletedStepColor="Color.Success"
                                     ErrorStepColor="Color.Error">
                                         @foreach (var wf in _workflowList!)
                                         {
-                                            <MudStep @bind-Title="@wf.ActivityName" @bind-SecondaryText="@wf.ApprovalDetail" 
-                                                @bind-ActiveIndex="_currentWFIndex" @bind-Disabled="@wf.IsCompleted">
-                                                <MudText Typo="Typo.subtitle2">
+                                            <MudStep @bind-Title="wf.ActivityName" @bind-SecondaryText="wf.ApprovalSummary"
+                                                @bind-Completed="wf.IsCompleted">
+                                                <MudText Typo="Typo.subtitle2" Color="Color.Surface">
                                                     <strong>
-                                                        @wf.ActivityDetail
+                                                        @wf.ApprovalDetails
                                                     </strong>
                                                 </MudText>
                                             </MudStep>
                                         }
-                                        @* <MudStep Title="Direct Supervisor">
-                                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
-                                        <strong>
-                                        Currently pending with Ervin Brosas
-                                        </strong>
-                                        </MudText>
-                                        </MudStep>
-                                        <MudStep Title="Manager" Disabled="true">
-                                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
-                                        <strong>
-                                        Note: Requires approval of the Department Manager
-                                        </strong>
-                                        </MudText>
-                                        </MudStep>
-                                        <MudStep Title="Head of HR" Disabled="true">
-                                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
-                                        <strong>
-                                        Note: Requires final approval by the Head of HR
-                                        </strong>
-                                        </MudText>
-                                        </MudStep> *@
                                 </MudStepper>
                             </MudPaper>
                         </ChildContent>

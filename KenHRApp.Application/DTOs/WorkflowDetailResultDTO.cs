@@ -44,14 +44,14 @@ namespace KenHRApp.Application.DTOs
             }
         }
 
-        public string ApprovalDetail 
+        public string ApprovalSummary 
         { 
             get
             {
                 if (ActivityStatus == CONST_APPROVED)
-                    return $"Approved by {ApproverName} (Emp. #: {ApproverNo})";
+                    return $"Approved by {ApproverName} (Emp. No: {ApproverNo})";
                 else if (ActivityStatus == CONST_REJECTED)
-                    return $"Rejected by {ApproverName} (Emp. #: {ApproverNo})";
+                    return $"Rejected by {ApproverName} (Emp. No: {ApproverNo})";
                 else if (ActivityStatus == CONST_PENDING)
                     return "In-progress";
                 else
@@ -60,16 +60,20 @@ namespace KenHRApp.Application.DTOs
             set { }
         }
 
-        public string ActivityDetail
+        public string ApprovalDetails
         {
             get
             {
+                StringBuilder sb = new StringBuilder();
+
                 if (ActivityStatus == CONST_APPROVED)
-                    return $"Approved by {ApproverName} (Emp. #: {ApproverNo})";
+                {
+                    return $"Approved by {ApproverName} (Emp. No: {ApproverNo})";
+                }
                 else if (ActivityStatus == CONST_REJECTED)
-                    return $"Rejected by {ApproverName} (Emp. #: {ApproverNo})";
+                    return $"Rejected by {ApproverName} (Emp. No: {ApproverNo})";
                 else if (ActivityStatus == CONST_PENDING)
-                    return $"Pending for approval with {ApproverName} (Emp. #: {ApproverNo})";
+                    return $"Pending for approval with {ApproverName} (Emp. No: {ApproverNo})";
                 else
                     return string.Empty;
             }
