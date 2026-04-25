@@ -246,6 +246,47 @@ namespace KenHRApp.Application.Services
                 return Result<List<WorkflowDetailResultDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching request types from the database.");
             }
         }
+
+        public async Task<Result<List<ApprovalRequestResultDTO>>> GetApprovalRequestAsync(
+            int empNo,
+            string requestType)
+        {
+            List<ApprovalRequestResultDTO> requestTypeList = new();
+
+            try
+            {
+                var repoResult = await _repository.GetApprovalRequestAsync(empNo, requestType);
+                if (!repoResult.Success)
+                {
+                    return Result<List<ApprovalRequestResultDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null && model.Any())
+                {
+                    requestTypeList = model.Select(e => new ApprovalRequestResultDTO
+                    {
+                        RequestNo = e.RequestNo,
+                        RequestTypeCode = e.RequestTypeCode,
+                        RequestTypeDesc = e.RequestTypeDesc,
+                        AppliedDate = e.AppliedDate,
+                        RequestedByNo = e.RequestedByNo,
+                        RequestedByName = e.RequestedByName,
+                        Detail = e.Detail,
+                        ApprovalRole = e.ApprovalRole,
+                        CurrentStatus = e.CurrentStatus,
+                        ApproverNo = e.ApproverNo,
+                        ApproverName = e.ApproverName
+                    }).ToList();
+                }
+
+                return Result<List<ApprovalRequestResultDTO>>.SuccessResult(requestTypeList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<ApprovalRequestResultDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching request types from the database.");
+            }
+        }
         #endregion
 
         #region Private Methods

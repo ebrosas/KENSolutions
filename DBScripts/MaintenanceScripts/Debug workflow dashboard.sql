@@ -23,6 +23,8 @@
 	SELECT a.LeaveConstraints, * FROM [kenuser].[LeaveRequisitionWF] a
 	WHERE a.LeaveRequestId = 15
 
+	SELECT 'First Line' + CHAR(13) + CHAR(10) + 'Second Line' AS Result;
+
 	SELECT * FROM kenuser.Employee a
 
 	SELECT * FROM kenuser.WorkflowDefinitions a

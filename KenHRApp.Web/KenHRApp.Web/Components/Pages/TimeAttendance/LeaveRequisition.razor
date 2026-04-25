@@ -518,21 +518,32 @@
                         </TitleContent>
                         <ChildContent>
                             <MudPaper Elevation="0" Square="true" Class="w-100 mt-0 mb-1">
-                                 <MudStepper NonLinear Ripple="true" Class="my-stepper" ShowResetButton="false" @bind-ActiveIndex="_currentWFIndex" 
-                                    CurrentStepColor="Color.Secondary" CompletedStepColor="Color.Success"
-                                    ErrorStepColor="Color.Error">
-                                        @foreach (var wf in _workflowList!)
-                                        {
-                                            <MudStep @bind-Title="wf.ActivityName" @bind-SecondaryText="wf.ApprovalSummary"
-                                                @bind-Completed="wf.IsCompleted">
-                                                <MudText Typo="Typo.subtitle2" Color="Color.Surface">
-                                                    <strong>
-                                                        @wf.ApprovalDetails
-                                                    </strong>
-                                                </MudText>
-                                            </MudStep>
-                                        }
-                                </MudStepper>
+                                @if (_workflowList.Any())
+                                {
+                                     <MudStepper NonLinear Ripple="true" Class="my-stepper" ShowResetButton="false" 
+                                        @bind-ActiveIndex="_currentWFIndex" 
+                                        CurrentStepColor="Color.Secondary" CompletedStepColor="Color.Success"
+                                        ErrorStepColor="Color.Error">
+                                            @foreach (var wf in _workflowList!)
+                                            {
+                                                <MudStep @bind-Title="wf.ActivityName" @bind-SecondaryText="wf.ApprovalSummary"
+                                                    @bind-Completed="wf.IsCompleted"  
+                                                    @bind-Disabled="wf.IsCompleted">
+                                                    <MudText Typo="Typo.subtitle2" Color="Color.Surface">
+                                                        <strong>
+                                                            @wf.ApprovalDetails
+                                                        </strong>
+                                                    </MudText>
+                                                </MudStep>
+                                            }
+                                    </MudStepper>
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.body2" Color="Color.Surface">
+                                        No workflow transactions found!
+                                    </MudText>
+                                }
                             </MudPaper>
                         </ChildContent>
                     </MudExpansionPanel>

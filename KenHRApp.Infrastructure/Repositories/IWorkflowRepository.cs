@@ -33,6 +33,10 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<List<WorkflowDetailResult>>> GetWorkflowStatusAsync(
             string workflowTypeCode,
             long requestNo);
+
+        Task<Result<List<ApprovalRequestResult>>> GetApprovalRequestAsync(
+            int empNo,
+            string requestType);
         #endregion
     }
 }

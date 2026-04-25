@@ -1139,6 +1139,45 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<List<WorkflowDetailResult>>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<List<ApprovalRequestResult>>> GetApprovalRequestAsync(
+            int empNo,
+            string requestType)
+        {
+            List<ApprovalRequestResult> requestTypeList = new();
+
+            try
+            {
+                var model = await _db.Set<ApprovalRequestResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetDashboardPendingRequest @empNo = {0}, @requestType = {1}",
+                    empNo,
+                    requestType)
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    requestTypeList = model.Select(e => new ApprovalRequestResult
+                    {
+                        RequestNo = e.RequestNo,
+                        RequestTypeCode = e.RequestTypeCode,
+                        RequestTypeDesc = e.RequestTypeDesc,
+                        AppliedDate = e.AppliedDate,
+                        RequestedByNo = e.RequestedByNo,
+                        RequestedByName = e.RequestedByName,
+                        Detail = e.Detail,
+                        ApprovalRole = e.ApprovalRole,
+                        CurrentStatus = e.CurrentStatus,
+                        ApproverNo = e.ApproverNo,
+                        ApproverName = e.ApproverName
+                    }).ToList();
+                }
+
+                return Result<List<ApprovalRequestResult>>.SuccessResult(requestTypeList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<ApprovalRequestResult>>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }
