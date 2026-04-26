@@ -20,6 +20,7 @@ namespace KenHRApp.Application.DTOs
         public string CurrentStatus { get; set; } = null!;
         public int ApproverNo { get; set; }
         public string? ApproverName { get; set; } = null;
+        public int? PendingDays { get; set; }
         #endregion
 
         #region Extended Properties
@@ -36,6 +37,14 @@ namespace KenHRApp.Application.DTOs
             get
             {
                 return $"{ApproverName} (Emp. No: {ApproverNo})";
+            }
+        }
+
+        public string PendingSince
+        {
+            get
+            {
+                return $"{PendingDays} days";
             }
         }
         #endregion

@@ -1167,7 +1167,8 @@ namespace KenHRApp.Infrastructure.Repositories
                         ApprovalRole = e.ApprovalRole,
                         CurrentStatus = e.CurrentStatus,
                         ApproverNo = e.ApproverNo,
-                        ApproverName = e.ApproverName
+                        ApproverName = e.ApproverName,
+                        PendingDays = e.PendingDays
                     }).ToList();
                 }
 

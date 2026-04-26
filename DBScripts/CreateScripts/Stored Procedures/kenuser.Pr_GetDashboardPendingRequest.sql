@@ -38,7 +38,8 @@ BEGIN
 				a.ApprovalStageDesc as ApprovalRole,			
 				d.ActivityStatus AS CurrentStatus,
 				d.ApproverNo,
-				d.ApproverName
+				d.ApproverName,
+				d.PendingDays
 		FROM kenuser.WorkflowStepDefinitions a WITH (NOLOCK)
 			INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
 			INNER JOIN kenuser.WorkflowInstances c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
@@ -72,7 +73,8 @@ BEGIN
 			(
 				SELECT	x.[Status] as ActivityStatus,
 						x.ApproverEmpNo AS ApproverNo,
-						RTRIM(ISNULL(y.FirstName, '')) + ' ' + RTRIM(ISNULL(y.MiddleName, '')) + ' ' + RTRIM(ISNULL(y.LastName, '')) AS ApproverName
+						RTRIM(ISNULL(y.FirstName, '')) + ' ' + RTRIM(ISNULL(y.MiddleName, '')) + ' ' + RTRIM(ISNULL(y.LastName, '')) AS ApproverName,
+						DATEDIFF(DAY, x.ActionDate, GETDATE()) AS PendingDays
 				FROM kenuser.WorkflowStepInstances x WITH (NOLOCK)
 					LEFT JOIN kenuser.Employee y WITH (NOLOCK) ON x.ApproverEmpNo = y.EmployeeNo
 				WHERE x.WorkflowInstanceId = c.WorkflowInstanceId
@@ -99,7 +101,8 @@ BEGIN
 			a.ApprovalStageDesc as ApprovalRole,			
 			d.ActivityStatus AS CurrentStatus,
 			d.ApproverNo,
-			d.ApproverName
+			d.ApproverName,
+			d.PendingDays
 		FROM kenuser.WorkflowStepDefinitions a WITH (NOLOCK)
 			INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
 			INNER JOIN kenuser.WorkflowInstances c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
@@ -133,7 +136,8 @@ BEGIN
 			(
 				SELECT	x.[Status] as ActivityStatus,
 						x.ApproverEmpNo AS ApproverNo,
-						RTRIM(ISNULL(y.FirstName, '')) + ' ' + RTRIM(ISNULL(y.MiddleName, '')) + ' ' + RTRIM(ISNULL(y.LastName, '')) AS ApproverName
+						RTRIM(ISNULL(y.FirstName, '')) + ' ' + RTRIM(ISNULL(y.MiddleName, '')) + ' ' + RTRIM(ISNULL(y.LastName, '')) AS ApproverName,
+						DATEDIFF(DAY, x.ActionDate, GETDATE()) AS PendingDays
 				FROM kenuser.WorkflowStepInstances x WITH (NOLOCK)
 					LEFT JOIN kenuser.Employee y WITH (NOLOCK) ON x.ApproverEmpNo = y.EmployeeNo
 				WHERE x.WorkflowInstanceId = c.WorkflowInstanceId
@@ -149,6 +153,7 @@ END
 /*	Debug:
 
 	EXEC kenuser.Pr_GetDashboardPendingRequest 10003666
+	EXEC kenuser.Pr_GetDashboardPendingRequest 10003633
 	EXEC kenuser.Pr_GetDashboardPendingRequest 10003633, 'RTYPELEAVE'
 
 

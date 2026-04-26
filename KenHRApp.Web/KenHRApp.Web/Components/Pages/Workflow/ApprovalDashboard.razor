@@ -72,15 +72,132 @@
                     <MudItem xs="7" sm="9">
                         <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
                             <MudAppBar Class="rounded-r-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
-                                <MudButtonGroup Color="Color.Transparent" Variant="Variant.Filled" Size="Size.Medium">
-                                    <MudButton StartIcon="@Icons.Material.Filled.AlarmAdd" IconColor="Color.Warning" Color="Color.Default">Pending</MudButton>
-                                    <MudButton StartIcon="@Icons.Material.Filled.AlarmAdd" IconColor="Color.Warning">Pending</MudButton>
+                                <MudButtonGroup Color="Color.Transparent" Variant="Variant.Text" Size="Size.Medium">
+                                    <MudButton StartIcon="@Icons.Material.Filled.AlarmAdd" IconColor="Color.Warning" Color="Color.Warning">Pending</MudButton>
+                                    <MudButton StartIcon="@Icons.Material.Filled.AlarmAdd" IconColor="Color.Warning" Color="Color.Warning">Approved</MudButton>
+                                    <MudButton StartIcon="@Icons.Material.Filled.AlarmAdd" IconColor="Color.Warning" Color="Color.Warning">Rejected</MudButton>
+                                    <MudButton StartIcon="@Icons.Material.Filled.AlarmAdd" IconColor="Color.Warning" Color="Color.Warning">On-hold</MudButton>
                                 </MudButtonGroup>
                             </MudAppBar>
+                            <MudPaper Elevation="5" Square="true" Class="w-100 mb-3">
+                                <MudDataGrid T="ApprovalRequestResultDTO" Items="@_approvalList" Hover="true" Striped="true" Class="leave-grid"
+                                    Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                                    QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                                    EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                                    EditDialogOptions="new DialogOptions 
+                                    { 
+                                        MaxWidth = MaxWidth.Small, 
+                                        FullWidth = true,
+                                        BackdropClick = false,
+                                        CloseOnEscapeKey = false
+                                    }"
+                                    StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
+                                    TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                                    <ToolBarContent>
+                                        <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                                            <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
+                                                          Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"
+                                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                                            </MudTextField>
+                                        </MudPaper>
+                                        <MudSpacer />
+                                        <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                            <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
+                                            @* <MudPaper Class="ms-3" Elevation="0">
+                                                <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new leave request" />
+                                            </MudPaper> *@
+                                        </MudPaper>
+                                    </ToolBarContent>
+                                    <Columns>
+                                        <PropertyColumn Property="x => x.RequestNo" Title="Request No." Class="col-RequestNo"
+                                            StickyLeft="true" Editable="false">
+                                            <CellTemplate Context="row">
+                                                <MudChip T="long"
+                                                         Size=Size.Small
+                                                         Color="Color.Info"
+                                                         Label="true"
+                                                         Class="fw-bold"
+                                                         Style="font-size: 14px;"
+                                                         OnClick="@(()=>OpenLeaveRequest(row.Item))">
+                                                    @row.Item.RequestNo
+                                                </MudChip>
+                                            </CellTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.RequestTypeCode" Hidden Editable="false">
+                                             <EditTemplate>
+                                                 @* Empty to prevent rendering *@
+                                             </EditTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.RequestTypeDesc" Title="Request Type" Class="col-RequestTypeDesc" Editable="false">
+                                             <CellTemplate>
+                                                 @context.Item.RequestTypeDesc
+                                            </CellTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.AppliedDate" Title="Applied Date" Class="col-AppliedDate" Editable="false">
+                                            <CellTemplate>
+                                                @(context.Item.AppliedDate.HasValue ? context.Item.AppliedDate.Value.ToString("dd-MMM-yyyy") : "")
+                                            </CellTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.RequesterName" Title="Requested By" Class="col-RequesterName" Editable="false">
+                                            <CellTemplate>
+                                                @context.Item.RequesterName
+                                            </CellTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.Detail" Title="Details" Class="col-Detail" Editable="false">
+                                            <CellTemplate>
+                                                @context.Item.Detail
+                                            </CellTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.CurrentStatus" Title="Requested By" Class="col-CurrentStatus" Editable="false">
+                                            <CellTemplate>
+                                                @context.Item.CurrentStatus
+                                            </CellTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.ApproverFullName" Title="Requested By" Class="col-ApproverFullName" Editable="false">
+                                            <CellTemplate>
+                                                @context.Item.ApproverFullName
+                                            </CellTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.PendingSince" Title="Pending Since" Class="col-PendingSince" Editable="false">
+                                            <CellTemplate>
+                                                @context.Item.PendingSince
+                                            </CellTemplate>
+                                        </PropertyColumn>
+                                        <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                                            <CellTemplate Context="row">
+                                                <MudIconButton title="View leave information"
+                                                               Class="show-btn fa-icon-btn"
+                                                               Color="Color.Info"
+                                                               OnClick="@row.Actions.StartEditingItemAsync">
+                                                    <ChildContent>
+                                                        <i class="fas fa-info fa-lg"></i>
+                                                    </ChildContent>
+                                                </MudIconButton>
+                                            </CellTemplate>
+                                        </TemplateColumn>
+                                    </Columns>
+                                    <NoRecordsContent>
+                                        <div class="no-data-box">
+                                            <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
+                                            <span>No data found</span>
+                                        </div>
+                                    </NoRecordsContent>
+                                    <PagerContent>
+                                        <MudDataGridPager T="ApprovalRequestResultDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                                    </PagerContent>
+                                </MudDataGrid>
+                            </MudPaper>
                         </MudStack>
                     </MudItem>
                 </MudGrid>
             </MudPaper>
+            <MudScrollToTop TopOffset="100"
+                            Style="position: fixed !important;bottom: 20px;left: 50%;transform: translateX(-50%);right: auto !important;z-index: 2000;"
+                            Selector="#mainPanel"
+                            VisibleCssClass="visible absolute"
+                            HiddenCssClass="hidden absolute">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+            </MudScrollToTop>
         </MudStack>
     </div>
 </MudContainer>

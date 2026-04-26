@@ -20,6 +20,7 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public string CurrentStatus { get; set; } = null!;
         public int ApproverNo { get; set; }
         public string? ApproverName { get; set; } = null;
+        public int? PendingDays { get; set; }
         #endregion
     }
 }

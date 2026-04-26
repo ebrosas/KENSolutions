@@ -60,7 +60,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
         #region Objects and collections
         private List<RequestTypeDTO> _requestTypeList = new List<RequestTypeDTO>();
-        private List<RequestApprovalDTO> _approvalList = new List<RequestApprovalDTO>();
+        private List<ApprovalRequestResultDTO> _approvalList = new List<ApprovalRequestResultDTO>();
         private List<string> _validationMessages = new();
 
         private List<BreadcrumbItem> _breadcrumbItems =
@@ -129,6 +129,49 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                     BeginLoadComboboxTask();
                 }
             }
+        }
+        #endregion
+
+        #region Grid Events 
+        private Func<ApprovalRequestResultDTO, bool> _quickFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(_searchString))
+                return true;
+
+            //if (!string.IsNullOrEmpty(x.DepartmentCode) && x.DepartmentCode.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            //if (!string.IsNullOrEmpty(x.DepartmentName) && x.DepartmentName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            //if (!string.IsNullOrEmpty(x.Description) && x.Description!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            //if (!string.IsNullOrEmpty(x.GroupName) && x.GroupName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            //if (!string.IsNullOrEmpty(x.SuperintendentName) && x.SuperintendentName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            //if (!string.IsNullOrEmpty(x.ManagerName) && x.ManagerName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            return false;
+        };
+
+        private void StartedEditingItem(ApprovalRequestResultDTO item)
+        {
+            _events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+        }
+
+        private void CanceledEditingItem(ApprovalRequestResultDTO item)
+        {
+            _events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+        }
+
+        private void CommittedItemChanges(ApprovalRequestResultDTO item)
+        {
+
         }
         #endregion
 
@@ -219,6 +262,11 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
             var dialog = await DialogService.ShowAsync<InfoDialog>(title, parameters, options);
             var result = await dialog.Result;
+        }
+
+        public void OpenLeaveRequest(ApprovalRequestResultDTO item)
+        {
+            Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.RequestNo}&CallerForm=LeaveApproval");
         }
         #endregion
 
