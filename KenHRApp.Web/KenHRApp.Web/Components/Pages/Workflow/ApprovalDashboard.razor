@@ -72,8 +72,10 @@
                     <MudItem xs="7" sm="9">
                         <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
                             <MudAppBar Class="rounded-r-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
-                                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Assign the Requisition</MudText>
-                                <MudSpacer />
+                                <MudButtonGroup Color="Color.Transparent" Variant="Variant.Filled" Size="Size.Medium">
+                                    <MudButton StartIcon="@Icons.Material.Filled.AlarmAdd" IconColor="Color.Warning" Color="Color.Default">Pending</MudButton>
+                                    <MudButton StartIcon="@Icons.Material.Filled.AlarmAdd" IconColor="Color.Warning">Pending</MudButton>
+                                </MudButtonGroup>
                             </MudAppBar>
                         </MudStack>
                     </MudItem>
