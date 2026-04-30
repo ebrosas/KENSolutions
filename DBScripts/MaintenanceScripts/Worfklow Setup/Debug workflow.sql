@@ -1,4 +1,5 @@
-DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE'
+DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE',
+		@requestNo			BIGINT = 16
 
 	--Get workflow setup
 	SELECT * FROM kenuser.WorkflowDefinitions a
@@ -8,7 +9,9 @@ DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE'
 	SELECT a.* 
 	FROM kenuser.WorkflowStepDefinitions a WITH (NOLOCK)
 		INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
+		INNER JOIN kenuser.WorkflowInstances c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
 	WHERE RTRIM(b.EntityName) = @workflowTypeCode
+		AND c.EntityId = @requestNo
 
 	--Get WF activity conditions
 	SELECT a.* 
@@ -22,13 +25,14 @@ DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE'
 	FROM kenuser.WorkflowInstances a
 		INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
 	WHERE RTRIM(b.EntityName) = @workflowTypeCode
+		AND a.EntityId = @requestNo
 
 	SELECT a.* 
 	FROM kenuser.WorkflowStepInstances a
 		INNER JOIN kenuser.WorkflowInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId
 		INNER JOIN kenuser.WorkflowDefinitions c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
 	WHERE RTRIM(c.EntityName) = @workflowTypeCode
-
+		AND b.EntityId = @requestNo
 /*
 
 	BEGIN TRAN T1

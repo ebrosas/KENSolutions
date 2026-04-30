@@ -11,7 +11,7 @@
 
 ALTER PROCEDURE kenuser.Pr_GetDashboardPendingRequest
 (   
-	@empNo			INT,
+	@empNo			INT = 0,
 	@requestType	VARCHAR(100) = ''
 )
 AS
@@ -21,6 +21,9 @@ BEGIN
 	SET NOCOUNT ON 
 
 	--Validate parameters
+	IF ISNULL(@empNo, 0) = 0
+		SET @empNo = NULL
+
 	IF ISNULL(@requestType, '') = ''
 		SET @requestType = NULL
 
@@ -81,7 +84,7 @@ BEGIN
 					and x.StepDefinitionId = a.StepDefinitionId
 			) d
 		WHERE RTRIM(d.ActivityStatus) = 'Pending'
-			AND d.ApproverNo = @empNo
+			AND (d.ApproverNo = @empNo OR @empNo IS NULL)
 			AND RTRIM(b.EntityName) = @requestType
 		ORDER BY c.EntityId
 	END
@@ -144,7 +147,7 @@ BEGIN
 					and x.StepDefinitionId = a.StepDefinitionId
 			) d
 		WHERE RTRIM(d.ActivityStatus) = 'Pending'
-			AND d.ApproverNo = @empNo
+			AND (d.ApproverNo = @empNo OR @empNo IS NULL)
 		ORDER BY c.EntityId
 	END 
 
@@ -152,7 +155,12 @@ END
 
 /*	Debug:
 
-	EXEC kenuser.Pr_GetDashboardPendingRequest 10003666
+	--Staging database
+	EXEC kenuser.Pr_GetDashboardPendingRequest
+	EXEC kenuser.Pr_GetDashboardPendingRequest 10003635		
+	EXEC kenuser.Pr_GetDashboardPendingRequest 10003635, 'RTYPELEAVE'
+	
+	--Development database
 	EXEC kenuser.Pr_GetDashboardPendingRequest 10003633
 	EXEC kenuser.Pr_GetDashboardPendingRequest 10003633, 'RTYPELEAVE'
 

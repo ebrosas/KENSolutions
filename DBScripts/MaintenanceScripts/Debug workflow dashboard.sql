@@ -47,6 +47,9 @@
 
 	BEGIN TRAN T1
 
+	DELETE FROM kenuser.WorkflowDefinitions 	
+	WHERE WorkflowDefinitionId = 12
+
 	UPDATE kenuser.WorkflowConditions
 	SET StepDefinitionId = 25
 

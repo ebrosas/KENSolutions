@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Text;
 using KenHRApp.Web.Components.Common.Helpers;
+using System.Net.Http.Headers;
 
 namespace KenHRApp.Web.Components.Pages.Workflow
 {
@@ -56,6 +57,12 @@ namespace KenHRApp.Web.Components.Pages.Workflow
         private bool _enableFilter = false;
         private bool _isActive = true;
         private bool _hasValidationError = false;
+        private bool _isSearchHovered = false;
+        private bool _isResetHovered = false;
+        private bool _isPendingClicked = false;
+        private bool _isApprovedClicked = false;
+        private bool _isRejectedClicked = false;
+        private bool _isOnHoldClicked = false;
         #endregion
 
         #region Objects and collections
@@ -95,6 +102,14 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             Confirm,
             Warning,
             Error
+        }
+
+        private enum SearchType
+        {
+            PendingRequest,
+            ApprovedRequest,
+            RejectedRequest,
+            OnholdRequest
         }
         #endregion
 
@@ -341,6 +356,60 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 #endregion                
 
             }, forceLoad);
+        }
+
+        private void BeginGetPendingApprovalTask(SearchType searchType)
+        {
+            try
+            {
+                //Reset button flags
+                _isPendingClicked = false;
+                _isApprovedClicked = false;
+                _isRejectedClicked = false;
+                _isOnHoldClicked = false;
+
+                switch (searchType)
+                {
+                    case SearchType.PendingRequest:
+                        overlayMessage = "Loading pending requests, please wait...";
+                        _isPendingClicked = true;
+                        break;
+
+                    case SearchType.ApprovedRequest:
+                        overlayMessage = "Loading approved requests, please wait...";
+                        _isApprovedClicked = true;
+                        break;
+
+                    case SearchType.RejectedRequest:
+                        overlayMessage = "Loading rejected requests, please wait...";
+                        _isRejectedClicked = true;
+                        break;
+
+                    case SearchType.OnholdRequest:
+                        overlayMessage = "Loading on-hold requests, please wait...";
+                        _isOnHoldClicked = true;
+                        break;
+                }
+
+                //var repoResult = await WorkflowService.GetWorkflowStatusAsync(string.Empty, 0);
+                //if (repoResult.Success)
+                //{
+                //    _requestTypeList = repoResult.Value!;
+                //}
+                //else
+                //{
+                //    // Show error message
+                //    _errorMessage.AppendLine(repoResult.Error);
+
+                //    ShowHideError(true);
+                //}
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         #endregion
 
