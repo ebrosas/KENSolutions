@@ -161,8 +161,8 @@ END
 	EXEC kenuser.Pr_GetDashboardPendingRequest 10003635, 'RTYPELEAVE'
 	
 	--Development database
-	EXEC kenuser.Pr_GetDashboardPendingRequest 10003633
-	EXEC kenuser.Pr_GetDashboardPendingRequest 10003633, 'RTYPELEAVE'
+	EXEC kenuser.Pr_GetDashboardPendingRequest 10003632
+	EXEC kenuser.Pr_GetDashboardPendingRequest 10003632, 'RTYPELEAVE'
 
 
 Parameters:

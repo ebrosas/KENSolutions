@@ -39,20 +39,33 @@ BEGIN
 	IF ISNULL(@endDate, '') = '' OR CAST(@endDate AS DATETIME) = CAST('' AS DATETIME)
 		SET @endDate = NULL
 
-	SELECT	RTRIM(a.UDCCode) AS RequestTypeCode,
-			RTRIM(a.UDCDesc1) AS RequestTypeName,
-			RTRIM(a.UDCDesc2) AS RequestTypeDesc,
-			CASE WHEN RTRIM(a.UDCCode) = 'RTYPELEAVE' THEN 'fas fa-calendar-alt'			--Leave Requisition
-				WHEN RTRIM(a.UDCCode) = 'RTYPETRAVEL' THEN 'fas fa-plane-departure'			--Travel Request
-				WHEN RTRIM(a.UDCCode) = 'RTYPEEXPENSE' THEN 'fas fa-hand-holding-usd'		--Expense Claim
-				WHEN RTRIM(a.UDCCode) = 'RTYPEOT' THEN 'fas fa-user-clock'					--Overtime
-				WHEN RTRIM(a.UDCCode) = 'RTYPEREGULAR' THEN 'far fa-calendar-check'			--Regularization
-				WHEN RTRIM(a.UDCCode) = 'RTYPERECRUIT' THEN 'fas fa-users'					--Recruitment Offer
-				ELSE ''
-			END AS IconName,
-			kenuser.fnGetAssignedRequestCount(RTRIM(a.UDCCode), @empNo, @startDate, @endDate) AS AssignedCount
-	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
-	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'REQTYPE')
+	SELECT * FROM
+	(
+		SELECT	'<ALL>' AS RequestTypeCode,
+				'<All>' AS RequestTypeName,
+				NULL AS RequestTypeDesc,
+				'fas fa-check' AS IconName,
+				0 AS AssignedCount
+
+		UNION 
+
+		SELECT	RTRIM(a.UDCCode) AS RequestTypeCode,
+				RTRIM(a.UDCDesc1) AS RequestTypeName,
+				RTRIM(a.UDCDesc2) AS RequestTypeDesc,
+				CASE WHEN RTRIM(a.UDCCode) = 'RTYPELEAVE' THEN 'fas fa-calendar-alt'			--Leave Requisition
+					WHEN RTRIM(a.UDCCode) = 'RTYPETRAVEL' THEN 'fas fa-plane-departure'			--Travel Request
+					WHEN RTRIM(a.UDCCode) = 'RTYPEEXPENSE' THEN 'fas fa-hand-holding-usd'		--Expense Claim
+					WHEN RTRIM(a.UDCCode) = 'RTYPEOT' THEN 'fas fa-user-clock'					--Overtime
+					WHEN RTRIM(a.UDCCode) = 'RTYPEREGULAR' THEN 'far fa-calendar-check'			--Regularization
+					WHEN RTRIM(a.UDCCode) = 'RTYPERECRUIT' THEN 'fas fa-users'					--Recruitment Offer
+					ELSE ''
+				END AS IconName,
+				kenuser.fnGetAssignedRequestCount(RTRIM(a.UDCCode), @empNo, @startDate, @endDate) AS AssignedCount
+		FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+		WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'REQTYPE')
+	) x
+	WHERE (RTRIM(x.RequestTypeCode) = @requestType OR @requestType IS NULL)
+	ORDER BY x.RequestTypeName
 
 	
 END
@@ -60,14 +73,13 @@ END
 /*	Debug:
 
 PARAMETERS:
-	@empNo				INT = 0,
+	@empNo				INT,
 	@requestType		VARCHAR(20) = NULL,
 	@periodType			TINYINT = NULL,
 	@startDate			DATETIME = NULL,
 	@endDate			DATETIME = NULL
 
 	EXEC kenuser.Pr_GetPendingRequest 10003632
-	EXEC kenuser.Pr_GetPendingRequest 0, 0, '7600'
-	EXEC kenuser.Pr_GetPendingRequest 0, 0, '', '03/01/2026', '03/31/2026'
+	EXEC kenuser.Pr_GetPendingRequest 0, 'RTYPELEAVE', '', '03/01/2026', '03/31/2026'
 
 */

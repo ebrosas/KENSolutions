@@ -1,5 +1,5 @@
 DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE',
-		@requestNo			BIGINT = 16
+		@requestNo			BIGINT = 15
 
 	--Get workflow setup
 	SELECT * FROM kenuser.WorkflowDefinitions a
@@ -39,6 +39,10 @@ DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE',
 
 	DELETE FROM kenuser.WorkflowDefinitions
 	WHERE WorkflowDefinitionId = 11
+
+	UPDATE kenuser.WorkflowStepInstances 
+	SET ApproverEmpNo = 10003632
+	WHERE StepInstanceId = 19
 
 	COMMIT TRAN T1
 

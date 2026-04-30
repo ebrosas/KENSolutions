@@ -46,10 +46,12 @@
                                 <MudSpacer />
                             </MudAppBar>
                             <MudPaper Elevation="5" Class="p-0 w-100">
-                                <MudList T="RequestTypeDTO" Dense="true" Elevation="1" SelectionMode="SelectionMode.SingleSelection" Color="Color.Info">
+                                <MudList T="RequestTypeDTO" Dense="true" Elevation="1"
+                                         @bind-SelectedValue="_selectedRequestType" 
+                                         SelectionMode="SelectionMode.SingleSelection" Color="Color.Info">
                                     @foreach (var request in _requestTypeList)
                                     {
-                                        <MudListItem>
+                                        <MudListItem Value="@request">
                                             <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Spacing="3">
                                                 <MudIconButton @bind-icon="request.IconName" Size="Size.Small" />
 
@@ -76,28 +78,28 @@
                                      <div>
                                          <MudButton Variant="@(_isPendingClicked ? Variant.Filled : Variant.Outlined)"
                                             StartIcon="fas fa-check-circle" Class="px-5"
-                                            Color="Color.Info" Size="Size.Small" OnClick="@(() => BeginGetPendingApprovalTask(SearchType.PendingRequest))">
+                                            Color="Color.Info" Size="Size.Small" OnClick="@(() => GetPendingRequestByType(SearchType.PendingRequest))">
                                              <MudText Typo="Typo.button" HtmlTag="h3">Pending</MudText>
                                          </MudButton>
                                      </div>
                                      <div>
                                          <MudButton Variant="@(_isApprovedClicked ? Variant.Filled : Variant.Outlined)"
                                             StartIcon="fas fa-thumbs-up" Class="px-5"
-                                            Color="Color.Success" Size="Size.Small" OnClick="@(() => BeginGetPendingApprovalTask(SearchType.ApprovedRequest))">
+                                            Color="Color.Success" Size="Size.Small" OnClick="@(() => GetPendingRequestByType(SearchType.ApprovedRequest))">
                                              <MudText Typo="Typo.button" HtmlTag="h3">Approved</MudText>
                                          </MudButton>
                                      </div>
                                      <div>
                                          <MudButton Variant="@(_isRejectedClicked ? Variant.Filled : Variant.Outlined)"
                                             StartIcon="fas fa-thumbs-down" Class="px-5"
-                                            Color="Color.Error" Size="Size.Small" OnClick="@(() => BeginGetPendingApprovalTask(SearchType.RejectedRequest))">
+                                            Color="Color.Error" Size="Size.Small" OnClick="@(() => GetPendingRequestByType(SearchType.RejectedRequest))">
                                              <MudText Typo="Typo.button" HtmlTag="h3">Rejected</MudText>
                                          </MudButton>
                                      </div>
                                      <div>
                                          <MudButton Variant="@(_isOnHoldClicked ? Variant.Filled : Variant.Outlined)"
                                             StartIcon="fas fa-pause" Class="px-5"
-                                            Color="Color.Warning" Size="Size.Small" OnClick="@(() => BeginGetPendingApprovalTask(SearchType.OnholdRequest))">
+                                            Color="Color.Warning" Size="Size.Small" OnClick="@(() => GetPendingRequestByType(SearchType.OnholdRequest))">
                                              <MudText Typo="Typo.button" HtmlTag="h3">On-hold</MudText>
                                          </MudButton>
                                      </div>

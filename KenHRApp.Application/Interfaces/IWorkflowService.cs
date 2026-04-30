@@ -28,7 +28,7 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<List<WorkflowDetailResultDTO>>> GetWorkflowStatusAsync(string workflowTypeCode,long requestNo);
 
         Task<Result<List<ApprovalRequestResultDTO>>> GetApprovalRequestAsync(
-            int empNo,
-            string requestType);
+            int? empNo,
+            string? requestType);
     }
 }

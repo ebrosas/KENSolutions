@@ -248,8 +248,8 @@ namespace KenHRApp.Application.Services
         }
 
         public async Task<Result<List<ApprovalRequestResultDTO>>> GetApprovalRequestAsync(
-            int empNo,
-            string requestType)
+            int? empNo,
+            string? requestType)
         {
             List<ApprovalRequestResultDTO> requestTypeList = new();
 
