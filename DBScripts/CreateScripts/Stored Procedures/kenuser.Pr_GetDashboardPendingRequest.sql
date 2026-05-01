@@ -6,7 +6,8 @@
 *
 *	Date			Author		Rev. #		Comments:
 *	25/04/2026		Ervin		1.0			Created
-*	
+*	01/05/2026		Ervin		1.1			Added "StepInstanceId" field
+*
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetDashboardPendingRequest
@@ -24,7 +25,7 @@ BEGIN
 	IF ISNULL(@empNo, 0) = 0
 		SET @empNo = NULL
 
-	IF ISNULL(@requestType, '') = ''
+	IF ISNULL(@requestType, '') = '' OR RTRIM(@requestType) = '<ALL>'
 		SET @requestType = NULL
 
 	IF @requestType IS NOT NULL
@@ -42,7 +43,8 @@ BEGIN
 				d.ActivityStatus AS CurrentStatus,
 				d.ApproverNo,
 				d.ApproverName,
-				d.PendingDays
+				d.PendingDays,
+				d.StepInstanceId	--Rev. #1.1
 		FROM kenuser.WorkflowStepDefinitions a WITH (NOLOCK)
 			INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
 			INNER JOIN kenuser.WorkflowInstances c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
@@ -77,7 +79,8 @@ BEGIN
 				SELECT	x.[Status] as ActivityStatus,
 						x.ApproverEmpNo AS ApproverNo,
 						RTRIM(ISNULL(y.FirstName, '')) + ' ' + RTRIM(ISNULL(y.MiddleName, '')) + ' ' + RTRIM(ISNULL(y.LastName, '')) AS ApproverName,
-						DATEDIFF(DAY, x.ActionDate, GETDATE()) AS PendingDays
+						DATEDIFF(DAY, x.ActionDate, GETDATE()) AS PendingDays,
+						x.StepInstanceId		--Rev. #1.1
 				FROM kenuser.WorkflowStepInstances x WITH (NOLOCK)
 					LEFT JOIN kenuser.Employee y WITH (NOLOCK) ON x.ApproverEmpNo = y.EmployeeNo
 				WHERE x.WorkflowInstanceId = c.WorkflowInstanceId
@@ -105,7 +108,8 @@ BEGIN
 			d.ActivityStatus AS CurrentStatus,
 			d.ApproverNo,
 			d.ApproverName,
-			d.PendingDays
+			d.PendingDays,
+			d.StepInstanceId		--Rev. #1.1
 		FROM kenuser.WorkflowStepDefinitions a WITH (NOLOCK)
 			INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
 			INNER JOIN kenuser.WorkflowInstances c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
@@ -140,7 +144,8 @@ BEGIN
 				SELECT	x.[Status] as ActivityStatus,
 						x.ApproverEmpNo AS ApproverNo,
 						RTRIM(ISNULL(y.FirstName, '')) + ' ' + RTRIM(ISNULL(y.MiddleName, '')) + ' ' + RTRIM(ISNULL(y.LastName, '')) AS ApproverName,
-						DATEDIFF(DAY, x.ActionDate, GETDATE()) AS PendingDays
+						DATEDIFF(DAY, x.ActionDate, GETDATE()) AS PendingDays,
+						x.StepInstanceId		--Rev. #1.1
 				FROM kenuser.WorkflowStepInstances x WITH (NOLOCK)
 					LEFT JOIN kenuser.Employee y WITH (NOLOCK) ON x.ApproverEmpNo = y.EmployeeNo
 				WHERE x.WorkflowInstanceId = c.WorkflowInstanceId

@@ -44,7 +44,7 @@ BEGIN
 		SELECT	'<ALL>' AS RequestTypeCode,
 				'<All>' AS RequestTypeName,
 				NULL AS RequestTypeDesc,
-				'fas fa-check' AS IconName,
+				'far fa-hand-point-up' AS IconName,
 				0 AS AssignedCount
 
 		UNION 

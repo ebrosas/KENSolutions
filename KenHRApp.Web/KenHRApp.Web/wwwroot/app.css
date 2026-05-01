@@ -2325,6 +2325,134 @@ h1:focus {
 }
 /* #endregion */
 
+/* #region Leave Entitlement Grid Stylesheets  */
+.pendingrequest-grid .no-data-box {
+    display: flex;
+    justify-content: flex-start; /* align content to the LEFT */
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    background-color: #f8f9fa; /* light gray */
+    border: 1px solid #FBE9E7;
+    border-radius: 6px;
+    color: #856404; /* dark yellow-brown */
+    font-weight: 600;
+}
+
+.pendingrequest-grid .no-data-icon {
+    font-size: 20px;
+    color: #6c757d; /* muted gray */
+}
+
+.pendingrequest-grid .mud-table {
+    table-layout: fixed;
+    width: 100%;
+    text-align: left;
+}
+
+/* Format table header */
+.pendingrequest-grid .mud-table-head {
+    background-color: #BBDEFB;
+    font-weight: bold;
+    text-align: center !important;
+    font-size: 14px !important;
+    text-decoration: underline;
+    height: 20px;
+    line-height: 20px;
+}
+
+/* Format table cell */
+.pendingrequest-grid .mud-table-cell {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
+    font-size: 14px;
+    border-bottom: none !important;
+}
+
+.pendingrequest-grid .action-cell {
+    display: flex;
+    align-items: center !important;
+    height: 100%;
+}
+
+/* Grid Column widths */
+.pendingrequest-grid .col-RequestNo {
+    width: 80px !important;
+    text-align: left;
+    overflow: hidden;
+    min-width: 50px !important;
+    text-overflow: ellipsis;
+}
+
+.pendingrequest-grid .col-RequestTypeDesc {
+    width: 120px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pendingrequest-grid .col-AppliedDate {
+    width: 90px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pendingrequest-grid .col-RequesterName {
+    width: 150px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pendingrequest-grid .col-Detail {
+    width: 200px !important;
+    max-width: 200px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pendingrequest-grid .col-CurrentStatus {
+    width: 90px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pendingrequest-grid .col-ApproverFullName {
+    width: 200px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pendingrequest-grid .col-PendingSince {
+    width: 90px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pendingrequest-grid .col-ApproverRemarks {
+    width: 300px !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pendingrequest-grid .flex-column {
+    width: auto; /* allow flex growth */
+    flex: 1; /* take remaining space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* adds ... if too long */
+}
+/* #endregion */
+
 /* #region <ToolBarContent> styling within MudDataGrid */
 .shift-grid .mud-datagrid-toolbar {
     height: 150px;
@@ -2510,12 +2638,11 @@ employee-autocomplete .mud-input-adornment .mud-icon-button {
 }
 /* #endregion*/
 
-/* #region Miscelenous Stylesheets */
+/*#region Miscelenous Stylesheets */
 .ken-button {
     background-color:#004165;
 }
-/* #endrgion*/
-
+/* #endregion*/
 
 /* #region MudStepper Stylesheets */
 .leave-stepper .leave-stepper-actions {

@@ -33,7 +33,8 @@ DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE',
 		INNER JOIN kenuser.WorkflowDefinitions c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
 	WHERE RTRIM(c.EntityName) = @workflowTypeCode
 		AND b.EntityId = @requestNo
-/*
+
+/*	Clear workflow
 
 	BEGIN TRAN T1
 
@@ -47,3 +48,27 @@ DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE',
 	COMMIT TRAN T1
 
 */	
+
+/*	Re-open workflow
+
+	BEGIN TRAN T1
+
+	UPDATE kenuser.WorkflowInstances
+	SET Status = 'Running'
+	WHERE WorkflowInstanceId = 13
+
+	DELETE FROM kenuser.WorkflowStepInstances
+	WHERE StepInstanceId IN (18, 19)
+
+	UPDATE kenuser.WorkflowStepInstances
+	SET ApproverUserID = NULL,
+		Status = 'Pending',
+		ActionDate = null,
+		Comments = null
+	WHERE StepInstanceId = 17
+
+	ROLLBACK TRAN T1
+	COMMIT TRAN T1
+
+
+*/

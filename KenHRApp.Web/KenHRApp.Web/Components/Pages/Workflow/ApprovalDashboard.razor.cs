@@ -40,50 +40,6 @@ namespace KenHRApp.Web.Components.Pages.Workflow
         private static string CONST_DEFAULT_LIST_ITEM = "<ALL>";
         #endregion
 
-        #region Fields
-        private StringBuilder _errorMessage = new StringBuilder();
-        private string _searchString = string.Empty;
-        private string overlayMessage = "Please wait...";
-        private List<string> _events = new();
-        private CancellationTokenSource? _cts;
-        private RequestTypeDTO? _selectedRequestType = null;
-
-        #region Dialog Box Button Icons
-        private readonly string _iconDelete = "fas fa-trash-alt";
-        private readonly string _iconCancel = "fas fa-window-close";
-        private readonly string _iconError = "fas fa-times-circle";
-        private readonly string _iconInfo = "fas fa-info-circle";
-        private readonly string _iconWarning = "fas fa-exclamation-circle";
-        #endregion
-
-        #region Flags
-        private bool _isRunning = false;
-        private bool _showErrorAlert = false;
-        private bool _enableFilter = false;
-        private bool _isActive = true;
-        private bool _hasValidationError = false;
-        private bool _isSearchHovered = false;
-        private bool _isResetHovered = false;
-        private bool _isPendingClicked = false;
-        private bool _isApprovedClicked = false;
-        private bool _isRejectedClicked = false;
-        private bool _isOnHoldClicked = false;
-        #endregion
-
-        #region Objects and collections
-        private List<RequestTypeDTO> _requestTypeList = new List<RequestTypeDTO>();
-        private List<ApprovalRequestResultDTO> _approvalList = new List<ApprovalRequestResultDTO>();
-        private List<string> _validationMessages = new();
-
-        private List<BreadcrumbItem> _breadcrumbItems =
-        [
-            new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Pending Requests Dashboard", href: null, icon: @Icons.Material.Filled.AccountBalance, disabled: true)
-        ];
-        #endregion
-
-        #endregion
-
         #region Enums
         private enum UDCKeys
         {
@@ -116,8 +72,65 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             RejectedRequest,
             OnholdRequest
         }
+
+        private enum WorkflowStatus
+        {
+            Running,
+            Pending,
+            InProgress,
+            Approved,
+            Rejected,
+            Cancelled,
+            Skipped,
+            Completed
+        }
         #endregion
 
+        #region Fields
+        private StringBuilder _errorMessage = new StringBuilder();
+        private string _searchString = string.Empty;
+        private string overlayMessage = "Please wait...";
+        private List<string> _events = new();
+        private CancellationTokenSource? _cts;
+        private RequestTypeDTO? _selectedRequestType = null;
+        private SearchType _searchType = SearchType.PendingRequest;
+
+        #region Dialog Box Button Icons
+        private readonly string _iconDelete = "fas fa-trash-alt";
+        private readonly string _iconCancel = "fas fa-window-close";
+        private readonly string _iconError = "fas fa-times-circle";
+        private readonly string _iconInfo = "fas fa-info-circle";
+        private readonly string _iconWarning = "fas fa-exclamation-circle";
+        #endregion
+
+        #region Flags
+        private bool _isRunning = false;
+        private bool _showErrorAlert = false;
+        private bool _enableFilter = false;
+        private bool _isActive = true;
+        private bool _hasValidationError = false;
+        private bool _isSearchHovered = false;
+        private bool _isResetHovered = false;
+        private bool _isPendingClicked = true;
+        private bool _isApprovedClicked = false;
+        private bool _isRejectedClicked = false;
+        private bool _isOnHoldClicked = false;
+        #endregion
+
+        #region Objects and collections
+        private List<RequestTypeDTO> _requestTypeList = new List<RequestTypeDTO>();
+        private List<ApprovalRequestResultDTO> _approvalList = new List<ApprovalRequestResultDTO>();
+        private List<string> _validationMessages = new();
+
+        private List<BreadcrumbItem> _breadcrumbItems =
+        [
+            new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
+            new("Pending Requests Dashboard", href: null, icon: @Icons.Material.Filled.AccountBalance, disabled: true)
+        ];
+        #endregion
+
+        #endregion
+                
         #region IPageAuthorization Implementation
         public string UserName { get; set; } = "";
         public string? UserID { get; set; } = "";
@@ -292,6 +305,13 @@ namespace KenHRApp.Web.Components.Pages.Workflow
         {
             Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.RequestNo}&CallerForm=LeaveApproval");
         }
+
+        private async Task OnSelectedValueChanged(RequestTypeDTO value)
+        {
+            _selectedRequestType = value;
+
+            await GetPendingRequestByType(_searchType);
+        }
         #endregion
 
         #region Asynchronous Methods
@@ -314,7 +334,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
                 // Load the request types
                 await GetRequestListAsync();
-
+                                
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
 
@@ -351,7 +371,66 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 #endregion                
 
             }, forceLoad);
-        }                
+        }     
+        
+        private async Task BeginApproveRequest(ApprovalRequestResultDTO requestItem)
+        {
+            try
+            {
+                if (requestItem == null)
+                {
+                    ShowNotification("The selected request is null.", NotificationType.Error);
+                    return;
+                }
+
+                int stepInstanceId = requestItem.StepInstanceId ?? 0;
+                int approverNo = requestItem.ApproverNo;
+                string userID = UserID!;
+                string? comments = requestItem.ApproverRemarks;
+
+                bool isSuccess = await ApproveWorkflowAsync(stepInstanceId, approverNo, userID, comments);
+                if (isSuccess)
+                {
+                    ShowNotification("The selected request has been approved successfully!", NotificationType.Success);
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task BeginRejectRequest(ApprovalRequestResultDTO requestItem)
+        {
+            try
+            {
+                if (requestItem == null)
+                {
+                    ShowNotification("The selected request is null.", NotificationType.Error);
+                    return;
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(requestItem.ApproverRemarks))
+                        throw new Exception("Remarks is required when rejecting the request!");
+                }
+
+                int stepInstanceId = requestItem.StepInstanceId ?? 0;
+                int approverNo = requestItem.ApproverNo;
+                string userID = UserID!;
+                string? comments = requestItem.ApproverRemarks;
+
+                bool isSuccess = await ApproveWorkflowAsync(stepInstanceId, approverNo, userID, comments);
+                if (isSuccess)
+                {
+                    ShowNotification("The selected request has been rejected successfully!", NotificationType.Success);
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
         #endregion
 
         #region Database Methods
@@ -478,12 +557,11 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
 
-        private async Task ApproveWorkflowAsync(int stepInstanceId, int approverNo, string userID, string? comments)
+        private async Task<bool> ApproveWorkflowAsync(int stepInstanceId, int approverNo, string userID, string? comments)
         {
             bool isSuccess = false;
 
@@ -497,14 +575,16 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 else
                 {
                     // Show error message
-                    _errorMessage.AppendLine(repoResult.Error);
+                    throw new Exception(repoResult.Error);
 
-                    ShowHideError(true);
+                    //_errorMessage.AppendLine(repoResult.Error);
+                    //ShowHideError(true);
                 }
+
+                return isSuccess;
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -548,6 +628,9 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 // Set the default selected list item to "All"
                 if (_requestTypeList != null && _requestTypeList.Any())
                     _selectedRequestType = _requestTypeList.FirstOrDefault(r => r.RequestTypeCode == CONST_DEFAULT_LIST_ITEM);
+
+                // Load the pending request
+                await GetPendingRequestByType(_searchType);
             }
             else
             {
@@ -567,6 +650,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 _isApprovedClicked = false;
                 _isRejectedClicked = false;
                 _isOnHoldClicked = false;
+                _searchType = searchType;
 
                 // Reset datagrid datasource
                 _approvalList.Clear();

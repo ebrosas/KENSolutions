@@ -47,8 +47,9 @@
                             </MudAppBar>
                             <MudPaper Elevation="5" Class="p-0 w-100">
                                 <MudList T="RequestTypeDTO" Dense="true" Elevation="1"
-                                         @bind-SelectedValue="_selectedRequestType" 
-                                         SelectionMode="SelectionMode.SingleSelection" Color="Color.Info">
+                                    SelectionMode="SelectionMode.SingleSelection" Color="Color.Info"
+                                    SelectedValue="_selectedRequestType"
+                                    SelectedValueChanged="OnSelectedValueChanged">
                                     @foreach (var request in _requestTypeList)
                                     {
                                         <MudListItem Value="@request">
@@ -74,10 +75,11 @@
                     <MudItem xs="7" sm="9">
                         <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
                             <MudAppBar Class="rounded-r-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
-                                <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="2" Wrap="Wrap.NoWrap">
+                                <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.FlexStart" 
+                                     Breakpoint="Breakpoint.SmAndDown" Spacing="2" Wrap="Wrap.NoWrap">
                                      <div>
                                          <MudButton Variant="@(_isPendingClicked ? Variant.Filled : Variant.Outlined)"
-                                            StartIcon="fas fa-check-circle" Class="px-5"
+                                            StartIcon="fas fa-check-circle" Class="px-5" 
                                             Color="Color.Info" Size="Size.Small" OnClick="@(() => GetPendingRequestByType(SearchType.PendingRequest))">
                                              <MudText Typo="Typo.button" HtmlTag="h3">Pending</MudText>
                                          </MudButton>
@@ -106,10 +108,10 @@
                                 </MudStack>
                             </MudAppBar>
                             <MudPaper Elevation="5" Square="true" Class="w-100 mb-3">
-                                <MudDataGrid T="ApprovalRequestResultDTO" Items="@_approvalList" Hover="true" Striped="true" Class="leave-grid"
+                                 <MudDataGrid T="ApprovalRequestResultDTO" Items="@_approvalList" Hover="true" Striped="true" Class="pendingrequest-grid"
                                     Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                                     QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
-                                    EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                                              EditTrigger="DataGridEditTrigger.OnRowClick" ReadOnly="false" EditMode="DataGridEditMode.Cell"
                                     EditDialogOptions="new DialogOptions 
                                     { 
                                         MaxWidth = MaxWidth.Small, 
@@ -135,6 +137,16 @@
                                         </MudPaper>
                                     </ToolBarContent>
                                     <Columns>
+                                         <PropertyColumn Property="x => x.RequestTypeCode" Hidden Editable="false">
+                                             <EditTemplate>
+                                                 @* Empty to prevent rendering *@
+                                             </EditTemplate>
+                                        </PropertyColumn>
+                                         <PropertyColumn Property="x => x.StepInstanceId" Hidden Editable="false">
+                                             <EditTemplate>
+                                                 @* Empty to prevent rendering *@
+                                             </EditTemplate>
+                                         </PropertyColumn>
                                         <PropertyColumn Property="x => x.RequestNo" Title="Request No." Class="col-RequestNo"
                                             StickyLeft="true" Editable="false">
                                             <CellTemplate Context="row">
@@ -148,11 +160,6 @@
                                                     @row.Item.RequestNo
                                                 </MudChip>
                                             </CellTemplate>
-                                        </PropertyColumn>
-                                        <PropertyColumn Property="x => x.RequestTypeCode" Hidden Editable="false">
-                                             <EditTemplate>
-                                                 @* Empty to prevent rendering *@
-                                             </EditTemplate>
                                         </PropertyColumn>
                                         <PropertyColumn Property="x => x.RequestTypeDesc" Title="Request Type" Class="col-RequestTypeDesc" Editable="false">
                                              <CellTemplate>
@@ -174,12 +181,25 @@
                                                 @context.Item.Detail
                                             </CellTemplate>
                                         </PropertyColumn>
-                                        <PropertyColumn Property="x => x.CurrentStatus" Title="Requested By" Class="col-CurrentStatus" Editable="false">
+                                        <PropertyColumn Property="x => x.CurrentStatus" Title="Status" Class="col-CurrentStatus" Editable="false">
                                             <CellTemplate>
                                                 @context.Item.CurrentStatus
                                             </CellTemplate>
+                                            <CellTemplate Context="row">
+                                                <MudChip T="string" Size=Size.Small Variant="Variant.Outlined"
+                                                    Color="@(row.Item.CurrentStatus == WorkflowStatus.Pending.ToString() ? Color.Info
+                                                      : row.Item.CurrentStatus == WorkflowStatus.Completed.ToString() ? Color.Tertiary
+                                                      : row.Item.CurrentStatus == WorkflowStatus.Rejected.ToString() ? Color.Error
+                                                      : row.Item.CurrentStatus == WorkflowStatus.Cancelled.ToString() ? Color.Warning
+                                                      : row.Item.CurrentStatus == WorkflowStatus.Approved.ToString() ? Color.Success
+                                                      : row.Item.CurrentStatus == WorkflowStatus.Skipped.ToString() ? Color.Secondary
+                                                      : row.Item.CurrentStatus == WorkflowStatus.Running.ToString() ? Color.Primary
+                                                      : Color.Surface)">
+                                                    @row.Item.CurrentStatus
+                                                </MudChip>
+                                            </CellTemplate>
                                         </PropertyColumn>
-                                        <PropertyColumn Property="x => x.ApproverFullName" Title="Requested By" Class="col-ApproverFullName" Editable="false">
+                                        <PropertyColumn Property="x => x.ApproverFullName" Title="Currently Assigned To" Class="col-ApproverFullName" Editable="false">
                                             <CellTemplate>
                                                 @context.Item.ApproverFullName
                                             </CellTemplate>
@@ -189,17 +209,32 @@
                                                 @context.Item.PendingSince
                                             </CellTemplate>
                                         </PropertyColumn>
-                                        <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
-                                            <CellTemplate Context="row">
-                                                <MudIconButton title="View leave information"
-                                                               Class="show-btn fa-icon-btn"
-                                                               Color="Color.Info"
-                                                               OnClick="@row.Actions.StartEditingItemAsync">
-                                                    <ChildContent>
-                                                        <i class="fas fa-info fa-lg"></i>
-                                                    </ChildContent>
-                                                </MudIconButton>
-                                            </CellTemplate>
+                                        <PropertyColumn Property="x => x.ApproverRemarks" Title="Remarks" Class="col-ApproverRemarks">
+                                            <EditTemplate Context="row">
+                                                <MudTextField @bind-Value="@row.Item.ApproverRemarks" 
+                                                              For="@(() => row.Item.ApproverRemarks)"
+                                                              HelperText="Max. text input is 300 chars."
+                                                              Variant="Variant.Text" HelperTextOnFocus="true" Counter="300" MaxLength="300" Lines="2"
+                                                              Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                            </EditTemplate>
+                                        </PropertyColumn>                                        
+                                        <TemplateColumn CellClass="d-flex align-center justify-end action-cell">
+                                            <EditTemplate Context="row">
+                                                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Spacing="2">
+                                                     <MudIconButton Color="Color.Success" title="Approve request" Size="Size.Small"
+                                                                    Icon="fas fa-thumbs-up"
+                                                                    OnClick="@(() => BeginApproveRequest(row.Item))">
+                                                     </MudIconButton>
+                                                     <MudIconButton Color="Color.Error" title="Reject request" Size="Size.Small"
+                                                                    Icon="fas fa-thumbs-down"
+                                                                    OnClick="() => BeginRejectRequest(row.Item)">
+                                                     </MudIconButton>
+                                                     <MudIconButton Color="Color.Info" title="View request" Size="Size.Small"
+                                                                    Icon="fas fa-eye"
+                                                                    OnClick="@(() => OpenLeaveRequest(row.Item))">
+                                                     </MudIconButton>
+                                                </MudStack>                                                                                          
+                                            </EditTemplate>
                                         </TemplateColumn>
                                     </Columns>
                                     <NoRecordsContent>

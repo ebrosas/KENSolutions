@@ -277,7 +277,8 @@ namespace KenHRApp.Application.Services
                         CurrentStatus = e.CurrentStatus,
                         ApproverNo = e.ApproverNo,
                         ApproverName = e.ApproverName,
-                        PendingDays = e.PendingDays
+                        PendingDays = e.PendingDays,
+                        StepInstanceId = e.StepInstanceId
                     }).ToList();
                 }
 

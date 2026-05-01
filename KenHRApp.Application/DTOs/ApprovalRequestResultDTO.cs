@@ -21,6 +21,7 @@ namespace KenHRApp.Application.DTOs
         public int ApproverNo { get; set; }
         public string? ApproverName { get; set; } = null;
         public int? PendingDays { get; set; }
+        public int? StepInstanceId { get; set; }
         #endregion
 
         #region Extended Properties
@@ -47,6 +48,8 @@ namespace KenHRApp.Application.DTOs
                 return $"{PendingDays} days";
             }
         }
+
+        public string? ApproverRemarks { get; set; }
         #endregion
     }
 }
