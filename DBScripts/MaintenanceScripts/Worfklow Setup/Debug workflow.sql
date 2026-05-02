@@ -1,6 +1,12 @@
 DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE',
 		@requestNo			BIGINT = 15
 
+	--Get request info
+	SELECT a.LeaveType, a.LeaveDuration, a.LeaveEmpCostCenter,
+		a.* 
+	FROM [kenuser].[LeaveRequisitionWF] a
+	WHERE a.LeaveRequestId = @requestNo
+
 	--Get workflow setup
 	SELECT * FROM kenuser.WorkflowDefinitions a
 	WHERE RTRIM(a.EntityName) = @workflowTypeCode
@@ -49,23 +55,23 @@ DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE',
 
 */	
 
-/*	Re-open workflow
+/*	Reset the workflow activity
 
 	BEGIN TRAN T1
 
 	UPDATE kenuser.WorkflowInstances
 	SET Status = 'Running'
-	WHERE WorkflowInstanceId = 13
+	WHERE WorkflowInstanceId = 8
 
 	DELETE FROM kenuser.WorkflowStepInstances
-	WHERE StepInstanceId IN (18, 19)
+	WHERE StepInstanceId IN (1016)
 
 	UPDATE kenuser.WorkflowStepInstances
 	SET ApproverUserID = NULL,
 		Status = 'Pending',
 		ActionDate = null,
 		Comments = null
-	WHERE StepInstanceId = 17
+	WHERE StepInstanceId = 15
 
 	ROLLBACK TRAN T1
 	COMMIT TRAN T1

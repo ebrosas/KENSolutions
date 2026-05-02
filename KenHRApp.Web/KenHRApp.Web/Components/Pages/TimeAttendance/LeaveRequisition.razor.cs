@@ -464,6 +464,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     Navigation.NavigateTo("/TimeAttendance/leaveinquiry");
                     break;
 
+                case "ApprovalDashboard":
+                    Navigation.NavigateTo("/Workflow/ApprovalDashboard");
+                    break;
+
                 default:
                     Navigation.NavigateTo("/home");
                     break;

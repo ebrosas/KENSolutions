@@ -23,8 +23,27 @@ namespace KenHRApp.Application.Interfaces
             string webRootPath,
             CancellationToken cancellationToken = default);
 
-        Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string? comments);
-        Task<Result<bool>> RejectStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string comments);
+        Task<Result<bool>> ApproveStepAsync(
+            int stepInstanceId,
+            int approverEmpNo,
+            string? approverUserID,
+            string? comments,
+            string entityName,
+            long entityId,
+            string webRootPath,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<bool>> RejectStepAsync(
+            int stepInstanceId,
+            int? creatorEmpNo,
+            int approverEmpNo,
+            string? approverUserID,
+            string rejectionReason,
+            string entityName,
+            long entityId,
+            string webRootPath,
+            CancellationToken cancellationToken = default);
+
         Task<Result<List<WorkflowDetailResultDTO>>> GetWorkflowStatusAsync(string workflowTypeCode,long requestNo);
 
         Task<Result<List<ApprovalRequestResultDTO>>> GetApprovalRequestAsync(

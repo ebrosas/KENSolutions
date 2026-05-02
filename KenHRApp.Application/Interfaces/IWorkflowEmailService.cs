@@ -9,8 +9,8 @@ namespace KenHRApp.Application.Interfaces
 {
     public interface IWorkflowEmailService
     {
-        #region Abstract Methods
-        Task<Result<bool>> SendAsync(
+        #region Public Methods
+        Task<Result<bool>> SendApprovalNotificationAsync(
             int userId,
             string subject,
             string requestTypeDesc,
@@ -18,6 +18,17 @@ namespace KenHRApp.Application.Interfaces
             long requestID,
             string webRootPath,
             string fileName,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<bool>> SendRejectionNotificationAsync(
+            int userId,
+            string subject,
+            string requestTypeDesc,
+            string requestLink,
+            long requestID,
+            string webRootPath,
+            string fileName,
+            string rejectionReason,
             CancellationToken cancellationToken = default);
 
         Task<Result<bool>> SendAsync(

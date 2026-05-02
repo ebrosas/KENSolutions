@@ -22,6 +22,7 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public string? ApproverName { get; set; } = null;
         public int? PendingDays { get; set; }
         public int? StepInstanceId { get; set; }
+        public int? CreatedByEmpNo { get; set; }
         #endregion
     }
 }

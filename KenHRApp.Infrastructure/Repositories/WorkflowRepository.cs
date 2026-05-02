@@ -110,7 +110,7 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        public async Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string? comments)
+        public async Task<Result<List<int>?>> ApproveStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string? comments)
         {
             try
             {
@@ -133,16 +133,20 @@ namespace KenHRApp.Infrastructure.Repositories
                 step.Comments = comments;
                 step.ApproverUserID = approverUserID;
 
+                // Save to database
                 await _db.SaveChangesAsync();
 
-                await AdvanceWorkflow(step.WorkflowInstance);
-
-                return Result<bool>.SuccessResult(true);
+                // Set the next approver(s) to the list before advancing the workflow
+                List<int> approverList = await AdvanceWorkflow(step.WorkflowInstance);
+                if (approverList.Any())
+                    return Result<List<int>?>.SuccessResult(approverList);
+                else
+                    return Result<List<int>?>.SuccessResult(null);
             }
             catch (Exception ex)
             {
                 // Log error here if needed (Serilog, NLog, etc.)
-                return Result<bool>.Failure($"Workflow Engine Error: {ex.Message}");
+                return Result<List<int>?>.Failure($"Workflow Engine Error: {ex.Message}");
             }
         }
 
@@ -183,7 +187,7 @@ namespace KenHRApp.Infrastructure.Repositories
             
         }
 
-        private async Task CreateNextStepInstance(
+        private async Task<int> CreateNextStepInstance(
             WorkflowInstance instance, 
             WorkflowStepDefinition stepDef,
             object? entity)
@@ -255,6 +259,8 @@ namespace KenHRApp.Infrastructure.Repositories
 
                 _db.WorkflowStepInstances.Add(step);
                 await _db.SaveChangesAsync();
+
+                return assigneeEmpNo;
 
                 //await _notify.SendPendingApprovalAsync(step);
             }
@@ -416,9 +422,10 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        private async Task AdvanceWorkflow(WorkflowInstance instance)
+        private async Task<List<int>> AdvanceWorkflow(WorkflowInstance instance)
         {
             WorkflowRequestType requestType = WorkflowRequestType.NotDefined;
+            List<int> approverList = new();
 
             try
             {
@@ -458,14 +465,14 @@ namespace KenHRApp.Infrastructure.Repositories
                         bool allApproved = groupSteps.All(x => x.Status == WorkflowStatus.Approved.ToString());
 
                         if (!allApproved)
-                            return;
+                            return approverList;
                     }
                     else
                     {
                         bool anyApproved = groupSteps.Any(x => x.Status == WorkflowStatus.Approved.ToString());
 
                         if (!anyApproved)
-                            return;
+                            return approverList;
 
                         // Auto-skip remaining
                         foreach (var pending in groupSteps.Where(x => x.Status == WorkflowStatus.Pending.ToString()))
@@ -479,7 +486,7 @@ namespace KenHRApp.Infrastructure.Repositories
                 {
                     // Sequential
                     if (latest.Status != WorkflowStatus.Approved.ToString())
-                        return;
+                        return approverList;
                 }
                 #endregion
 
@@ -541,7 +548,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     await _db.SaveChangesAsync();
 
                     // await _notify.SendCompletedAsync(dbInstance.EntityId);
-                    return;
+                    return approverList;
                 }
 
                 // ============================================
@@ -554,10 +561,17 @@ namespace KenHRApp.Infrastructure.Repositories
                 // ============================================
                 // ✅ CREATE NEXT STEP INSTANCES
                 // ============================================
+                int newApproverNo = 0;
                 foreach (var nextStep in nextSteps)
                 {
-                    await CreateNextStepInstance(dbInstance, nextStep, requestEntity);
+                    newApproverNo = await CreateNextStepInstance(dbInstance, nextStep, requestEntity);
+                    if (newApproverNo > 0 && !approverList.Contains(newApproverNo) )
+                    {
+                        approverList.Add(newApproverNo);
+                    }
                 }
+
+                return approverList;
             }
             catch (Exception)
             {
@@ -1169,7 +1183,8 @@ namespace KenHRApp.Infrastructure.Repositories
                         ApproverNo = e.ApproverNo,
                         ApproverName = e.ApproverName,
                         PendingDays = e.PendingDays,
-                        StepInstanceId = e.StepInstanceId
+                        StepInstanceId = e.StepInstanceId,
+                        CreatedByEmpNo = e.CreatedByEmpNo
                     }).ToList();
                 }
 

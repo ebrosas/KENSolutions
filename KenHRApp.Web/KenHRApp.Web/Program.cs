@@ -153,7 +153,7 @@ using (var scope = app.Services.CreateScope())
 
         //await db.Database.MigrateAsync();
         //await WorkflowSeedData.SeedAsync(db);
-        await WorkflowSeedData.SeedLeaveWorkflowAsync(db);
+        //await WorkflowSeedData.SeedLeaveWorkflowAsync(db);
     }
     catch (Exception ex)
     {

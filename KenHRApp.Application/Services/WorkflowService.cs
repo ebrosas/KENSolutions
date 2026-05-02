@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -29,6 +30,7 @@ namespace KenHRApp.Application.Services
 
         #region Constants
         private readonly string CONST_GENERIC_MESSAGE = "GenericMessage.xml";
+        private readonly string CONST_REJECTION_MESSAGE = "RejectionMessage.xml";
         #endregion
 
         #endregion
@@ -160,12 +162,35 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<Result<bool>> ApproveStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string? comments)
+        public async Task<Result<bool>> ApproveStepAsync(
+            int stepInstanceId, 
+            int approverEmpNo, 
+            string? approverUserID, 
+            string? comments,
+            string entityName,
+            long entityId,
+            string webRootPath,
+            CancellationToken cancellationToken = default)
         {
-            bool isSuccess = false;
-
             try
             {
+                string baseUrl = _settings.BaseUrl.TrimEnd('/');
+                string subject = "Pending Approval Request";
+                string requestTypeDesc = string.Empty;
+                string requestLink = string.Empty;
+
+                if (!string.IsNullOrWhiteSpace(entityName))
+                {
+                    #region Identity the type of request
+                    switch (entityName)
+                    {
+                        case "RTYPELEAVE":
+                            this.RequestType = WorkflowRequestType.LeaveRequisition;
+                            break;
+                    }
+                    #endregion
+                }
+
                 var repoResult = await _repository.ApproveStepAsync(stepInstanceId, approverEmpNo, approverUserID, comments);
                 if (!repoResult.Success)
                 {
@@ -173,10 +198,25 @@ namespace KenHRApp.Application.Services
                 }
                 else
                 {
-                    isSuccess = repoResult.Value;
+                    if (repoResult.Value != null && repoResult.Value.Any())
+                    {
+                        if (this.RequestType == WorkflowRequestType.LeaveRequisition)
+                        {
+                            #region Build the email parameters
+                            subject = "Leave Request for Approval";
+                            requestTypeDesc = "Leave Requisition";
+                            requestLink = $"{baseUrl}/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={entityId}&CallerForm=ApprovalDashboard";
+                            #endregion
+
+                            foreach (int approver in repoResult.Value)
+                            {
+                                await SendPendingApprovalAsync(approver, subject, requestTypeDesc, requestLink, entityId, webRootPath, cancellationToken);
+                            }
+                        }
+                    }
                 }
 
-                return Result<bool>.SuccessResult(isSuccess);
+                return Result<bool>.SuccessResult(true);
             }
             catch (Exception ex)
             {
@@ -184,13 +224,39 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<Result<bool>> RejectStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string comments)
+        public async Task<Result<bool>> RejectStepAsync(
+            int stepInstanceId,
+            int? creatorEmpNo,
+            int approverEmpNo, 
+            string? approverUserID, 
+            string rejectionReason,
+            string entityName,
+            long entityId,
+            string webRootPath,
+            CancellationToken cancellationToken = default)
         {
             bool isSuccess = false;
 
             try
             {
-                var repoResult = await _repository.RejectStepAsync(stepInstanceId, approverEmpNo, approverUserID, comments);
+                string baseUrl = _settings.BaseUrl.TrimEnd('/');
+                string subject = "Rejected Request Notification";
+                string requestTypeDesc = string.Empty;
+                string requestLink = string.Empty;
+
+                if (!string.IsNullOrWhiteSpace(entityName))
+                {
+                    #region Identity the type of request
+                    switch (entityName)
+                    {
+                        case "RTYPELEAVE":
+                            this.RequestType = WorkflowRequestType.LeaveRequisition;
+                            break;
+                    }
+                    #endregion
+                }
+
+                var repoResult = await _repository.RejectStepAsync(stepInstanceId, approverEmpNo, approverUserID, rejectionReason);
                 if (!repoResult.Success)
                 {
                     return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
@@ -198,6 +264,23 @@ namespace KenHRApp.Application.Services
                 else
                 {
                     isSuccess = repoResult.Value;
+                    if (isSuccess)
+                    {
+                        if (this.RequestType == WorkflowRequestType.LeaveRequisition)
+                        {
+                            if (creatorEmpNo > 0)
+                            {
+                                #region Build the email parameters
+                                subject = "Rejected Leave Request";
+                                requestTypeDesc = "Leave Requisition";
+                                requestLink = $"{baseUrl}/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={entityId}&CallerForm=ApprovalDashboard";
+                                #endregion
+
+                                await NotifyRejectionAsync(Convert.ToInt32(creatorEmpNo), subject, requestTypeDesc, requestLink, 
+                                    entityId, webRootPath, rejectionReason, cancellationToken);
+                            }
+                        }
+                    }
                 }
 
                 return Result<bool>.SuccessResult(isSuccess);
@@ -278,7 +361,8 @@ namespace KenHRApp.Application.Services
                         ApproverNo = e.ApproverNo,
                         ApproverName = e.ApproverName,
                         PendingDays = e.PendingDays,
-                        StepInstanceId = e.StepInstanceId
+                        StepInstanceId = e.StepInstanceId,
+                        CreatedByEmpNo = e.CreatedByEmpNo,
                     }).ToList();
                 }
 
@@ -304,7 +388,7 @@ namespace KenHRApp.Application.Services
             bool isSuccess = false;
             try
             {
-                var repoResult = await _emailService.SendAsync(approverEmpNo, subject, requestTypeDesc, 
+                var repoResult = await _emailService.SendApprovalNotificationAsync(approverEmpNo, subject, requestTypeDesc, 
                     requestLink, requestID, webRootPath, CONST_GENERIC_MESSAGE, cancellationToken);
                 if (!repoResult.Success)
                     return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
@@ -316,6 +400,35 @@ namespace KenHRApp.Application.Services
             catch (Exception ex)
             {
                 return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in SendPendingApprovalAsync() method.");
+            }
+        }
+
+        private async Task<Result<bool>> NotifyRejectionAsync(
+            int creatorEmpNo,
+            string subject,
+            string requestTypeDesc,
+            string requestLink,
+            long requestID,
+            string webRootPath,
+            string rejectionReason,
+            CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var repoResult = await _emailService.SendRejectionNotificationAsync(creatorEmpNo, subject, requestTypeDesc,
+                    requestLink, requestID, webRootPath, CONST_REJECTION_MESSAGE, rejectionReason, cancellationToken);
+                if (!repoResult.Success)
+                    return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
+                else
+                    isSuccess = repoResult.Value;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in NotifyRejectionAsync() method.");
             }
         }
         #endregion

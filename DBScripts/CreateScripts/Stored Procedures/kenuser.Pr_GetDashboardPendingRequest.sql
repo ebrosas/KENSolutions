@@ -6,8 +6,8 @@
 *
 *	Date			Author		Rev. #		Comments:
 *	25/04/2026		Ervin		1.0			Created
-*	01/05/2026		Ervin		1.1			Added "StepInstanceId" field
-*
+*	01/05/2026		Ervin		1.1			Added "StepInstanceId" field in the returned dataset
+*	02/05/2026		Ervin		1.2			Added "CreatedByEmpNo" field in the returned dataset
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetDashboardPendingRequest
@@ -44,7 +44,8 @@ BEGIN
 				d.ApproverNo,
 				d.ApproverName,
 				d.PendingDays,
-				d.StepInstanceId	--Rev. #1.1
+				d.StepInstanceId,	--Rev. #1.1
+				lv.CreatedByEmpNo	--Rev. #1.2
 		FROM kenuser.WorkflowStepDefinitions a WITH (NOLOCK)
 			INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
 			INNER JOIN kenuser.WorkflowInstances c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
@@ -63,7 +64,8 @@ BEGIN
 						'Leave Type: ' + RTRIM(udc.UDCDesc1) + CHAR(13) + CHAR(10) + 
 							'Originator Employee: ' + x.LeaveEmpName + CHAR(13) + CHAR(10) + 
 							'Leave Start Date: ' + FORMAT(x.LeaveStartDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) +
-							'Leave Resume Date: ' + FORMAT(x.LeaveResumeDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) AS LeaveDetails
+							'Leave Resume Date: ' + FORMAT(x.LeaveResumeDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) AS LeaveDetails,
+						x.LeaveCreatedBy AS CreatedByEmpNo		--Rev. #1.2
 				FROM kenuser.LeaveRequisitionWF x WITH (NOLOCK) 
 					INNER JOIN kenuser.Employee y WITh (NOLOCK) ON x.LeaveCreatedBy = y.EmployeeNo
 					CROSS APPLY
@@ -109,7 +111,8 @@ BEGIN
 			d.ApproverNo,
 			d.ApproverName,
 			d.PendingDays,
-			d.StepInstanceId		--Rev. #1.1
+			d.StepInstanceId,		--Rev. #1.1
+			lv.CreatedByEmpNo		--Rev. #1.2
 		FROM kenuser.WorkflowStepDefinitions a WITH (NOLOCK)
 			INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
 			INNER JOIN kenuser.WorkflowInstances c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
@@ -128,7 +131,8 @@ BEGIN
 						'Leave Type: ' + RTRIM(udc.UDCDesc1) + CHAR(13) + CHAR(10) + 
 							'Originator Employee: ' + x.LeaveEmpName + CHAR(13) + CHAR(10) + 
 							'Leave Start Date: ' + FORMAT(x.LeaveStartDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) +
-							'Leave Resume Date: ' + FORMAT(x.LeaveResumeDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) AS LeaveDetails
+							'Leave Resume Date: ' + FORMAT(x.LeaveResumeDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) AS LeaveDetails,
+						x.LeaveCreatedBy AS CreatedByEmpNo		--Rev. #1.2
 				FROM kenuser.LeaveRequisitionWF x WITH (NOLOCK) 
 					INNER JOIN kenuser.Employee y WITh (NOLOCK) ON x.LeaveCreatedBy = y.EmployeeNo
 					CROSS APPLY
@@ -166,6 +170,7 @@ END
 	EXEC kenuser.Pr_GetDashboardPendingRequest 10003635, 'RTYPELEAVE'
 	
 	--Development database
+	EXEC kenuser.Pr_GetDashboardPendingRequest
 	EXEC kenuser.Pr_GetDashboardPendingRequest 10003632
 	EXEC kenuser.Pr_GetDashboardPendingRequest 10003632, 'RTYPELEAVE'
 

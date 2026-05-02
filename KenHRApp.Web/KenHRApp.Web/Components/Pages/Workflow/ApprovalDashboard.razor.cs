@@ -8,6 +8,7 @@ using MudBlazor;
 using System.Text;
 using KenHRApp.Web.Components.Common.Helpers;
 using System.Net.Http.Headers;
+using Azure.Core;
 
 namespace KenHRApp.Web.Components.Pages.Workflow
 {
@@ -379,16 +380,23 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             {
                 if (requestItem == null)
                 {
-                    ShowNotification("The selected request is null.", NotificationType.Error);
-                    return;
+                    throw new Exception("The selected request workflow instance is not configured correctly!");
+                }
+                else
+                {
+                    if (requestItem.StepInstanceId == null)
+                        throw new Exception("The current workflow instance is not defined!");
                 }
 
+                // Get the current WF activity instance id
                 int stepInstanceId = requestItem.StepInstanceId ?? 0;
-                int approverNo = requestItem.ApproverNo;
-                string userID = UserID!;
-                string? comments = requestItem.ApproverRemarks;
 
-                bool isSuccess = await ApproveWorkflowAsync(stepInstanceId, approverNo, userID, comments);
+                bool isSuccess = await ApproveWorkflowAsync(
+                    stepInstanceId,
+                    requestItem.ApproverNo,
+                    UserID!,
+                    requestItem.ApproverRemarks,
+                    requestItem.RequestNo);
                 if (isSuccess)
                 {
                     ShowNotification("The selected request has been approved successfully!", NotificationType.Success);
@@ -406,21 +414,22 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             {
                 if (requestItem == null)
                 {
-                    ShowNotification("The selected request is null.", NotificationType.Error);
-                    return;
+                    throw new Exception("The selected request workflow instance is not configured correctly!");
                 }
                 else
                 {
+                    if (requestItem.StepInstanceId == null)
+                        throw new Exception("The current workflow instance is not defined!");
+
                     if (string.IsNullOrWhiteSpace(requestItem.ApproverRemarks))
                         throw new Exception("Remarks is required when rejecting the request!");
                 }
 
+                // Get the current WF activity instance id
                 int stepInstanceId = requestItem.StepInstanceId ?? 0;
-                int approverNo = requestItem.ApproverNo;
-                string userID = UserID!;
-                string? comments = requestItem.ApproverRemarks;
-
-                bool isSuccess = await ApproveWorkflowAsync(stepInstanceId, approverNo, userID, comments);
+                
+                bool isSuccess = await RejectWorkflowAsync(stepInstanceId, requestItem.CreatedByEmpNo, requestItem.ApproverNo, UserID!,
+                    requestItem.ApproverRemarks, requestItem.RequestNo);
                 if (isSuccess)
                 {
                     ShowNotification("The selected request has been rejected successfully!", NotificationType.Success);
@@ -561,56 +570,65 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             }
         }
 
-        private async Task<bool> ApproveWorkflowAsync(int stepInstanceId, int approverNo, string userID, string? comments)
+        private async Task<bool> ApproveWorkflowAsync(
+            int stepInstanceId, 
+            int approverNo, 
+            string userID, 
+            string? comments,
+            long requestNo)
         {
             bool isSuccess = false;
 
             try
             {
-                var repoResult = await WorkflowService.ApproveStepAsync(stepInstanceId, approverNo, userID, comments);
+                // Initialize the cancellation token
+                _cts = new CancellationTokenSource();
+
+                var repoResult = await WorkflowService.ApproveStepAsync(stepInstanceId, approverNo, userID, comments,
+                    WorkflowHelper.CONST_LEAVE_REQUEST, requestNo, Environment.WebRootPath, _cts.Token);
                 if (repoResult.Success)
                 {
                     isSuccess = repoResult.Value;
                 }
                 else
-                {
-                    // Show error message
                     throw new Exception(repoResult.Error);
-
-                    //_errorMessage.AppendLine(repoResult.Error);
-                    //ShowHideError(true);
-                }
 
                 return isSuccess;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }
         }
 
-        private async Task RejectWorkflowAsync(int stepInstanceId, int approverNo, string? userID, string comments)
+        private async Task<bool> RejectWorkflowAsync(
+            int stepInstanceId, 
+            int? creatorEmpNo,
+            int approverNo, 
+            string? userID, 
+            string comments,
+            long requestNo)
         {
             bool isSuccess = false;
 
             try
             {
-                var repoResult = await WorkflowService.RejectStepAsync(stepInstanceId, approverNo, userID, comments);
+                // Initialize the cancellation token
+                _cts = new CancellationTokenSource();
+
+                var repoResult = await WorkflowService.RejectStepAsync(stepInstanceId, creatorEmpNo, approverNo, userID, comments,
+                    WorkflowHelper.CONST_LEAVE_REQUEST, requestNo, Environment.WebRootPath, _cts.Token);
                 if (repoResult.Success)
                 {
                     isSuccess = repoResult.Value;
                 }
                 else
-                {
-                    // Show error message
-                    _errorMessage.AppendLine(repoResult.Error);
+                    throw new Exception(repoResult.Error);
 
-                    ShowHideError(true);
-                }
+                return isSuccess;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
                 throw;
             }
         }
