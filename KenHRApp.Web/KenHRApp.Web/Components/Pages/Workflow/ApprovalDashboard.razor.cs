@@ -31,10 +31,6 @@ namespace KenHRApp.Web.Components.Pages.Workflow
         [Parameter]
         [SupplyParameterFromQuery]
         public string? RequestType { get; set; } = null;
-
-        [Parameter]
-        [SupplyParameterFromQuery]
-        public int? PeriodType { get; set; } = null;
         #endregion
 
         #region Constants
@@ -304,7 +300,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
         public void OpenLeaveRequest(ApprovalRequestResultDTO item)
         {
-            Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.RequestNo}&CallerForm=LeaveApproval");
+            Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
         }
 
         private async Task OnSelectedValueChanged(RequestTypeDTO value)
@@ -645,7 +641,12 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
                 // Set the default selected list item to "All"
                 if (_requestTypeList != null && _requestTypeList.Any())
-                    _selectedRequestType = _requestTypeList.FirstOrDefault(r => r.RequestTypeCode == CONST_DEFAULT_LIST_ITEM);
+                {
+                    if (!string.IsNullOrWhiteSpace(this.RequestType))
+                        _selectedRequestType = _requestTypeList.FirstOrDefault(r => r.RequestTypeCode == this.RequestType);
+                    else
+                        _selectedRequestType = _requestTypeList.FirstOrDefault(r => r.RequestTypeCode == CONST_DEFAULT_LIST_ITEM);
+                }
 
                 // Load the pending request
                 await GetPendingRequestByType(_searchType);

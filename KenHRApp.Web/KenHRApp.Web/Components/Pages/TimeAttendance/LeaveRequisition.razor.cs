@@ -860,7 +860,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 { "DialogTitle", "Confirm Cancel"},
                 { "DialogIcon", _iconDelete },
                 { "ContentText", $"Are you sure you want to cancel leave requsition no. '{_leaveRequest.LeaveRequestId}'?" },
-                { "ConfirmText", "Cancel Leave" },
+                { "ConfirmText", "Proceed" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
             };
