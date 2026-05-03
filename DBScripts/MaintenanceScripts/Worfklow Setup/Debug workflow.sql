@@ -64,7 +64,7 @@ DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE',
 	WHERE WorkflowInstanceId = 13
 
 	DELETE FROM kenuser.WorkflowStepInstances
-	WHERE StepInstanceId IN (20)
+	WHERE StepInstanceId IN (21)
 
 	UPDATE kenuser.WorkflowStepInstances
 	SET ApproverUserID = NULL,

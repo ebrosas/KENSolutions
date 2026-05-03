@@ -110,7 +110,11 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        public async Task<Result<List<int>?>> ApproveStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string? comments)
+        public async Task<Result<List<int>?>> ApproveStepAsync(
+            int stepInstanceId, 
+            int approverEmpNo, 
+            string? approverUserID, 
+            string? comments)
         {
             try
             {
