@@ -61,17 +61,17 @@ DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE',
 
 	UPDATE kenuser.WorkflowInstances
 	SET Status = 'Running'
-	WHERE WorkflowInstanceId = 8
+	WHERE WorkflowInstanceId = 13
 
 	DELETE FROM kenuser.WorkflowStepInstances
-	WHERE StepInstanceId IN (1016)
+	WHERE StepInstanceId IN (20)
 
 	UPDATE kenuser.WorkflowStepInstances
 	SET ApproverUserID = NULL,
 		Status = 'Pending',
 		ActionDate = null,
 		Comments = null
-	WHERE StepInstanceId = 15
+	WHERE StepInstanceId = 17
 
 	ROLLBACK TRAN T1
 	COMMIT TRAN T1

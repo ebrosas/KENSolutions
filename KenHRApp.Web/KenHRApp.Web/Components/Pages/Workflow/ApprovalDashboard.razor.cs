@@ -370,7 +370,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             }, forceLoad);
         }     
         
-        private async Task BeginApproveRequest(ApprovalRequestResultDTO requestItem)
+        private void BeginApproveRequest(ApprovalRequestResultDTO requestItem)
         {
             try
             {
@@ -387,16 +387,26 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 // Get the current WF activity instance id
                 int stepInstanceId = requestItem.StepInstanceId ?? 0;
 
-                bool isSuccess = await ApproveWorkflowAsync(
-                    stepInstanceId,
-                    requestItem.ApproverNo,
-                    UserID!,
-                    requestItem.ApproverRemarks,
-                    requestItem.RequestNo);
-                if (isSuccess)
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Approving request, please wait...";
+
+                _ = ApproveWorkflowAsync(async () =>
                 {
-                    ShowNotification("The selected request has been approved successfully!", NotificationType.Success);
-                }
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    // Remove locally from the list so UI updates immediately
+                    _approvalList.Remove(requestItem);
+
+                    StateHasChanged();
+
+                }, stepInstanceId, requestItem.ApproverNo, UserID!,
+                requestItem.ApproverRemarks, requestItem.RequestNo);
             }
             catch (Exception ex)
             {
@@ -404,7 +414,35 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             }
         }
 
-        private async Task BeginRejectRequest(ApprovalRequestResultDTO requestItem)
+        private async Task ConfirmReject(ApprovalRequestResultDTO requestItem)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Reject"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to reject request no. '{requestItem.RequestNo}'? Click Proceed to continue, otherwise click Cancel button." },
+                { "ConfirmText", "Proceed" },
+                { "Color", Color.Error },
+                { "DialogIconColor", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.Center,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Reject Request", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                BeginRejectRequest(requestItem);
+            }
+        }
+        private void BeginRejectRequest(ApprovalRequestResultDTO requestItem)
         {
             try
             {
@@ -423,13 +461,34 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
                 // Get the current WF activity instance id
                 int stepInstanceId = requestItem.StepInstanceId ?? 0;
-                
-                bool isSuccess = await RejectWorkflowAsync(stepInstanceId, requestItem.CreatedByEmpNo, requestItem.ApproverNo, UserID!,
-                    requestItem.ApproverRemarks, requestItem.RequestNo);
-                if (isSuccess)
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Rejecting request, please wait...";
+
+                //bool isSuccess = await RejectWorkflowAsync(stepInstanceId, requestItem.CreatedByEmpNo, requestItem.ApproverNo, UserID!,
+                //    requestItem.ApproverRemarks, requestItem.RequestNo);
+                //if (isSuccess)
+                //{
+                //    ShowNotification("The selected request has been rejected successfully!", NotificationType.Success);
+                //}
+
+                _ = RejectWorkflowAsync(async () =>
                 {
-                    ShowNotification("The selected request has been rejected successfully!", NotificationType.Success);
-                }
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    // Remove locally from the list so UI updates immediately
+                    _approvalList.Remove(requestItem);
+
+                    StateHasChanged();
+
+                }, stepInstanceId, requestItem.CreatedByEmpNo, requestItem.ApproverNo, UserID!,
+                requestItem.ApproverRemarks, requestItem.RequestNo);
             }
             catch (Exception ex)
             {
@@ -566,38 +625,57 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             }
         }
 
-        private async Task<bool> ApproveWorkflowAsync(
+        private async Task ApproveWorkflowAsync(
+            Func<Task> callback,
             int stepInstanceId, 
             int approverNo, 
             string userID, 
             string? comments,
             long requestNo)
         {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
             bool isSuccess = false;
+            string errorMsg = string.Empty;
 
-            try
+            var repoResult = await WorkflowService.ApproveStepAsync(stepInstanceId, approverNo, userID, comments,
+                WorkflowHelper.CONST_LEAVE_REQUEST, requestNo, Environment.WebRootPath, _cts.Token);
+
+            isSuccess = repoResult.Success;
+            if (!isSuccess)
+                errorMsg = repoResult.Error!;
+
+            if (isSuccess)
             {
-                // Initialize the cancellation token
-                _cts = new CancellationTokenSource();
-
-                var repoResult = await WorkflowService.ApproveStepAsync(stepInstanceId, approverNo, userID, comments,
-                    WorkflowHelper.CONST_LEAVE_REQUEST, requestNo, Environment.WebRootPath, _cts.Token);
-                if (repoResult.Success)
-                {
-                    isSuccess = repoResult.Value;
-                }
-                else
-                    throw new Exception(repoResult.Error);
-
-                return isSuccess;
+                // Show notification
+                ShowNotification("The selected request has been approved successfully!", NotificationType.Success);
             }
-            catch (Exception ex)
+            else
             {
-                throw;
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(errorMsg);
+                    ShowHideError(true);
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
             }
         }
 
-        private async Task<bool> RejectWorkflowAsync(
+        private async Task RejectWorkflowAsync(
+            Func<Task> callback,
             int stepInstanceId, 
             int? creatorEmpNo,
             int approverNo, 
@@ -605,27 +683,44 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             string comments,
             long requestNo)
         {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
             bool isSuccess = false;
+            string errorMsg = string.Empty;
 
-            try
+            var repoResult = await WorkflowService.RejectStepAsync(stepInstanceId, creatorEmpNo, approverNo, userID, comments,
+                WorkflowHelper.CONST_LEAVE_REQUEST, requestNo, Environment.WebRootPath, _cts.Token);
+
+            isSuccess = repoResult.Success;
+            if (!isSuccess)
+                errorMsg = repoResult.Error!;
+
+            if (isSuccess)
             {
-                // Initialize the cancellation token
-                _cts = new CancellationTokenSource();
-
-                var repoResult = await WorkflowService.RejectStepAsync(stepInstanceId, creatorEmpNo, approverNo, userID, comments,
-                    WorkflowHelper.CONST_LEAVE_REQUEST, requestNo, Environment.WebRootPath, _cts.Token);
-                if (repoResult.Success)
-                {
-                    isSuccess = repoResult.Value;
-                }
-                else
-                    throw new Exception(repoResult.Error);
-
-                return isSuccess;
+                // Show notification
+                ShowNotification("The selected request has been rejected successfully!", NotificationType.Success);
             }
-            catch (Exception ex)
+            else
             {
-                throw;
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(errorMsg);
+                    ShowHideError(true);
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
             }
         }
 

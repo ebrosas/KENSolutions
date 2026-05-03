@@ -220,16 +220,16 @@
                                         </PropertyColumn>                                        
                                         <TemplateColumn CellClass="d-flex align-center justify-end action-cell">
                                             <EditTemplate Context="row">
-                                                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Spacing="2">
-                                                     <MudIconButton Color="Color.Success" title="Approve request" Size="Size.Small"
+                                                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Spacing="0">
+                                                     <MudIconButton Color="Color.Success" title="Approve request" Size="Size.Medium"
                                                                     Icon="fas fa-thumbs-up"
                                                                     OnClick="@(() => BeginApproveRequest(row.Item))">
                                                      </MudIconButton>
-                                                     <MudIconButton Color="Color.Error" title="Reject request" Size="Size.Small"
+                                                     <MudIconButton Color="Color.Error" title="Reject request" Size="Size.Medium"
                                                                     Icon="fas fa-thumbs-down"
-                                                                    OnClick="() => BeginRejectRequest(row.Item)">
+                                                                    OnClick="() => ConfirmReject(row.Item)">
                                                      </MudIconButton>
-                                                     <MudIconButton Color="Color.Info" title="View request" Size="Size.Small"
+                                                     <MudIconButton Color="Color.Info" title="View request details" Size="Size.Medium"
                                                                     Icon="fas fa-eye"
                                                                     OnClick="@(() => OpenLeaveRequest(row.Item))">
                                                      </MudIconButton>
