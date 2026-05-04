@@ -90,7 +90,8 @@ BEGIN
 				req.LeaveDetails AS Detail,
 				req.CreatedByEmpNo,
 				wf.ApprovalRole,
-				wf.CurrentStatus,
+				--wf.CurrentStatus,
+				'Approved' AS CurrentStatus,
 				wf.ApproverNo,
 				wf.ApproverName,
 				wf.PendingDays,
@@ -113,7 +114,7 @@ BEGIN
 						DATEDIFF(DAY, b.ActionDate, GETDATE()) AS PendingDays,
 						b.StepInstanceId
 				FROM kenuser.WorkflowInstances a WITH (NOLOCK) 
-					INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId
+					INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId AND RTRIM(b.[Status]) = 'Approved'
 					INNER JOIN kenuser.WorkflowStepDefinitions c WITH (NOLOCK) ON b.StepDefinitionId = c.StepDefinitionId
 					LEFT JOIN kenuser.Employee emp WITH (NOLOCK) ON b.ApproverEmpNo = emp.EmployeeNo
 				WHERE a.EntityId = app.RequisitionNo 
@@ -135,7 +136,8 @@ BEGIN
 				req.LeaveDetails AS Detail,
 				req.CreatedByEmpNo,
 				wf.ApprovalRole,
-				wf.CurrentStatus,
+				--wf.CurrentStatus,
+				'Rejected' AS CurrentStatus,
 				wf.ApproverNo,
 				wf.ApproverName,
 				wf.PendingDays,
@@ -158,7 +160,7 @@ BEGIN
 						DATEDIFF(DAY, b.ActionDate, GETDATE()) AS PendingDays,
 						b.StepInstanceId
 				FROM kenuser.WorkflowInstances a WITH (NOLOCK) 
-					INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId
+					INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId AND RTRIM(b.[Status]) = 'Rejected'
 					INNER JOIN kenuser.WorkflowStepDefinitions c WITH (NOLOCK) ON b.StepDefinitionId = c.StepDefinitionId
 					LEFT JOIN kenuser.Employee emp WITH (NOLOCK) ON b.ApproverEmpNo = emp.EmployeeNo
 				WHERE a.EntityId = app.RequisitionNo 
@@ -180,7 +182,8 @@ BEGIN
 				req.LeaveDetails AS Detail,
 				req.CreatedByEmpNo,
 				wf.ApprovalRole,
-				wf.CurrentStatus,
+				--wf.CurrentStatus,
+				'On-hold' AS CurrentStatus,
 				wf.ApproverNo,
 				wf.ApproverName,
 				wf.PendingDays,
@@ -203,7 +206,7 @@ BEGIN
 						DATEDIFF(DAY, b.ActionDate, GETDATE()) AS PendingDays,
 						b.StepInstanceId
 				FROM kenuser.WorkflowInstances a WITH (NOLOCK) 
-					INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId
+					INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId AND RTRIM(b.[Status]) = 'OnHold'
 					INNER JOIN kenuser.WorkflowStepDefinitions c WITH (NOLOCK) ON b.StepDefinitionId = c.StepDefinitionId
 					LEFT JOIN kenuser.Employee emp WITH (NOLOCK) ON b.ApproverEmpNo = emp.EmployeeNo
 				WHERE a.EntityId = app.RequisitionNo 
@@ -226,7 +229,9 @@ END
 	EXEC kenuser.Pr_GetDashboardStatistics 1
 	EXEC kenuser.Pr_GetDashboardStatistics 1, 10003633
 
-	EXEC kenuser.Pr_GetDashboardStatistics 2
+	EXEC kenuser.Pr_GetDashboardStatistics 2, 10003632			--Approved
+	EXEC kenuser.Pr_GetDashboardStatistics 3, 10003632			--Rejected
+	EXEC kenuser.Pr_GetDashboardStatistics 4, 10003632			--Hold
 
 PARAMETERS:
 	@searchType		TINYINT,			--(Notes: 0 = All, 1 = Pending request, 2 = Approved request, 3 = Rejected request, 4 = On-hold request)

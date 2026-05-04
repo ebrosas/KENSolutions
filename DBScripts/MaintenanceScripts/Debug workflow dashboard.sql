@@ -42,8 +42,12 @@
 
 	DELETE FROM kenuser.WorkflowDefinitions 	
 	DELETE  FROM kenuser.WorkflowStepDefinitions 
+	
 	DELETE FROM kenuser.WorkflowInstances 
+	WHERE WorkflowInstanceId = 13
+
 	DELETE FROM kenuser.WorkflowStepInstances
+	WHERE WorkflowInstanceId = 13
 
 	BEGIN TRAN T1
 

@@ -64,6 +64,64 @@ namespace KenHRApp.Application.Services
         }
         #endregion
 
+        #region Private Methods
+        private async Task<Result<bool>> SendPendingApprovalAsync(
+            int approverEmpNo,
+            string subject,
+            string requestTypeDesc,
+            string requestLink,
+            long requestID,
+            string webRootPath,
+            CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+            try
+            {
+                var repoResult = await _emailService.SendApprovalNotificationAsync(approverEmpNo, subject, requestTypeDesc,
+                    requestLink, requestID, webRootPath, CONST_GENERIC_MESSAGE, cancellationToken);
+                if (!repoResult.Success)
+                    return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
+                else
+                    isSuccess = repoResult.Value;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in SendPendingApprovalAsync() method.");
+            }
+        }
+
+        private async Task<Result<bool>> NotifyRejectionAsync(
+            int creatorEmpNo,
+            string subject,
+            string requestTypeDesc,
+            string requestLink,
+            long requestID,
+            string webRootPath,
+            string rejectionReason,
+            CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var repoResult = await _emailService.SendRejectionNotificationAsync(creatorEmpNo, subject, requestTypeDesc,
+                    requestLink, requestID, webRootPath, CONST_REJECTION_MESSAGE, rejectionReason, cancellationToken);
+                if (!repoResult.Success)
+                    return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
+                else
+                    isSuccess = repoResult.Value;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in NotifyRejectionAsync() method.");
+            }
+        }
+        #endregion
+
         #region Public Methods     
         public async Task<Result<List<RequestTypeDTO>>> GetPendingRequestAsync(
             int empNo,
@@ -331,6 +389,7 @@ namespace KenHRApp.Application.Services
         }
 
         public async Task<Result<List<ApprovalRequestResultDTO>>> GetApprovalRequestAsync(
+            byte searchType,
             int? empNo,
             string? requestType)
         {
@@ -338,7 +397,7 @@ namespace KenHRApp.Application.Services
 
             try
             {
-                var repoResult = await _repository.GetApprovalRequestAsync(empNo, requestType);
+                var repoResult = await _repository.GetApprovalRequestAsync(searchType, empNo, requestType);
                 if (!repoResult.Success)
                 {
                     return Result<List<ApprovalRequestResultDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
@@ -373,64 +432,6 @@ namespace KenHRApp.Application.Services
                 return Result<List<ApprovalRequestResultDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching request types from the database.");
             }
         }
-        #endregion
-
-        #region Private Methods
-        private async Task<Result<bool>> SendPendingApprovalAsync(
-            int approverEmpNo,
-            string subject,
-            string requestTypeDesc,
-            string requestLink,
-            long requestID,
-            string webRootPath,
-            CancellationToken cancellationToken = default)
-        {
-            bool isSuccess = false;
-            try
-            {
-                var repoResult = await _emailService.SendApprovalNotificationAsync(approverEmpNo, subject, requestTypeDesc, 
-                    requestLink, requestID, webRootPath, CONST_GENERIC_MESSAGE, cancellationToken);
-                if (!repoResult.Success)
-                    return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
-                else
-                    isSuccess = repoResult.Value;
-
-                return Result<bool>.SuccessResult(isSuccess);
-            }
-            catch (Exception ex)
-            {
-                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in SendPendingApprovalAsync() method.");
-            }
-        }
-
-        private async Task<Result<bool>> NotifyRejectionAsync(
-            int creatorEmpNo,
-            string subject,
-            string requestTypeDesc,
-            string requestLink,
-            long requestID,
-            string webRootPath,
-            string rejectionReason,
-            CancellationToken cancellationToken = default)
-        {
-            bool isSuccess = false;
-
-            try
-            {
-                var repoResult = await _emailService.SendRejectionNotificationAsync(creatorEmpNo, subject, requestTypeDesc,
-                    requestLink, requestID, webRootPath, CONST_REJECTION_MESSAGE, rejectionReason, cancellationToken);
-                if (!repoResult.Success)
-                    return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
-                else
-                    isSuccess = repoResult.Value;
-
-                return Result<bool>.SuccessResult(isSuccess);
-            }
-            catch (Exception ex)
-            {
-                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in NotifyRejectionAsync() method.");
-            }
-        }
-        #endregion
+        #endregion                
     }
 }

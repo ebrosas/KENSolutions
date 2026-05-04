@@ -304,11 +304,83 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
         }
 
-        private async Task OnSelectedValueChanged(RequestTypeDTO value)
+        private void OnSelectedValueChanged(RequestTypeDTO value)
         {
             _selectedRequestType = value;
 
-            await GetPendingRequestByType(_searchType);
+            BeginGetPendingRequestByType(_searchType);
+
+            switch (_searchType)
+            {
+                case SearchType.PendingRequest:
+                    overlayMessage = "Loading pending requests, please wait...";
+                    _isPendingClicked = true;
+                    break;
+
+                case SearchType.ApprovedRequest:
+                    overlayMessage = "Loading approved requests, please wait...";
+                    _isApprovedClicked = true;
+                    break;
+
+                case SearchType.RejectedRequest:
+                    overlayMessage = "Loading rejected requests, please wait...";
+                    _isRejectedClicked = true;
+                    break;
+
+                case SearchType.OnholdRequest:
+                    overlayMessage = "Loading on-hold requests, please wait...";
+                    _isOnHoldClicked = true;
+                    break;
+            }
+        }
+
+        private void BeginGetPendingRequestByType(SearchType searchType)
+        {
+            // Set flag to display the loading panel
+            _isRunning = true;
+
+            //Reset button flags
+            _isPendingClicked = false;
+            _isApprovedClicked = false;
+            _isRejectedClicked = false;
+            _isOnHoldClicked = false;
+
+            // Update the flag
+            _searchType = searchType;
+
+            switch (_searchType)
+            {
+                case SearchType.PendingRequest:
+                    overlayMessage = "Loading pending requests, please wait...";
+                    _isPendingClicked = true;
+                    break;
+
+                case SearchType.ApprovedRequest:
+                    overlayMessage = "Loading approved requests, please wait...";
+                    _isApprovedClicked = true;
+                    break;
+
+                case SearchType.RejectedRequest:
+                    overlayMessage = "Loading rejected requests, please wait...";
+                    _isRejectedClicked = true;
+                    break;
+
+                case SearchType.OnholdRequest:
+                    overlayMessage = "Loading on-hold requests, please wait...";
+                    _isOnHoldClicked = true;
+                    break;
+            }
+
+            _ = GetPendingRequestByType(async () =>
+            {
+                _isRunning = false;
+
+                // Hide the spinner overlay
+                await InvokeAsync(StateHasChanged);
+
+                StateHasChanged();
+
+            }, searchType);
         }
         #endregion
 
@@ -744,8 +816,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                         _selectedRequestType = _requestTypeList.FirstOrDefault(r => r.RequestTypeCode == CONST_DEFAULT_LIST_ITEM);
                 }
 
-                // Load the pending request
-                await GetPendingRequestByType(_searchType);
+                BeginGetPendingRequestByType(_searchType);
             }
             else
             {
@@ -756,44 +827,23 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             }
         }
 
-        private async Task GetPendingRequestByType(SearchType searchType)
+        private async Task GetPendingRequestByType(
+            Func<Task> callback, 
+            SearchType searchType)
         {
             try
             {
-                //Reset button flags
-                _isPendingClicked = false;
-                _isApprovedClicked = false;
-                _isRejectedClicked = false;
-                _isOnHoldClicked = false;
-                _searchType = searchType;
+                // Wait for 1 second then gives control back to the runtime
+                await Task.Delay(300);
+
+                // Reset error messages
+                _errorMessage.Clear();
 
                 // Reset datagrid datasource
                 _approvalList.Clear();
 
-                switch (searchType)
-                {
-                    case SearchType.PendingRequest:
-                        overlayMessage = "Loading pending requests, please wait...";
-                        _isPendingClicked = true;
-                        break;
-
-                    case SearchType.ApprovedRequest:
-                        overlayMessage = "Loading approved requests, please wait...";
-                        _isApprovedClicked = true;
-                        break;
-
-                    case SearchType.RejectedRequest:
-                        overlayMessage = "Loading rejected requests, please wait...";
-                        _isRejectedClicked = true;
-                        break;
-
-                    case SearchType.OnholdRequest:
-                        overlayMessage = "Loading on-hold requests, please wait...";
-                        _isOnHoldClicked = true;
-                        break;
-                }
-
                 var repoResult = await WorkflowService.GetApprovalRequestAsync(
+                    Convert.ToByte(searchType),
                     UserEmpNo,
                     _selectedRequestType != null ? _selectedRequestType!.RequestTypeCode : null);
                 if (repoResult.Success)
@@ -808,6 +858,11 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                     ShowHideError(true);
                 }
 
+                if (callback != null)
+                {
+                    // Hide the spinner overlay
+                    await callback.Invoke();
+                }
             }
             catch (Exception ex)
             {

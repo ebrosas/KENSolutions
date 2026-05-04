@@ -44,9 +44,12 @@ namespace KenHRApp.Application.Interfaces
             string webRootPath,
             CancellationToken cancellationToken = default);
 
-        Task<Result<List<WorkflowDetailResultDTO>>> GetWorkflowStatusAsync(string workflowTypeCode,long requestNo);
+        Task<Result<List<WorkflowDetailResultDTO>>> GetWorkflowStatusAsync(
+            string workflowTypeCode,
+            long requestNo);
 
         Task<Result<List<ApprovalRequestResultDTO>>> GetApprovalRequestAsync(
+            byte searchType,
             int? empNo,
             string? requestType);
     }

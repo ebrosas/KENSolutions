@@ -80,28 +80,28 @@
                                      <div>
                                          <MudButton Variant="@(_isPendingClicked ? Variant.Filled : Variant.Outlined)"
                                             StartIcon="fas fa-check-circle" Class="px-2" 
-                                            Color="Color.Info" Size="Size.Small" OnClick="@(() => GetPendingRequestByType(SearchType.PendingRequest))">
+                                            Color="Color.Info" Size="Size.Small" OnClick="@(() => BeginGetPendingRequestByType(SearchType.PendingRequest))">
                                              <MudText Typo="Typo.button" HtmlTag="h3">Pending</MudText>
                                          </MudButton>
                                      </div>
                                      <div>
                                          <MudButton Variant="@(_isApprovedClicked ? Variant.Filled : Variant.Outlined)"
                                             StartIcon="fas fa-thumbs-up" Class="px-2"
-                                            Color="Color.Success" Size="Size.Small" OnClick="@(() => GetPendingRequestByType(SearchType.ApprovedRequest))">
+                                            Color="Color.Success" Size="Size.Small" OnClick="@(() => BeginGetPendingRequestByType(SearchType.ApprovedRequest))">
                                              <MudText Typo="Typo.button" HtmlTag="h3">Approved</MudText>
                                          </MudButton>
                                      </div>
                                      <div>
                                          <MudButton Variant="@(_isRejectedClicked ? Variant.Filled : Variant.Outlined)"
                                             StartIcon="fas fa-thumbs-down" Class="px-2"
-                                            Color="Color.Error" Size="Size.Small" OnClick="@(() => GetPendingRequestByType(SearchType.RejectedRequest))">
+                                            Color="Color.Error" Size="Size.Small" OnClick="@(() => BeginGetPendingRequestByType(SearchType.RejectedRequest))">
                                              <MudText Typo="Typo.button" HtmlTag="h3">Rejected</MudText>
                                          </MudButton>
                                      </div>
                                      <div>
                                          <MudButton Variant="@(_isOnHoldClicked ? Variant.Filled : Variant.Outlined)"
                                             StartIcon="fas fa-pause" Class="px-2"
-                                            Color="Color.Warning" Size="Size.Small" OnClick="@(() => GetPendingRequestByType(SearchType.OnholdRequest))">
+                                                    Color="Color.Warning" Size="Size.Small" OnClick="@(() => BeginGetPendingRequestByType(SearchType.OnholdRequest))">
                                              <MudText Typo="Typo.button" HtmlTag="h3">On-hold</MudText>
                                          </MudButton>
                                      </div>
@@ -199,17 +199,21 @@
                                                 </MudChip>
                                             </CellTemplate>
                                         </PropertyColumn>
-                                        <PropertyColumn Property="x => x.ApproverFullName" Title="Currently Assigned To" Class="col-ApproverFullName" Editable="false">
+                                        <PropertyColumn Property="x => x.ApproverFullName" Title="Currently Assigned To" 
+                                            Hidden="@(!_isPendingClicked)"
+                                            Class="col-ApproverFullName" Editable="false">
                                             <CellTemplate>
                                                 @context.Item.ApproverFullName
                                             </CellTemplate>
                                         </PropertyColumn>
-                                        <PropertyColumn Property="x => x.PendingSince" Title="Pending Since" Class="col-PendingSince" Editable="false">
+                                        <PropertyColumn Property="x => x.PendingSince" Title="Pending Since"
+                                                        Hidden="@(!_isPendingClicked)"
+                                            Class="col-PendingSince" Editable="false">
                                             <CellTemplate>
                                                 @context.Item.PendingSince
                                             </CellTemplate>
                                         </PropertyColumn>
-                                        <PropertyColumn Property="x => x.ApproverRemarks" Title="Remarks" Class="col-ApproverRemarks">
+                                        <PropertyColumn Property="x => x.ApproverRemarks" Title="Remarks" Class="col-ApproverRemarks" Editable="@_isPendingClicked">
                                             <EditTemplate Context="row">
                                                 <MudTextField @bind-Value="@row.Item.ApproverRemarks" 
                                                               For="@(() => row.Item.ApproverRemarks)"
@@ -221,17 +225,20 @@
                                         <TemplateColumn CellClass="d-flex align-center justify-end action-cell">
                                             <EditTemplate Context="row">
                                                 <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Spacing="0">
-                                                     <MudIconButton Color="Color.Success" title="Approve request" Size="Size.Medium"
-                                                                    Icon="fas fa-thumbs-up"
-                                                                    OnClick="@(() => BeginApproveRequest(row.Item))">
-                                                     </MudIconButton>
-                                                     <MudIconButton Color="Color.Error" title="Reject request" Size="Size.Medium"
-                                                                    Icon="fas fa-thumbs-down"
-                                                                    OnClick="() => ConfirmReject(row.Item)">
-                                                     </MudIconButton>
-                                                     <MudIconButton Color="Color.Info" title="View request details" Size="Size.Medium"
-                                                                    Icon="fas fa-eye"
-                                                                    OnClick="@(() => OpenLeaveRequest(row.Item))">
+                                                    @if (_isPendingClicked)
+                                                    {
+                                                        <MudIconButton Color="Color.Success" title="Approve request" Size="Size.Medium"
+                                                            Icon="fas fa-thumbs-up"
+                                                            OnClick="@(() => BeginApproveRequest(row.Item))">
+                                                        </MudIconButton>
+                                                        <MudIconButton Color="Color.Error" title="Reject request" Size="Size.Medium"
+                                                            Icon="fas fa-thumbs-down"
+                                                            OnClick="() => ConfirmReject(row.Item)">
+                                                        </MudIconButton>
+                                                    }
+                                                    <MudIconButton Color="Color.Info" title="View request details" Size="Size.Medium"
+                                                        Icon="fas fa-eye"
+                                                        OnClick="@(() => OpenLeaveRequest(row.Item))">
                                                      </MudIconButton>
                                                 </MudStack>                                                                                          
                                             </EditTemplate>

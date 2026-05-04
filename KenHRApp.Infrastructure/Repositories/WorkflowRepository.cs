@@ -1227,6 +1227,7 @@ namespace KenHRApp.Infrastructure.Repositories
         }
 
         public async Task<Result<List<ApprovalRequestResult>>> GetApprovalRequestAsync(
+            byte searchType,
             int? empNo,
             string? requestType)
         {
@@ -1235,7 +1236,9 @@ namespace KenHRApp.Infrastructure.Repositories
             try
             {
                 var model = await _db.Set<ApprovalRequestResult>()
-                    .FromSqlRaw("EXEC kenuser.Pr_GetDashboardPendingRequest @empNo = {0}, @requestType = {1}",
+                    //.FromSqlRaw("EXEC kenuser.Pr_GetDashboardPendingRequest @empNo = {0}, @requestType = {1}",
+                    .FromSqlRaw("EXEC kenuser.Pr_GetDashboardStatistics @searchType = {0}, @empNo = {1}, @requestType = {2}",
+                    searchType,
                     empNo!,
                     requestType!)
                     .ToListAsync();

@@ -35,6 +35,7 @@ namespace KenHRApp.Infrastructure.Repositories
             long requestNo);
 
         Task<Result<List<ApprovalRequestResult>>> GetApprovalRequestAsync(
+            byte searchType,
             int? empNo,
             string? requestType);
         #endregion

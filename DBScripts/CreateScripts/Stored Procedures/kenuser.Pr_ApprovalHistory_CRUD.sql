@@ -85,8 +85,6 @@ PARAMETERS:
 	@isHold				BIT, 
 	@approverRemarks	VARCHAR(500)
 
-	
-
 */
 
 /*	Manage data:
