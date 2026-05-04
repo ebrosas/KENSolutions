@@ -64,6 +64,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
         private enum SearchType
         {
+            All,
             PendingRequest,
             ApprovedRequest,
             RejectedRequest,

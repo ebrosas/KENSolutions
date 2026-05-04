@@ -17,10 +17,14 @@ ALTER PROCEDURE kenuser.Pr_ApprovalHistory_CRUD
 	@approverUserID		VARCHAR(50),
 	@isApproved			BIT,
 	@isHold				BIT, 
-	@approverRemarks	VARCHAR(500)
+	@approverRemarks	VARCHAR(500),
+	@affectedRow		INT OUTPUT
 )
 AS	
 BEGIN
+
+	--Initialize output parameter
+	SET @affectedRow = 0
 
 	IF @actionType = 1
 	BEGIN
@@ -61,13 +65,16 @@ BEGIN
 			INNER JOIN kenuser.WorkflowApprovalRoles e WITH (NOLOCK) ON RTRIM(c.ApprovalRole) = RTRIM(e.ApprovalGroupCode)
 			LEFT JOIN kenuser.Employee f WITH (NOLOCK) ON a.ApproverEmpNo = f.EmployeeNo
 		WHERE a.StepInstanceId = @stepInstanceId
+
+		SELECT @affectedRow = @@ROWCOUNT
 	END 
 
 END 
 
 /*	Debug:
 
-	EXEC kenuser.Pr_ApprovalHistory_CRUD 1, 17, 10003632, 'ervin', 1, 0, 'Test approval'
+	EXEC kenuser.Pr_ApprovalHistory_CRUD 1, 17, 10003632, 'ervin', 1, 0, 'Test approval'		--Development
+	EXEC kenuser.Pr_ApprovalHistory_CRUD 1, 15, 10003632, 'ervin', 1, 0, 'Test approval'		--Staging
 
 PARAMETERS:
 	@actionType			TINYINT,	--(Notes: 0 = Check records, 1 = Insert, 2 = Update, 3 = Delete)	

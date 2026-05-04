@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using NCalc;
 using System.Text.RegularExpressions;
 using System.Linq.Dynamic.Core;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace KenHRApp.Infrastructure.Repositories
 {
@@ -48,6 +50,69 @@ namespace KenHRApp.Infrastructure.Repositories
 
         #region Properties
         public List<int> ApproverList { get; set; } = new();
+        #endregion
+
+        #region Private Methods
+        private async Task<int> InsertApprovalHistoryAsync(
+            int stepInstanceId,
+            int approverEmpNo,
+            string approverUserId,
+            bool isApproved,
+            bool isHold,
+            string approverRemarks,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                // Input parameters
+                var parameters = new[]
+                {
+                    new SqlParameter("@actionType", SqlDbType.TinyInt) { Value = 1 },
+                    new SqlParameter("@stepInstanceId", SqlDbType.Int) { Value = stepInstanceId },
+                    new SqlParameter("@approverEmpNo", SqlDbType.Int) { Value = approverEmpNo },
+                    new SqlParameter("@approverUserID", SqlDbType.VarChar, 50) { Value = approverUserId ?? (object)DBNull.Value },
+                    new SqlParameter("@isApproved", SqlDbType.Bit) { Value = isApproved },
+                    new SqlParameter("@isHold", SqlDbType.Bit) { Value = isHold },
+                    new SqlParameter("@approverRemarks", SqlDbType.VarChar, 500)
+                    {
+                        Value = string.IsNullOrWhiteSpace(approverRemarks)
+                            ? DBNull.Value
+                            : approverRemarks
+                    },
+
+                    // Output parameter
+                    new SqlParameter("@affectedRow", SqlDbType.Int)
+                    {
+                        Direction = ParameterDirection.Output
+                    }
+                };
+
+                // Execute stored procedure
+                await _db.Database.ExecuteSqlRawAsync(
+                    @"EXEC kenuser.Pr_ApprovalHistory_CRUD 
+                    @actionType,
+                    @stepInstanceId,
+                    @approverEmpNo,
+                    @approverUserID,
+                    @isApproved,
+                    @isHold,
+                    @approverRemarks,
+                    @affectedRow OUTPUT",
+                    parameters,
+                    cancellationToken);
+
+                // Return output value
+                return (int)(parameters.Last().Value ?? 0);
+            }
+            catch (SqlException ex)
+            {
+                throw new ApplicationException("Database error occurred while inserting approval history.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Unexpected error occurred while inserting approval history. {ex.Message}");
+            }
+        }
         #endregion
 
         #region Workflow Methods       
@@ -139,6 +204,9 @@ namespace KenHRApp.Infrastructure.Repositories
 
                 // Save to database
                 await _db.SaveChangesAsync();
+
+                // Insert approval history
+                await InsertApprovalHistoryAsync(step.StepInstanceId, step.ApproverEmpNo, step.ApproverUserID!, isApproved: true, isHold: false, approverRemarks: comments ?? string.Empty);
 
                 // Set the next approver(s) to the list before advancing the workflow
                 List<int> approverList = await AdvanceWorkflow(step.WorkflowInstance);
@@ -1198,7 +1266,7 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 return Result<List<ApprovalRequestResult>>.Failure($"Database error: {ex.Message}");
             }
-        }
+        }                
         #endregion
     }
 }
