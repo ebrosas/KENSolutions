@@ -135,8 +135,6 @@ BEGIN
 			)
 			OR (@startDate IS NULL AND @endDate IS NULL) 
 		)
-	
-	
 END
 
 /*	Debug:

@@ -186,7 +186,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region IWorkflowProcess Implementation
-        public async Task InitializeWorkflowAsync(long leaveNo)
+        public async Task InitializeWorkflowAsync(long leaveNo, int originatorEmpNo)
         {
             bool isSuccess = false;
 
@@ -199,7 +199,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _cts = new CancellationTokenSource();
 
                 var repoResult = await WorkflowService.StartWorkflowAsync(WorkflowHelper.CONST_LEAVE_REQUEST, 
-                    leaveNo, Environment.WebRootPath, _cts.Token);
+                    leaveNo, Environment.WebRootPath, originatorEmpNo, _cts.Token);
                 if (repoResult.Success)
                 {
                     isSuccess = repoResult.Value;
@@ -327,7 +327,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     if (_leaveRequest.LeaveRequestId > 0)
                     {
                         // Initiate the workflow
-                        await InitializeWorkflowAsync(_leaveRequest.LeaveRequestId);
+                        await InitializeWorkflowAsync(_leaveRequest.LeaveRequestId, _leaveRequest.LeaveEmpNo);
 
                         BeginLoadLeaveRequest(_leaveRequest.LeaveRequestId);
                     }

@@ -3,7 +3,7 @@
     public interface IWorkflowProcess
     {
         #region Abstract Methods
-        Task InitializeWorkflowAsync(long requisitionNo);
+        Task InitializeWorkflowAsync(long requisitionNo, int originatorEmpNo);
         #endregion
     }
 }

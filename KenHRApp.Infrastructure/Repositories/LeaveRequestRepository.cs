@@ -450,7 +450,7 @@ namespace KenHRApp.Infrastructure.Repositories
 
             try
             {
-                var model = await _db.Set<LeaveRequestResult>()
+                var model = (await _db.Set<LeaveRequestResult>()
                     .FromSqlRaw("EXEC kenuser.Pr_GetLeaveRequestDetail @leaveNo = {0}, @empNo = {1}, @costCenter = {2}, @leaveType = {3}, @status = {4}, @startDate = {5}, @endDate = {6}",
                     leaveRequestNo!,
                     empNo!,
@@ -459,7 +459,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     status!,
                     startDate!,
                     endDate!)
-                    .ToListAsync();
+                    .ToListAsync()).AsEnumerable().OrderByDescending(a => a.LeaveRequestId);
                 if (model != null && model.Any())
                 {
                     leaveRequestList = model.Select(e => new LeaveRequestResult

@@ -21,6 +21,7 @@ namespace KenHRApp.Application.Interfaces
             string entityName,
             long entityId,
             string webRootPath,
+            int originatorEmpNo,
             CancellationToken cancellationToken = default);
 
         Task<Result<bool>> ApproveStepAsync(

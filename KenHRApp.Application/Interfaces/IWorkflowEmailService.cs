@@ -10,6 +10,16 @@ namespace KenHRApp.Application.Interfaces
     public interface IWorkflowEmailService
     {
         #region Public Methods
+        Task<Result<bool>> NotifyOriginatorAsync(
+            int originatorEmpNo,
+            string subject,
+            string requestTypeDesc,
+            string requestLink,
+            long requestID,
+            string webRootPath,
+            string fileName,
+            CancellationToken cancellationToken = default);
+
         Task<Result<bool>> SendApprovalNotificationAsync(
             int userId,
             string subject,

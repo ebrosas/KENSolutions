@@ -679,7 +679,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 // Initialize the cancellation token
                 _cts = new CancellationTokenSource();
 
-                var repoResult = await WorkflowService.StartWorkflowAsync(WorkflowHelper.CONST_LEAVE_REQUEST, 15, Environment.WebRootPath, _cts.Token);
+                var repoResult = await WorkflowService.StartWorkflowAsync(WorkflowHelper.CONST_LEAVE_REQUEST, 15, Environment.WebRootPath, 0, _cts.Token);
                 if (repoResult.Success)
                 {
                     isSuccess = repoResult.Value;

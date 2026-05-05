@@ -120,6 +120,33 @@ namespace KenHRApp.Application.Services
                 return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in NotifyRejectionAsync() method.");
             }
         }
+
+        private async Task<Result<bool>> NotifyOriginatorAsync(
+            int originatorEmpNo,
+            string subject,
+            string requestTypeDesc,
+            string requestLink,
+            long requestID,
+            string webRootPath,
+            CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+            try
+            {
+                var repoResult = await _emailService.NotifyOriginatorAsync(originatorEmpNo, subject, requestTypeDesc,
+                    requestLink, requestID, webRootPath, CONST_GENERIC_MESSAGE, cancellationToken);
+                if (!repoResult.Success)
+                    return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
+                else
+                    isSuccess = repoResult.Value;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString() ?? "Unknown error in SendPendingApprovalAsync() method.");
+            }
+        }
         #endregion
 
         #region Public Methods     
@@ -165,6 +192,7 @@ namespace KenHRApp.Application.Services
             string entityName, 
             long entityId,
             string webRootPath,
+            int originatorEmpNo,
             CancellationToken cancellationToken = default)
         {
             try
@@ -193,25 +221,32 @@ namespace KenHRApp.Application.Services
                 }
                 else
                 {
+                    #region Initialize email parameters 
+                    if (this.RequestType == WorkflowRequestType.LeaveRequisition)
+                    {
+                        subject = "Leave Request for Approval";
+                        requestTypeDesc = "Leave Requisition";
+                        requestLink = $"{baseUrl}/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={entityId}&CallerForm=LeaveInquiry";
+                    }
+                    #endregion
+
+                    #region Send email notification to the Originator
+                    if (originatorEmpNo > 0)
+                        await NotifyOriginatorAsync(originatorEmpNo, subject, requestTypeDesc, requestLink, entityId, webRootPath, cancellationToken);
+                    #endregion
+
+                    #region Send email notification to the assigned approvers
                     List<int> approverList = repoResult.Value!;
                     if (approverList != null && approverList.Any())
                     {
-                        if (this.RequestType == WorkflowRequestType.LeaveRequisition)
+                        foreach (int approver in approverList)
                         {
-                            #region Build the email parameters
-                            subject = "Leave Request for Approval";
-                            requestTypeDesc = "Leave Requisition";
-                            requestLink = $"{baseUrl}/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={entityId}&CallerForm=LeaveInquiry";
-                            #endregion
-
-                            foreach (int approver in approverList)
-                            {
-                                await SendPendingApprovalAsync(approver, subject, requestTypeDesc, requestLink, entityId, webRootPath, cancellationToken);
-                            }
+                            await SendPendingApprovalAsync(approver, subject, requestTypeDesc, requestLink, entityId, webRootPath, cancellationToken);
                         }
                     }
+                    #endregion
                 }
-                
+
                 return Result<bool>.SuccessResult(true);
             }
             catch (Exception ex)
