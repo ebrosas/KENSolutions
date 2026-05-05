@@ -186,12 +186,19 @@
                                  @* Empty to prevent rendering *@
                              </EditTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.DepartmentCode" Title="Department Code" Class="col-dept-code">
+                         <PropertyColumn Property="x => x.DepartmentCode" Title="Department Code" Class="col-dept-code" StickyLeft="true">
+                             <CellTemplate Context="row">
+                                 <MudChip T="string" Size=Size.Small Color="Color.Info"
+                                          Label="true" Class="fw-bold"
+                                          Style="font-size: 14px;">
+                                     @row.Item.DepartmentCode
+                                </MudChip>
+                            </CellTemplate>
                              <EditTemplate>
                                  <MudTextField @bind-Value="context.Item.DepartmentCode" Label="Department Name" HelperText="Maximum input is 20 chars."
-                                               Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="20" MaxLength="20"
-                                                Required RequiredError="Department Code is required"
-                                               Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                    Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="20" MaxLength="20"
+                                    Required RequiredError="Department Code is required"
+                                    Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                              </EditTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.DepartmentName" Title="Department Name" Class="col-dept-name">

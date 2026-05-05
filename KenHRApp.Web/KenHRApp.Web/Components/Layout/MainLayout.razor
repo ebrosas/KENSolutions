@@ -2,6 +2,7 @@
 @inject IAppState State
 @inject ISharedAction Actions
 @inject NavigationManager Nav
+@inject IBrowserViewportService BrowserViewportService
 
 <MudThemeProvider />
 <MudPopoverProvider />
@@ -105,7 +106,7 @@
             @*  </MudMenu> *@
          </MudMenu>         
     </MudAppBar>
-     <MudDrawer @bind-Open="@_drawerOpen" Elevation="0" ClipMode="DrawerClipMode.Always" Variant="DrawerVariant.Responsive" Width="260px"
+     <MudDrawer @bind-Open="@_drawerOpen" Elevation="0" ClipMode="DrawerClipMode.Always" Variant="DrawerVariant.Temporary" Width="260px"
         Color="Color.Default" Class="custom-drawer">
                 @* Style="overflow-y: scroll; scrollbar-width: none;"> *@   
          <MudDrawerHeader Dense="true">              
@@ -131,25 +132,64 @@
     </MudMainContent>
 </MudLayout>
 
-@code {
+@implements IBrowserViewportObserver
+@implements IAsyncDisposable
 
+@code {
     #region Fields
     private bool _drawerOpen = false;
     private Color appBarColor = Color.Primary;
+    // private Guid _subscriptionId;
     #endregion
 
     #region Properties
     public bool PinDrawer { get; set; }
+    public Guid Id { get; } = Guid.NewGuid();
+    #endregion
+
+    #region Lifecycle
+    protected override async Task OnInitializedAsync()
+    {
+        await BrowserViewportService.SubscribeAsync(this);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await BrowserViewportService.UnsubscribeAsync(this);
+    }
+    #endregion
+
+    #region Viewport Handling
+    public async Task NotifyBrowserViewportChangeAsync(BrowserViewportEventArgs args)
+    {
+        // if (args.Breakpoint < Breakpoint.Md)
+        // {
+        //     _drawerOpen = false;
+
+        //     PinDrawer = false;
+        //     State.ShowAppDrawer = false;
+        //     Actions.ShowHideDrawer = HideDrawer;
+
+        //     await InvokeAsync(StateHasChanged);
+        // }
+
+        if (args.Breakpoint < Breakpoint.Md)
+        {
+            // Mobile → always closed unless user opens
+            _drawerOpen = false;
+        }
+        else
+        {
+            // Desktop → only open if pinned
+            _drawerOpen = PinDrawer;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
     #endregion
 
     private void CloseDrawer() => _drawerOpen = false;
 
-    #region Override Methods
-    protected override void OnInitialized()
-    {
-        Actions.ShowHideDrawer = ShowDrawer;
-    }
-    #endregion
 
     #region Private Methods
     private void ShowDrawer()
@@ -180,6 +220,25 @@
             Actions.ShowHideDrawer = HideDrawer;
         }
     }
+
+    // public void DrawerToggle()
+    // {
+    //     _drawerOpen = !_drawerOpen;
+
+    //     // Only affect pin state on desktop
+    //     if (_drawerOpen)
+    //     {
+    //         PinDrawer = true;
+    //         State.ShowAppDrawer = true;
+    //         Actions.ShowHideDrawer = ShowDrawer;
+    //     }
+    //     else
+    //     {
+    //         PinDrawer = false;
+    //         State.ShowAppDrawer = false;
+    //         Actions.ShowHideDrawer = HideDrawer;
+    //     }
+    // }
 
     public void OnToggledPinDrawerChanged(bool toggled)
     {

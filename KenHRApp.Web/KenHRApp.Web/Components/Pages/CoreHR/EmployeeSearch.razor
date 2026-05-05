@@ -219,20 +219,49 @@
                 <MudSpacer />
                 <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add New Employee" OnClick="AddNewEmployee" />
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export Grid Data to Excel" hidden />
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Dark" Label="Download Master Data" />
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Upload" IconColor="Color.Dark" Label="Upload Employees" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Upload" IconColor="Color.Dark" Label="Upload Employees" hidden />
                  </MudMenu>
             </MudAppBar>
             <MudPaper Elevation="4" Square="true" Class="w-100">
-                <MudDataGrid T="EmployeeMasterDTO" Items="@employeeList" Hover="true" Striped="true" Class="employee-master-grid"
-                    TableLayout="TableLayout.Fixed" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                @* <MudDataGrid T="EmployeeMasterDTO" Items="@employeeList" Hover="true" Striped="true" Class="employee-master-grid"
+                    TableLayout="TableLayout.Fixed" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true"> *@
+
+                 <MudDataGrid T="EmployeeMasterDTO" Items="@employeeList" Hover="true" Striped="true" Class="employee-master-grid"
+                    Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                    QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                    EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                    EditDialogOptions="new DialogOptions
+                    {
+                        MaxWidth = MaxWidth.Small,
+                        FullWidth = true,
+                        BackdropClick = false,
+                        CloseOnEscapeKey = false
+                    }"
+                    StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
+                    TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                    <ToolBarContent>
+                         <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                             <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
+                                           Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"
+                                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                             </MudTextField>
+                         </MudPaper>
+                         <MudSpacer />
+                         <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                             <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
+                             <MudPaper Class="ms-3" Elevation="0">
+                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new employee" OnClick="AddNewEmployee" />
+                             </MudPaper>
+                         </MudPaper>
+                     </ToolBarContent>
                     <Columns>
                         <PropertyColumn Property="x => x.EmployeeId" Hidden />
                          <PropertyColumn Property="x => x.EmployeeNo" Title="Employee No." Class="col-employee-code" StickyLeft="true">
                              <CellTemplate Context="row">
-                                 <MudChip T="string" Size=Size.Small Color="Color.Primary" 
-                                    Label="true" Class="fw-bold"
+                                 <MudChip T="string" Size=Size.Small Color="Color.Info"
+                                          Label="true" Class="fw-bold"
                                     OnClick="@(()=>GoToEmployeeDetail(row.Item))"
                                     Style="font-size: 14px;">
                                      @row.Item.EmployeeNo
@@ -341,6 +370,8 @@
     private string overlayMessage = "Please wait...";
     private string _departmentCacheKey = string.Empty;
     private string _employeeCacheKey = string.Empty;
+    private string _searchString = string.Empty;
+    private List<string> _events = new();
 
     #region Flags
     private bool _isSearchHovered = false;
@@ -348,6 +379,7 @@
     private bool _isTaskFinished = false;
     private bool _isRunning = false;
     private bool _showErrorAlert = false;
+    private bool _enableFilter = false;
     #endregion
 
     private enum UDCKeys
@@ -386,6 +418,49 @@
             LookupCache.IsEmployeeSearch = false;
             BeginSearchEmployeeTask(ForceLoad);
         }
+    }
+    #endregion
+
+    #region Grid Events
+    private Func<EmployeeMasterDTO, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.EmployeeNo > 0 && x.EmployeeNo.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.LastName) && x.LastName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.DepartmentName) && x.DepartmentName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.DepartmentName) && x.DepartmentName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.ReportingManager) && x.ReportingManager!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Gender) && x.Gender!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+
+    private void StartedEditingItem(EmployeeMasterDTO item)
+    {
+        _events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+    }
+
+    private void CanceledEditingItem(EmployeeMasterDTO item)
+    {
+        _events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+    }
+
+    private void CommittedItemChanges(EmployeeMasterDTO item)
+    {
+        
     }
     #endregion
 

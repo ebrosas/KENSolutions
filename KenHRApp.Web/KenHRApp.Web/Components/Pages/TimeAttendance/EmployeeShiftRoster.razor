@@ -34,16 +34,18 @@
             <MudSpacer></MudSpacer>
             <MudPaper Elevation="0">
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonSearch"  Class="ml-1"
-                           Size="Size.Small" Color="Color.Info" Disabled="@(!_saveBtnEnabled)" OnClick="@(() => BeginSearchEmployeeTask(true))">
-                    Search Employee
+                    Style="background-color:#004165;"
+                    Size="Size.Small" Color="Color.Info" Disabled="@(!_saveBtnEnabled)" OnClick="@(() => BeginSearchEmployeeTask(true))">
+                    Search 
                 </MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" ButtonType="ButtonType.Submit" Class="ml-1"
-                           Size="Size.Small" Color="Color.Success" Disabled="@(!_saveBtnEnabled)">
-                    Save Shift Roster
+                           Style="background-color:#004165;"
+                    Size="Size.Small" Color="Color.Success" Disabled="@(!_saveBtnEnabled)">
+                    Save Roster
                 </MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" Class="ml-1" ButtonType="ButtonType.Reset"
-                           Size="Size.Small" Color="Color.Default" Disabled="@(_isEditMode)" OnClick="BeginRefreshPageTask">
-                    Refresh
+                           Size="Size.Small" Color="Color.Warning" Disabled="@(_isEditMode)" OnClick="BeginRefreshPageTask">
+                    Reset
                 </MudButton>
             </MudPaper>
         </MudPaper>
@@ -197,10 +199,18 @@
                                  </MudPaper>
                              </ToolBarContent>
                             <Columns>
-                                 <PropertyColumn Property="x => x.EmployeeId" Hidden />
-                                 <PropertyColumn Property="x => x.EmployeeNo" Title="Employee No." Class="col-employee-no" Editable="false" />
-                                 <PropertyColumn Property="x => x.EmployeeName" Title="Employee Name" Class="col-employee-name" />
-                                 <PropertyColumn Property="x => x.HireDate" Title="Date of Join" Hidden>
+                                <PropertyColumn Property="x => x.EmployeeId" Hidden />
+                                <PropertyColumn Property="x => x.EmployeeNo" Title="Employee No." Class="col-employee-no" Editable="false" StickyLeft="true">
+                                     <CellTemplate Context="row">
+                                         <MudChip T="string" Size=Size.Small Color="Color.Info"
+                                                  Label="true" Class="fw-bold"
+                                                  Style="font-size: 14px;">
+                                             @row.Item.EmployeeNo
+                                        </MudChip>
+                                    </CellTemplate>
+                                </PropertyColumn>
+                                <PropertyColumn Property="x => x.EmployeeName" Title="Employee Name" Class="col-employee-name" />
+                                <PropertyColumn Property="x => x.HireDate" Title="Date of Join" Hidden>
                                      <CellTemplate Context="row">
                                          @row.Item.HireDate?.ToString("dd-MMM-yyyy")
                                     </CellTemplate>
