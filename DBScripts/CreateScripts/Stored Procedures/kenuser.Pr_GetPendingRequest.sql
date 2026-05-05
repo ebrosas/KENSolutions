@@ -42,7 +42,7 @@ BEGIN
 	SELECT * FROM
 	(
 		SELECT	'<ALL>' AS RequestTypeCode,
-				'<All>' AS RequestTypeName,
+				'All Notifications' AS RequestTypeName,
 				NULL AS RequestTypeDesc,
 				'far fa-hand-point-up' AS IconName,
 				0 AS AssignedCount

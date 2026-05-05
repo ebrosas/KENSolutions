@@ -74,7 +74,7 @@
                           Label="Employee Life Cycle" />
         </MudMenu>
         <MudIconButton Icon="@Icons.Material.Filled.FavoriteBorder" Color="Color.Inherit" Edge="Edge.End" title="Frequently used links" />
-        <MudIconButton Icon="@Icons.Material.Outlined.NotificationsActive" Color="Color.Inherit" Edge="Edge.End" title="Notifications" />
+        <MudIconButton Href="/Workflow/ApprovalDashboard" Icon="@Icons.Material.Outlined.NotificationsActive" Color="Color.Inherit" Edge="Edge.End" title="Notifications" />
         <MudIconButton Icon="@Icons.Material.Filled.SupervisedUserCircle" Color="Color.Inherit" Edge="Edge.End" title="User Profile" />
         <MudMenu Dense
                   Variant="Variant.Text"
@@ -100,7 +100,7 @@
                  <MudMenuItem ForceLoad
                               Icon="@Icons.Material.TwoTone.Logout"
                               Class="navMenu"
-                              Label="Sign Out"
+                              Label="Log Out"
                               OnClick="SignOut" />
             @*  </MudMenu> *@
          </MudMenu>         
@@ -110,8 +110,8 @@
                 @* Style="overflow-y: scroll; scrollbar-width: none;"> *@   
          <MudDrawerHeader Dense="true">              
              <MudButtonGroup Color="Color.Transparent" Variant="Variant.Filled" Size="Size.Small" Class="p-0 m-0">
-                 <MudIconButton Icon="@Icons.Material.Filled.Home" Color="Color.Dark" Size=Size.Small title="Homepage" Href="/"></MudIconButton>
-                 <MudIconButton Icon="@Icons.Material.Filled.DashboardCustomize" Color="Color.Dark" Size=Size.Small Href="/dashboard" title="Dashboard"></MudIconButton>
+                 <MudIconButton Icon="@Icons.Material.Filled.Home" Color="Color.Dark" Size=Size.Small title="Homepage" Href="/TimeAttendance/tnadashboard"></MudIconButton>
+                 <MudIconButton Icon="@Icons.Material.Filled.DashboardCustomize" Color="Color.Dark" Size=Size.Small Href="/ProfileDashboard" title="User Profile Dashboard"></MudIconButton>
                 <MudToggleIconButton Icon="@Icons.Material.Outlined.PushPin" 
                     Color="@Color.Dark" Size=Size.Small
                     Toggled="PinDrawer"
