@@ -23,6 +23,7 @@ namespace KenHRApp.Application.DTOs
         public int? PendingDays { get; set; }
         public int? StepInstanceId { get; set; }
         public int? CreatedByEmpNo { get; set; }
+        public string? Remarks { get; set; } = null;
         #endregion
 
         #region Extended Properties
@@ -30,7 +31,7 @@ namespace KenHRApp.Application.DTOs
         {
             get
             {
-                return $"{RequestedByName} (Emp.No: {RequestedByNo})";
+                return $"{RequestedByName} (Emp.#: {RequestedByNo})";
             }
         }
 
@@ -38,7 +39,7 @@ namespace KenHRApp.Application.DTOs
         {
             get
             {
-                return $"{ApproverName} (Emp. No: {ApproverNo})";
+                return $"{ApproverName} (Emp. #: {ApproverNo})";
             }
         }
 
@@ -49,8 +50,6 @@ namespace KenHRApp.Application.DTOs
                 return $"{PendingDays} days";
             }
         }
-
-        public string? ApproverRemarks { get; set; }
         #endregion
     }
 }

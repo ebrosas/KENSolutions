@@ -49,9 +49,9 @@ namespace KenHRApp.Application.DTOs
             get
             {
                 if (ActivityStatus == CONST_APPROVED)
-                    return $"Approved by {ApproverName} (Emp. No: {ApproverNo})";
+                    return $"Approved by {ApproverName} (Emp. #: {ApproverNo})";
                 else if (ActivityStatus == CONST_REJECTED)
-                    return $"Rejected by {ApproverName} (Emp. No: {ApproverNo})";
+                    return $"Rejected by {ApproverName} (Emp. #: {ApproverNo})";
                 else if (ActivityStatus == CONST_PENDING)
                     return "In-progress";
                 else
@@ -68,12 +68,12 @@ namespace KenHRApp.Application.DTOs
 
                 if (ActivityStatus == CONST_APPROVED)
                 {
-                    return $"Approved by {ApproverName} (Emp. No: {ApproverNo})";
+                    return $"Approved by {ApproverName} (Emp. #: {ApproverNo})";
                 }
                 else if (ActivityStatus == CONST_REJECTED)
-                    return $"Rejected by {ApproverName} (Emp. No: {ApproverNo})";
+                    return $"Rejected by {ApproverName} (Emp. #: {ApproverNo})";
                 else if (ActivityStatus == CONST_PENDING)
-                    return $"Pending for approval with {ApproverName} (Emp. No: {ApproverNo})";
+                    return $"Pending for approval with {ApproverName} (Emp. #: {ApproverNo})";
                 else
                     return string.Empty;
             }

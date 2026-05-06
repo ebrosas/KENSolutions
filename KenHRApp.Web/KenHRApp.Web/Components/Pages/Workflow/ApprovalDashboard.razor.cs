@@ -479,7 +479,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                     StateHasChanged();
 
                 }, stepInstanceId, requestItem.ApproverNo, UserID!,
-                requestItem.ApproverRemarks, requestItem.RequestNo);
+                requestItem.Remarks, requestItem.RequestNo);
             }
             catch (Exception ex)
             {
@@ -528,7 +528,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                     if (requestItem.StepInstanceId == null)
                         throw new Exception("The current workflow instance is not defined!");
 
-                    if (string.IsNullOrWhiteSpace(requestItem.ApproverRemarks))
+                    if (string.IsNullOrWhiteSpace(requestItem.Remarks))
                         throw new Exception("Remarks is required when rejecting the request!");
                 }
 
@@ -561,7 +561,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                     StateHasChanged();
 
                 }, stepInstanceId, requestItem.CreatedByEmpNo, requestItem.ApproverNo, UserID!,
-                requestItem.ApproverRemarks, requestItem.RequestNo);
+                requestItem.Remarks, requestItem.RequestNo);
             }
             catch (Exception ex)
             {

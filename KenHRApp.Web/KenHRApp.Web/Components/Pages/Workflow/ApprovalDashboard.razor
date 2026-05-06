@@ -39,7 +39,7 @@
         <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-2 mb-0">
             <MudPaper Elevation="0" Class="p-0 w-100">
                 <MudGrid Spacing="3">
-                    <MudItem xs="5" sm="3">
+                    <MudItem xs="12" sm="3">
                         <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
                             <MudAppBar Class="rounded-l-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
                                 <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Request Types</MudText>
@@ -72,35 +72,35 @@
                             </MudPaper>
                         </MudStack>
                     </MudItem>
-                    <MudItem xs="7" sm="9">
-                        <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.Wrap">
+                    <MudItem xs="12" sm="9">
+                        <MudStack AlignItems="AlignItems.Start" Spacing="0" Wrap="Wrap.NoWrap">
                             <MudAppBar Class="rounded-r-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
                                 <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.FlexStart"
-                                           Breakpoint="Breakpoint.SmAndDown" Spacing="2" Wrap="Wrap.WrapReverse">
+                                     Spacing="2" Wrap="Wrap.NoWrap">
                                      <div>
                                          <MudButton Variant="@(_isPendingClicked ? Variant.Filled : Variant.Outlined)"
-                                            StartIcon="fas fa-check-circle" Class="px-2" 
+                                            StartIcon="fas fa-check-circle" Class="px-1" 
                                             Color="Color.Info" Size="Size.Small" OnClick="@(() => BeginGetPendingRequestByType(SearchType.PendingRequest))">
                                              <MudText Typo="Typo.button" HtmlTag="h3">Pending</MudText>
                                          </MudButton>
                                      </div>
                                      <div>
                                          <MudButton Variant="@(_isApprovedClicked ? Variant.Filled : Variant.Outlined)"
-                                            StartIcon="fas fa-thumbs-up" Class="px-2"
+                                            StartIcon="fas fa-thumbs-up" Class="px-1"
                                             Color="Color.Success" Size="Size.Small" OnClick="@(() => BeginGetPendingRequestByType(SearchType.ApprovedRequest))">
                                              <MudText Typo="Typo.button" HtmlTag="h3">Approved</MudText>
                                          </MudButton>
                                      </div>
                                      <div>
                                          <MudButton Variant="@(_isRejectedClicked ? Variant.Filled : Variant.Outlined)"
-                                            StartIcon="fas fa-thumbs-down" Class="px-2"
+                                            StartIcon="fas fa-thumbs-down" Class="px-1"
                                             Color="Color.Error" Size="Size.Small" OnClick="@(() => BeginGetPendingRequestByType(SearchType.RejectedRequest))">
                                              <MudText Typo="Typo.button" HtmlTag="h3">Rejected</MudText>
                                          </MudButton>
                                      </div>
                                      <div>
                                          <MudButton Variant="@(_isOnHoldClicked ? Variant.Filled : Variant.Outlined)"
-                                            StartIcon="fas fa-pause" Class="px-2"
+                                            StartIcon="fas fa-pause" Class="px-1"
                                                     Color="Color.Warning" Size="Size.Small" OnClick="@(() => BeginGetPendingRequestByType(SearchType.OnholdRequest))">
                                              <MudText Typo="Typo.button" HtmlTag="h3">On-hold</MudText>
                                          </MudButton>
@@ -177,8 +177,10 @@
                                             </CellTemplate>
                                         </PropertyColumn>
                                         <PropertyColumn Property="x => x.Detail" Title="Details" Class="col-Detail" Editable="false">
-                                            <CellTemplate>
-                                                @context.Item.Detail
+                                            <CellTemplate Context="row">
+                                                <div style="white-space: pre-line; line-height: 1.5; font-size: 13px; color: #333;">
+                                                    @row.Item.Detail
+                                                </div>
                                             </CellTemplate>
                                         </PropertyColumn>
                                         <PropertyColumn Property="x => x.CurrentStatus" Title="Status" Class="col-CurrentStatus" Editable="false">
@@ -213,10 +215,10 @@
                                                 @context.Item.PendingSince
                                             </CellTemplate>
                                         </PropertyColumn>
-                                        <PropertyColumn Property="x => x.ApproverRemarks" Title="Remarks" Class="col-ApproverRemarks" Editable="@_isPendingClicked">
+                                        <PropertyColumn Property="x => x.Remarks" Title="Remarks" Class="col-ApproverRemarks" Editable="@_isPendingClicked">
                                             <EditTemplate Context="row">
-                                                <MudTextField @bind-Value="@row.Item.ApproverRemarks" 
-                                                              For="@(() => row.Item.ApproverRemarks)"
+                                                <MudTextField @bind-Value="@row.Item.Remarks" 
+                                                              For="@(() => row.Item.Remarks)"
                                                               HelperText="Max. text input is 300 chars."
                                                               Variant="Variant.Text" HelperTextOnFocus="true" Counter="300" MaxLength="300" Lines="2"
                                                               Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />

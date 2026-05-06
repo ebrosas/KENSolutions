@@ -2378,70 +2378,56 @@ h1:focus {
     height: 100%;
 }
 
+.pendingrequest-grid .detail-text {
+    white-space: pre-line;
+    line-height: 1.4;
+}
+
 /* Grid Column widths */
 .pendingrequest-grid .col-RequestNo {
     width: 80px !important;
     text-align: left;
-    overflow: hidden;
     min-width: 50px !important;
-    text-overflow: ellipsis;
 }
 
 .pendingrequest-grid .col-RequestTypeDesc {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .pendingrequest-grid .col-AppliedDate {
     width: 90px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .pendingrequest-grid .col-RequesterName {
     width: 150px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .pendingrequest-grid .col-Detail {
-    width: 200px !important;
-    max-width: 200px !important;
+    width: 300px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .pendingrequest-grid .col-CurrentStatus {
     width: 90px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .pendingrequest-grid .col-ApproverFullName {
     width: 200px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .pendingrequest-grid .col-PendingSince {
     width: 90px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .pendingrequest-grid .col-ApproverRemarks {
     width: 300px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .pendingrequest-grid .flex-column {

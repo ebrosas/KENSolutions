@@ -7,6 +7,10 @@ DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE',
 	FROM [kenuser].[LeaveRequisitionWF] a
 	WHERE a.LeaveRequestId = @requestNo
 
+	--Apprval history
+	SELECT * FROM [kenuser].[RequestApprovals] a WITH (NOLOCK)
+	WHERE a.RequisitionNo = @requestNo
+
 	--Get workflow setup
 	SELECT * FROM kenuser.WorkflowDefinitions a
 	WHERE RTRIM(a.EntityName) = @workflowTypeCode

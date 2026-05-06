@@ -457,6 +457,7 @@ namespace KenHRApp.Application.Services
                         PendingDays = e.PendingDays,
                         StepInstanceId = e.StepInstanceId,
                         CreatedByEmpNo = e.CreatedByEmpNo,
+                        Remarks = e.Remarks
                     }).ToList();
                 }
 

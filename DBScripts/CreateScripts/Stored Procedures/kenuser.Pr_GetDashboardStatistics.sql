@@ -6,7 +6,8 @@
 *
 *	Date			Author		Rev. #		Comments:
 *	25/04/2026		Ervin		1.0			Created
-
+*	06/05/2026		Ervin		1.1			Added "Remarks" field in the returned dataset
+*
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetDashboardStatistics
@@ -48,7 +49,8 @@ BEGIN
 				d.ApproverNo,
 				d.ApproverName,
 				d.PendingDays,
-				d.StepInstanceId					
+				d.StepInstanceId,
+				'' AS Remarks			--Rev. #1.1
 		FROM kenuser.WorkflowStepDefinitions a WITH (NOLOCK)
 			INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
 			INNER JOIN kenuser.WorkflowInstances c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
@@ -75,7 +77,7 @@ BEGIN
 		WHERE RTRIM(d.ActivityStatus) = 'Pending'
 			AND (d.ApproverNo = @empNo OR @empNo IS NULL)
 			AND (RTRIM(b.EntityName) = @requestType OR @requestType IS NULL)
-		ORDER BY c.EntityId
+		ORDER BY c.EntityId DESC
 	END 
 
 	ELSE IF @searchType = 2
@@ -95,7 +97,8 @@ BEGIN
 				wf.ApproverNo,
 				wf.ApproverName,
 				wf.PendingDays,
-				wf.StepInstanceId					
+				wf.StepInstanceId,
+				app.Remarks				--Rev. #1.1
 		FROM kenuser.RequestApprovals app WITH (NOLOCK)
 			CROSS APPLY
 			(
@@ -122,6 +125,7 @@ BEGIN
 		WHERE app.IsApproved = 1
 			AND (app.AssignedEmpNo = @empNo OR @empNo IS NULL)
 			AND (RTRIM(app.RequestTypeCode) = @requestType OR @requestType IS NULL)
+		ORDER BY app.RequisitionNo DESC
 	END 
 
 	ELSE IF @searchType = 3
@@ -141,7 +145,8 @@ BEGIN
 				wf.ApproverNo,
 				wf.ApproverName,
 				wf.PendingDays,
-				wf.StepInstanceId					
+				wf.StepInstanceId,
+				app.Remarks				--Rev. #1.1
 		FROM kenuser.RequestApprovals app WITH (NOLOCK)
 			CROSS APPLY
 			(
@@ -168,6 +173,7 @@ BEGIN
 		WHERE ISNULL(app.IsApproved, 0) = 0
 			AND (app.AssignedEmpNo = @empNo OR @empNo IS NULL)
 			AND (RTRIM(app.RequestTypeCode) = @requestType OR @requestType IS NULL)
+		ORDER BY app.RequisitionNo DESC
 	END 
 
 	ELSE IF @searchType = 4
@@ -187,7 +193,8 @@ BEGIN
 				wf.ApproverNo,
 				wf.ApproverName,
 				wf.PendingDays,
-				wf.StepInstanceId					
+				wf.StepInstanceId,
+				app.Remarks					--Rev. #1.1
 		FROM kenuser.RequestApprovals app WITH (NOLOCK)
 			CROSS APPLY
 			(
@@ -214,6 +221,7 @@ BEGIN
 		WHERE app.IsHold = 1
 			AND (app.AssignedEmpNo = @empNo OR @empNo IS NULL)
 			AND (RTRIM(app.RequestTypeCode) = @requestType OR @requestType IS NULL)
+		ORDER BY app.RequisitionNo DESC
 	END 
 
 END 
@@ -221,9 +229,12 @@ END
 /*	Debug:
 
 	--Staging database
-	EXEC kenuser.Pr_GetDashboardStatistics
+	EXEC kenuser.Pr_GetDashboardStatistics 1
 	EXEC kenuser.Pr_GetDashboardStatistics 10003635		
 	EXEC kenuser.Pr_GetDashboardStatistics 10003635, 'RTYPELEAVE'
+
+	EXEC kenuser.Pr_GetDashboardStatistics 2, 10003632
+	EXEC kenuser.Pr_GetDashboardStatistics 3, 10003632
 	
 	--Development database
 	EXEC kenuser.Pr_GetDashboardStatistics 1

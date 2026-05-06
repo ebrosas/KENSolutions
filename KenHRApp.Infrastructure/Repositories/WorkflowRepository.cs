@@ -1259,7 +1259,8 @@ namespace KenHRApp.Infrastructure.Repositories
                         ApproverName = e.ApproverName,
                         PendingDays = e.PendingDays,
                         StepInstanceId = e.StepInstanceId,
-                        CreatedByEmpNo = e.CreatedByEmpNo
+                        CreatedByEmpNo = e.CreatedByEmpNo,
+                        Remarks = e.Remarks
                     }).ToList();
                 }
 
