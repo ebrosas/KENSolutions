@@ -17,6 +17,7 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
         [Inject] public NavigationManager Nav { get; set; } = default!;
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         [Inject] private IAppState State { get; set; } = default!;
+        [Inject] private UserSessionService UserSession { get; set; } = default!;
         #endregion
 
         #region Fields
@@ -279,6 +280,22 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
                     // Set authentication state
                     State.IsAuthenticated = true;
                     State.AuthenticatedUser = repoResult!.Value.AuthenticatedUser;
+
+                    #region Save user credentials
+                    EmployeeDTO? userInfo = repoResult!.Value.AuthenticatedUser;
+                    if (userInfo != null)
+                    {
+                        UserSession.SetUser(new UserSessionModel
+                        {
+                            UserId = Guid.NewGuid(),
+                            Username = userInfo.UserID ?? string.Empty,                            
+                            UserEmpNo = userInfo.EmployeeNo,
+                            EmailAddress = userInfo.OfficialEmail,
+                            CostCenter = userInfo.DepartmentCode,
+                            UserFullName = userInfo.EmployeeFullName ?? string.Empty
+                        });
+                    }
+                    #endregion
                 }
                 else
                 {

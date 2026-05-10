@@ -61,6 +61,7 @@ builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
 builder.Services.AddScoped<IWorkflowService, WorkflowService>();
 builder.Services.AddScoped<IWorkflowEmailService, WorkflowEmailService>();
 builder.Services.AddScoped<IWorkflowRepository, WorkflowRepository>();
+builder.Services.AddScoped<UserSessionService>();
 #endregion
 
 builder.Services.AddAuthentication(options =>

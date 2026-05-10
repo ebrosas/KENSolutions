@@ -25,6 +25,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IAppState State { get; set; } = default!;
+        [Inject] private UserSessionService UserSession { get; set; } = default!;
         #endregion
 
         #region Fields
@@ -131,11 +132,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region IPageAuthorization Implementation
-        public string UserName { get; set; } = "";
+        public Guid UserId { get; set; }
         public string? UserID { get; set; } = "";
+        public string UserName { get; set; } = "";
         public string? UserEmail { get; set; } = "";
         public int UserEmpNo { get; set; } = 0;
         public string? UserCostCenter { get; set; } = "";
+        public string UserFullName { get; set; } = "";
 
         public void GoToLogin()
         {
@@ -148,12 +151,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             // Initialize the EditContext 
             _editContext = new EditContext(_swipeLog);
-
-            //PopulateFiscalYears();
-            //_selectedFiscalYear = DateTime.Now.Year;
-
-            //await LoadPayrollPeriodsAsync(_selectedFiscalYear);
-            //BeginGetAttendanceSummary();                        
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -166,14 +163,26 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 PopulateFiscalYears();
                 _selectedFiscalYear = DateTime.Now.Year;
                 await LoadPayrollPeriodsAsync(_selectedFiscalYear);
+                
+                //if (State.AuthenticatedUser != null)
+                //{
+                //    UserName = State.AuthenticatedUser!.UserFullName;
+                //    UserEmpNo = State.AuthenticatedUser.EmployeeNo;
+                //    UserID = State.AuthenticatedUser!.UserID;
+                //    UserEmail = State.AuthenticatedUser!.OfficialEmail;
+                //    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
 
-                if (State.AuthenticatedUser != null)
+                //    BeginGetAttendanceSummary();
+                //}
+
+                if (UserSession.IsAuthenticated)
                 {
-                    UserName = State.AuthenticatedUser!.EmployeeFullName;
-                    UserEmpNo = State.AuthenticatedUser.EmployeeNo;
-                    UserID = State.AuthenticatedUser!.UserID;
-                    UserEmail = State.AuthenticatedUser!.OfficialEmail;
-                    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
+                    UserId = UserSession.CurrentUser!.UserId;
+                    UserName = UserSession.CurrentUser!.Username;
+                    UserEmpNo = UserSession.CurrentUser!.UserEmpNo;
+                    UserFullName = UserSession.CurrentUser!.UserFullName;
+                    UserEmail = UserSession.CurrentUser!.EmailAddress;
+                    UserCostCenter = UserSession.CurrentUser!.CostCenter;
 
                     BeginGetAttendanceSummary();
                 }

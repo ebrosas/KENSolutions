@@ -1091,7 +1091,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             //    {
             //        _leaveRequest.LeaveEmpNo = selectedEmployee.EmployeeNo;
             //        _leaveRequest.LeaveEmpCostCenter = selectedEmployee.DepartmentCode;
-            //        _leaveRequest.LeaveEmpName = selectedEmployee.EmployeeFullName;
+            //        _leaveRequest.LeaveEmpName = selectedEmployee.UserFullName;
             //        _leaveRequest.LeaveEmpEmail = selectedEmployee.EmpEmail;
             //        _leaveRequest.LeaveBalance = selectedEmployee.LeaveBalance;
             //    }
