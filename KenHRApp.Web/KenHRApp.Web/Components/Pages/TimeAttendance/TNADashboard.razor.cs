@@ -25,7 +25,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IAppState State { get; set; } = default!;
-        [Inject] private UserSessionService UserSession { get; set; } = default!;
+        [Inject] private IUserSessionService UserSession { get; set; } = default!;
         #endregion
 
         #region Fields
@@ -157,7 +157,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             if (firstRender)
             {
-                if (!State.IsAuthenticated)
+                //if (!State.IsAuthenticated)
+                //    GoToLogin();
+
+                if (!UserSession.IsAuthenticated())
                     GoToLogin();
 
                 PopulateFiscalYears();
@@ -175,7 +178,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 //    BeginGetAttendanceSummary();
                 //}
 
-                if (UserSession.IsAuthenticated)
+                if (UserSession.IsAuthenticated())
                 {
                     UserId = UserSession.CurrentUser!.UserId;
                     UserName = UserSession.CurrentUser!.Username;

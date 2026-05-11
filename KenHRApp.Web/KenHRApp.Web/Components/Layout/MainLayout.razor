@@ -3,6 +3,7 @@
 @inject ISharedAction Actions
 @inject NavigationManager Nav
 @inject IBrowserViewportService BrowserViewportService
+@inject IUserSessionService UserSession
 
 <MudThemeProvider />
 <MudPopoverProvider />
@@ -140,6 +141,7 @@
     private bool _drawerOpen = false;
     private Color appBarColor = Color.Primary;
     // private Guid _subscriptionId;
+    private bool _initialized;
     #endregion
 
     #region Properties
@@ -156,6 +158,19 @@
     public async ValueTask DisposeAsync()
     {
         await BrowserViewportService.UnsubscribeAsync(this);
+    }
+
+    protected override async Task OnAfterRenderAsync(
+        bool firstRender)
+    {
+        if (firstRender && !_initialized)
+        {
+            _initialized = true;
+
+            await UserSession.InitializeAsync();
+
+            StateHasChanged();
+        }
     }
     #endregion
 
@@ -259,10 +274,13 @@
         }
     }
 
-    private void SignOut()
+    private async Task SignOut()
     {
         // Set authentication state
         State.IsAuthenticated = false;
+
+        // Reset user session
+        await UserSession.ClearAsync();
 
         Nav.NavigateTo("/login", true);
     }

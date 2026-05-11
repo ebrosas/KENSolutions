@@ -1,4 +1,4 @@
-using KenHRApp.Web.Client.Pages;
+//using KenHRApp.Web.Client.Pages;
 using KenHRApp.Web.Components;
 using KenHRApp.Web.Components.Account;
 using KenHRApp.Web.Data;
@@ -61,7 +61,7 @@ builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
 builder.Services.AddScoped<IWorkflowService, WorkflowService>();
 builder.Services.AddScoped<IWorkflowEmailService, WorkflowEmailService>();
 builder.Services.AddScoped<IWorkflowRepository, WorkflowRepository>();
-builder.Services.AddScoped<UserSessionService>();
+builder.Services.AddScoped<IUserSessionService, UserSessionService>();
 #endregion
 
 builder.Services.AddAuthentication(options =>
@@ -139,8 +139,8 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(KenHRApp.Web.Client._Imports).Assembly);
+    .AddInteractiveWebAssemblyRenderMode();
+    //.AddAdditionalAssemblies(typeof(KenHRApp.Web.Client._Imports).Assembly);
 
 // Add additional endpoints required by the Identity /Account Razor components.
 //app.MapAdditionalIdentityEndpoints();
