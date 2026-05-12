@@ -160,13 +160,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 //if (!State.IsAuthenticated)
                 //    GoToLogin();
 
-                if (!UserSession.IsAuthenticated())
-                    GoToLogin();
+                //PopulateFiscalYears();
+                //_selectedFiscalYear = DateTime.Now.Year;
+                //await LoadPayrollPeriodsAsync(_selectedFiscalYear);
 
-                PopulateFiscalYears();
-                _selectedFiscalYear = DateTime.Now.Year;
-                await LoadPayrollPeriodsAsync(_selectedFiscalYear);
-                
                 //if (State.AuthenticatedUser != null)
                 //{
                 //    UserName = State.AuthenticatedUser!.UserFullName;
@@ -178,7 +175,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 //    BeginGetAttendanceSummary();
                 //}
 
-                if (UserSession.IsAuthenticated())
+                bool isAuthenticated = UserSession.IsAuthenticated();
+                if (!isAuthenticated)
+                {
+                    // Refresh the user session
+                    await UserSession.InitializeAsync();
+                    isAuthenticated = UserSession.IsAuthenticated();
+                }
+
+                if (isAuthenticated)
                 {
                     UserId = UserSession.CurrentUser!.UserId;
                     UserName = UserSession.CurrentUser!.Username;
@@ -187,8 +192,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     UserEmail = UserSession.CurrentUser!.EmailAddress;
                     UserCostCenter = UserSession.CurrentUser!.CostCenter;
 
+                    PopulateFiscalYears();
+                    _selectedFiscalYear = DateTime.Now.Year;
+                    await LoadPayrollPeriodsAsync(_selectedFiscalYear);
+
                     BeginGetAttendanceSummary();
                 }
+                else
+                    GoToLogin();
             }
         }
         #endregion

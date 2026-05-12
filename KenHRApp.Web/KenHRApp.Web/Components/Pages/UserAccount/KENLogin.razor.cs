@@ -285,16 +285,6 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
                     EmployeeDTO? userInfo = repoResult!.Value.AuthenticatedUser;
                     if (userInfo != null)
                     {
-                        //UserSession.SetUser(new UserSessionModel
-                        //{
-                        //    UserId = Guid.NewGuid(),
-                        //    Username = userInfo.UserID ?? string.Empty,                            
-                        //    UserEmpNo = userInfo.EmployeeNo,
-                        //    EmailAddress = userInfo.OfficialEmail,
-                        //    CostCenter = userInfo.DepartmentCode,
-                        //    UserFullName = userInfo.EmployeeFullName ?? string.Empty
-                        //});
-
                         await UserSession.SetUserAsync(
                             new UserSessionModel
                             {

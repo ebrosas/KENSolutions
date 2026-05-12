@@ -47,7 +47,8 @@ namespace KenHRApp.Application.Services
 
         public bool IsAuthenticated()
         {
-            return _currentUser is not null && _currentUser.IsAuthenticated;
+            bool isAuthenticated = _currentUser is not null && _currentUser.IsAuthenticated;
+            return isAuthenticated;
         }                
 
         public async Task InitializeAsync()
