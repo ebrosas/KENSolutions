@@ -26,6 +26,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IAppState State { get; set; } = default!;
+        [Inject] private IUserSessionService UserSession { get; set; } = default!;
 
         [Parameter]
         [SupplyParameterFromQuery]
@@ -115,10 +116,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         #region IPageAuthorization Implementation
         public string UserName { get; set; } = "";
-        public string? UserID { get; set; } = "";
-        public string? UserEmail { get; set; } = "";
         public int UserEmpNo { get; set; } = 0;
+        public Guid UserId { get; set; }
+        public string? UserEmail { get; set; } = "";
         public string? UserCostCenter { get; set; } = "";
+        public string UserFullName { get; set; } = "";
+
         public void GoToLogin()
         {
             Navigation.NavigateTo("/login");
@@ -138,23 +141,47 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             //    _selectedResumeDate = LeaveEndDate;
         }
 
-        protected override void OnAfterRender(bool firstRender)
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                if (!State.IsAuthenticated)
-                    GoToLogin();
+                #region Old authentication Logic
+                //if (!State.IsAuthenticated)
+                //    GoToLogin();
 
-                if (State.AuthenticatedUser != null)
+                //if (State.AuthenticatedUser != null)
+                //{
+                //    UserName = State.AuthenticatedUser!.EmployeeFullName;
+                //    UserEmpNo = State.AuthenticatedUser.EmployeeNo;
+                //    UserID = State.AuthenticatedUser!.UserID;
+                //    UserEmail = State.AuthenticatedUser!.OfficialEmail;
+                //    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
+
+                //    BeginLoadComboboxTask();
+                //}
+                #endregion
+
+                bool isAuthenticated = UserSession.IsAuthenticated();
+                if (!isAuthenticated)
                 {
-                    UserName = State.AuthenticatedUser!.EmployeeFullName;
-                    UserEmpNo = State.AuthenticatedUser.EmployeeNo;
-                    UserID = State.AuthenticatedUser!.UserID;
-                    UserEmail = State.AuthenticatedUser!.OfficialEmail;
-                    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
+                    // Refresh the user session
+                    await UserSession.InitializeAsync();
+                    isAuthenticated = UserSession.IsAuthenticated();
+                }
+
+                if (isAuthenticated)
+                {
+                    UserId = UserSession.CurrentUser!.UserId;
+                    UserName = UserSession.CurrentUser!.Username;
+                    UserEmpNo = UserSession.CurrentUser!.UserEmpNo;
+                    UserFullName = UserSession.CurrentUser!.UserFullName;
+                    UserEmail = UserSession.CurrentUser!.EmailAddress;
+                    UserCostCenter = UserSession.CurrentUser!.CostCenter;
 
                     BeginLoadComboboxTask();
                 }
+                else
+                    GoToLogin();
             }
         }
         #endregion
@@ -470,7 +497,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _isRunning = true;
 
             // Set the overlay message
-            if (!State.IsAuthenticated)
+            if (!UserSession.IsAuthenticated())
                 overlayMessage = "Authentication required. Redirecting to login page...";
             else
                 overlayMessage = "Initializing form, please wait...";
@@ -513,7 +540,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _isRunning = true;
 
             // Set the overlay message
-            if (!State.IsAuthenticated)
+            if (!UserSession.IsAuthenticated())
                 overlayMessage = "Authentication required. Redirecting to login page...";
             else
                 overlayMessage = "Loading leave entitlements, please wait...";
@@ -990,7 +1017,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set the created by and created date fields for new record
                 entitlement.CreatedDate = DateTime.Now;
                 entitlement.LeaveCreatedBy = UserEmpNo;
-                entitlement.CreatedUserID = UserID;
+                entitlement.CreatedUserID = UserName;
 
                 var addResult = await LeaveService.AddLeaveEntitlementAsync(entitlement, _cts.Token);
                 isSuccess = addResult.Success;
@@ -1012,7 +1039,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set the created by and created date fields for new record
                 entitlement.LastUpdatedDate = DateTime.Now;
                 entitlement.LastUpdatedBy = UserEmpNo;
-                entitlement.LastUpdatedUserID = UserID;
+                entitlement.LastUpdatedUserID = UserName;
 
                 var updateResult = await LeaveService.UpdateLeaveEntitlementAsync(entitlement, _cts.Token);
                 isSuccess = updateResult.Success;

@@ -3,17 +3,19 @@ using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Application.Services;
 using KenHRApp.Domain.Entities;
+using KenHRApp.Web.Components.Common.Interface;
 using KenHRApp.Web.Components.Pages.Recruitment;
 using KenHRApp.Web.Components.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using MudBlazor;
 using System.Globalization;
 using System.Text;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
-    public partial class MasterShiftRoster
+    public partial class MasterShiftRoster: IPageAuthorization
     {
         #region Parameters and Injections
         [Inject] private IAttendanceService AttendanceService { get; set; } = default!;
@@ -22,6 +24,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IAppState AppState { get; set; } = default!;
+        [Inject] private IUserSessionService UserSession { get; set; } = default!;
 
         [Parameter]
         [SupplyParameterFromQuery]
@@ -133,7 +136,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             Warning,
             Error
         }
-        #endregion
+    #endregion
+    #endregion
+
+        #region IPageAuthorization Implementation
+        public string UserName { get; set; } = "";
+        public int UserEmpNo { get; set; } = 0;
+        public Guid UserId { get; set; }
+        public string? UserEmail { get; set; } = "";
+        public string? UserCostCenter { get; set; } = "";
+        public string UserFullName { get; set; } = "";
+
+        public void GoToLogin()
+        {
+            Navigation.NavigateTo("/login");
+        }
         #endregion
 
         #region Page Events
@@ -141,92 +158,117 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             // Initialize the EditContext 
             _editContext = new EditContext(_shiftPattern);                        
+        }
 
-            if (ActionType == ActionTypes.Edit.ToString() ||
-                ActionType == ActionTypes.View.ToString())
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
             {
-                _isDisabled = true;
+                bool isAuthenticated = UserSession.IsAuthenticated();
+                if (!isAuthenticated)
+                {
+                    // Refresh the user session
+                    await UserSession.InitializeAsync();
+                    isAuthenticated = UserSession.IsAuthenticated();
+                }
 
-                if (ShiftPatternId > 0)
-                    BeginGetShiftRosterDetail();
+                if (isAuthenticated)
+                {
+                    UserId = UserSession.CurrentUser!.UserId;
+                    UserName = UserSession.CurrentUser!.Username;
+                    UserEmpNo = UserSession.CurrentUser!.UserEmpNo;
+                    UserFullName = UserSession.CurrentUser!.UserFullName;
+                    UserEmail = UserSession.CurrentUser!.EmailAddress;
+                    UserCostCenter = UserSession.CurrentUser!.CostCenter;
+
+                    if (ActionType == ActionTypes.Edit.ToString() ||
+                        ActionType == ActionTypes.View.ToString())
+                    {
+                        _isDisabled = true;
+
+                        if (ShiftPatternId > 0)
+                            BeginGetShiftRosterDetail();
+                    }
+                    else if (ActionType == ActionTypes.Add.ToString())
+                    {
+                        _isDisabled = false;
+                        _saveBtnEnabled = true;
+                        _allowGridEdit = true;
+                    }
+
+                    // For demo, initialize default selection
+                    _selectedTimingForSchedule = _shiftTimingLookup.Keys.FirstOrDefault();
+                    //_selectedTimingForSequence = _shiftTimingLookup.Keys.FirstOrDefault();
+
+                    #region Populate shift master list
+                    _shiftMasterList.Add(new ShiftMasterDTO()
+                    {
+                        ShiftCode = "D",
+                        ShiftDescription = "Day",
+                        ArrivalFrom = new TimeSpan(6, 0, 0),
+                        ArrivalTo = new TimeSpan(7, 30, 0),
+                        DepartFrom = new TimeSpan(16, 0, 0),
+                        DepartTo = new TimeSpan(16, 30, 0),
+                        DurationNormal = 8,
+                        RArrivalFrom = new TimeSpan(6, 0, 0),
+                        RArrivalTo = new TimeSpan(7, 30, 0),
+                        RDepartFrom = new TimeSpan(13, 30, 0),
+                        RDepartTo = new TimeSpan(14, 00, 0),
+                        DurationRamadan = 6
+                    });
+
+                    _shiftMasterList.Add(new ShiftMasterDTO()
+                    {
+                        ShiftCode = "M",
+                        ShiftDescription = "Morning",
+                        ArrivalFrom = new TimeSpan(6, 0, 0),
+                        ArrivalTo = new TimeSpan(7, 0, 0),
+                        DepartFrom = new TimeSpan(15, 0, 0),
+                        DepartTo = new TimeSpan(15, 30, 0),
+                        DurationNormal = 8,
+                        RArrivalFrom = new TimeSpan(6, 0, 0),
+                        RArrivalTo = new TimeSpan(7, 0, 0),
+                        RDepartFrom = new TimeSpan(13, 0, 0),
+                        RDepartTo = new TimeSpan(13, 30, 0),
+                        DurationRamadan = 6
+                    });
+
+                    _shiftMasterList.Add(new ShiftMasterDTO()
+                    {
+                        ShiftCode = "E",
+                        ShiftDescription = "Evening",
+                        ArrivalFrom = new TimeSpan(14, 0, 0),
+                        ArrivalTo = new TimeSpan(15, 0, 0),
+                        DepartFrom = new TimeSpan(23, 0, 0),
+                        DepartTo = new TimeSpan(23, 30, 0),
+                        DurationNormal = 8,
+                        RArrivalFrom = new TimeSpan(14, 0, 0),
+                        RArrivalTo = new TimeSpan(15, 0, 0),
+                        RDepartFrom = new TimeSpan(21, 0, 0),
+                        RDepartTo = new TimeSpan(21, 30, 0),
+                        DurationRamadan = 6
+                    });
+
+                    _shiftMasterList.Add(new ShiftMasterDTO()
+                    {
+                        ShiftCode = "N",
+                        ShiftDescription = "Night",
+                        ArrivalFrom = new TimeSpan(22, 0, 0),
+                        ArrivalTo = new TimeSpan(23, 0, 0),
+                        DepartFrom = new TimeSpan(7, 0, 0),
+                        DepartTo = new TimeSpan(7, 30, 0),
+                        DurationNormal = 8,
+                        RArrivalFrom = new TimeSpan(22, 0, 0),
+                        RArrivalTo = new TimeSpan(23, 0, 0),
+                        RDepartFrom = new TimeSpan(5, 0, 0),
+                        RDepartTo = new TimeSpan(5, 30, 0),
+                        DurationRamadan = 6
+                    });
+                    #endregion
+                }
+                else
+                    GoToLogin();
             }
-            else if (ActionType == ActionTypes.Add.ToString())
-            {
-                _isDisabled = false;
-                _saveBtnEnabled = true;
-                _allowGridEdit = true;
-            }
-
-                // example: load existing master record (or keep empty for new)
-                // For demo, initialize default selection
-                _selectedTimingForSchedule = _shiftTimingLookup.Keys.FirstOrDefault();
-            //_selectedTimingForSequence = _shiftTimingLookup.Keys.FirstOrDefault();
-
-            #region Populate shift master list
-            _shiftMasterList.Add(new ShiftMasterDTO()
-            {
-                ShiftCode = "D",
-                ShiftDescription = "Day",
-                ArrivalFrom = new TimeSpan(6,0,0),
-                ArrivalTo = new TimeSpan(7, 30, 0),
-                DepartFrom = new TimeSpan(16, 0, 0),
-                DepartTo = new TimeSpan(16, 30, 0),
-                DurationNormal = 8,
-                RArrivalFrom = new TimeSpan(6, 0, 0),
-                RArrivalTo = new TimeSpan(7, 30, 0),
-                RDepartFrom = new TimeSpan(13, 30, 0),
-                RDepartTo = new TimeSpan(14, 00, 0),
-                DurationRamadan = 6
-            });
-
-            _shiftMasterList.Add(new ShiftMasterDTO()
-            {
-                ShiftCode = "M",
-                ShiftDescription = "Morning",
-                ArrivalFrom = new TimeSpan(6, 0, 0),
-                ArrivalTo = new TimeSpan(7, 0, 0),
-                DepartFrom = new TimeSpan(15, 0, 0),
-                DepartTo = new TimeSpan(15, 30, 0),
-                DurationNormal = 8,
-                RArrivalFrom = new TimeSpan(6, 0, 0),
-                RArrivalTo = new TimeSpan(7, 0, 0),
-                RDepartFrom = new TimeSpan(13, 0, 0),
-                RDepartTo = new TimeSpan(13, 30, 0),
-                DurationRamadan = 6
-            });
-
-            _shiftMasterList.Add(new ShiftMasterDTO()
-            {
-                ShiftCode = "E",
-                ShiftDescription = "Evening",
-                ArrivalFrom = new TimeSpan(14, 0, 0),
-                ArrivalTo = new TimeSpan(15, 0, 0),
-                DepartFrom = new TimeSpan(23, 0, 0),
-                DepartTo = new TimeSpan(23, 30, 0),
-                DurationNormal = 8,
-                RArrivalFrom = new TimeSpan(14, 0, 0),
-                RArrivalTo = new TimeSpan(15, 0, 0),
-                RDepartFrom = new TimeSpan(21, 0, 0),
-                RDepartTo = new TimeSpan(21, 30, 0),
-                DurationRamadan = 6
-            });
-
-            _shiftMasterList.Add(new ShiftMasterDTO()
-            {
-                ShiftCode = "N",
-                ShiftDescription = "Night",
-                ArrivalFrom = new TimeSpan(22, 0, 0),
-                ArrivalTo = new TimeSpan(23, 0, 0),
-                DepartFrom = new TimeSpan(7, 0, 0),
-                DepartTo = new TimeSpan(7, 30, 0),
-                DurationNormal = 8,
-                RArrivalFrom = new TimeSpan(22, 0, 0),
-                RArrivalTo = new TimeSpan(23, 0, 0),
-                RDepartFrom = new TimeSpan(5, 0, 0),
-                RDepartTo = new TimeSpan(5, 30, 0),
-                DurationRamadan = 6
-            });
-            #endregion
         }
         #endregion
 

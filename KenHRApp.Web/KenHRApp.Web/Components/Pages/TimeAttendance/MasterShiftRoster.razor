@@ -1,6 +1,10 @@
 ﻿@page "/TimeAttendance/mastershiftroster"
 
-<MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-0 ps-4 fw-bolder" Style="color: #004165;">Shift Roster Detail</MudText>
+<MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
+     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Shift Roster Detail</MudText>
+     <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserFullName</MudText>
+</MudStack>
+
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
     <EditForm EditContext="@_editContext" @ref="_editForm"
         OnValidSubmit="HandleValidSubmit" 

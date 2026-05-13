@@ -126,12 +126,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         #region IPageAuthorization Implementation
         public string UserName { get; set; } = "";
-        public string? UserID { get; set; } = "";
+        public int UserEmpNo { get; set; } = 0;
         public Guid UserId { get; set; }
         public string? UserEmail { get; set; } = "";
-        public int UserEmpNo { get; set; } = 0;
         public string? UserCostCenter { get; set; } = "";
         public string UserFullName { get; set; } = "";
+        
         public void GoToLogin()
         {
             Navigation.NavigateTo("/login");

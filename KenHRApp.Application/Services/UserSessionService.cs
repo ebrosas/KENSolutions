@@ -41,10 +41,6 @@ namespace KenHRApp.Application.Services
         #endregion
 
         #region Public Methods
-        //public bool IsAuthenticated =>
-        //    _currentUser is not null &&
-        //    _currentUser.IsAuthenticated;
-
         public bool IsAuthenticated()
         {
             bool isAuthenticated = _currentUser is not null && _currentUser.IsAuthenticated;
@@ -109,24 +105,6 @@ namespace KenHRApp.Application.Services
                 _semaphore.Release();
             }
         }
-
-        //public void SetUser(UserSessionModel user)
-        //{
-        //    ArgumentNullException.ThrowIfNull(user);
-
-        //    lock (_lock)
-        //    {
-        //        _currentUser = user;
-        //    }
-        //}
-
-        //public void Clear()
-        //{
-        //    lock (_lock)
-        //    {
-        //        _currentUser = null;
-        //    }
-        //}
         #endregion        
     }
 }

@@ -157,6 +157,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             if (firstRender)
             {
+                #region Old authentication Logic
                 //if (!State.IsAuthenticated)
                 //    GoToLogin();
 
@@ -174,6 +175,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 //    BeginGetAttendanceSummary();
                 //}
+                #endregion
 
                 bool isAuthenticated = UserSession.IsAuthenticated();
                 if (!isAuthenticated)
