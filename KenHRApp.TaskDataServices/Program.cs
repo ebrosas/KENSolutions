@@ -54,37 +54,35 @@ using Serilog;
 
     try
     {
-    //DateTime attendanceDate = DateTime.Today.AddDays(-1);
+        #region Set the attendance date to process
+        var attendanceSettings = services
+        .GetRequiredService<
+            Microsoft.Extensions.Options.IOptions<AttendanceSettings>>()
+        .Value;
 
-    #region Set the attendance date to process
-    var attendanceSettings = services
-    .GetRequiredService<
-        Microsoft.Extensions.Options.IOptions<AttendanceSettings>>()
-    .Value;
+        DateTime attendanceDate;
 
-    DateTime attendanceDate;
-
-    if (!string.IsNullOrWhiteSpace(attendanceSettings.AttendanceDate))
-    {
-        if (!DateTime.TryParse(
-                attendanceSettings.AttendanceDate,
-                out attendanceDate))
+        if (!string.IsNullOrWhiteSpace(attendanceSettings.AttendanceDate))
         {
-            throw new Exception(
-                "Invalid AttendanceDate format in appsettings.json");
+            if (!DateTime.TryParse(
+                    attendanceSettings.AttendanceDate,
+                    out attendanceDate))
+            {
+                throw new Exception(
+                    "Invalid AttendanceDate format in appsettings.json");
+            }
+
+            attendanceDate = attendanceDate.Date;
         }
+        else
+        {
+            attendanceDate = DateTime.Today
+                .AddDays(attendanceSettings.ExecutionDateOffset)
+                .Date;
+        }
+        #endregion
 
-        attendanceDate = attendanceDate.Date;
-    }
-    else
-    {
-        attendanceDate = DateTime.Today
-            .AddDays(attendanceSettings.ExecutionDateOffset)
-            .Date;
-    }
-    #endregion
-
-    logger.LogInformation(
+        logger.LogInformation(
             "Application started at {Time}",
             DateTime.Now);
 

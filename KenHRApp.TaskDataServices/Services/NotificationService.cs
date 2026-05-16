@@ -77,9 +77,6 @@ namespace KenHRApp.TaskDataServices.Services
                         _emailSettings.SenderName,
                         _emailSettings.SenderEmail));
 
-                //email.To.Add(
-                //    MailboxAddress.Parse(_emailSettings.AdminEmail));
-
                 if (!MailboxAddress.TryParse(_emailSettings.AdminEmail, out _))
                 {
                     throw new Exception("Invalid AdminEmail format.");
@@ -120,7 +117,6 @@ namespace KenHRApp.TaskDataServices.Services
 
                 throw;
             }
-            
         }
     }
 }
