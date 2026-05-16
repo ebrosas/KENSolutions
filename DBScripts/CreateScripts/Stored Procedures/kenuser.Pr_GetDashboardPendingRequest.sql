@@ -166,7 +166,7 @@ END
 
 	--Staging database
 	EXEC kenuser.Pr_GetDashboardPendingRequest
-	EXEC kenuser.Pr_GetDashboardPendingRequest 10003635		
+	EXEC kenuser.Pr_GetDashboardPendingRequest 10003632		
 	EXEC kenuser.Pr_GetDashboardPendingRequest 10003635, 'RTYPELEAVE'
 	
 	--Development database

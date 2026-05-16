@@ -230,7 +230,7 @@ END
 
 	--Staging database
 	EXEC kenuser.Pr_GetDashboardStatistics 1
-	EXEC kenuser.Pr_GetDashboardStatistics 10003635		
+	EXEC kenuser.Pr_GetDashboardStatistics 1, 10003632		
 	EXEC kenuser.Pr_GetDashboardStatistics 10003635, 'RTYPELEAVE'
 
 	EXEC kenuser.Pr_GetDashboardStatistics 2, 10003632

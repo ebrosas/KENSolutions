@@ -1,3 +1,15 @@
+/*****************************************************************************************************************************************************************************
+*	Revision History
+*
+*	Name: kenuser.Pr_GetDashboardStatistics
+*	Description: Get the list of pending, approved, rejected, and on-hold requests based on the employee number
+*
+*	Date			Author		Rev. #		Comments:
+*	27/02/2026		Ervin		1.0			Created
+*	16/05/2026		Ervin		1.1			Set the value of "CreatedDate" field to the current system date
+*
+******************************************************************************************************************************************************************************/
+
 ALTER PROCEDURE kenuser.Pr_GenerateAttendance
 (
     @AttendanceDate DATE
@@ -151,7 +163,8 @@ BEGIN
             ShiftPatCode, SchedShiftCode, ActualShiftCode,
             DurationRequired, DurationWorked,
             DurationWorkedCumulative, NetMinutes,
-            IsLastRow
+            IsLastRow, 
+			CreatedDate		--Rev. #1.1
         )
         SELECT
             ae.EmpNo,
@@ -170,7 +183,8 @@ BEGIN
             SUM(ISNULL(DATEDIFF(MINUTE, ps.TimeIn, ps.TimeOut),0))
                 OVER (PARTITION BY ae.EmpNo),
             ISNULL(DATEDIFF(MINUTE, ps.TimeIn, ps.TimeOut), 0),
-            CASE WHEN ps.PairRow = ps.TotalPairs THEN 1 ELSE 0 END
+            CASE WHEN ps.PairRow = ps.TotalPairs THEN 1 ELSE 0 END,
+			GETDATE()		--Rev. #1.1
         FROM #ActiveEmployees ae
         INNER JOIN #ShiftResolved sr ON ae.EmpNo = sr.EmpNo
         INNER JOIN #PairedSwipe ps ON ae.EmpNo = ps.EmpNo
@@ -186,7 +200,8 @@ BEGIN
             ShiftPatCode, SchedShiftCode, ActualShiftCode,
             DurationRequired,
             DurationWorked, DurationWorkedCumulative,
-            NetMinutes, RemarkCode, IsLastRow
+            NetMinutes, RemarkCode, IsLastRow, 
+			CreatedDate		--Rev. #1.1
         )
         SELECT
             ae.EmpNo,
@@ -199,7 +214,8 @@ BEGIN
             sr.DurationNormal,
             0, 0, 0,
             'A',
-            1
+            1,
+			GETDATE()		--Rev. #1.1
         FROM #ActiveEmployees ae
         INNER JOIN #ShiftResolved sr ON ae.EmpNo = sr.EmpNo
         LEFT JOIN #PairedSwipe ps ON ae.EmpNo = ps.EmpNo
@@ -217,7 +233,8 @@ BEGIN
             SchedShiftCode, ActualShiftCode,
             DurationRequired,
             DurationWorked, DurationWorkedCumulative,
-            NetMinutes, AbsenceReasonColumn, IsLastRow
+            NetMinutes, AbsenceReasonColumn, IsLastRow, 
+			CreatedDate		--Rev. #1.1
         )
         SELECT
             ae.EmpNo,
@@ -230,7 +247,8 @@ BEGIN
             0,
             0, 0, 0,
             'Day-off',
-            1
+            1,
+			GETDATE()		--Rev. #1.1
         FROM #ActiveEmployees ae
         INNER JOIN #ShiftResolved sr ON ae.EmpNo = sr.EmpNo
         LEFT JOIN #PairedSwipe ps ON ae.EmpNo = ps.EmpNo
@@ -249,7 +267,8 @@ BEGIN
             SchedShiftCode, ActualShiftCode,
             DurationRequired,
             DurationWorked, DurationWorkedCumulative,
-            NetMinutes, IsLastRow
+            NetMinutes, IsLastRow, 
+			CreatedDate		--Rev. #1.1
         )
         SELECT
             ae.EmpNo,
@@ -268,7 +287,8 @@ BEGIN
             SUM(ISNULL(DATEDIFF(MINUTE, ps.TimeIn, ps.TimeOut),0))
                 OVER (PARTITION BY ae.EmpNo),
             ISNULL(DATEDIFF(MINUTE, ps.TimeIn, ps.TimeOut), 0),
-            CASE WHEN ps.PairRow = ps.TotalPairs THEN 1 ELSE 0 END
+            CASE WHEN ps.PairRow = ps.TotalPairs THEN 1 ELSE 0 END,
+			GETDATE()		--Rev. #1.1
         FROM #ActiveEmployees ae
         INNER JOIN #ShiftResolved sr ON ae.EmpNo = sr.EmpNo
         INNER JOIN #PairedSwipe ps ON ae.EmpNo = ps.EmpNo
@@ -292,7 +312,7 @@ END
 
 /*	Testing:
 
-	EXEC kenuser.Pr_GenerateAttendance '03/01/2026'
+	EXEC kenuser.Pr_GenerateAttendance '05/14/2026'
 	EXEC kenuser.Pr_GenerateAttendance '03/02/2026'
 	EXEC kenuser.Pr_GenerateAttendance '03/03/2026'
 	EXEC kenuser.Pr_GenerateAttendance '03/04/2026'

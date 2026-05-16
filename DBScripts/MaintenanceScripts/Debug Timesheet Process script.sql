@@ -19,6 +19,10 @@
 	ORDER BY a.EmpNo, a.AttendanceDate DESC
 
 	SELECT * FROM [kenuser].[AttendanceTimesheet] a
+	WHERE a.AttendanceDate = '05/15/2026'
+	ORDER BY a.EmpNo, a.AttendanceDate DESC
+
+	SELECT * FROM [kenuser].[AttendanceTimesheet] a
 	WHERE a.EmpNo = 10003632
 		AND MONTH(a.AttendanceDate) = 3
 	ORDER BY a.AttendanceDate DESC

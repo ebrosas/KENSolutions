@@ -336,18 +336,20 @@
                                 <MudIconButton title="Edit leave entitlement"
                                     Color="Color.Info"
                                     Icon="@Icons.Material.Rounded.Edit"
+                                               Size="Size.Small"
                                     OnClick="() => EditEntitlementAsync(row.Item)">
-                                    <ChildContent>
+                                    @* <ChildContent>
                                         <i class="fas fa-edit fa-sm"></i>
-                                    </ChildContent>
+                                    </ChildContent> *@
                                 </MudIconButton>
                                 <MudIconButton Color="Color.Error" 
                                     title="Delete leeve entitlement"
                                     Icon="@Icons.Material.Rounded.DeleteForever"
+                                               Size="Size.Small"
                                     OnClick="() => ConfirmDelete(row.Item)">
-                                    <ChildContent>
+                                    @* <ChildContent>
                                         <i class="fas fa-trash-alt fa-sm"></i>
-                                    </ChildContent>
+                                    </ChildContent> *@
                                 </MudIconButton>
                             </CellTemplate>
                         </TemplateColumn>

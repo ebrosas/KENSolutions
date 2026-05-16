@@ -319,12 +319,10 @@
                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                              <CellTemplate Context="row">
                                  <MudIconButton title="View leave information"
-                                                Class="show-btn fa-icon-btn"
-                                               Color="Color.Info"
-                                                OnClick="@row.Actions.StartEditingItemAsync">
-                                     <ChildContent>
-                                        <i class="fas fa-info fa-lg"></i>
-                                     </ChildContent>
+                                    Class="show-btn fa-icon-btn"
+                                    Color="Color.Info" Size="Size.Small"
+                                    Icon="@Icons.Material.Rounded.Edit"
+                                    OnClick="@row.Actions.StartEditingItemAsync">
                                  </MudIconButton>
                                  <MudIconButton Color="Color.Error" hidden title="Delete department record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
                                      <ChildContent>
