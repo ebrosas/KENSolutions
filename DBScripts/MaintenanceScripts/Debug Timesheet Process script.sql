@@ -19,18 +19,20 @@
 	ORDER BY a.EmpNo, a.AttendanceDate DESC
 
 	SELECT * FROM [kenuser].[AttendanceTimesheet] a
-	WHERE a.AttendanceDate = '05/15/2026'
+	WHERE a.AttendanceDate = '05/10/2026'
 	ORDER BY a.EmpNo, a.AttendanceDate DESC
+
+	SELECT * FROM [kenuser].[AttendanceSwipeLog] a
+	--WHERE a.SwipeDate = '02/07/2026'
+	WHERE a.EmpNo = 10003632
+	ORDER BY a.EmpNo, a.SwipeDate DESC, a.SwipeTime
 
 	SELECT * FROM [kenuser].[AttendanceTimesheet] a
 	WHERE a.EmpNo = 10003632
 		AND MONTH(a.AttendanceDate) = 3
 	ORDER BY a.AttendanceDate DESC
 
-	SELECT * FROM [kenuser].[AttendanceSwipeLog] a
-	--WHERE a.SwipeDate = '02/07/2026'
-	WHERE a.EmpNo = 10003633
-	ORDER BY a.EmpNo, a.SwipeDate, a.SwipeTime
+	
 
 /*
 
