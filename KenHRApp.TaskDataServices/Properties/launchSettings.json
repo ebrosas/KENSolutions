@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "KenHRApp.TaskDataServices": {
+      "commandName": "Project",
+      "commandLineArgs": "TIMESHEET"
+    }
+  }
+}

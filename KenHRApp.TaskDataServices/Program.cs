@@ -8,100 +8,119 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-    var builder = Host.CreateApplicationBuilder(args);
+var builder = Host.CreateApplicationBuilder(args);
 
-    builder.Configuration
-        .SetBasePath(AppContext.BaseDirectory)
-        .AddJsonFile(
-            "appsettings.json",
-            optional: false,
-            reloadOnChange: true);
+builder.Configuration
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile(
+        "appsettings.json",
+        optional: false,
+        reloadOnChange: true);
 
-    Log.Logger = new LoggerConfiguration()
-        .WriteTo.File(
-            path: builder.Configuration["Serilog:LogPath"]!,
-            rollingInterval: RollingInterval.Day,
-            retainedFileCountLimit: 30)
-        .CreateLogger();
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.File(
+        path: builder.Configuration["Serilog:LogPath"]!,
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30)
+    .CreateLogger();
 
-    builder.Logging.ClearProviders();
-    builder.Logging.AddSerilog();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog();
 
-    builder.Services.Configure<AttendanceSettings>(
-        builder.Configuration.GetSection("AttendanceSettings"));
+builder.Services.Configure<EnvironmentSettings>(
+    builder.Configuration.GetSection("EnvironmentSettings"));
 
-    builder.Services.Configure<EmailSettings>(
-        builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<AttendanceSettings>(
+    builder.Configuration.GetSection("AttendanceSettings"));
 
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.Configure<PayrollSettings>(
+    builder.Configuration.GetSection("PayrollSettings"));
+
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+
+var environmentSettings = builder.Configuration
+    .GetSection("EnvironmentSettings")
+    .Get<EnvironmentSettings>();
+
+string connectionString;
+
+switch(environmentSettings!.Environment )
+{
+    case "Production":
+        connectionString = builder.Configuration
+            .GetConnectionString("ProductionDB")!;
+        break;
+
+    case "Staging":
+        connectionString = builder.Configuration
+            .GetConnectionString("StagingDB")!;
+        break;
+
+    case "Development":
+        connectionString = builder.Configuration
+            .GetConnectionString("DevelopmentDB")!;
+        break;
+
+    default:
+        throw new Exception($"Unsupported environment: {environmentSettings.Environment}");
+}
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(connectionString);
+});
+
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IJobService, AttendanceService>();
+builder.Services.AddScoped<IJobService, PayrollService>();
+
+var app = builder.Build();
+
+using var scope = app.Services.CreateScope();
+
+var services = scope.ServiceProvider;
+
+var logger = services.GetRequiredService<ILogger<Program>>();
+
+try
+{
+    if (args.Length == 0)
     {
-        options.UseSqlServer(
-            builder.Configuration.GetConnectionString("DefaultConnection"));
-    });
-
-    builder.Services.AddScoped<IAttendanceService, AttendanceService>();
-    builder.Services.AddScoped<INotificationService, NotificationService>();
-
-    var app = builder.Build();
-
-    using var scope = app.Services.CreateScope();
-
-    var services = scope.ServiceProvider;
-
-    var logger = services.GetRequiredService<ILogger<Program>>();
-    var attendanceService = services.GetRequiredService<IAttendanceService>();
-    var notificationService = services.GetRequiredService<INotificationService>();
-
-    try
-    {
-        #region Set the attendance date to process
-        var attendanceSettings = services
-        .GetRequiredService<
-            Microsoft.Extensions.Options.IOptions<AttendanceSettings>>()
-        .Value;
-
-        DateTime attendanceDate;
-
-        if (!string.IsNullOrWhiteSpace(attendanceSettings.AttendanceDate))
-        {
-            if (!DateTime.TryParse(
-                    attendanceSettings.AttendanceDate,
-                    out attendanceDate))
-            {
-                throw new Exception(
-                    "Invalid AttendanceDate format in appsettings.json");
-            }
-
-            attendanceDate = attendanceDate.Date;
-        }
-        else
-        {
-            attendanceDate = DateTime.Today
-                .AddDays(attendanceSettings.ExecutionDateOffset)
-                .Date;
-        }
-        #endregion
-
-        logger.LogInformation(
-            "Application started at {Time}",
-            DateTime.Now);
-
-        await attendanceService.ExecuteAttendanceGenerationAsync(attendanceDate);
-
-        await notificationService
-            .SendSuccessNotificationAsync(attendanceDate);
-
-        logger.LogInformation(
-            "Application completed successfully.");
+        throw new Exception(
+            "Execution key parameter is missing.");
     }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "Application execution failed.");
 
-        await notificationService
-            .SendFailureNotificationAsync(ex);
-    }
-    finally
+    string executionKey = args[0];
+
+    logger.LogInformation(
+        "Execution Key: {ExecutionKey}",
+        executionKey);
+
+    var jobServices = services.GetServices<IJobService>();
+
+    var selectedService = jobServices.FirstOrDefault(x =>
+        x.ExecutionKey.Equals(
+            executionKey,
+            StringComparison.OrdinalIgnoreCase));
+
+    if (selectedService == null)
     {
-        Log.CloseAndFlush();
+        throw new Exception(
+            $"No service found for execution key: {executionKey}");
     }
+
+    await selectedService.ExecuteAsync();
+
+    logger.LogInformation(
+        "Job execution completed successfully.");
+}
+catch (Exception ex)
+{
+    logger.LogError(ex, "Application execution failed.");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
+

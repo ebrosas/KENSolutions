@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace KenHRApp.TaskDataServices.Configurations
 {
-    public class AttendanceSettings
+    public class PayrollSettings
     {
         #region Properties
         public string ExecutionKey { get; set; } = string.Empty;
-        public int ExecutionDateOffset { get; set; }
-        public string? AttendanceDate { get; set; }
         #endregion
     }
 }

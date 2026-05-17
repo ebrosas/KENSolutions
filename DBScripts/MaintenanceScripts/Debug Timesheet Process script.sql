@@ -19,7 +19,7 @@
 	ORDER BY a.EmpNo, a.AttendanceDate DESC
 
 	SELECT * FROM [kenuser].[AttendanceTimesheet] a
-	WHERE a.AttendanceDate = '05/10/2026'
+	WHERE a.AttendanceDate = '05/16/2026'
 	ORDER BY a.EmpNo, a.AttendanceDate DESC
 
 	SELECT * FROM [kenuser].[AttendanceSwipeLog] a
@@ -39,7 +39,7 @@
 	BEGIN TRAN T1
 
 	DELETE FROM [kenuser].[AttendanceTimesheet] 
-	WHERE AttendanceDate = '02/07/2026'
+	WHERE AttendanceDate = '05/16/2026'
 
 	UPDATE [kenuser].[AttendanceSwipeLog] 
 	SET EmpNo = 10003633,
