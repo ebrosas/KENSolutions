@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KenHRApp.Web", "KenHRApp.We
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KenHRApp.Web.Client", "KenHRApp.Web\KenHRApp.Web.Client\KenHRApp.Web.Client.csproj", "{DBEF9DE5-07DB-4451-ABCC-20B000552C34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KenHRApp.TaskDataServices", "KenHRApp.TaskDataServices\KenHRApp.TaskDataServices.csproj", "{016F5053-F84D-425C-BC24-B3A42FE896AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KenHRApp.TaskDataServices", "KenHRApp.TaskDataServices\KenHRApp.TaskDataServices.csproj", "{016F5053-F84D-425C-BC24-B3A42FE896AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
