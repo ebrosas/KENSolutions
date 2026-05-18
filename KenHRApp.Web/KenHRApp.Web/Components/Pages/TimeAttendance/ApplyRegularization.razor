@@ -130,8 +130,8 @@
         </MudPaper>
 
         <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
-            <MudGrid Spacing="3" Class="px-2">
-                <MudItem xs="12" sm="4">
+            <MudGrid Spacing="10" Class="px-2">
+                <MudItem xs="12" sm="3">
                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" 
                         StretchItems="StretchItems.Start" Spacing="0">
                         <MudPaper Elevation="0" Class="pa-0 w-100">
@@ -142,7 +142,7 @@
                                         Color="Color.Dark" 
                                         Rounded="true"
                                         Elevation="0"
-                                        Orientation="@_calOrientation" 
+                                        Orientation="Orientation.Portrait" 
                                         Date="@_selectedDate"
                                         DateChanged="OnDateChanged"
                                         Style="@_pickerStyle"
@@ -154,7 +154,45 @@
                     </MudStack>
                 </MudItem>
 
-                <MudItem xs="12" sm="8">
+                <MudItem xs="12" sm="9">
+                    <MudPaper Elevation="0" Square="true" Class="w-100 px-2 mt-0">
+                        <MudGrid Spacing="5" Class="mt-0">
+                            <MudItem xs="6">
+                                <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                    <MudText Typo="Typo.subtitle2" Class="fw-bold">Date:</MudText>
+                                    <MudText Typo="Typo.body2">
+                                        @($"{_selectedDate!.Value.Day}{GetOrdinal(_selectedDate!.Value.Day)} {_selectedDate!.Value:MMMM yyyy}")
+                                    </MudText>
+                                </MudStack>
+                            </MudItem>  
+                                <MudItem xs="6">
+                                    <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                        <MudText Typo="Typo.subtitle2" Class="fw-bold">Shift Description:</MudText>
+                                        <MudText Typo="Typo.body2">
+                                            @_regularRequest.ShiftDescription
+                                        </MudText>
+                                    </MudStack>
+                                </MudItem>
+                        </MudGrid>
+                            <MudGrid Spacing="5" Class="mt-0">
+                                <MudItem xs="6">
+                                    <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                        <MudText Typo="Typo.subtitle2" Class="fw-bold">Actual Timing:</MudText>
+                                        <MudText Typo="Typo.body2">
+                                            @_regularRequest.ActualTiming
+                                        </MudText>
+                                    </MudStack>
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                        <MudText Typo="Typo.subtitle2" Class="fw-bold">Scheduled Timing:</MudText>
+                                        <MudText Typo="Typo.body2">
+                                            @_regularRequest.ShiftTiming
+                                        </MudText>
+                                    </MudStack>
+                                </MudItem>
+                            </MudGrid>
+                    </MudPaper>
                 </MudItem>
             </MudGrid>
         </div>

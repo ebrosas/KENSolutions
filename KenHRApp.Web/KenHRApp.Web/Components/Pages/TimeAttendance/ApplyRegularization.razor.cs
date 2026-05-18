@@ -81,7 +81,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Objects and Collections       
-        private RegularizationRequestDTO _regularizationRequest = new();
+        private RegularizationRequestDTO _regularRequest = new();
         private IReadOnlyList<IBrowserFile> _files = Array.Empty<IBrowserFile>();
         private MudSelect<string> _endDayMode = new();
         private MudSelect<string> _startDayMode = new();
@@ -204,8 +204,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Page Events
         protected override void OnInitialized()
         {
+            #region Initialize _regularRequest for testing purpose
+            _regularRequest = new RegularizationRequestDTO()
+            {
+                RegularizedRequestId = 1,
+                AttendanceDate = DateTime.Today,
+                ShiftPattern = "D8",
+                ShiftDescription = "Shift timing for Admin employees",
+                ShiftTiming = "08:00 AM - 04:30 PM",
+                ActualTiming = "07:45 AM - 05:00 PM",
+                WorkDuration = 520
+            };
+            #endregion
+
             // Initialize the EditContext 
-            _editContext = new EditContext(_regularizationRequest);
+            _editContext = new EditContext(_regularRequest);
 
             if (ActionType == ActionTypes.Edit.ToString() ||
                 ActionType == ActionTypes.View.ToString())
@@ -241,9 +254,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     UserCostCenter = UserSession.CurrentUser!.CostCenter;
 
                     // Initialize the Leave Request object
-                    _regularizationRequest.CreatedBy = UserEmpNo;
-                    _regularizationRequest.CreatedEmail = UserEmail;
-                    _regularizationRequest.CreatedUserID = UserName;
+                    _regularRequest.CreatedBy = UserEmpNo;
+                    _regularRequest.CreatedEmail = UserEmail;
+                    _regularRequest.CreatedUserID = UserName;
 
                     //BeginLoadComboboxTask();
                 }
@@ -265,7 +278,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             try
             {
                 //#region Check if Leave Start Date is public holiday or not
-                //bool isStartDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_regularizationRequest.LeaveStartDate!.Value).Result;
+                //bool isStartDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_regularRequest.LeaveStartDate!.Value).Result;
                 //if (isStartDateHoliday)
                 //{
                 //    _hasValidationError = true;
@@ -274,7 +287,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 //#endregion
 
                 //#region Check if Leave Resume Date is public holiday or not
-                //bool isResumeDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_regularizationRequest.LeaveResumeDate!.Value).Result;
+                //bool isResumeDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_regularRequest.LeaveResumeDate!.Value).Result;
                 //if (isResumeDateHoliday)
                 //{
                 //    _hasValidationError = true;
@@ -284,8 +297,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 //#region Check if leave period exist
                 //bool isLeaveExist = LeaveService.CheckIfLeavePeriodExistAsync(
-                //    _regularizationRequest.LeaveEmpNo,
-                //    _regularizationRequest.LeaveResumeDate!.Value).Result;
+                //    _regularRequest.LeaveEmpNo,
+                //    _regularRequest.LeaveResumeDate!.Value).Result;
                 //if (isLeaveExist)
                 //{
                 //    _hasValidationError = true;
@@ -313,12 +326,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 //    // Shows the spinner overlay
                 //    await InvokeAsync(StateHasChanged);
 
-                //    if (_regularizationRequest.LeaveRequestId > 0)
+                //    if (_regularRequest.LeaveRequestId > 0)
                 //    {
                 //        // Initiate the workflow
-                //        await InitializeWorkflowAsync(_regularizationRequest.LeaveRequestId, _regularizationRequest.LeaveEmpNo);
+                //        await InitializeWorkflowAsync(_regularRequest.LeaveRequestId, _regularRequest.LeaveEmpNo);
 
-                //        BeginLoadLeaveRequest(_regularizationRequest.LeaveRequestId);
+                //        BeginLoadLeaveRequest(_regularRequest.LeaveRequestId);
                 //    }
                 //});
             }
@@ -395,10 +408,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private async Task HandleRefreshButton()
         {
             // Reset Leave Request object
-            _regularizationRequest = new();
-            _regularizationRequest.CreatedBy = UserEmpNo;
-            _regularizationRequest.CreatedEmail = UserEmail;
-            _regularizationRequest.CreatedUserID = UserName;
+            _regularRequest = new();
+            _regularRequest.CreatedBy = UserEmpNo;
+            _regularRequest.CreatedEmail = UserEmail;
+            _regularRequest.CreatedUserID = UserName;
 
             #region Reset file attachments
             _files = Array.Empty<IBrowserFile>();
@@ -566,7 +579,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Delete"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to delete Regularization Request No. '{request.RegularizationRequestId}'?" },
+                { "ContentText", $"Are you sure you want to delete Regularization Request No. '{request.RegularizedRequestId}'?" },
                 { "ConfirmText", "Delete" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -679,7 +692,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Cancel"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to cancel leave requsition no. '{_regularizationRequest.RegularizationRequestId}'?" },
+                { "ContentText", $"Are you sure you want to cancel leave requsition no. '{_regularRequest.RegularizedRequestId}'?" },
                 { "ConfirmText", "Proceed" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -698,7 +711,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                //BeginLeaveCancellation(_regularizationRequest);
+                //BeginLeaveCancellation(_regularRequest);
             }
         }
 
@@ -718,18 +731,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private void OnDateChanged(DateTime? date)
         {
-            //_isRunning = true;
+            _selectedDate = date;
+        }
 
-            // Set the overlay message
-            overlayMessage = "Loading attendance details, please wait...";
+        private string GetOrdinal(int day)
+        {
+            if (day >= 11 && day <= 13)
+                return "th";
 
-            //_ = GetAttendanceDetail(async () =>
-            //{
-            //    //_isRunning = false;
-
-            //    // Shows the spinner overlay
-            //    await InvokeAsync(StateHasChanged);
-            //}, date);
+            return (day % 10) switch
+            {
+                1 => "st",
+                2 => "nd",
+                3 => "rd",
+                _ => "th"
+            };
         }
         #endregion
     }
