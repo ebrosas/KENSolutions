@@ -323,9 +323,10 @@
              </MudPaper>
 
              <MudScrollToTop TopOffset="100"
-                             Selector="#mainPanel"
-                             VisibleCssClass="visible absolute"
-                             HiddenCssClass="hidden absolute">
+                    Style="position: fixed !important;bottom: 20px;left: 50%;transform: translateX(-50%);right: auto !important;z-index: 2000;"
+                    Selector="#mainPanel"
+                    VisibleCssClass="visible absolute"
+                    HiddenCssClass="hidden absolute">
                  <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
              </MudScrollToTop>
         </div>        

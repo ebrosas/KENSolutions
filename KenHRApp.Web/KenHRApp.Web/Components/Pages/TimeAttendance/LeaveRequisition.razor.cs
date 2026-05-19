@@ -87,7 +87,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Apply Leave", href: null, disabled: true, @Icons.Material.Filled.CardTravel)
+            new("Leave Request", href: null, disabled: true, @Icons.Material.Filled.CardTravel)
         ];
 
         private string[]? _leaveTypeArray = null;

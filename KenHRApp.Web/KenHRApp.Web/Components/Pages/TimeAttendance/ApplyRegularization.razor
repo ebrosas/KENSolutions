@@ -131,7 +131,7 @@
 
         <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
             <MudGrid Spacing="10" Class="px-2">
-                <MudItem xs="12" sm="3">
+                <MudItem sm="12" md="3">
                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" 
                         StretchItems="StretchItems.Start" Spacing="0">
                         <MudPaper Elevation="0" Class="pa-0 w-100">
@@ -142,7 +142,7 @@
                                         Color="Color.Dark" 
                                         Rounded="true"
                                         Elevation="0"
-                                        Orientation="Orientation.Portrait" 
+                                        Orientation="@_calOrientation"
                                         Date="@_selectedDate"
                                         DateChanged="OnDateChanged"
                                         Style="@_pickerStyle"
@@ -154,8 +154,28 @@
                     </MudStack>
                 </MudItem>
 
-                <MudItem xs="12" sm="9">
-                    <MudPaper Elevation="0" Square="true" Class="w-100 px-2 mt-0">
+                <MudItem sm="12" md="9">
+                    <MudPaper Elevation="0" Square="true" Class="w-100 px-5 mt-0">
+                        <MudGrid Spacing="5" Class="my-0 py-0">
+                            <MudItem xs="6">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_regularRequest.EmployeeFullName"
+                                                     SearchFunc="SearchEmployee!"
+                                                     Variant="Variant.Text"
+                                                     Label="Select Employee"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
+                                                     Disabled="@_isDisabled"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="6">
+                                
+                            </MudItem>
+                        </MudGrid>
                         <MudGrid Spacing="5" Class="mt-0">
                             <MudItem xs="6">
                                 <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
@@ -165,33 +185,115 @@
                                     </MudText>
                                 </MudStack>
                             </MudItem>  
-                                <MudItem xs="6">
-                                    <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                        <MudText Typo="Typo.subtitle2" Class="fw-bold">Shift Description:</MudText>
-                                        <MudText Typo="Typo.body2">
-                                            @_regularRequest.ShiftDescription
-                                        </MudText>
-                                    </MudStack>
-                                </MudItem>
+                            <MudItem xs="6">
+                                <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                    <MudText Typo="Typo.subtitle2" Class="fw-bold">Shift Name:</MudText>
+                                    <MudText Typo="Typo.body2">
+                                        @_regularRequest.ShiftDetails
+                                    </MudText>
+                                </MudStack>
+                            </MudItem>
                         </MudGrid>
-                            <MudGrid Spacing="5" Class="mt-0">
-                                <MudItem xs="6">
-                                    <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                        <MudText Typo="Typo.subtitle2" Class="fw-bold">Actual Timing:</MudText>
-                                        <MudText Typo="Typo.body2">
-                                            @_regularRequest.ActualTiming
-                                        </MudText>
-                                    </MudStack>
-                                </MudItem>
-                                <MudItem xs="6">
-                                    <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                        <MudText Typo="Typo.subtitle2" Class="fw-bold">Scheduled Timing:</MudText>
-                                        <MudText Typo="Typo.body2">
-                                            @_regularRequest.ShiftTiming
-                                        </MudText>
-                                    </MudStack>
-                                </MudItem>
-                            </MudGrid>
+                        <MudGrid Spacing="5" Class="mt-0">
+                            <MudItem xs="6">
+                                <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                    <MudText Typo="Typo.subtitle2" Class="fw-bold">Scheduled Timing:</MudText>
+                                    <MudText Typo="Typo.body2">
+                                        @_regularRequest.ShiftTiming
+                                    </MudText>
+                                </MudStack>
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                    <MudText Typo="Typo.subtitle2" Class="fw-bold">Actual Timing:</MudText>
+                                    <MudText Typo="Typo.body2">
+                                        @_regularRequest.ActualTiming
+                                    </MudText>
+                                </MudStack>
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Spacing="5" Class="mt-0">
+                            <MudItem xs="6">
+                                <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                    <MudText Typo="Typo.subtitle2" Class="fw-bold">Total Hours:</MudText>
+                                    <MudText Typo="Typo.body2">
+                                        @_regularRequest.TotalWorkHours
+                                    </MudText>
+                                </MudStack>
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
+                                    <MudText Typo="Typo.subtitle2" Class="fw-bold">Deficit Hours:</MudText>
+                                    <MudText Typo="Typo.body2">
+                                        @_regularRequest.TotalDeficitHours
+                                    </MudText>
+                                </MudStack>
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Spacing="5" Class="mt-0">
+                            <MudItem xs="6">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_regularRequest.ActionDescription"
+                                                     SearchFunc="SearchAction!"
+                                                     Variant="Variant.Text"
+                                                     Label="Select Action"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for action"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_actionList != null ? _actionList.Count : 10)"
+                                                     Disabled="@_isDisabled"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudAutocomplete @bind-Value="_regularRequest.ROADescription"
+                                                     SearchFunc="SearchReasonOfAbsence!"
+                                                     Variant="Variant.Text"
+                                                     Label="Select Reason"
+                                                     Margin="Margin.Normal"
+                                                     Dense="true"
+                                                     Placeholder="Please Select"
+                                                     HelperText="Type a key to search for reason"
+                                                     HelperTextOnFocus="true"
+                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                     MaxItems="@(_roaList != null ? _roaList.Count : 10)"
+                                                     Disabled="@_isDisabled"
+                                                     Modal="true" />
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Spacing="5" Class="mt-0">
+                            <MudItem xs="6">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt"
+                                        Label="Regularized In Time" Required="true" RequiredError="Regularized In Time is required"
+                                        @bind-Time="_regularRequest.RegularizedTimeIn" />
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" 
+                                                   Label="Regularized Out Time" Required="true" RequiredError="Regularized Out Time is required"
+                                        @bind-Time="_regularRequest.RegularizedTimeOut" />
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Spacing="5" Class="mt-0">
+                            <MudItem xs="12">
+                                <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudTextField @bind-Value="_regularRequest.RegularizedDescription" Label="Description"
+                                                  For="@(() => _regularRequest.RegularizedDescription)"
+                                                  HelperText="Max. text input is 500 chars."
+                                                  Variant="Variant.Text" HelperTextOnFocus="true" Counter="500" MaxLength="500" Lines="4"
+                                                  Required="true" RequiredError="Description is required"
+                                                  Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
                     </MudPaper>
                 </MudItem>
             </MudGrid>

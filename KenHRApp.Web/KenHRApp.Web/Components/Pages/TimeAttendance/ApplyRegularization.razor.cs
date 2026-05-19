@@ -81,7 +81,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Objects and Collections       
-        private RegularizationRequestDTO _regularRequest = new();
+        private RegularRequestDTO _regularRequest = new();
         private IReadOnlyList<IBrowserFile> _files = Array.Empty<IBrowserFile>();
         private MudSelect<string> _endDayMode = new();
         private MudSelect<string> _startDayMode = new();
@@ -92,11 +92,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             new("Regularization Request", href: null, disabled: true, @Icons.Material.Filled.CardTravel)
         ];
 
-        private string[]? _leaveTypeArray = null;
-        private List<UserDefinedCodeDTO> _leaveTypeList = new List<UserDefinedCodeDTO>();
+        private List<UserDefinedCodeDTO> _actionList = new List<UserDefinedCodeDTO>();
+        private string[]? _actionArray = null;
 
-        private string[]? _leaveModeArray = null;
-        private List<UserDefinedCodeDTO> _leaveModeList = new List<UserDefinedCodeDTO>();
+        private List<UserDefinedCodeDTO> _roaList = new List<UserDefinedCodeDTO>();
+        private string[]? _roaArray = null;
 
         private string[]? _employeeArray = null;
         private IReadOnlyList<EmployeeResultDTO> _employeeList = new List<EmployeeResultDTO>();
@@ -205,7 +205,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         protected override void OnInitialized()
         {
             #region Initialize _regularRequest for testing purpose
-            _regularRequest = new RegularizationRequestDTO()
+            _regularRequest = new RegularRequestDTO()
             {
                 RegularizedRequestId = 1,
                 AttendanceDate = DateTime.Today,
@@ -573,7 +573,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             //};
         }
 
-        private async Task ConfirmDelete(RegularizationRequestDTO request)
+        private async Task ConfirmDelete(RegularRequestDTO request)
         {
             var parameters = new DialogParameters
             {
@@ -642,49 +642,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             //_files.Remove(file);
             _files = _files.Where(f => f != file).ToList();
-        }
-
-        private async Task<IEnumerable<string>> SearchLeaveTypes(string value, CancellationToken token)
-        {
-            // In real life use an asynchronous function for fetching data from an api.
-            await Task.Delay(5, token);
-
-            // if text is null or empty, show complete list
-            if (string.IsNullOrEmpty(value))
-            {
-                return _leaveTypeArray!;
-            }
-
-            return _leaveTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
-        }
-
-        private async Task<IEnumerable<string>> SearchEmployee(string value, CancellationToken token)
-        {
-            // In real life use an asynchronous function for fetching data from an api.
-            await Task.Delay(5, token);
-
-            // if text is null or empty, show complete list
-            if (string.IsNullOrEmpty(value))
-            {
-                return _employeeArray!;
-            }
-
-            return _employeeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
-        }
-
-        private async Task<IEnumerable<string>> SearchLeaveMode(string value, CancellationToken token)
-        {
-            // In real life use an asynchronous function for fetching data from an api.
-            await Task.Delay(5, token);
-
-            // if text is null or empty, show complete list
-            if (string.IsNullOrEmpty(value))
-            {
-                return _leaveModeArray!;
-            }
-
-            return _leaveModeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
-        }
+        }               
 
         private async Task ConfirmCancel()
         {
@@ -717,15 +675,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private void OnBreakpointChanged(Breakpoint breakpoint)
         {
-            if (breakpoint <= Breakpoint.Md)
+            if (breakpoint <= Breakpoint.Sm)
             {
-                _calOrientation = Orientation.Portrait;
-                _pickerStyle = "width: 100%;";
+                _calOrientation = Orientation.Landscape;
+                _pickerStyle = "width: 420px; padding-top: 15px;";                
             }
             else
             {
-                _calOrientation = Orientation.Landscape;
-                _pickerStyle = "width: 420px;";
+                _calOrientation = Orientation.Portrait;
+                _pickerStyle = "width: 100%;";
             }
         }
 
@@ -746,6 +704,48 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 3 => "rd",
                 _ => "th"
             };
+        }
+
+        private async Task<IEnumerable<string>> SearchAction(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _actionArray!;
+            }
+
+            return _actionArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchReasonOfAbsence(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _roaArray!;
+            }
+
+            return _roaArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchEmployee(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _employeeArray!;
+            }
+
+            return _employeeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
         #endregion
     }

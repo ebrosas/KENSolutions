@@ -8,19 +8,27 @@ using System.Threading.Tasks;
 
 namespace KenHRApp.Application.DTOs
 {
-    public class RegularizationRequestDTO
+    public class RegularRequestDTO
     {
         #region Properties
         public long RegularizedRequestId { get; set; }       // Identity column  
+
+        public int? EmployeeNo { get; set; }
+        public string? EmployeeName { get; set; } = null;
 
         [Display(Name = "Attendance Date")]
         [DataType(DataType.Date)]
         public DateTime? AttendanceDate { get; set; }
 
-        public string? ReasonCode { get; set; } = null;
+        public string? ROACode { get; set; } = null;
 
-        [Display(Name = "Reason")]
-        public string ReasonDescription { get; set; } = null!;
+        [Display(Name = "Select Reason")]
+        public string ROADescription { get; set; } = null!;
+
+        public string? ActionCode { get; set; } = null;
+
+        [Display(Name = "Select Action")]
+        public string ActionDescription { get; set; } = null!;
 
         [Required(ErrorMessage = "Regularized In Time is required")]
         [Display(Name = "Regularized In Time")]
@@ -34,7 +42,8 @@ namespace KenHRApp.Application.DTOs
         public string? ShiftPattern { get; set; } = null;
 
         [Display(Name = "Description")]
-        public string? Description { get; set; } = null;
+        [Required(ErrorMessage = "Description is required")]
+        public string RegularizedDescription { get; set; } = null!;
 
         [Display(Name = "Shift Description")]
         public string? ShiftDescription { get; set; } = null;
@@ -46,6 +55,7 @@ namespace KenHRApp.Application.DTOs
         public string? ActualTiming { get; set; } = null;
 
         public int WorkDuration { get; set; }
+        public int NoPayHours { get; set; }
 
         [Display(Name = "Created Date")]
         [DataType(DataType.Date)]
@@ -84,6 +94,52 @@ namespace KenHRApp.Application.DTOs
                 else
                     return "0";
             }
+        }
+
+        [Display(Name = "Deficit Hours")]
+        public string TotalDeficitHours
+        {
+            get
+            {
+                if (NoPayHours > 0)
+                {
+                    TimeSpan duration = TimeSpan.FromMinutes(NoPayHours);
+                    return $"{(int)duration.TotalHours:00}:{duration.Minutes:00}";
+                }
+                else
+                    return "0";
+            }
+        }
+
+        [Display(Name = "Shift Details")]
+        public string ShiftDetails
+        {
+            get
+            {
+                if (!string.IsNullOrWhiteSpace(ShiftPattern) &&
+                    !string.IsNullOrWhiteSpace(ShiftTiming))
+                {
+                    return $"{ShiftPattern} - {ShiftTiming}";
+                }
+                else
+                    return "No shift pattern setup";
+            }
+        }
+
+        [Display(Name = "Employee Name")]
+        public string EmployeeFullName
+        {
+            get
+            {
+                if (EmployeeNo > 0 &&
+                    !string.IsNullOrWhiteSpace(EmployeeName))
+                {
+                    return $"{EmployeeNo} - {EmployeeName}";
+                }
+                else
+                    return "";
+            }
+            set { }
         }
         #endregion
     }
