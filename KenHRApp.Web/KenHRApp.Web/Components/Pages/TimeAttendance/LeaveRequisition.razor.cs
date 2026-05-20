@@ -430,7 +430,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             //    // Shows the spinner overlay
             //    await InvokeAsync(StateHasChanged);
-            //}, _shiftPattern.LeaveRequestNo);
+            //}, _shiftPattern.RegularizedRequestId);
         }
 
         private async Task HandleRefreshButton()

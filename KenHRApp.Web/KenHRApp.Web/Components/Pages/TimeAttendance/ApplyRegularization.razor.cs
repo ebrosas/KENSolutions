@@ -34,7 +34,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         [Parameter]
         [SupplyParameterFromQuery]
-        public long LeaveRequestNo { get; set; } = 0;
+        public long RegularizedRequestId { get; set; } = 0;
 
         [Parameter]
         [SupplyParameterFromQuery]
@@ -101,7 +101,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string[]? _employeeArray = null;
         private IReadOnlyList<EmployeeResultDTO> _employeeList = new List<EmployeeResultDTO>();
 
-        private List<UserDefinedCodeDTO> _leaveStatusList = new();
         private List<WorkflowDetailResultDTO> _workflowList = new List<WorkflowDetailResultDTO>();
         private Guid _calendarRenderKey = Guid.NewGuid();
         #endregion
@@ -146,8 +145,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private enum UDCKeys
         {
-            LEAVETYPES,         // Leave Request Types
-            LEAVEAPVFLAG,       // Leave Approval Flags
+            ROATYPE,            // ROA Types
+            ATTENDACT,          // Attendance Action Types
             LEAVEAPORTION,      // Leave Day Portions
             STATUS              // Leave Statuses
         }
@@ -258,7 +257,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _regularRequest.CreatedEmail = UserEmail;
                     _regularRequest.CreatedUserID = UserName;
 
-                    //BeginLoadComboboxTask();
+                    BeginLoadComboboxTask();
                 }
                 else
                     GoToLogin();
@@ -402,7 +401,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             //    // Shows the spinner overlay
             //    await InvokeAsync(StateHasChanged);
-            //}, _shiftPattern.LeaveRequestNo);
+            //}, _shiftPattern.RegularizedRequestId);
         }
 
         private async Task HandleRefreshButton()
@@ -746,6 +745,123 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
 
             return _employeeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+        #endregion
+
+        #region Database Methods
+        private void BeginLoadComboboxTask()
+        {
+            _isRunning = true;
+
+            // Set the overlay message
+            if (!UserSession.IsAuthenticated())
+                overlayMessage = "Authentication required. Redirecting to login page...";
+            else
+                overlayMessage = "Initializing form, please wait...";
+
+            _ = LoadComboboxAsync(async () =>
+            {
+                _isRunning = false;
+
+                if (_errorMessage.Length > 0)
+                    ShowHideError(true);
+
+                // Shows the spinner overlay
+                await InvokeAsync(StateHasChanged);
+
+                //if (RegularizedRequestId > 0)
+                //{
+                //    BeginLoadLeaveRequest(RegularizedRequestId);
+                //}
+            });
+        }
+
+        private async Task LoadComboboxAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(300);
+
+            #region Get employee list
+            var repoResult = await LookupCache.GetEmployeeAsync();
+            if (repoResult.Success)
+            {
+                _employeeList = repoResult.Value!;
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(repoResult.Error);
+            }
+
+            if (_employeeList != null)
+            {
+                _employeeArray = _employeeList.Select(d => d.EmployeeNameWithCostCenter).OrderBy(d => d).ToArray();
+            }
+            #endregion
+
+            #region Get all UDC group codes
+            List<UserDefinedCodeGroupDTO>? udcGroupList = new();
+            int groupID = 0;
+
+            var resultUDC = await EmployeeService.GetUserDefinedCodeGroupAsync();
+            if (resultUDC.Success)
+            {
+                udcGroupList = resultUDC!.Value;
+            }
+            else
+                _errorMessage.Append(resultUDC.Error);
+            #endregion
+
+            // Get UDC dataset
+            var result = await EmployeeService.GetUserDefinedCodeAllAsync();
+            if (result.Success)
+            {
+                var udcData = result.Value;
+                if (udcData!.Any() && udcGroupList!.Any())
+                {
+                    #region Get ROA Types
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ROATYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting ROA group id: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _roaList = udcData!.Where(a => a.GroupID == groupID && a.IsActive == true).ToList();
+                        if (_roaList != null)
+                            _roaArray = _roaList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Attendance Action Types
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ATTENDACT.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Action Types group id: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _actionList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_actionList != null)
+                            _actionArray = _actionList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
         }
         #endregion
     }

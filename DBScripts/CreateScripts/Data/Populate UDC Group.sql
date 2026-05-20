@@ -275,6 +275,18 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	--		@UDCGDesc2					= NULL,
 	--		@UDCGSpecialHandlingCode	= NULL
 
+	--Add ROA Types
+	--SELECT	@UDCGCode					= 'ROATYPE',
+	--		@UDCGDesc1					= 'Reason of Absence',
+	--		@UDCGDesc2					= NULL,
+	--		@UDCGSpecialHandlingCode	= NULL
+
+	--Add Attendance Action Types
+	--SELECT	@UDCGCode					= 'ATTENDACT',
+	--		@UDCGDesc1					= 'Attendance Action Types',
+	--		@UDCGDesc2					= NULL,
+	--		@UDCGSpecialHandlingCode	= NULL
+
 	IF @actionType = 0
 	BEGIN
 
@@ -315,6 +327,9 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 
 	SELECT * FROM [kenuser].[UserDefinedCodeGroup]
 	WHERE UDCGroupId = 2031
+
+	SELECT * FROM [kenuser].[UserDefinedCodeGroup]
+	ORDER BY UDCGDesc1
 
 	BEGIN TRAN T1
 
