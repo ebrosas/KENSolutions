@@ -11,13 +11,15 @@ using KenHRApp.Application.DTOs.TNA;
 using KenHRApp.Application.DTOs;
 using System.Text;
 using KenHRApp.Web.Components.Shared;
+using System.Collections.Generic;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
     public partial class ApplyRegularization : IPageAuthorization, IWorkflowProcess
     {
         #region Parameters and Injections
-        [Inject] private ILeaveRequestService LeaveService { get; set; } = default!;
+        [Inject] private IAttendanceService AttendanceService { get; set; } = default!;
         [Inject] private IEmployeeService EmployeeService { get; set; } = default!;
         [Inject] private IDialogService DialogService { get; set; } = default!;
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
@@ -103,6 +105,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private List<WorkflowDetailResultDTO> _workflowList = new List<WorkflowDetailResultDTO>();
         private Guid _calendarRenderKey = Guid.NewGuid();
+        private List<AttendanceSwipeDTO> _attendanceChips { get; set; } = new();
         #endregion
 
         #region Constants
@@ -204,16 +207,16 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         protected override void OnInitialized()
         {
             #region Initialize _regularRequest for testing purpose
-            _regularRequest = new RegularRequestDTO()
-            {
-                RegularizedRequestId = 1,
-                AttendanceDate = DateTime.Today,
-                ShiftPattern = "D8",
-                ShiftDescription = "Shift timing for Admin employees",
-                ShiftTiming = "08:00 AM - 04:30 PM",
-                ActualTiming = "07:45 AM - 05:00 PM",
-                WorkDuration = 520
-            };
+            //_regularRequest = new RegularRequestDTO()
+            //{
+            //    RegularizedRequestId = 1,
+            //    AttendanceDate = DateTime.Today,
+            //    ShiftPattern = "D8",
+            //    ShiftDescription = "Shift timing for Admin employees",
+            //    ShiftTiming = "08:00 AM - 04:30 PM",
+            //    ActualTiming = "07:45 AM - 05:00 PM",
+            //    WorkDuration = 520
+            //};
             #endregion
 
             // Initialize the EditContext 
@@ -686,9 +689,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private void OnDateChanged(DateTime? date)
-        {
-            _selectedDate = date;
+        private async void OnDateChanged(DateTime? date)
+        {            
+            if (date.HasValue)
+                await GetAttendanceInfoAsync(UserEmpNo, date!.Value);
         }
 
         private string GetOrdinal(int day)
@@ -761,6 +765,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             _ = LoadComboboxAsync(async () =>
             {
+                // Set the default employee to the current logged in user
+                _regularRequest.EmployeeNo = UserEmpNo;
+                _regularRequest.EmployeeName = UserFullName;
+
                 _isRunning = false;
 
                 if (_errorMessage.Length > 0)
@@ -795,7 +803,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             if (_employeeList != null)
             {
-                _employeeArray = _employeeList.Select(d => d.EmployeeNameWithCostCenter).OrderBy(d => d).ToArray();
+                _employeeArray = _employeeList.Select(d => d.EmployeeNameWithCode).OrderBy(d => d).ToArray();
             }
             #endregion
 
@@ -861,6 +869,54 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 // Hide the spinner overlay
                 await callback.Invoke();
+            }
+        }
+
+        private async Task GetAttendanceInfoAsync(int empNo, DateTime attendanceDate)
+        {
+            try
+            {
+                // Reset error
+                _errorMessage.Clear();
+                _showErrorAlert = false;
+
+                // Clear swipe data
+                _attendanceChips.Clear();
+
+                // Set calendar selected date
+                _selectedDate = attendanceDate;
+
+                var result = await AttendanceService.GetAttendanceInfoAsync(empNo, attendanceDate);
+                if (result.Success)
+                {
+                    AttendanceInfoResultDTO attendanceInfo = result.Value!;
+                    if (attendanceInfo != null)
+                    {
+                        _regularRequest.AttendanceDate = attendanceInfo.AttendanceDate;
+                        _regularRequest.ShiftPattern = attendanceInfo.ShiftRoster;
+                        _regularRequest.ShiftTiming = attendanceInfo.ShiftTiming;
+                        _regularRequest.WorkDuration = attendanceInfo.TotalWorkMinute;
+
+                        #region Populate the raw swipe chips
+                        if (attendanceInfo.SwipeLogList != null && attendanceInfo.SwipeLogList.Any())
+                            _attendanceChips.AddRange(attendanceInfo.SwipeLogList.ToList());
+                        #endregion
+
+                        // Refresh the page
+                        await InvokeAsync(StateHasChanged);
+                    }
+                }
+                else
+                {
+                    // Set the error message
+                    _errorMessage.Append(result.Error);
+
+                    ShowHideError(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
             }
         }
         #endregion

@@ -821,6 +821,55 @@ namespace KenHRApp.Application.Services
                 return Result<List<AttendanceCalendarDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching attendance calendar data from the database.");
             }
         }
+
+        public async Task<Result<AttendanceInfoResultDTO>> GetAttendanceInfoAsync(
+            int empNo,
+            DateTime attendanceDate)
+        {
+            AttendanceInfoResultDTO attendanceInfo = new AttendanceInfoResultDTO();
+
+            try
+            {
+                var repoResult = await _repository.GetAttendanceInfoAsync(empNo, attendanceDate);
+                if (!repoResult.Success)
+                {
+                    return Result<AttendanceInfoResultDTO>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null)
+                {
+                    attendanceInfo.AttendanceDate = model.AttendanceDate;
+                    attendanceInfo.EmployeeNo = model.EmployeeNo;
+                    attendanceInfo.EmployeeName = model.EmployeeName;
+                    attendanceInfo.ShiftRoster = model.ShiftRoster;
+                    attendanceInfo.ShiftRosterDesc = model.ShiftRosterDesc;
+                    attendanceInfo.ShiftTiming = model.ShiftTiming;
+                    attendanceInfo.TotalDeficitHour = model.TotalDeficitHour;
+                    attendanceInfo.TotalWorkHour = model.TotalWorkHour;
+                    attendanceInfo.TotalWorkMinute = model.TotalWorkMinute;
+
+                    if (model.SwipeLogList != null && model.SwipeLogList.Any())
+                    {
+                        attendanceInfo.SwipeLogList = model.SwipeLogList!.Select(e => new AttendanceSwipeDTO
+                        {
+                            SwipeID = e.SwipeID,
+                            EmpNo = e.EmpNo,
+                            SwipeDate = e.SwipeDate,
+                            SwipeTime = e.SwipeTime,
+                            SwipeType = e.SwipeType,
+                            SwipeLogDate = e.SwipeLogDate
+                        }).ToList();
+                    }
+                }
+
+                return Result<AttendanceInfoResultDTO>.SuccessResult(attendanceInfo);
+            }
+            catch (Exception ex)
+            {
+                return Result<AttendanceInfoResultDTO>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the attendance information from the database.");
+            }
+        }
         #endregion
     }
 }

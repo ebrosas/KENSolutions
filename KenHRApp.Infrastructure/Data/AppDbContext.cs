@@ -152,6 +152,12 @@ namespace KenHRApp.Infrastructure.Data
                 entity.HasNoKey();
                 entity.ToView(null); // prevents migration
             });
+
+            modelBuilder.Entity<AttendanceInfoResult>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView(null); // prevents migration
+            });
             #endregion
 
             #region Configure models

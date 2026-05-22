@@ -31,6 +31,10 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<AttendanceDurationResult>> GetAttendanceDurationAsync(int empNo, DateTime attendanceDate);
         Task<Result<List<PayrollPeriodResult>>> GetPayrollPeriodAsync(int fiscalYear = 0);
         Task<Result<List<AttendanceCalendarResult>>> GetAttendanceCalendarAsync(int empNo, int year, int month, CancellationToken cancellationToken);
+
+        Task<Result<AttendanceInfoResult>> GetAttendanceInfoAsync(
+            int empNo,
+            DateTime attendanceDate);
         #endregion
     }
 }

@@ -122,7 +122,7 @@ namespace KenHRApp.Application.DTOs
                     return $"{ShiftPattern} - {ShiftTiming}";
                 }
                 else
-                    return "No shift pattern setup";
+                    return "";
             }
         }
 

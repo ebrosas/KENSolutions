@@ -1,4 +1,5 @@
 ﻿using KenHRApp.Application.DTOs;
+using KenHRApp.Application.DTOs.TNA;
 using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Domain.Models.Common;
 using System;
@@ -30,6 +31,10 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<AttendanceDurationDTO>> GetAttendanceDurationAsync(int empNo, DateTime attendanceDate);
         Task<Result<List<PayrollPeriodResultDTO>>> GetPayrollPeriodAsync(int fiscalYear = 0);
         Task<Result<List<AttendanceCalendarDTO>>> GetAttendanceCalendarAsync(int empNo, int year, int month, CancellationToken cancellationToken = default);
+
+        Task<Result<AttendanceInfoResultDTO>> GetAttendanceInfoAsync(
+            int empNo,
+            DateTime attendanceDate);
         #endregion
     }
 }

@@ -206,9 +206,23 @@
                             <MudItem xs="6">
                                 <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                     <MudText Typo="Typo.subtitle2" Class="fw-bold">Actual Timing:</MudText>
-                                    <MudText Typo="Typo.body2">
+                                    @* <MudText Typo="Typo.body2">
                                         @_regularRequest.ActualTiming
-                                    </MudText>
+                                    </MudText> *@
+                                    <MudStack Justify="@Justify.Center" Class="mud-width-full">
+                                        <MudChipSet T="string" SelectedColor="Color.Default" Disabled="true"
+                                                    AllClosable="false"
+                                                    CheckMark="true" Size="Size.Small"
+                                                    SelectionMode="SelectionMode.SingleSelection">
+                                            @for (var i = 0; i < _attendanceChips.Count; i++)
+                                            {
+                                                var localIndex = i;
+                                                <MudChip Value="@_attendanceChips[localIndex].SwipeTime!.Value.ToString("hh:mm:ss tt")"
+                                                         Variant="Variant.Filled"
+                                                         Color="Color.Default" />
+                                            }
+                                        </MudChipSet>
+                                    </MudStack>
                                 </MudStack>
                             </MudItem>
                         </MudGrid>
@@ -297,6 +311,14 @@
                     </MudPaper>
                 </MudItem>
             </MudGrid>
+
+            <MudScrollToTop TopOffset="100"
+                            Style="position: fixed !important;bottom: 20px;left: 50%;transform: translateX(-50%);right: auto !important;z-index: 2000;"
+                            Selector="#mainPanel"
+                            VisibleCssClass="visible absolute"
+                            HiddenCssClass="hidden absolute">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+            </MudScrollToTop>
         </div>
     </EditForm>
 </MudContainer>

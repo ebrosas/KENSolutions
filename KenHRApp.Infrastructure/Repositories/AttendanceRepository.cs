@@ -1026,6 +1026,62 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<List<AttendanceCalendarResult>>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<AttendanceInfoResult>> GetAttendanceInfoAsync(
+            int empNo, 
+            DateTime attendanceDate)
+        {
+            AttendanceInfoResult attendanceInfo = new AttendanceInfoResult();
+
+            try
+            {
+                var model = await _db.Set<AttendanceInfoResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetAttendanceDetails @empNo = {0}, @attendanceDate = {1}",
+                    empNo, attendanceDate)
+                    .AsNoTracking()
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    attendanceInfo.AttendanceDate = model[0].AttendanceDate;
+                    attendanceInfo.EmployeeNo = model[0].EmployeeNo;
+                    attendanceInfo.EmployeeName = model[0].EmployeeName;
+                    attendanceInfo.ShiftRoster = model[0].ShiftRoster;
+                    attendanceInfo.ShiftRosterDesc = model[0].ShiftRosterDesc;
+                    attendanceInfo.ShiftTiming = model[0].ShiftTiming;
+                    attendanceInfo.TotalDeficitHour = model[0].TotalDeficitHour;
+                    attendanceInfo.TotalWorkHour = model[0].TotalWorkHour;
+                    attendanceInfo.TotalWorkMinute = model[0].TotalWorkMinute;
+
+                    #region Get the swipe logs
+                    List<AttendanceSwipeLog> swipeLogs = new List<AttendanceSwipeLog>();
+
+                    var swipeModel = await (from log in _db.AttendanceSwipeLogs
+                                            where log.EmpNo == attendanceInfo.EmployeeNo &&
+                                                log.SwipeDate == attendanceInfo.AttendanceDate
+                                            select log).ToListAsync();
+                    if (swipeModel != null)
+                    {
+                        attendanceInfo.SwipeLogList = swipeModel.Select(e => new AttendanceSwipeLog
+                        {
+                            SwipeID = e.SwipeID,
+                            EmpNo = e.EmpNo,
+                            SwipeDate = e.SwipeDate,
+                            SwipeTime = e.SwipeTime,
+                            SwipeType = e.SwipeType,
+                            SwipeLogDate = e.SwipeLogDate
+                        }).ToList();
+                    }
+                    #endregion
+                }
+
+                return Result<AttendanceInfoResult>.SuccessResult(attendanceInfo);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<AttendanceInfoResult>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }
