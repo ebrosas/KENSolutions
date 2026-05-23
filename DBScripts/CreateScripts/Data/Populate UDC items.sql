@@ -2609,69 +2609,301 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
 		WHERE RTRIM(a.UDCGCode) = 'ROATYPE'
 
-		SELECT	@UDCCode					= 'ROABT',
-				@UDCDesc1					= 'Business Meeting',
+		SELECT	@UDCCode					= 'AA',
+				@UDCDesc1					= 'Advance Annual Leave',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
 				@SequenceNo					= 1,
 				@IsActive					= 1,
 				@Amount						= NULL 
 
-		SELECT	@UDCCode					= 'ROABT',
-				@UDCDesc1					= 'Business Trip',
+		SELECT	@UDCCode					= 'BM',
+				@UDCDesc1					= 'Business Meeting / Visit',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
 				@SequenceNo					= 2,
 				@IsActive					= 1,
 				@Amount						= NULL 
 
-		--SELECT	@UDCCode					= 'WFPROGRESS',
-		--		@UDCDesc1					= 'InProgress',
-		--		@UDCDesc2					= NULL,
-		--		@UDCSpecialHandlingCode		= NULL,
-		--		@SequenceNo					= 3,
-		--		@IsActive					= 1,
-		--		@Amount						= NULL 
+		SELECT	@UDCCode					= 'BT',
+				@UDCDesc1					= 'Business Trip',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 3,
+				@IsActive					= 1,
+				@Amount						= NULL 
 
-		--SELECT	@UDCCode					= 'WFAPPROVED',
-		--		@UDCDesc1					= 'Approved',
-		--		@UDCDesc2					= NULL,
-		--		@UDCSpecialHandlingCode		= NULL,
-		--		@SequenceNo					= 4,
-		--		@IsActive					= 1,
-		--		@Amount						= NULL 
+		SELECT	@UDCCode					= 'CE',
+				@UDCDesc1					= 'Company related event',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 4,
+				@IsActive					= 1,
+				@Amount						= NULL 
 
-		--SELECT	@UDCCode					= 'WFREJECTED',
-		--		@UDCDesc1					= 'Rejected',
-		--		@UDCDesc2					= NULL,
-		--		@UDCSpecialHandlingCode		= NULL,
-		--		@SequenceNo					= 5,
-		--		@IsActive					= 1,
-		--		@Amount						= NULL 
+		SELECT	@UDCCode					= 'CR',
+				@UDCDesc1					= 'Course Registration',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 5,
+				@IsActive					= 1,
+				@Amount						= NULL 
 
-		--SELECT	@UDCCode					= 'WFCANCELLED',
-		--		@UDCDesc1					= 'Cancelled',
-		--		@UDCDesc2					= NULL,
-		--		@UDCSpecialHandlingCode		= NULL,
-		--		@SequenceNo					= 6,
-		--		@IsActive					= 1,
-		--		@Amount						= NULL 
+		SELECT	@UDCCode					= 'DC',
+				@UDCDesc1					= 'Disabled Child',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 6,
+				@IsActive					= 1,
+				@Amount						= NULL 
 
-		--SELECT	@UDCCode					= 'WFSKIPPED',
-		--		@UDCDesc1					= 'Skipped',
-		--		@UDCDesc2					= NULL,
-		--		@UDCSpecialHandlingCode		= NULL,
-		--		@SequenceNo					= 7,
-		--		@IsActive					= 1,
-		--		@Amount						= NULL 
+		SELECT	@UDCCode					= 'XL',
+				@UDCDesc1					= 'Exam Leave',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 7,
+				@IsActive					= 1,
+				@Amount						= NULL 
 
-		--SELECT	@UDCCode					= 'WFCOMPLETED',
-		--		@UDCDesc1					= 'Completed',
-		--		@UDCDesc2					= NULL,
-		--		@UDCSpecialHandlingCode		= NULL,
-		--		@SequenceNo					= 8,
-		--		@IsActive					= 1,
-		--		@Amount						= NULL 
+		SELECT	@UDCCode					= 'EL',
+				@UDCDesc1					= 'Exceptional Leave',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 8,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'EX',
+				@UDCDesc1					= 'Excused',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 9,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'FT',
+				@UDCDesc1					= 'Foreign Training',
+				@UDCDesc2					= 'FT',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 10,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'FS',
+				@UDCDesc1					= 'Forgot to Swipe',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 11,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'HL',
+				@UDCDesc1					= 'Haj Leave',
+				@UDCDesc2					= '18 Calendar days',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 12,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'IF',
+				@UDCDesc1					= 'In House TR/Full Time',
+				@UDCDesc2					= 'IT',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 13,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'IP',
+				@UDCDesc1					= 'In House TR/Part Time',
+				@UDCDesc2					= 'IT',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 14,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'IS',
+				@UDCDesc1					= 'Investigation Suspension',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 15,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'LD',
+				@UDCDesc1					= 'Light Duty',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 16,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'LC',
+				@UDCDesc1					= 'Local Conference',
+				@UDCDesc2					= 'LC',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 17,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'LS',
+				@UDCDesc1					= 'Local Seminar/Exhibition',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 18,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'LF',
+				@UDCDesc1					= 'Local TR/Full Time',
+				@UDCDesc2					= 'LT',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 19,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'LP',
+				@UDCDesc1					= 'Local TR/Part Time',
+				@UDCDesc2					= 'LT',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 20,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'LT',
+				@UDCDesc1					= 'Local Training',
+				@UDCDesc2					= 'LT',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 21,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'MR',
+				@UDCDesc1					= 'Marriage Leave',
+				@UDCDesc2					= '',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 22,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'MB',
+				@UDCDesc1					= 'Maternity Benefit',
+				@UDCDesc2					= '',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 23,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'ROAML',
+				@UDCDesc1					= 'Maternity Leave',
+				@UDCDesc2					= '',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 24,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'OS',
+				@UDCDesc1					= 'Overseas Training',
+				@UDCDesc2					= '',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 25,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'DR',
+				@UDCDesc1					= 'Physical Disability',
+				@UDCDesc2					= '',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 26,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'RT',
+				@UDCDesc1					= 'Ramadhan Timing',
+				@UDCDesc2					= '',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 27,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'SA',
+				@UDCDesc1					= 'Special Assignment',
+				@UDCDesc2					= '',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 28,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'SL',
+				@UDCDesc1					= 'Special Leave',
+				@UDCDesc2					= '',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 29,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'FB',
+				@UDCDesc1					= 'Sport team',
+				@UDCDesc2					= '',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 30,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'SI',
+				@UDCDesc1					= 'Sports Injury-Company related',
+				@UDCDesc2					= '',
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 31,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'SP',
+				@UDCDesc1					= 'Suspension',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 32,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'TU',
+				@UDCDesc1					= 'Trade Union',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 33,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'UA',
+				@UDCDesc1					= 'Unjustified Absence',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 34,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'UV',
+				@UDCDesc1					= 'Unpaid Employee Leave',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 35,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'US',
+				@UDCDesc1					= 'Unpaid Sick Leave',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 36,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'WH',
+				@UDCDesc1					= 'Work from home',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 37,
+				@IsActive					= 1,
+				@Amount						= NULL 
 	*/
 
 	/*	Populate Attendance Actions Types
