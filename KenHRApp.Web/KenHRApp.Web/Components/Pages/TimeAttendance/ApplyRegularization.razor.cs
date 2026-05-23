@@ -85,8 +85,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Objects and Collections       
         private RegularRequestDTO _regularRequest = new();
         private IReadOnlyList<IBrowserFile> _files = Array.Empty<IBrowserFile>();
-        private MudSelect<string> _endDayMode = new();
-        private MudSelect<string> _startDayMode = new();
 
         private List<BreadcrumbItem> _breadcrumbItems =
         [
@@ -205,20 +203,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         #region Page Events
         protected override void OnInitialized()
-        {
-            #region Initialize _regularRequest for testing purpose
-            //_regularRequest = new RegularRequestDTO()
-            //{
-            //    RegularizedRequestId = 1,
-            //    AttendanceDate = DateTime.Today,
-            //    ShiftPattern = "D8",
-            //    ShiftDescription = "Shift timing for Admin employees",
-            //    ShiftTiming = "08:00 AM - 04:30 PM",
-            //    ActualTiming = "07:45 AM - 05:00 PM",
-            //    WorkDuration = 520
-            //};
-            #endregion
-
+        {            
             // Initialize the EditContext 
             _editContext = new EditContext(_regularRequest);
 
@@ -258,7 +243,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     // Initialize the Leave Request object
                     _regularRequest.CreatedBy = UserEmpNo;
                     _regularRequest.CreatedEmail = UserEmail;
-                    _regularRequest.CreatedUserID = UserName;
+                    _regularRequest.CreatedUserID = UserName;                                        
 
                     BeginLoadComboboxTask();
                 }
@@ -404,7 +389,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             //    // Shows the spinner overlay
             //    await InvokeAsync(StateHasChanged);
-            //}, _shiftPattern.RegularizedRequestId);
+            //}, _shiftPattern.RegularizationId);
         }
 
         private async Task HandleRefreshButton()
@@ -417,8 +402,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             #region Reset file attachments
             _files = Array.Empty<IBrowserFile>();
-            await _endDayMode.ClearAsync();
-            await _startDayMode.ClearAsync();
 
             StateHasChanged();
             #endregion
@@ -774,12 +757,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 if (_errorMessage.Length > 0)
                     ShowHideError(true);
 
+                OnDateChanged(_selectedDate);
+
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
 
-                //if (RegularizedRequestId > 0)
+                //if (RegularizationId > 0)
                 //{
-                //    BeginLoadLeaveRequest(RegularizedRequestId);
+                //    BeginLoadLeaveRequest(RegularizationId);
                 //}
             });
         }
@@ -902,8 +887,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             _attendanceChips.AddRange(attendanceInfo.SwipeLogList.ToList());
                         #endregion
 
-                        // Refresh the page
-                        await InvokeAsync(StateHasChanged);
+                        // Re-render the page
+                        StateHasChanged();
                     }
                 }
                 else

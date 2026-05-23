@@ -56,6 +56,8 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<WorkflowInstance> WorkflowInstances => Set<WorkflowInstance>();
         public DbSet<WorkflowStepInstance> WorkflowStepInstances => Set<WorkflowStepInstance>();
         public DbSet<WorkflowApprovalRole> WorkflowApprovalRoles => Set<WorkflowApprovalRole>();
+        public DbSet<RegularRequestWF> RegularRequestWFs => Set<RegularRequestWF>();
+        public DbSet<FileAttachment> FileAttachments => Set<FileAttachment>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -81,7 +83,9 @@ namespace KenHRApp.Infrastructure.Data
             new WorkflowConditionConfig().Configure(modelBuilder.Entity<WorkflowCondition>());  
             new WorkflowInstanceConfig().Configure(modelBuilder.Entity<WorkflowInstance>());    
             new WorkflowStepInstanceConfig().Configure(modelBuilder.Entity<WorkflowStepInstance>());
-            new WorkflowApprovalRoleConfig().Configure(modelBuilder.Entity<WorkflowApprovalRole>());    
+            new WorkflowApprovalRoleConfig().Configure(modelBuilder.Entity<WorkflowApprovalRole>());
+            new RegularRequestWFConfig().Configure(modelBuilder.Entity<RegularRequestWF>());
+            new FileAttachmentConfig().Configure(modelBuilder.Entity<FileAttachment>());
             #endregion
 
             #region Configure keyless models that are mapped to views or stored procedures
@@ -516,7 +520,7 @@ namespace KenHRApp.Infrastructure.Data
                 #region Set relationships 
                 entity.HasMany(e => e.AttachmentList)
                       .WithOne()
-                      .HasPrincipalKey(e => e.LeaveAttachmentId)     // Map to LeaveAttachmentId alternate key of LeaveRequisitionWF principal
+                      .HasPrincipalKey(e => e.LeaveAttachmentId)     // Map to AttachmentId alternate key of LeaveRequisitionWF principal
                       .HasForeignKey(c => c.LeaveAttachmentId);
                       //.IsRequired()
                       //.OnDelete(DeleteBehavior.Cascade);

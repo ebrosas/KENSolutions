@@ -3000,7 +3000,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	DELETE FROM kenuser.UserDefinedCode
 	WHERE UDCId IN
 	(
-		4403
+		4973, 4974
 	)
 
 	--Disable UDC items

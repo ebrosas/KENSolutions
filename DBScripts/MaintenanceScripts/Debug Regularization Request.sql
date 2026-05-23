@@ -10,3 +10,6 @@
 	WHERE a.EmpNo = 10003632
 		AND a.AttendanceDate = '05/22/2026'
 	ORDER By a.AttendanceDate Desc
+
+	SELECT * FROM kenuser.LeaveRequisitionWF a
+	ORDER BY a.LeaveRequestId desc
