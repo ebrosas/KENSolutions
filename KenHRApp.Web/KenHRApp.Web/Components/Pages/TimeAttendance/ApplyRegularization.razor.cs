@@ -108,13 +108,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Constants
-
-        #region Leave Request Statuses
         private readonly string CONST_CANCELLED_BY_USER = "101";         // Cancelled by User
         private readonly string CONST_REQUEST_SENT = "02";              // Request Sent
         private readonly string CONST_WAITING_FOR_APPROVAL = "05";      // Waiting for Approval
-        #endregion
-
+        private readonly string CONST_REGULARIZATION = "Regularization";
         #endregion
 
         #endregion
@@ -169,20 +166,20 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region IWorkflowProcess Implementation
-        public async Task InitializeWorkflowAsync(long leaveNo, int originatorEmpNo)
+        public async Task InitializeWorkflowAsync(long requestNo, int originatorEmpNo)
         {
             bool isSuccess = false;
 
             try
             {
-                if (leaveNo == 0)
-                    throw new ArgumentException("Leave Requisition No. is not defined!");
+                if (requestNo == 0)
+                    throw new ArgumentException("Request No. is not defined!");
 
                 // Initialize the cancellation token
                 _cts = new CancellationTokenSource();
 
-                var repoResult = await WorkflowService.StartWorkflowAsync(WorkflowHelper.CONST_LEAVE_REQUEST,
-                    leaveNo, Environment.WebRootPath, originatorEmpNo, _cts.Token);
+                var repoResult = await WorkflowService.StartWorkflowAsync(WorkflowHelper.CONST_REGULARIZATION,
+                    requestNo, Environment.WebRootPath, originatorEmpNo, _cts.Token);
                 if (repoResult.Success)
                 {
                     isSuccess = repoResult.Value;
@@ -244,7 +241,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     // Initialize the Leave Request object
                     _regularRequest.CreatedBy = UserEmpNo;
                     _regularRequest.CreatedEmail = UserEmail;
-                    _regularRequest.CreatedUserID = UserName;                                        
+                    _regularRequest.CreatedUserID = UserName;
+                    _regularRequest.ActionDescription = CONST_REGULARIZATION;
 
                     BeginLoadComboboxTask();
                 }
@@ -265,39 +263,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             try
             {
-                //#region Check if Leave Start Date is public holiday or not
-                //bool isStartDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_regularRequest.LeaveStartDate!.Value).Result;
-                //if (isStartDateHoliday)
-                //{
-                //    _hasValidationError = true;
-                //    _validationMessages.Add("Start Date should not be a public holiday.");
-                //}
-                //#endregion
-
-                //#region Check if Leave Resume Date is public holiday or not
-                //bool isResumeDateHoliday = LeaveService.CheckIfLeaveDateIsHolidayAsync(_regularRequest.LeaveResumeDate!.Value).Result;
-                //if (isResumeDateHoliday)
-                //{
-                //    _hasValidationError = true;
-                //    _validationMessages.Add("Resume Date should not be a public holiday.");
-                //}
-                //#endregion
-
-                //#region Check if leave period exist
-                //bool isLeaveExist = LeaveService.CheckIfLeavePeriodExistAsync(
-                //    _regularRequest.LeaveEmpNo,
-                //    _regularRequest.LeaveResumeDate!.Value).Result;
-                //if (isLeaveExist)
-                //{
-                //    _hasValidationError = true;
-                //    _validationMessages.Add("The specified date period overlaps with an existing leave request.");
-                //}
-                //#endregion
-
-                if (_hasValidationError && _validationMessages.Any())
-                    return;
-
-                // If we got here, model is valid
                 _hasValidationError = false;
                 _validationMessages.Clear();
 
@@ -307,21 +272,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set the overlay message
                 overlayMessage = "Submitting regularization request, please wait...";
 
-                //_ = SubmitLeaveRequestAsync(async () =>
-                //{
-                //    _isRunning = false;
+                _ = SubmitRegularRequestAsync(async () =>
+                {
+                    _isRunning = false;
 
-                //    // Shows the spinner overlay
-                //    await InvokeAsync(StateHasChanged);
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
 
-                //    if (_regularRequest.LeaveRequestId > 0)
-                //    {
-                //        // Initiate the workflow
-                //        await InitializeWorkflowAsync(_regularRequest.LeaveRequestId, _regularRequest.LeaveEmpNo);
+                    if (_regularRequest.RegularizationId > 0)
+                    {
+                        // Initiate the workflow
+                        await InitializeWorkflowAsync(_regularRequest.RegularizationId, _regularRequest.EmployeeNo);
 
-                //        BeginLoadLeaveRequest(_regularRequest.LeaveRequestId);
-                //    }
-                //});
+                        //BeginLoadLeaveRequest(_regularRequest.RegularizationId);
+                    }
+                });
             }
             catch (OperationCanceledException)
             {
@@ -975,7 +940,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
             #endregion
 
-            #region Initialize DTO
+            #region Initialize File Attachment DTO
             var fileDtos = new List<FileUploadDTO>();
 
             foreach (var file in _files)
@@ -1034,7 +999,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set the user who update the record and the timestamp
                 _regularRequest.LastUpdatedDate = DateTime.Now;
 
-                #region Set leave status to "Request Sent" 
+                #region Set request status to "Request Sent" 
                 if (_leaveStatusList != null && _leaveStatusList.Any())
                 {
                     UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_REQUEST_SENT).FirstOrDefault();

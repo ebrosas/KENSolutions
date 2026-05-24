@@ -1,16 +1,35 @@
-DECLARE	@actionType				TINYINT = 0,		--(Notes: 0 = Check records, 1 = Create new workflow, 2 = Update record, 3 = Delete record)
-		@isCommitTrans			BIT = 0,
-		@workflowDefinitionId	INT = 10,
-		@workflowName			VARCHAR(150) = 'Leave Requisition',
-		@workflowTypeCode		VARCHAR(100) = 'RTYPELEAVE',
-		@newWorkflowTypeCode	VARCHAR(100) = 'RTYPELEAVETEST',
+DECLARE	@actionType				TINYINT,		--(Notes: 0 = Check records, 1 = Create new workflow, 2 = Update record, 3 = Delete record)
+		@isCommitTrans			BIT,
+		@workflowDefinitionId	INT,
+		@workflowName			VARCHAR(150),
+		@workflowTypeCode		VARCHAR(100),
+		@newWorkflowTypeCode	VARCHAR(100),
 		@isActive				BIT = 1
+
+	--Leave Requisition Workflow
+	--SELECT	@actionType				= 0,		
+	--		@isCommitTrans			= 0,
+	--		@workflowDefinitionId	= 10,
+	--		@workflowName			= 'Leave Requisition',
+	--		@workflowTypeCode		= 'RTYPELEAVE',
+	--		@newWorkflowTypeCode	= 'RTYPELEAVETEST',
+	--		@isActive				= 1	
+
+	--Regularization Request Workflow
+	SELECT	@actionType				= 0,		
+			@isCommitTrans			= 0,
+			@workflowName			= 'Regularization',
+			@workflowTypeCode		= 'RTYPEREGULAR',
+			@isActive				= 1	
 
 	IF @actionType = 0
 	BEGIN
     
 		SELECT * FROM kenuser.WorkflowDefinitions a
 		WHERE RTRIM(a.EntityName) = @workflowTypeCode
+
+		--Get all workflows
+		SELECT * FROM kenuser.WorkflowDefinitions a
 	END
 
 	ELSE IF @actionType = 1

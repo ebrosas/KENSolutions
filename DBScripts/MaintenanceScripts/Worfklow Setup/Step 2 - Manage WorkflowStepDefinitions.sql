@@ -8,6 +8,16 @@ DECLARE	@actionType				TINYINT = 0,		--(Notes: 0 = Check records, 1 = Create new
 		@requiresAllParallel	BIT = 0,
 		@approvalStageDesc		VARCHAR(300)
 
+	--Leave Requisition Workflow
+	--SELECT	@actionType				= 0,		
+	--		@isCommitTrans			= 0,
+	--		@workflowTypeCode		= 'RTYPELEAVE'
+
+	--Regularization Workflow
+	SELECT	@actionType				= 0,		
+			@isCommitTrans			= 0,
+			@workflowTypeCode		= 'RTYPEREGULAR'
+
 	DECLARE @workflowDefinitionId INT = 0
 
 	--Get the work definition id
@@ -19,6 +29,34 @@ DECLARE	@actionType				TINYINT = 0,		--(Notes: 0 = Check records, 1 = Create new
 	DECLARE @parallelGroupId AS UNIQUEIDENTIFIER = NEWID() 
 
 /*	Setup workflow for Leave Requisition
+
+	--Add Direct Supervisor
+	SELECT	@stepName				= 'Approval by Direct Supervisor',
+			@stepOrder				= 1,
+			@approvalRole			= 'SUPERVISOR',
+			@isParallelGroup		= 0,
+			@requiresAllParallel	= 0,
+			@approvalStageDesc		= 'Direct Supervisor'
+
+	--Add Cost Center Manager
+	SELECT	@stepName				= 'Approval by Department Manager',
+			@stepOrder				= 2,
+			@approvalRole			= 'CCMANAGER',
+			@isParallelGroup		= 0,
+			@requiresAllParallel	= 0,
+			@approvalStageDesc		= 'Department Manager'
+
+	--Add Head of HR
+	SELECT	@stepName				= 'Final approval by Head of HR',
+			@stepOrder				= 3,
+			@approvalRole			= 'HRHEAD',
+			@isParallelGroup		= 0,
+			@requiresAllParallel	= 0,
+			@approvalStageDesc		= 'Head of HR'
+
+*/
+
+/*	Setup workflow for Regularization Request
 
 	--Add Direct Supervisor
 	SELECT	@stepName				= 'Approval by Direct Supervisor',
