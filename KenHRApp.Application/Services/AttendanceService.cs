@@ -17,6 +17,7 @@ namespace KenHRApp.Application.Services
     {
         #region Fields
         private readonly IAttendanceRepository _repository;
+        private const long MaxFileSize = 10 * 1024 * 1024; // 10MB
         #endregion
 
         #region Constructors
@@ -868,6 +869,195 @@ namespace KenHRApp.Application.Services
             catch (Exception ex)
             {
                 return Result<AttendanceInfoResultDTO>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the attendance information from the database.");
+            }
+        }
+
+        public async Task<Result<long>> AddRegularRequestAsync(
+            RegularRequestDTO dto,
+            List<FileUploadDTO> files,
+            string webRootPath,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Create "RegularRequestWF" entity from DTO
+                RegularRequestWF regularRequest = new RegularRequestWF
+                {
+                    EmployeeNo = dto.EmployeeNo,
+                    EmployeeName = dto.EmployeeName,
+                    AttendanceDate = Convert.ToDateTime(dto.AttendanceDate),
+                    ROACode = dto!.ROACode,
+                    ActionCode = dto!.ActionCode,
+                    RegularizedTimeIn = dto.RegularizedTimeIn!.Value,
+                    RegularizedTimeOut = dto.RegularizedTimeOut!.Value,
+                    ShiftPattern = dto.ShiftPattern,
+                    RegularizedDescription = dto.RegularizedDescription,
+                    StatusCode = dto.StatusCode,
+                    StatusID = dto.StatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    CreatedDate = dto.CreatedDate,
+                    CreatedBy = dto.CreatedBy,
+                    CreatedUserID = dto.CreatedUserID,
+                    CreatedEmail = dto.CreatedEmail,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedEmail = dto.LastUpdatedEmail
+                };
+                #endregion
+
+                #region Initialize the file upload path
+                string uploadPath = Path.Combine(
+                    webRootPath,
+                    "uploads",
+                    "attachments");
+
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
+                #endregion
+
+                #region Initialize file attachments
+                if (files is not null && files.Any())
+                {
+                    foreach (var file in files)
+                    {
+                        if (file.Size > MaxFileSize)
+                            throw new InvalidOperationException(
+                                $"File {file.FileName} exceeds 10MB limit.");
+
+                        if (file.Content is null)
+                            throw new InvalidOperationException(
+                                $"File stream for {file.FileName} is null.");
+
+                        string storedFileName =
+                            $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+
+                        string fullPath =
+                            Path.Combine(uploadPath, storedFileName);
+
+                        try
+                        {
+                            await using (var fileStream = new FileStream(
+                               fullPath,
+                               FileMode.Create,
+                               FileAccess.Write,
+                               FileShare.None,
+                               81920,
+                               useAsync: true))
+                            {
+                                await file.Content.CopyToAsync(fileStream);
+                            }
+                        }
+                        catch (Exception attachErr)
+                        {
+                        }
+
+                        var attachment = new FileAttachment(
+                            regularRequest.AttachmentId,
+                            file.FileName,
+                            file.ContentType,
+                            storedFileName,
+                            file.Size);
+
+                        regularRequest.AddAttachment(attachment);
+                    }
+                }
+                #endregion
+
+                var result = await _repository.AddRegularRequestAsync(regularRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to save leave request due to error. Please check the data entry then try to save again!");
+                }
+
+                return Result<long>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<long>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<int>> UpdateRegularizRequestAsync(
+            RegularRequestDTO dto,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Create "RegularRequestWF" entity from DTO
+                RegularRequestWF regularRequest = new RegularRequestWF
+                {
+                    RegularizationId = dto.RegularizationId,
+                    EmployeeNo = dto.EmployeeNo,
+                    AttendanceDate = Convert.ToDateTime(dto.AttendanceDate),
+                    ROACode = dto!.ROACode,
+                    RegularizedTimeIn = dto.RegularizedTimeIn!.Value,
+                    RegularizedTimeOut = dto.RegularizedTimeOut!.Value,
+                    RegularizedDescription = dto.RegularizedDescription,
+                    StatusCode = dto.StatusCode,
+                    StatusID = dto.StatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedEmail = dto.LastUpdatedEmail
+                };
+                #endregion
+
+                var result = await _repository.UpdateRegularRequestAsync(regularRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to save shift roster changes due to error. Please check the data entry then try to save again!");
+                }
+
+                return Result<int>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<int>> CancelRegularRequestAsync(
+            RegularRequestDTO dto,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Create "RegularRequestWF" entity from DTO
+                RegularRequestWF regularRequest = new RegularRequestWF
+                {
+                    RegularizationId = dto.RegularizationId,
+                    StatusCode = dto.StatusCode,
+                    StatusID = dto.StatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedEmail = dto.LastUpdatedEmail
+                };
+                #endregion
+
+                var result = await _repository.CancelRegularRequestAsync(regularRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to cancel leave request due to unhandled error. Please check the data entry then try again!");
+                }
+
+                return Result<int>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
             }
         }
         #endregion

@@ -1082,6 +1082,178 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<AttendanceInfoResult>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Add new regularization request
+        /// </summary>
+        public async Task<Result<long>> AddRegularRequestAsync(RegularRequestWF dto, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (dto is null)
+                    throw new ArgumentNullException(nameof(dto));
+
+                #region Initialize entity
+                var regularRequest = new RegularRequestWF
+                {
+                    EmployeeNo = dto.EmployeeNo,
+                    EmployeeName = dto.EmployeeName,
+                    AttendanceDate = dto.AttendanceDate,
+                    ROACode = dto.ROACode,
+                    ActionCode = dto.ActionCode,
+                    RegularizedTimeIn = dto.RegularizedTimeIn,
+                    RegularizedTimeOut = dto.RegularizedTimeOut,
+                    ShiftPattern = dto.ShiftPattern,
+                    RegularizedDescription = dto.RegularizedDescription,
+                    StatusCode = dto.StatusCode,
+                    StatusID = dto.StatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    CreatedDate = dto.CreatedDate,
+                    CreatedBy = dto.CreatedBy,
+                    CreatedUserID = dto.CreatedUserID,
+                    CreatedEmail = dto.CreatedEmail,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedEmail = dto.LastUpdatedEmail
+                };
+                #endregion
+
+                #region Initialize attachments
+                if (dto.AttachmentList != null && dto.AttachmentList.Any())
+                {
+                    regularRequest.AttachmentList = dto.AttachmentList.Select(e => new FileAttachment
+                    {
+                        AttachmentId = e.AttachmentId,
+                        FileName = e.FileName,
+                        StoredFileName = e.StoredFileName,
+                        ContentType = e.ContentType,
+                        FileSize = e.FileSize
+                    }).ToList();
+                }
+                #endregion
+
+                // Save to database
+                await _db.RegularRequestWFs.AddAsync(regularRequest);
+                await _db.SaveChangesAsync(cancellationToken);
+
+                // ✅ EF Core automatically populates identity after SaveChanges
+                long generatedId = regularRequest.RegularizationId;
+
+                return Result<long>.SuccessResult(generatedId);
+
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<long>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<long>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Update regularization request
+        /// </summary>
+        public async Task<Result<int>> UpdateRegularRequestAsync(RegularRequestWF regularRequest, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (regularRequest == null)
+                    throw new ArgumentNullException(nameof(regularRequest));
+
+                var existing = await _db.RegularRequestWFs
+                    .FirstOrDefaultAsync(e =>
+                        e.RegularizationId == regularRequest.RegularizationId,
+                        cancellationToken);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find regularization request with the specified no.");
+
+                #region Update leave request information
+                existing.ROACode = regularRequest.ROACode;
+                existing.RegularizedTimeIn = regularRequest.RegularizedTimeIn;
+                existing.RegularizedTimeOut = regularRequest.RegularizedTimeOut;
+                existing.RegularizedDescription = regularRequest.RegularizedDescription;
+                existing.StatusCode = regularRequest.StatusCode;
+                existing.StatusID = regularRequest.StatusID;
+                existing.StatusHandlingCode = regularRequest.StatusHandlingCode;
+                existing.LastUpdatedDate = regularRequest.LastUpdatedDate;
+                existing.LastUpdatedBy = regularRequest.LastUpdatedBy;
+                existing.LastUpdatedUserID = regularRequest.LastUpdatedUserID;
+                existing.LastUpdatedEmail = regularRequest.LastUpdatedEmail;
+
+                #endregion
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Cancel Regularization Request
+        /// </summary>
+        public async Task<Result<int>> CancelRegularRequestAsync(RegularRequestWF regularRequest, CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (regularRequest == null)
+                    throw new ArgumentNullException(nameof(regularRequest));
+
+                var existing = await _db.RegularRequestWFs
+                    .FirstOrDefaultAsync(e =>
+                        e.RegularizationId == regularRequest.RegularizationId,
+                        cancellationToken);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find regularization request with the specified request no.");
+
+                #region Update leave information to cancel the request
+                existing.StatusCode = regularRequest.StatusCode;
+                existing.StatusID = regularRequest.StatusID;
+                existing.StatusHandlingCode = regularRequest.StatusHandlingCode;
+                existing.LastUpdatedDate = regularRequest.LastUpdatedDate;
+                existing.LastUpdatedBy = regularRequest.LastUpdatedBy;
+                existing.LastUpdatedUserID = regularRequest.LastUpdatedUserID;
+                existing.LastUpdatedEmail = regularRequest.LastUpdatedEmail;
+                #endregion
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

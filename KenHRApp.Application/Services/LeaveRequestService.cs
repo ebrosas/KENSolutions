@@ -734,7 +734,7 @@ namespace KenHRApp.Application.Services
             {
                 return Result<bool>.Failure(ex.Message.ToString());
             }
-        }
+        }                
         #endregion
     }
 }

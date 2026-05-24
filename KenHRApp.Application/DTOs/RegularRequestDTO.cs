@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,10 +12,10 @@ namespace KenHRApp.Application.DTOs
     public class RegularRequestDTO
     {
         #region Properties
-        public long RegularizedRequestId { get; set; }       // Identity column  
+        public long RegularizationId { get; set; }       // Identity column  
 
-        public int? EmployeeNo { get; set; }
-        public string? EmployeeName { get; set; } = null;
+        public int EmployeeNo { get; set; }
+        public string EmployeeName { get; set; } = null!;
 
         [Display(Name = "Attendance Date")]
         [DataType(DataType.Date)]
@@ -22,7 +23,8 @@ namespace KenHRApp.Application.DTOs
 
         public string? ROACode { get; set; } = null;
 
-        [Display(Name = "Select Reason")]
+        [Display(Name = "Descriptio")]
+        [StringLength(500, ErrorMessage = "Description can't be more than 500 characters.")]
         public string ROADescription { get; set; } = null!;
 
         public string? ActionCode { get; set; } = null;
@@ -56,15 +58,22 @@ namespace KenHRApp.Application.DTOs
 
         public int WorkDuration { get; set; }
         public int NoPayHours { get; set; }
+                
+        public string StatusCode { get; set; } = null!;
+
+        public int? StatusID { get; set; }
+
+        [Display(Name = "Status")]
+        public string? StatusHandlingCode { get; set; } = null;
+
+        public string CostCenter { get; set; } = null!;
 
         [Display(Name = "Created Date")]
         [DataType(DataType.Date)]
         public DateTime? CreatedDate { get; set; }
 
         public int? CreatedBy { get; set; }
-
         public string? CreatedUserID { get; set; } = null;
-
         public string? CreatedEmail { get; set; } = null;
 
         [Display(Name = "Last Updated Date")]
@@ -72,11 +81,8 @@ namespace KenHRApp.Application.DTOs
         public DateTime? LastUpdatedDate { get; set; }
 
         public int? LastUpdatedBy { get; set; }
-
         public string? LastUpdatedUserID { get; set; } = null;
-
         public string? LastUpdatedEmail { get; set; } = null;
-
         public List<FileAttachmentDTO> Files { get; set; } = new();
         #endregion
 

@@ -2,6 +2,7 @@
 using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -733,7 +734,7 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 return Result<bool>.Failure($"Database error: {ex.Message}");
             }
-        }
+        }                
         #endregion
     }
 }

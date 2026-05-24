@@ -60,6 +60,17 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "varchar(50)")]
         public string? LastUpdatedEmail { get; set; } = null;
+
+        [Column(TypeName = "varchar(20)")]
+        public string StatusCode { get; set; } = null!;
+
+        public int? StatusID { get; set; }
+
+        [Column(TypeName = "varchar(20)")]
+        public string? StatusHandlingCode { get; set; } = null;
+
+        [Column(TypeName = "varchar(20)")]
+        public string CostCenter { get; set; } = null!;
         #endregion
 
         #region Unmapped Properties

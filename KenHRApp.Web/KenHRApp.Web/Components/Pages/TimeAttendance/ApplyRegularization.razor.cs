@@ -101,9 +101,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string[]? _employeeArray = null;
         private IReadOnlyList<EmployeeResultDTO> _employeeList = new List<EmployeeResultDTO>();
 
-        private List<WorkflowDetailResultDTO> _workflowList = new List<WorkflowDetailResultDTO>();
         private Guid _calendarRenderKey = Guid.NewGuid();
         private List<AttendanceSwipeDTO> _attendanceChips { get; set; } = new();
+        private List<UserDefinedCodeDTO> _leaveStatusList = new();
+        private List<WorkflowDetailResultDTO> _workflowList = new List<WorkflowDetailResultDTO>();
         #endregion
 
         #region Constants
@@ -564,7 +565,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Delete"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to delete Regularization Request No. '{request.RegularizedRequestId}'?" },
+                { "ContentText", $"Are you sure you want to delete Regularization Request No. '{request.RegularizationId}'?" },
                 { "ConfirmText", "Delete" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -635,7 +636,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Cancel"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to cancel leave requsition no. '{_regularRequest.RegularizedRequestId}'?" },
+                { "ContentText", $"Are you sure you want to cancel leave requsition no. '{_regularRequest.RegularizationId}'?" },
                 { "ConfirmText", "Proceed" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -847,6 +848,22 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             _actionArray = _actionList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
                     }
                     #endregion
+
+                    #region Leave Statuses
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.STATUS.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Leave Status group id: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _leaveStatusList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                    }
+                    #endregion
                 }
             }
 
@@ -902,6 +919,170 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             catch (Exception ex)
             {
                 await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task SubmitRegularRequestAsync(Func<Task> callback)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            bool isNewRequition = _regularRequest.RegularizationId == 0;
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = true;
+            string errorMsg = string.Empty;
+
+            #region Get the selected employee information 
+            if (!string.IsNullOrEmpty(_regularRequest.EmployeeFullName))
+            {
+                EmployeeResultDTO? selectedEmployee = _employeeList
+                    .Where(a => a.EmployeeNameWithCode == _regularRequest.EmployeeFullName)
+                    .FirstOrDefault();
+                if (selectedEmployee != null)
+                {
+                    _regularRequest.EmployeeNo = selectedEmployee.EmployeeNo;
+                    _regularRequest.CostCenter = selectedEmployee!.DepartmentCode;
+                    _regularRequest.EmployeeName = selectedEmployee.EmployeeFullName;
+                }
+            }
+            #endregion
+
+            #region Get the selected ROA
+            if (!string.IsNullOrEmpty(_regularRequest.ROADescription))
+            {
+                UserDefinedCodeDTO? selectedROA = _roaList
+                    .Where(a => a.UDCDesc1 == _regularRequest.ROADescription)
+                    .FirstOrDefault();
+                if (selectedROA != null)
+                    _regularRequest.ROACode = selectedROA.UDCCode;
+            }
+            #endregion
+
+            #region Get the selected Action
+            if (!string.IsNullOrEmpty(_regularRequest.ActionDescription))
+            {
+                UserDefinedCodeDTO? selectedAction = _actionList
+                    .Where(a => a.UDCDesc1 == _regularRequest.ActionDescription)
+                    .FirstOrDefault();
+                if (selectedAction != null)
+                    _regularRequest.ActionCode = selectedAction.UDCCode;
+            }
+            #endregion
+
+            #region Initialize DTO
+            var fileDtos = new List<FileUploadDTO>();
+
+            foreach (var file in _files)
+            {
+                var stream = file.OpenReadStream(10 * 1024 * 1024);
+
+                fileDtos.Add(new FileUploadDTO
+                {
+                    FileName = file.Name,
+                    ContentType = file.ContentType,
+                    Size = file.Size,
+                    Content = stream
+                });
+            }
+            #endregion
+
+            if (isNewRequition)
+            {
+                // Set leave request information and flags 
+                _regularRequest.CreatedDate = DateTime.Now;
+
+                #region Set leave status to "Request Sent" 
+                if (_leaveStatusList != null && _leaveStatusList.Any())
+                {
+                    UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_REQUEST_SENT).FirstOrDefault();
+                    if (statusFlag != null)
+                    {
+                        _regularRequest.StatusCode = statusFlag.UDCCode;
+                        _regularRequest.StatusID = statusFlag.UDCId;
+                        _regularRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
+                    }
+                }
+                #endregion
+
+                var addResult = await AttendanceService.AddRegularRequestAsync(_regularRequest, fileDtos, Environment.WebRootPath, _cts.Token);
+                isSuccess = addResult.Success;
+                if (!isSuccess)
+                    errorMsg = addResult.Error!;
+                else
+                {
+                    // Set flag to enable reload when navigating back to the caller page
+                    _forceLoad = true;
+
+                    // Set action type flag
+                    ActionType = ActionTypes.Edit.ToString();
+
+                    // Get the new identity seed value
+                    _regularRequest.RegularizationId = addResult.Value;
+
+                    // Display the requisition number in the page title
+                    //_pageTitle = $" Submitted Leave Request No. {addResult.Value}";
+                }
+            }
+            else
+            {
+                // Set the user who update the record and the timestamp
+                _regularRequest.LastUpdatedDate = DateTime.Now;
+
+                #region Set leave status to "Request Sent" 
+                if (_leaveStatusList != null && _leaveStatusList.Any())
+                {
+                    UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_REQUEST_SENT).FirstOrDefault();
+                    if (statusFlag != null)
+                    {
+                        _regularRequest.StatusCode = statusFlag.UDCCode;
+                        _regularRequest.StatusID = statusFlag.UDCId;
+                        _regularRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
+                    }
+                }
+                #endregion
+
+                var saveResult = await AttendanceService.UpdateRegularizRequestAsync(_regularRequest, _cts.Token);
+                isSuccess = saveResult.Success;
+                if (!isSuccess)
+                    errorMsg = saveResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Reset flags
+                _isEditMode = false;
+                _saveBtnEnabled = false;
+                _isDisabled = true;
+
+                // Hide error message if any
+                ShowHideError(false);
+
+                // Show notification
+                if (isNewRequition)
+                    ShowNotification("Regularization request has been submitted successfully!", NotificationType.Success);
+                else
+                    ShowNotification("Regularization request has been updated successfully!", NotificationType.Success);
+
+                // Go back to T&A dashboard
+                //Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(errorMsg);
+                ShowHideError(true);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
             }
         }
         #endregion

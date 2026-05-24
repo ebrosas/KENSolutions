@@ -35,6 +35,20 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<AttendanceInfoResultDTO>> GetAttendanceInfoAsync(
             int empNo,
             DateTime attendanceDate);
+
+        Task<Result<long>> AddRegularRequestAsync(
+            RegularRequestDTO dto,
+            List<FileUploadDTO> files,
+            string webRootPath,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<int>> UpdateRegularizRequestAsync(
+            RegularRequestDTO dto,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<int>> CancelRegularRequestAsync(
+            RegularRequestDTO dto,
+            CancellationToken cancellationToken = default);
         #endregion
     }
 }

@@ -43,7 +43,7 @@ namespace KenHRApp.Infrastructure.Repositories
 
         Task<Result<int>> AddLeaveEntitlementAsync(LeaveEntitlement entitlement, CancellationToken cancellationToken = default);
         Task<Result<int>> UpdateLeaveEntitlementAsync(LeaveEntitlement entitlement, CancellationToken cancellationToken = default);
-        Task<Result<bool>> DeleteLeaveEntitlementAsync(int entitlementID, CancellationToken cancellationToken = default);
+        Task<Result<bool>> DeleteLeaveEntitlementAsync(int entitlementID, CancellationToken cancellationToken = default);        
         #endregion
     }
 }
