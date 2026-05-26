@@ -61,6 +61,11 @@ To-do List (As of 15-Apr-2026):
 1. Refactor the code in SendPendingApprovalAsync() method in "WorkflowService" class.
 2. Refactor the code in SendAsync() method in "WorkflowEmailService" class
 
+Regularization Request Page:
+
+To-do Task:
+1. After successfull submission of the regularization request, change the page title to display the requisition number.
+2. Create the Regularization Inquiry page
 
 
 

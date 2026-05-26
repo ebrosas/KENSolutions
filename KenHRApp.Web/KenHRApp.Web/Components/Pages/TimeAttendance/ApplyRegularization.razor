@@ -131,6 +131,35 @@
 
         <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
             <MudPaper Elevation="0" Square="true" Class="w-100 px-2 mt-4">
+                <MudGrid Spacing="5">
+                    <MudItem xs="12" sm="6">
+                        @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
+                        {
+                            <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Spacing="0">
+                                <!-- Requisition No. -->
+                                <MudText Typo="Typo.h6" Color="Color.Surface" Class="fw-bold">
+                                    Regularization Request No. @_regularRequest.RegularizationId
+                                </MudText>
+
+                                <!-- Created Date and Time -->
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    Created On: @_regularRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")
+                                </MudText>
+
+                                <!-- Employee Name and Number -->
+                                <MudText Typo="Typo.body2" Color="Color.Surface">
+                                    Created By: @_regularRequest.CreatedByName
+                                </MudText>
+
+                                <!-- Current Status -->
+                                <MudText Typo="Typo.body2" Color="@(_regularRequest.StatusHandlingCode == "Cancelled" ? Color.Error : _regularRequest.StatusHandlingCode == "Approved" || _regularRequest.StatusHandlingCode == "Closed" ? Color.Success : Color.Info)" Class="fw-semibold">
+                                    @($"Status: {_regularRequest.StatusHandlingCode} - {_regularRequest.StatusDesc}")
+                                </MudText>
+                            </MudStack>
+                        }
+                    </MudItem>
+                </MudGrid>
+
                 <MudGrid Spacing="10" Class="px-2">
                     <MudItem sm="12" md="3">
                         <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart"

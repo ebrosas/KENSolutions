@@ -35,13 +35,15 @@ namespace KenHRApp.Domain.Entities
         public FileAttachment() { }
 
         public FileAttachment(
-            Guid attachmentId, 
+            Guid attachmentId,
+            string requestType,
             string fileName, 
             string contentType, 
             string storedFileName, 
             long fileSize)
         {
             AttachmentId = attachmentId;
+            RequestType = requestType;
             FileName = fileName;
             ContentType = contentType;
             StoredFileName = storedFileName;

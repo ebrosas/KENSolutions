@@ -13,7 +13,8 @@ namespace KenHRApp.Application.DTOs
     {
         #region Properties
         public long RegularizationId { get; set; }       // Identity column  
-
+        public Guid AttachmentId { get; set; } = Guid.NewGuid();
+        public Guid WorkflowId { get; set; } = Guid.NewGuid();
         public int EmployeeNo { get; set; }
         public string EmployeeName { get; set; } = null!;
 
@@ -23,7 +24,7 @@ namespace KenHRApp.Application.DTOs
 
         public string? ROACode { get; set; } = null;
 
-        [Display(Name = "Descriptio")]
+        [Display(Name = "Description")]
         [StringLength(500, ErrorMessage = "Description can't be more than 500 characters.")]
         public string ROADescription { get; set; } = null!;
 
@@ -60,6 +61,7 @@ namespace KenHRApp.Application.DTOs
         public int NoPayHours { get; set; }
                 
         public string StatusCode { get; set; } = null!;
+        public string? StatusDesc { get; set; } = null;
 
         public int? StatusID { get; set; }
 
@@ -67,6 +69,7 @@ namespace KenHRApp.Application.DTOs
         public string? StatusHandlingCode { get; set; } = null;
 
         public string CostCenter { get; set; } = null!;
+        public string? CostCenterName { get; set; } = null;
 
         [Display(Name = "Created Date")]
         [DataType(DataType.Date)]
@@ -75,6 +78,7 @@ namespace KenHRApp.Application.DTOs
         public int? CreatedBy { get; set; }
         public string? CreatedUserID { get; set; } = null;
         public string? CreatedEmail { get; set; } = null;
+        public string? CreatedByName { get; set; } = null;
 
         [Display(Name = "Last Updated Date")]
         [DataType(DataType.Date)]

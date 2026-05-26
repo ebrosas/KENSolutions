@@ -36,11 +36,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         [Parameter]
         [SupplyParameterFromQuery]
-        public long RegularizedRequestId { get; set; } = 0;
+        public long RequestNo { get; set; } = 0;
 
         [Parameter]
         [SupplyParameterFromQuery]
         public string CallerForm { get; set; } = "";
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public DateTime? AttendanceDate { get; set; }
         #endregion
 
         #region Fields
@@ -57,7 +61,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string _pageTitle = "Apply Regularization";
         private int _currentWFIndex = 0;
         private MudDatePicker _picker;
-        private DateTime? _selectedDate = DateTime.Today;
+        private DateTime? _selectedDate; //= DateTime.Today;
         private Orientation _calOrientation = Orientation.Portrait;
         private string _pickerStyle = "width: 420px;";
         #endregion
@@ -205,6 +209,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Initialize the EditContext 
             _editContext = new EditContext(_regularRequest);
 
+            if (AttendanceDate.HasValue)
+                _selectedDate = AttendanceDate.Value;
+            else
+                _selectedDate = DateTime.Today;
+
             if (ActionType == ActionTypes.Edit.ToString() ||
                 ActionType == ActionTypes.View.ToString())
             {
@@ -284,7 +293,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                         // Initiate the workflow
                         await InitializeWorkflowAsync(_regularRequest.RegularizationId, _regularRequest.EmployeeNo);
 
-                        //BeginLoadLeaveRequest(_regularRequest.RegularizationId);
+                        BeginLoadRegularRequest(_regularRequest.RegularizationId);
                     }
                 });
             }
@@ -728,10 +737,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
 
-                //if (RegularizationId > 0)
-                //{
-                //    BeginLoadLeaveRequest(RegularizationId);
-                //}
+                if (RequestNo > 0)
+                {
+                    BeginLoadRegularRequest(RequestNo);
+                }
             });
         }
 
@@ -962,10 +971,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set leave request information and flags 
                 _regularRequest.CreatedDate = DateTime.Now;
 
-                #region Set leave status to "Request Sent" 
+                #region Set status to "Waiting for Approval" 
                 if (_leaveStatusList != null && _leaveStatusList.Any())
                 {
-                    UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_REQUEST_SENT).FirstOrDefault();
+                    UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_WAITING_FOR_APPROVAL).FirstOrDefault();
                     if (statusFlag != null)
                     {
                         _regularRequest.StatusCode = statusFlag.UDCCode;
@@ -1033,9 +1042,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     ShowNotification("Regularization request has been submitted successfully!", NotificationType.Success);
                 else
                     ShowNotification("Regularization request has been updated successfully!", NotificationType.Success);
-
-                // Go back to T&A dashboard
-                //Navigation.NavigateTo("/TimeAttendance/tnadashboard");
             }
             else
             {
@@ -1048,6 +1054,63 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 // Hide the spinner overlay
                 await callback.Invoke();
+            }
+        }
+
+        private async void BeginLoadRegularRequest(long requestNo)
+        {
+            // Load regularization details
+            await GetRegularizationDetail(requestNo);
+
+            #region Get the workflow data
+            var result = await WorkflowService.GetWorkflowStatusAsync(WorkflowHelper.CONST_REGULARIZATION, requestNo);
+            if (result.Success)
+            {
+                _workflowList = result.Value!;
+
+                if (_workflowList.Any())
+                {
+                    #region Find the current pending activity
+                    WorkflowDetailResultDTO currentAct = _workflowList.Where(w => w.IsCurrent == true).FirstOrDefault()!;
+                    if (currentAct != null)
+                    {
+                        _currentWFIndex = _workflowList.IndexOf(currentAct);
+                    }
+                    #endregion
+                }
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.Append(result.Error);
+
+                ShowHideError(true);
+            }
+            #endregion
+        }
+
+        private async Task GetRegularizationDetail(long requestNo)
+        {
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Clear attachment list
+            _files = Array.Empty<IBrowserFile>();
+
+            var result = await AttendanceService.GetRegularRequestAsync(requestNo);
+            if (result.Success)
+            {
+                _regularRequest = result.Value!;
+
+                // Recreate the EditContext with the loaded _regularRequest
+                _editContext = new EditContext(_regularRequest);
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.Append(result.Error);
+
+                ShowHideError(true);
             }
         }
         #endregion

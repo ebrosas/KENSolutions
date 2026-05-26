@@ -210,6 +210,10 @@ namespace KenHRApp.Application.Services
                         case "RTYPELEAVE":
                             this.RequestType = WorkflowRequestType.LeaveRequisition;
                             break;
+
+                        case "RTYPEREGULAR":
+                            this.RequestType = WorkflowRequestType.Regularization;
+                            break;
                     }
                     #endregion
                 }
@@ -227,6 +231,12 @@ namespace KenHRApp.Application.Services
                         subject = "Leave Request for Approval";
                         requestTypeDesc = "Leave Requisition";
                         requestLink = $"{baseUrl}/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={entityId}&CallerForm=LeaveInquiry";
+                    }
+                    else if (this.RequestType == WorkflowRequestType.Regularization)
+                    {
+                        subject = "Regularization Request for Approval";
+                        requestTypeDesc = "Regularization Request";
+                        requestLink = $"{baseUrl}/TimeAttendance/regularization?ActionType=View&RequestNo={entityId}&CallerForm=LeaveInquiry";
                     }
                     #endregion
 
@@ -280,6 +290,10 @@ namespace KenHRApp.Application.Services
                         case "RTYPELEAVE":
                             this.RequestType = WorkflowRequestType.LeaveRequisition;
                             break;
+
+                        case "RTYPEREGULAR":
+                            this.RequestType = WorkflowRequestType.Regularization;
+                            break;
                     }
                     #endregion
                 }
@@ -295,16 +309,24 @@ namespace KenHRApp.Application.Services
                     {
                         if (this.RequestType == WorkflowRequestType.LeaveRequisition)
                         {
-                            #region Build the email parameters
+                            #region Build email parameters for Leave Request
                             subject = "Leave Request for Approval";
                             requestTypeDesc = "Leave Requisition";
                             requestLink = $"{baseUrl}/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={entityId}&CallerForm=ApprovalDashboard";
                             #endregion
+                        }
+                        else if (this.RequestType == WorkflowRequestType.Regularization)
+                        {
+                            #region Build email parameters for Regularization Request
+                            subject = "Regularization Request for Approval";
+                            requestTypeDesc = "Regularization Request";
+                            requestLink = $"{baseUrl}/TimeAttendance/regularization?ActionType=View&RequestNo={entityId}&CallerForm=ApprovalDashboard";
+                            #endregion
+                        }
 
-                            foreach (int approver in repoResult.Value)
-                            {
-                                await SendPendingApprovalAsync(approver, subject, requestTypeDesc, requestLink, entityId, webRootPath, cancellationToken);
-                            }
+                        foreach (int approver in repoResult.Value)
+                        {
+                            await SendPendingApprovalAsync(approver, subject, requestTypeDesc, requestLink, entityId, webRootPath, cancellationToken);
                         }
                     }
                 }
@@ -345,6 +367,10 @@ namespace KenHRApp.Application.Services
                         case "RTYPELEAVE":
                             this.RequestType = WorkflowRequestType.LeaveRequisition;
                             break;
+
+                        case "RTYPEREGULAR":
+                            this.RequestType = WorkflowRequestType.Regularization;
+                            break;
                     }
                     #endregion
                 }
@@ -359,19 +385,27 @@ namespace KenHRApp.Application.Services
                     isSuccess = repoResult.Value;
                     if (isSuccess)
                     {
-                        if (this.RequestType == WorkflowRequestType.LeaveRequisition)
+                        if (creatorEmpNo > 0)
                         {
-                            if (creatorEmpNo > 0)
+                            if (this.RequestType == WorkflowRequestType.LeaveRequisition)
                             {
-                                #region Build the email parameters
+                                #region Build email parameters for Leave Request
                                 subject = "Rejected Leave Request";
                                 requestTypeDesc = "Leave Requisition";
                                 requestLink = $"{baseUrl}/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={entityId}&CallerForm=ApprovalDashboard";
                                 #endregion
-
-                                await NotifyRejectionAsync(Convert.ToInt32(creatorEmpNo), subject, requestTypeDesc, requestLink, 
-                                    entityId, webRootPath, rejectionReason, cancellationToken);
                             }
+                            else if (this.RequestType == WorkflowRequestType.Regularization)
+                            {
+                                #region Build email parameters for Regularization Request
+                                subject = "Rejected Regularization Request";
+                                requestTypeDesc = "Regularization Request";
+                                requestLink = $"{baseUrl}/TimeAttendance/regularization?ActionType=View&RequestNo={entityId}&CallerForm=ApprovalDashboard";
+                                #endregion
+                            }
+
+                            await NotifyRejectionAsync(Convert.ToInt32(creatorEmpNo), subject, requestTypeDesc, requestLink,
+                                entityId, webRootPath, rejectionReason, cancellationToken);
                         }
                     }
                 }

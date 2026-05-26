@@ -49,6 +49,8 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<int>> CancelRegularRequestAsync(
             RegularRequestDTO dto,
             CancellationToken cancellationToken = default);
+
+        Task<Result<RegularRequestDTO?>> GetRegularRequestAsync(long requestNo);
         #endregion
     }
 }

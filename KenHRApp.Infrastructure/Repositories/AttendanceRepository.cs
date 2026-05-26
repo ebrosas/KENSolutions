@@ -1098,6 +1098,7 @@ namespace KenHRApp.Infrastructure.Repositories
                 {
                     EmployeeNo = dto.EmployeeNo,
                     EmployeeName = dto.EmployeeName,
+                    CostCenter = dto.CostCenter,
                     AttendanceDate = dto.AttendanceDate,
                     ROACode = dto.ROACode,
                     ActionCode = dto.ActionCode,
@@ -1125,6 +1126,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     regularRequest.AttachmentList = dto.AttachmentList.Select(e => new FileAttachment
                     {
                         AttachmentId = e.AttachmentId,
+                        RequestType = e.RequestType,
                         FileName = e.FileName,
                         StoredFileName = e.StoredFileName,
                         ContentType = e.ContentType,
@@ -1252,6 +1254,84 @@ namespace KenHRApp.Infrastructure.Repositories
                     return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
                 else
                     return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get Regularization Request details
+        /// </summary>
+        /// <param name="requestNo"></param>
+        /// <returns></returns>
+        public async Task<Result<RegularizationResult>> GetRegularRequestAsync(long requestNo)
+        {
+            RegularizationResult regularRequest = new();
+
+            try
+            {
+                var model = await _db.Set<RegularizationResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetRegularizationDetail @requestNo = {0}",
+                    requestNo)
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    regularRequest.RegularizationId = model[0].RegularizationId;
+                    regularRequest.AttachmentId = model[0].AttachmentId;
+                    regularRequest.WorkflowId = model[0].WorkflowId;
+                    regularRequest.EmployeeNo = model[0].EmployeeNo;
+                    regularRequest.EmployeeName = model[0].EmployeeName;
+                    regularRequest.CostCenter = model[0].CostCenter;
+                    regularRequest.CostCenterName = model[0].CostCenter;
+                    regularRequest.AttendanceDate = model[0].AttendanceDate;
+                    regularRequest.ROACode = model[0].ROACode;
+                    regularRequest.ROADesc = model[0].ROADesc;
+                    regularRequest.ActionCode = model[0].ActionCode;
+                    regularRequest.ActionDesc = model[0].ActionDesc;
+                    regularRequest.RegularizedTimeIn = model[0].RegularizedTimeIn;
+                    regularRequest.RegularizedTimeOut = model[0].RegularizedTimeOut;
+                    regularRequest.ShiftPattern = model[0].ShiftPattern;
+                    regularRequest.RegularizedDescription = model[0].RegularizedDescription;
+                    regularRequest.StatusID = model[0].StatusID;
+                    regularRequest.StatusCode = model[0].StatusCode;
+                    regularRequest.StatusDesc = model[0].StatusDesc;
+                    regularRequest.StatusHandlingCode = model[0].StatusHandlingCode;
+                    regularRequest.CreatedDate = model[0].CreatedDate;
+                    regularRequest.CreatedBy = model[0].CreatedBy;
+                    regularRequest.CreatedUserID = model[0].CreatedUserID;
+                    regularRequest.CreatedEmail = model[0].CreatedEmail;
+                    regularRequest.CreatedByName = model[0].CreatedByName;
+                    regularRequest.LastUpdatedDate = model[0].LastUpdatedDate;
+                    regularRequest.LastUpdatedBy = model[0].LastUpdatedBy;
+                    regularRequest.LastUpdatedUserID = model[0].LastUpdatedUserID;
+                    regularRequest.LastUpdatedEmail = model[0].LastUpdatedEmail;
+
+                    #region Get the file attachments
+                    List<LeaveAttachment> attachments = new();
+
+                    var attachModel = await (from attach in _db.FileAttachments
+                                             where attach.AttachmentId == regularRequest.AttachmentId
+                                             select attach).ToListAsync();
+                    if (attachModel != null)
+                    {
+                        regularRequest.AttachmentList = attachModel.Select(e => new FileAttachment
+                        {
+                            Id = e.Id,
+                            RequestType = e.RequestType,
+                            AttachmentId = e.AttachmentId,
+                            FileName = e.FileName,
+                            StoredFileName = e.StoredFileName,
+                            ContentType = e.ContentType,
+                            FileSize = e.FileSize
+                        }).ToList();
+                    }
+                    #endregion
+                }
+
+                return Result<RegularizationResult>.SuccessResult(regularRequest);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<RegularizationResult>.Failure($"Database error: {ex.Message}");
             }
         }
         #endregion

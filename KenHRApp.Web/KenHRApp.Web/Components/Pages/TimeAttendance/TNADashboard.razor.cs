@@ -448,6 +448,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo=9&CallerForm=TNADashboard");
         }
 
+        public void ApplyRegularization()
+        {
+            Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=Add&AttendanceDate={_selectedDate!.Value.ToString()}");
+        }
+
         public void OpenLeaveInquiry()
         {
             Navigation.NavigateTo($"/TimeAttendance/leaveinquiry?ForceLoad=true&LeaveEmpNo={UserEmpNo}&LeaveStartDate={_payrollStartDate}&LeaveEndDate={_payrollEndDate}&CallerForm=TNADashboard");

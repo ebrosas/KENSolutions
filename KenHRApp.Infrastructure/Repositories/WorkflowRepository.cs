@@ -149,6 +149,10 @@ namespace KenHRApp.Infrastructure.Repositories
                         case "RTYPELEAVE":
                             requestType = WorkflowRequestType.LeaveRequisition;
                             break;
+
+                        case "RTYPEREGULAR":
+                            requestType = WorkflowRequestType.Regularization;
+                            break;
                     }
                 }
 
@@ -157,6 +161,17 @@ namespace KenHRApp.Infrastructure.Repositories
                     var entity = await _db.LeaveRequisitionWFs
                             .AsNoTracking()
                             .FirstOrDefaultAsync(x => x.LeaveRequestId == instance.EntityId);
+                    if (entity != null)
+                    {
+                        // Set the request entity
+                        requestEntity = entity;
+                    }
+                }
+                else if (requestType == WorkflowRequestType.Regularization)
+                {
+                    var entity = await _db.RegularRequestWFs
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(x => x.RegularizationId == instance.EntityId);
                     if (entity != null)
                     {
                         // Set the request entity
@@ -284,6 +299,14 @@ namespace KenHRApp.Infrastructure.Repositories
                             assigneeEmpNo = Convert.ToInt32(employeeInfo.ReportingManagerCode);
                         }
                     }
+                    else if (entity is RegularRequestWF regular)
+                    {
+                        var employeeInfo = await _db.Employees.FirstAsync(x => x.EmployeeNo == regular.EmployeeNo);
+                        if (employeeInfo != null && employeeInfo.ReportingManagerCode.HasValue)
+                        {
+                            assigneeEmpNo = Convert.ToInt32(employeeInfo.ReportingManagerCode);
+                        }
+                    }
                     #endregion
                 }
                 else if (approver.GroupType == 2)
@@ -297,6 +320,14 @@ namespace KenHRApp.Infrastructure.Repositories
                             assigneeEmpNo = Convert.ToInt32(departmentInfo.SuperintendentEmpNo);
                         }
                     }
+                    else if (entity is RegularRequestWF regular)
+                    {
+                        var departmentInfo = await _db.DepartmentMasters.FirstAsync(x => x.DepartmentCode == regular.CostCenter);
+                        if (departmentInfo != null && departmentInfo.SuperintendentEmpNo.HasValue)
+                        {
+                            assigneeEmpNo = Convert.ToInt32(departmentInfo.SuperintendentEmpNo);
+                        }
+                    }
                     #endregion
                 }
                 else if (approver.GroupType == 3)
@@ -305,6 +336,14 @@ namespace KenHRApp.Infrastructure.Repositories
                     if (entity is LeaveRequisitionWF leave)
                     {
                         var departmentInfo = await _db.DepartmentMasters.FirstAsync(x => x.DepartmentCode == leave.LeaveEmpCostCenter);
+                        if (departmentInfo != null && departmentInfo.ManagerEmpNo.HasValue)
+                        {
+                            assigneeEmpNo = Convert.ToInt32(departmentInfo.ManagerEmpNo);
+                        }
+                    }
+                    else if (entity is RegularRequestWF regular)
+                    {
+                        var departmentInfo = await _db.DepartmentMasters.FirstAsync(x => x.DepartmentCode == regular.CostCenter);
                         if (departmentInfo != null && departmentInfo.ManagerEmpNo.HasValue)
                         {
                             assigneeEmpNo = Convert.ToInt32(departmentInfo.ManagerEmpNo);
@@ -333,8 +372,6 @@ namespace KenHRApp.Infrastructure.Repositories
                 await _db.SaveChangesAsync();
 
                 return assigneeEmpNo;
-
-                //await _notify.SendPendingApprovalAsync(step);
             }
             catch (Exception ex)
             {
@@ -573,6 +610,10 @@ namespace KenHRApp.Infrastructure.Repositories
                         case "RTYPELEAVE":
                             requestType = WorkflowRequestType.LeaveRequisition;
                             break;
+
+                        case "RTYPEREGULAR":
+                            requestType = WorkflowRequestType.Regularization;
+                            break;
                     }
                 }
 
@@ -581,6 +622,17 @@ namespace KenHRApp.Infrastructure.Repositories
                     var entity = await _db.LeaveRequisitionWFs
                                 .AsNoTracking()
                                 .FirstOrDefaultAsync(x => x.LeaveRequestId == dbInstance.EntityId);
+                    if (entity != null)
+                    {
+                        // Set the request entity
+                        requestEntity = entity;
+                    }
+                }
+                else if (requestType == WorkflowRequestType.Regularization)
+                {
+                    var entity = await _db.RegularRequestWFs
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(x => x.RegularizationId == dbInstance.EntityId);
                     if (entity != null)
                     {
                         // Set the request entity
@@ -1029,6 +1081,12 @@ namespace KenHRApp.Infrastructure.Repositories
                     if (entity is LeaveRequisitionWF leave)
                     {
                         var queryable = new List<LeaveRequisitionWF> { leave }.AsQueryable();
+
+                        return queryable.Any(normalized);
+                    }
+                    else if (entity is RegularRequestWF regular)
+                    {
+                        var queryable = new List<RegularRequestWF> { regular }.AsQueryable();
 
                         return queryable.Any(normalized);
                     }

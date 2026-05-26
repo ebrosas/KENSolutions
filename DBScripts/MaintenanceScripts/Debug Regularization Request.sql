@@ -11,5 +11,8 @@
 		AND a.AttendanceDate = '05/22/2026'
 	ORDER By a.AttendanceDate Desc
 
-	SELECT * FROM kenuser.LeaveRequisitionWF a
-	ORDER BY a.LeaveRequestId desc
+	SELECT * FROM kenuser.RegularRequestWFs a
+	ORDER BY a.RegularizationId desc
+
+	SELECT * FROM kenuser.FileAttachments a
+		

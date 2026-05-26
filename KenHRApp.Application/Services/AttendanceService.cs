@@ -1,4 +1,5 @@
-﻿using KenHRApp.Application.DTOs;
+﻿using KenHRApp.Application.Common.Helpers;
+using KenHRApp.Application.DTOs;
 using KenHRApp.Application.DTOs.TNA;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Domain.Entities;
@@ -885,6 +886,7 @@ namespace KenHRApp.Application.Services
                 {
                     EmployeeNo = dto.EmployeeNo,
                     EmployeeName = dto.EmployeeName,
+                    CostCenter = dto.CostCenter,
                     AttendanceDate = Convert.ToDateTime(dto.AttendanceDate),
                     ROACode = dto!.ROACode,
                     ActionCode = dto!.ActionCode,
@@ -954,6 +956,7 @@ namespace KenHRApp.Application.Services
 
                         var attachment = new FileAttachment(
                             regularRequest.AttachmentId,
+                            ServiceHelper.CONST_REGULARIZATION,
                             file.FileName,
                             file.ContentType,
                             storedFileName,
@@ -1058,6 +1061,73 @@ namespace KenHRApp.Application.Services
             catch (Exception ex)
             {
                 return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<RegularRequestDTO?>> GetRegularRequestAsync(long requestNo)
+        {
+            RegularRequestDTO? regularRequest = null;
+
+            try
+            {
+                var repoResult = await _repository.GetRegularRequestAsync(requestNo);
+                if (!repoResult.Success)
+                {
+                    return Result<RegularRequestDTO?>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null)
+                {
+                    regularRequest = new RegularRequestDTO
+                    {
+                        RegularizationId = model.RegularizationId,
+                        AttachmentId = model.AttachmentId,
+                        WorkflowId = model.WorkflowId,
+                        EmployeeNo = model.EmployeeNo,
+                        EmployeeName = model.EmployeeName,
+                        CostCenter = model.CostCenter,
+                        CostCenterName = model.CostCenter,
+                        AttendanceDate = model.AttendanceDate,
+                        ROACode = model.ROACode,
+                        ROADescription = model.ROADesc,
+                        ActionCode = model.ActionCode,
+                        ActionDescription = model.ActionDesc,
+                        RegularizedTimeIn = model.RegularizedTimeIn,
+                        RegularizedTimeOut = model.RegularizedTimeOut,
+                        ShiftPattern = model.ShiftPattern,
+                        RegularizedDescription = model.RegularizedDescription,
+                        StatusID = model.StatusID,
+                        StatusCode = model.StatusCode,
+                        StatusHandlingCode = model.StatusHandlingCode,
+                        CreatedDate = model.CreatedDate,
+                        CreatedBy = model.CreatedBy,
+                        CreatedUserID = model.CreatedUserID,
+                        CreatedEmail = model.CreatedEmail,
+                        CreatedByName = model.CreatedByName,
+                        LastUpdatedDate = model.LastUpdatedDate,
+                        LastUpdatedBy = model.LastUpdatedBy,
+                        LastUpdatedUserID = model.LastUpdatedUserID,
+                        LastUpdatedEmail = model.LastUpdatedEmail,
+
+                        Files = model.AttachmentList!.Select(e => new FileAttachmentDTO
+                        {
+                            Id = e.Id,
+                            RequestType = e.RequestType,
+                            AttachmentId = e.AttachmentId,
+                            FileName = e.FileName,
+                            StoredFileName = e.StoredFileName,
+                            ContentType = e.ContentType,
+                            FileSize = e.FileSize
+                        }).ToList(),
+                    };
+                }
+
+                return Result<RegularRequestDTO?>.SuccessResult(regularRequest);
+            }
+            catch (Exception ex)
+            {
+                return Result<RegularRequestDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching leave request record from the database.");
             }
         }
         #endregion

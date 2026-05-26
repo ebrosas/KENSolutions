@@ -9,6 +9,11 @@ namespace KenHRApp.Application.Common.Helpers
 {
     public static class ServiceHelper
     {
+        #region Constants
+        public static readonly string CONST_LEAVE_REQUEST = "RTYPELEAVE";
+        public static readonly string CONST_REGULARIZATION = "RTYPEREGULAR";
+        #endregion   
+
         #region Public Methods
         public static string RetrieveXmlMessage(string xmlFile)
         {

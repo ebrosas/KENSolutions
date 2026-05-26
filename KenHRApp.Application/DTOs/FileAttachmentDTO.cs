@@ -13,15 +13,11 @@ namespace KenHRApp.Application.DTOs
         public Guid Id { get; set; } = Guid.NewGuid();
         public Guid AttachmentId { get; set; }
         public long RequestId { get; set; }
-
+        public string RequestType { get; set; } = null!;
         public string FileName { get; set; } = null!;
-
         public string StoredFileName { get; set; } = null!;
-
         public string ContentType { get; set; } = null!;
-
         public long FileSize { get; set; }
-
         public byte[]? FileData { get; set; }
         #endregion
     }
