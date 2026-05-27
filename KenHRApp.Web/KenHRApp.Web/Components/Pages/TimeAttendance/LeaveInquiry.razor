@@ -6,7 +6,7 @@
 </MudStack>
 
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
-     @if (_hasValidationError && _validationMessages.Any())
+    @if (_hasValidationError && _validationMessages.Any())
     {
         <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
             <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
@@ -29,10 +29,48 @@
         </MudAlert>
     }
 
-    <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
+    <MudPaper class="paper-header w-100 px-4" Elevation="0"> 
         <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
             CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
+        <MudSpacer></MudSpacer>
 
+        <MudPaper Elevation="0">        
+            <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full mt-0" Spacing="2">
+                <MudButton Variant="Variant.Filled"
+                            Color="Color.Primary"
+                            Style="background-color:#004165;"
+                            Class="mt-1 px-4"
+                            FullWidth="false"
+                            Size="Size.Small"
+                            StartIcon="@Icons.Material.Filled.PersonSearch"
+                            OnClick="@(() => BeginSearchLeaveTask(true))"
+                            Disabled="@_isRunning">
+                        @if (_isRunning)
+                    {
+                        <span>Searching...</span>
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+                    }
+                    else
+                    {
+                        <span>Search</span>
+                    }
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                            ButtonType="ButtonType.Reset"
+                            Color="Color.Warning"
+                            FullWidth="false"
+                            Class="mt-1 px-4"
+                            Size="Size.Small"
+                            Disabled="@_isRunning"
+                            StartIcon="@Icons.Material.Filled.Refresh"
+                            OnClick="HandleRefreshButton">
+                    Reset
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    </MudPaper>
+
+    <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">        
         <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-2 mb-0">
             <MudPaper Elevation="0" Square="true" Class="w-100">
                 <MudGrid Spacing="5">
@@ -153,39 +191,7 @@
                     </MudItem>
                 </MudGrid>
             </MudPaper>
-            <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full mt-0" Spacing="2">
-                 <MudButton Variant="Variant.Filled"
-                            Color="Color.Primary"
-                            Style="background-color:#004165;"
-                            Class="mt-1 px-4"
-                            FullWidth="false"
-                            Size="Size.Small"
-                            StartIcon="@Icons.Material.Filled.PersonSearch"
-                            OnClick="@(() => BeginSearchLeaveTask(true))"
-                            Disabled="@_isRunning">
-                    @if (_isRunning)
-                    {
-                        <span>Searching...</span>
-                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
-                    }
-                    else
-                    {
-                        <span>Search</span>
-                    }
-                </MudButton>
-                <MudButton Variant="Variant.Filled"
-                           ButtonType="ButtonType.Reset"
-                           Color="Color.Warning"
-                           FullWidth="false"
-                           Class="mt-1 px-4"
-                           Size="Size.Small"
-                           Disabled="@_isRunning"
-                           StartIcon="@Icons.Material.Filled.Refresh"
-                           OnClick="HandleRefreshButton">
-                    Reset
-                </MudButton>
-            </MudStack>
-
+            
             <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
                 <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LEAVE REQUISITION LIST</MudText>
                 <MudSpacer />

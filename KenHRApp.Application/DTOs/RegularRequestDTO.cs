@@ -151,6 +151,15 @@ namespace KenHRApp.Application.DTOs
             }
             set { }
         }
+
+        [Display(Name = "Department")]
+        public string DepartmentFullName
+        {
+            get
+            {
+                return $"{CostCenter} - {CostCenterName}";
+            }
+        }
         #endregion
     }
 }

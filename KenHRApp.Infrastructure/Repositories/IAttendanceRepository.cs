@@ -40,6 +40,15 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<int>> UpdateRegularRequestAsync(RegularRequestWF regularRequest, CancellationToken cancellationToken = default);
         Task<Result<int>> CancelRegularRequestAsync(RegularRequestWF regularRequest, CancellationToken cancellationToken = default);
         Task<Result<RegularizationResult>> GetRegularRequestAsync(long requestNo);
+
+        Task<Result<List<RegularizationResult>>> SearchRegularizationAsync(
+            long? requestNo,
+            int? empNo,
+            string? costCenter,
+            string? roaCode,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate);
         #endregion
     }
 }

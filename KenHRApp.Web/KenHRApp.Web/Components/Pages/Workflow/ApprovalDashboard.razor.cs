@@ -655,9 +655,9 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
                     //if (groupID > 0)
                     //{
-                    //    _leaveTypeList = udcData!.Where(a => a.GroupID == groupID).ToList();
-                    //    if (_leaveTypeList != null)
-                    //        _leaveTypeArray = _leaveTypeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    //    _roaList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                    //    if (_roaList != null)
+                    //        _roaArray = _roaList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
                     //}
                     #endregion
                 }

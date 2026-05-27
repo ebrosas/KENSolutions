@@ -131,14 +131,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Page Events
         protected override void OnInitialized()
         {
-            //if (LeaveEmpNo.HasValue && LeaveEmpNo > 0)
-            //    _empNo = LeaveEmpNo;
+            //if (RegularEmpNo.HasValue && RegularEmpNo > 0)
+            //    _empNo = RegularEmpNo;
 
-            //if (LeaveStartDate.HasValue)
-            //    _selectedStartDate = LeaveStartDate;
+            //if (RegularStartDate.HasValue)
+            //    _selectedStartDate = RegularStartDate;
 
-            //if (LeaveEndDate.HasValue)
-            //    _selectedResumeDate = LeaveEndDate;
+            //if (RegularEndDate.HasValue)
+            //    _selectedEndDate = RegularEndDate;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -445,13 +445,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _errorMessage.Clear();
 
             // Clear field mappings
-            //_leaveNo = null;
+            //_requestNo = null;
             //_empNo = null;
             //_selectedDepartment = string.Empty;
-            //_selectedLeaveType = string.Empty;
+            //_selectedROAType = string.Empty;
             //_selectedStatus = string.Empty;
             //_selectedStartDate = null;
-            //_selectedResumeDate = null;
+            //_selectedEndDate = null;
 
             // Clear datagrid datasource
             //_approvalList = new();

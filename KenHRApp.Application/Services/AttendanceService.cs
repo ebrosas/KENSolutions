@@ -1130,6 +1130,80 @@ namespace KenHRApp.Application.Services
                 return Result<RegularRequestDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching leave request record from the database.");
             }
         }
+
+        public async Task<Result<List<RegularRequestDTO>>> SearchRegularizationAsync(
+            long? requestNo,
+            int? empNo,
+            string? costCenter,
+            string? roaCode,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate)
+        {
+            List<RegularRequestDTO> regularizationList = new();
+
+            try
+            {
+                var repoResult = await _repository.SearchRegularizationAsync(requestNo, empNo, costCenter, roaCode, status, startDate, endDate);
+                if (!repoResult.Success)
+                {
+                    return Result<List<RegularRequestDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var e = repoResult.Value;
+                if (e != null && e.Any())
+                {
+                    regularizationList = e.Select(e => new RegularRequestDTO
+                    {
+                        RegularizationId = e.RegularizationId,
+                        AttachmentId = e.AttachmentId,
+                        WorkflowId = e.WorkflowId,
+                        EmployeeNo = e.EmployeeNo,
+                        EmployeeName = e.EmployeeName,
+                        CostCenter = e.CostCenter,
+                        CostCenterName = e.CostCenter,
+                        AttendanceDate = e.AttendanceDate,
+                        ROACode = e.ROACode,
+                        ROADescription = e.ROADesc,
+                        ActionCode = e.ActionCode,
+                        ActionDescription = e.ActionDesc,
+                        RegularizedTimeIn = e.RegularizedTimeIn,
+                        RegularizedTimeOut = e.RegularizedTimeOut,
+                        ShiftPattern = e.ShiftPattern,
+                        RegularizedDescription = e.RegularizedDescription,
+                        StatusID = e.StatusID,
+                        StatusCode = e.StatusCode,
+                        StatusHandlingCode = e.StatusHandlingCode,
+                        CreatedDate = e.CreatedDate,
+                        CreatedBy = e.CreatedBy,
+                        CreatedUserID = e.CreatedUserID,
+                        CreatedEmail = e.CreatedEmail,
+                        CreatedByName = e.CreatedByName,
+                        LastUpdatedDate = e.LastUpdatedDate,
+                        LastUpdatedBy = e.LastUpdatedBy,
+                        LastUpdatedUserID = e.LastUpdatedUserID,
+                        LastUpdatedEmail = e.LastUpdatedEmail,
+
+                        Files = e.AttachmentList!.Select(e => new FileAttachmentDTO
+                        {
+                            Id = e.Id,
+                            RequestType = e.RequestType,
+                            AttachmentId = e.AttachmentId,
+                            FileName = e.FileName,
+                            StoredFileName = e.StoredFileName,
+                            ContentType = e.ContentType,
+                            FileSize = e.FileSize
+                        }).ToList(),
+                    }).ToList();
+                }
+
+                return Result<List<RegularRequestDTO>>.SuccessResult(regularizationList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<RegularRequestDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the leave requisition records from the database.");
+            }
+        }
         #endregion
     }
 }

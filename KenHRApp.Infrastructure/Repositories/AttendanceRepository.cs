@@ -1334,6 +1334,110 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<RegularizationResult>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Search Regularization Requests 
+        /// </summary>
+        /// <param name="requestNo"></param>
+        /// <param name="empNo"></param>
+        /// <param name="costCenter"></param>
+        /// <param name="roaCode"></param>
+        /// <param name="status"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        public async Task<Result<List<RegularizationResult>>> SearchRegularizationAsync(
+            long? requestNo,
+            int? empNo,
+            string? costCenter,
+            string? roaCode,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate)
+        {
+            List<RegularizationResult> regularizationList = new();
+
+            try
+            {
+                var model = (await _db.Set<RegularizationResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetRegularizationDetail @requestNo = {0}, @empNo = {1}, @costCenter = {2}, @roaCode = {3}, @status = {4}, @startDate = {5}, @endDate = {6}",
+                    requestNo!,
+                    empNo!,
+                    costCenter!,
+                    roaCode!,
+                    status!,
+                    startDate!,
+                    endDate!)
+                    .ToListAsync()).AsEnumerable().OrderByDescending(a => a.RegularizationId);
+                if (model != null && model.Any())
+                {
+                    regularizationList = model.Select(e => new RegularizationResult
+                    {
+                        RegularizationId = e.RegularizationId,
+                        AttachmentId = e.AttachmentId,
+                        WorkflowId = e.WorkflowId,
+                        EmployeeNo = e.EmployeeNo,
+                        EmployeeName = e.EmployeeName,
+                        CostCenter = e.CostCenter,
+                        CostCenterName = e.CostCenter,
+                        AttendanceDate = e.AttendanceDate,
+                        ROACode = e.ROACode,
+                        ROADesc = e.ROADesc,
+                        ActionCode = e.ActionCode,
+                        ActionDesc = e.ActionDesc,
+                        RegularizedTimeIn = e.RegularizedTimeIn,
+                        RegularizedTimeOut = e.RegularizedTimeOut,
+                        ShiftPattern = e.ShiftPattern,
+                        RegularizedDescription = e.RegularizedDescription,
+                        StatusID = e.StatusID,
+                        StatusCode = e.StatusCode,
+                        StatusDesc = e.StatusDesc,
+                        StatusHandlingCode = e.StatusHandlingCode,
+                        CreatedDate = e.CreatedDate,
+                        CreatedBy = e.CreatedBy,
+                        CreatedUserID = e.CreatedUserID,
+                        CreatedEmail = e.CreatedEmail,
+                        CreatedByName = e.CreatedByName,
+                        LastUpdatedDate = e.LastUpdatedDate,
+                        LastUpdatedBy = e.LastUpdatedBy,
+                        LastUpdatedUserID = e.LastUpdatedUserID,
+                        LastUpdatedEmail = e.LastUpdatedEmail
+                    }).ToList();
+
+                    if (regularizationList.Any())
+                    {
+                        foreach (var item in regularizationList)
+                        {
+                            #region Get the file attachments
+                            var attachModel = await (from attach in _db.FileAttachments
+                                                     where attach.AttachmentId == item.AttachmentId
+                                                     select attach).ToListAsync();
+                            if (attachModel != null)
+                            {
+                                item.AttachmentList = attachModel.Select(e => new FileAttachment
+                                {
+                                    Id = e.Id,
+                                    AttachmentId = e.AttachmentId,
+                                    RequestType = e.RequestType,
+                                    FileName = e.FileName,
+                                    StoredFileName = e.StoredFileName,
+                                    ContentType = e.ContentType,
+                                    FileSize = e.FileSize
+                                }).ToList();
+                            }
+                            #endregion
+                        }
+                    }
+                }
+
+                return Result<List<RegularizationResult>>.SuccessResult(regularizationList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<RegularizationResult>>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿using KenHRApp.Application.Common.Interfaces;
+using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.DTOs;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Application.Services;
@@ -11,16 +11,15 @@ using System.Text;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
-    public partial class LeaveInquiry : IPageAuthorization
+    public partial class RegularizationInquiry : IPageAuthorization
     {
         #region Parameters and Injections
-        [Inject] private ILeaveRequestService LeaveService { get; set; } = default!;
+        [Inject] private IAttendanceService AttendanceService { get; set; } = default!;
         [Inject] private IEmployeeService EmployeeService { get; set; } = default!;
         [Inject] private IDialogService DialogService { get; set; } = default!;
         [Inject] private ISnackbar Snackbar { get; set; } = default!;
         [Inject] private ILookupCacheService LookupCache { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
-        [Inject] private IAppState State { get; set; } = default!;
         [Inject] private IUserSessionService UserSession { get; set; } = default!;
 
         [Parameter]
@@ -29,31 +28,31 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         [Parameter]
         [SupplyParameterFromQuery]
-        public int? LeaveEmpNo { get; set; } = null;
+        public int? RegularEmpNo { get; set; } = null;
 
         [Parameter]
         [SupplyParameterFromQuery]
-        public DateTime? LeaveStartDate { get; set; } = null;
+        public DateTime? RegularStartDate { get; set; } = null;
 
         [Parameter]
         [SupplyParameterFromQuery]
-        public DateTime? LeaveEndDate { get; set; } = null;
+        public DateTime? RegularEndDate { get; set; } = null;
         #endregion
 
         #region Fields
         private StringBuilder _errorMessage = new StringBuilder();
         private int? _empNo = null;
-        private int? _leaveNo = null;
-        private string _selectedLeaveType = string.Empty;
+        private int? _requestNo = null;
+        private string _selectedROAType = string.Empty;
         private string _selectedDepartment = string.Empty;
         private string _selectedStatus = string.Empty;
         private DateTime? _selectedStartDate = null;
-        private DateTime? _selectedResumeDate = null;
+        private DateTime? _selectedEndDate = null;
         private string _searchString = string.Empty;
         private string overlayMessage = "Please wait...";
         private List<string> _events = new();
         private CancellationTokenSource? _cts;
-        
+
         #region Dialog Box Button Icons
         private readonly string _iconDelete = "fas fa-trash-alt";
         private readonly string _iconCancel = "fas fa-window-close";
@@ -76,21 +75,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         #region Objects and collections
         private MudDatePicker _startDatePicker;
-        private MudDatePicker _resumeDatePicker;
-        private List<LeaveRequestResultDTO> _leaveRequestList = new List<LeaveRequestResultDTO>();        
+        private MudDatePicker _endDatePicker;
+        private List<RegularRequestDTO> _regularRequestList = new List<RegularRequestDTO>();
         private List<string> _validationMessages = new();
 
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Leave Inquiry", href: null, icon: @Icons.Material.Filled.AccountBalance, disabled: true)
+            new("Regularization Request", href: null, icon: @Icons.Material.Filled.AccountBalance, disabled: true)
         ];
 
-        private string[]? _leaveTypeArray = null;
-        private List<UserDefinedCodeDTO> _leaveTypeList = new List<UserDefinedCodeDTO>();
+        private string[]? _roaArray = null;
+        private List<UserDefinedCodeDTO> _roaList = new List<UserDefinedCodeDTO>();
 
-        private string[]? _leaveStatusArray = null;
-        private List<UserDefinedCodeDTO> _leaveStatusList = new List<UserDefinedCodeDTO>();
+        private string[]? _requestStatusArray = null;
+        private List<UserDefinedCodeDTO> _requestStatusList = new List<UserDefinedCodeDTO>();
 
         private string[]? _departmentArray = null;
         private IReadOnlyList<DepartmentDTO> _departmentList = new List<DepartmentDTO>();
@@ -101,8 +100,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Enums
         private enum UDCKeys
         {
-            LEAVETYPES,     // Leave Types
-            STATUS,  // Leave Modes
+            ROATYPE,        // Reason of Absence Types
+            STATUS,         // Request Statuses
             DEPARTMENT      // Departments
         }
 
@@ -131,7 +130,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         public string? UserEmail { get; set; } = "";
         public string? UserCostCenter { get; set; } = "";
         public string UserFullName { get; set; } = "";
-        
+
         public void GoToLogin()
         {
             Navigation.NavigateTo("/login");
@@ -141,36 +140,20 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Page Events
         protected override void OnInitialized()
         {
-            if (LeaveEmpNo.HasValue && LeaveEmpNo > 0)
-                _empNo = LeaveEmpNo;
+            if (RegularEmpNo.HasValue && RegularEmpNo > 0)
+                _empNo = RegularEmpNo;
 
-            if (LeaveStartDate.HasValue)
-                _selectedStartDate = LeaveStartDate;
+            if (RegularStartDate.HasValue)
+                _selectedStartDate = RegularStartDate;
 
-            if (LeaveEndDate.HasValue)
-                _selectedResumeDate = LeaveEndDate;
+            if (RegularEndDate.HasValue)
+                _selectedEndDate = RegularEndDate;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                #region Old authentication Logic
-                //if (!State.IsAuthenticated)
-                //    GoToLogin();
-
-                //if (State.AuthenticatedUser != null)
-                //{
-                //    UserName = State.AuthenticatedUser!.EmployeeFullName;
-                //    UserEmpNo = State.AuthenticatedUser.EmployeeNo;
-                //    UserID = State.AuthenticatedUser!.UserID;
-                //    UserEmail = State.AuthenticatedUser!.OfficialEmail;
-                //    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
-
-                //    BeginLoadComboboxTask();
-                //}
-                #endregion
-
                 bool isAuthenticated = UserSession.IsAuthenticated();
                 if (!isAuthenticated)
                 {
@@ -197,54 +180,54 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Grid Events 
-        private Func<LeaveRequestResultDTO, bool> _quickFilter => x =>
+        private Func<RegularRequestDTO, bool> _quickFilter => x =>
         {
             if (string.IsNullOrWhiteSpace(_searchString))
                 return true;
 
-            //if (!string.IsNullOrEmpty(x.DepartmentCode) && x.DepartmentCode.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
+            if (!string.IsNullOrEmpty(x.CostCenter) && x.CostCenter.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
 
-            //if (!string.IsNullOrEmpty(x.DepartmentName) && x.DepartmentName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
+            if (!string.IsNullOrEmpty(x.CostCenterName) && x.CostCenterName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
 
-            //if (!string.IsNullOrEmpty(x.Description) && x.Description!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
+            if (!string.IsNullOrEmpty(x.ROADescription) && x.ROADescription!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
 
-            //if (!string.IsNullOrEmpty(x.GroupName) && x.GroupName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
+            if (!string.IsNullOrEmpty(x.ShiftPattern) && x.ShiftPattern!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
 
-            //if (!string.IsNullOrEmpty(x.SuperintendentName) && x.SuperintendentName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
+            if (!string.IsNullOrEmpty(x.RegularizedDescription) && x.RegularizedDescription!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
 
-            //if (!string.IsNullOrEmpty(x.ManagerName) && x.ManagerName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
+            if (!string.IsNullOrEmpty(x.CreatedByName) && x.CreatedByName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
 
             return false;
         };
 
-        private void StartedEditingItem(LeaveRequestResultDTO item)
+        private void StartedEditingItem(RegularRequestDTO item)
         {
             _events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
         }
 
-        private void CanceledEditingItem(LeaveRequestResultDTO item)
+        private void CanceledEditingItem(RegularRequestDTO item)
         {
             _events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
         }
 
-        private void CommittedItemChanges(LeaveRequestResultDTO item)
+        private void CommittedItemChanges(RegularRequestDTO item)
         {
 
         }
 
-        private async Task ConfirmDelete(LeaveRequestResultDTO leaveRequest)
+        private async Task ConfirmDelete(RegularRequestDTO regularRequest)
         {
             var parameters = new DialogParameters
             {
                 { "DialogTitle", "Confirm Delete"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to delete leave requisition no. '{leaveRequest.LeaveRequestId}'?" },
+                { "ContentText", $"Are you sure you want to delete leave requisition no. '{regularRequest.RegularizationId}'?" },
                 { "ConfirmText", "Delete" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -357,17 +340,17 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             var result = await dialog.Result;
         }
 
-        public void ApplyLeave()
+        public void ApplyRegularization()
         {
-            Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=Add&CallerForm=LeaveInquiry");
+            Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=Add&CallerForm=regularinquiry");
         }
 
-        public void OpenLeaveRequest(LeaveRequestResultDTO item)
+        public void OpenRegularizationRequest(RegularRequestDTO item)
         {
-            Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.LeaveRequestId}&CallerForm=LeaveInquiry");
+            Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=View&RequestNo={item.RegularizationId}&CallerForm=regularinquiry");
         }
 
-        private async Task<IEnumerable<string>> SearchLeaveTypes(string value, CancellationToken token)
+        private async Task<IEnumerable<string>> SearchROATypes(string value, CancellationToken token)
         {
             // In real life use an asynchronous function for fetching data from an api.
             await Task.Delay(5, token);
@@ -375,13 +358,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // if text is null or empty, show complete list
             if (string.IsNullOrEmpty(value))
             {
-                return _leaveTypeArray!;
+                return _roaArray!;
             }
 
-            return _leaveTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+            return _roaArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        private async Task<IEnumerable<string>> SearchLeaveStatus(string value, CancellationToken token)
+        private async Task<IEnumerable<string>> SearchRequestStatus(string value, CancellationToken token)
         {
             // In real life use an asynchronous function for fetching data from an api.
             await Task.Delay(5, token);
@@ -389,10 +372,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // if text is null or empty, show complete list
             if (string.IsNullOrEmpty(value))
             {
-                return _leaveStatusArray!;
+                return _requestStatusArray!;
             }
 
-            return _leaveStatusArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+            return _requestStatusArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
 
         private async Task<IEnumerable<string>> SearchDepartment(string value, CancellationToken token)
@@ -417,7 +400,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _isRunning = true;
 
             // Set the overlay message
-            //if (!State.IsAuthenticated)
             if (!UserSession.IsAuthenticated())
                 overlayMessage = "Authentication required. Redirecting to login page...";
             else
@@ -436,7 +418,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 if (ForceLoad)
                 {
-                    BeginSearchLeaveTask(ForceLoad);
+                    BeginSearchRegularization(ForceLoad);
                 }
             });
         }
@@ -447,31 +429,31 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _errorMessage.Clear();
 
             // Clear field mappings
-            _leaveNo = null;
+            _requestNo = null;
             _empNo = null;
             _selectedDepartment = string.Empty;
-            _selectedLeaveType = string.Empty;
+            _selectedROAType = string.Empty;
             _selectedStatus = string.Empty;
             _selectedStartDate = null;
-            _selectedResumeDate = null;
-            
+            _selectedEndDate = null;
+
             // Clear datagrid datasource
-            _leaveRequestList = new();
+            _regularRequestList = new();
 
             // Reset validation error messages
             _hasValidationError = false;
             _validationMessages.Clear();
         }
 
-        private void BeginSearchLeaveTask(bool forceLoad = false)
+        private void BeginSearchRegularization(bool forceLoad = false)
         {
             // Reset validation errors
             _hasValidationError = false;
             _validationMessages.Clear();
 
             #region Check if date period is valid
-            if (_selectedStartDate.HasValue && _selectedResumeDate.HasValue &&
-                _selectedStartDate > _selectedResumeDate)
+            if (_selectedStartDate.HasValue && _selectedEndDate.HasValue &&
+                _selectedStartDate > _selectedEndDate)
             {
                 _hasValidationError = true;
                 _validationMessages.Add("Start Date cannot be greater than End Date.");
@@ -485,13 +467,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _isRunning = true;
 
             // Set the overlay message
-            //if (!State.IsAuthenticated)
             if (!UserSession.IsAuthenticated())
                 overlayMessage = "Authentication required. Redirecting to login page...";
             else
-                overlayMessage = "Loading leave requisitions, please wait...";
+                overlayMessage = "Loading regularization requests, please wait...";
 
-            _ = SearchLeaveRequestAsync(async () =>
+            _ = SearchRegularizationAsync(async () =>
             {
                 _isTaskFinished = true;
                 _isRunning = false;
@@ -548,25 +529,25 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 var udcData = result.Value;
                 if (udcData!.Any() && udcGroupList!.Any())
                 {
-                    #region Get Leave Types
+                    #region Get ROA Types
                     try
                     {
-                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.LEAVETYPES.ToString()).FirstOrDefault()!.UDCGroupId;
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ROATYPE.ToString()).FirstOrDefault()!.UDCGroupId;
                     }
                     catch (Exception ex)
                     {
-                        _errorMessage.Append($"Error getting Leave Types group id: {ex.Message}");
+                        _errorMessage.Append($"Error getting ROA Types: {ex.Message}");
                     }
 
                     if (groupID > 0)
                     {
-                        _leaveTypeList = udcData!.Where(a => a.GroupID == groupID).ToList();
-                        if (_leaveTypeList != null)
-                            _leaveTypeArray = _leaveTypeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                        _roaList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_roaList != null)
+                            _roaArray = _roaList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
                     }
                     #endregion
 
-                    #region Get Leave Statuses
+                    #region Get Request Statuses
                     try
                     {
                         groupID = udcGroupList!
@@ -575,17 +556,17 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     }
                     catch (Exception ex)
                     {
-                        _errorMessage.Append($"Error getting Leave Status group id: {ex.Message}");
+                        _errorMessage.Append($"Error getting Request Status: {ex.Message}");
                     }
 
                     if (groupID > 0)
                     {
-                        _leaveStatusList = udcData!
+                        _requestStatusList = udcData!
                             .Where(a => a.GroupID == groupID)
                             .DistinctBy(s => s.UDCSpecialHandlingCode)
                             .ToList();
-                        if (_leaveStatusList != null)
-                            _leaveStatusArray = _leaveStatusList.Select(s => s.UDCSpecialHandlingCode).OrderBy(s => s).ToArray();
+                        if (_requestStatusList != null)
+                            _requestStatusArray = _requestStatusList.Select(s => s.UDCSpecialHandlingCode).OrderBy(s => s).ToArray();
                     }
                     #endregion
                 }
@@ -598,7 +579,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task SearchLeaveRequestAsync(Func<Task> callback, bool forceLoad = false)
+        private async Task SearchRegularizationAsync(Func<Task> callback, bool forceLoad = false)
         {
             await Task.Delay(500);
 
@@ -615,37 +596,37 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
             #endregion
 
-            #region Get the selected Leave Type
-            string leaveType = string.Empty;
-            if (!string.IsNullOrEmpty(_selectedLeaveType))
+            #region Get the selected ROA Type
+            string roaType = string.Empty;
+            if (!string.IsNullOrEmpty(_selectedROAType))
             {
-                UserDefinedCodeDTO? leaveTypeUDC = _leaveTypeList.Where(d => d.UDCDesc1 == _selectedLeaveType).FirstOrDefault();
-                if (leaveTypeUDC != null)
-                    leaveType = leaveTypeUDC.UDCCode;
+                UserDefinedCodeDTO? roaTypeUDC = _roaList.Where(d => d.UDCDesc1 == _selectedROAType).FirstOrDefault();
+                if (roaTypeUDC != null)
+                    roaType = roaTypeUDC.UDCCode;
             }
             #endregion
 
             #region Get the selected status
-            //string status = string.Empty;
-            //if (!string.IsNullOrEmpty(_selectedStatus))
-            //{
-            //    UserDefinedCodeDTO? statusUDC = _requestStatusList.Where(d => d.UDCSpecialHandlingCode == _selectedStatus).FirstOrDefault();
-            //    if (statusUDC != null)
-            //        status = statusUDC.UDCCode;
-            //}
+            string status = string.Empty;
+            if (!string.IsNullOrEmpty(_selectedStatus))
+            {
+                UserDefinedCodeDTO? statusUDC = _requestStatusList.Where(d => d.UDCSpecialHandlingCode == _selectedStatus).FirstOrDefault();
+                if (statusUDC != null)
+                    status = statusUDC.UDCCode;
+            }
             #endregion
 
-            var repoResult = await LeaveService.SearchLeaveRequestAsync(
-                _leaveNo,
+            var repoResult = await AttendanceService.SearchRegularizationAsync(
+                _requestNo,
                 _empNo,
                 costCenter,
-                leaveType,
+                roaType,
                 _selectedStatus,
                 _selectedStartDate,
-                _selectedResumeDate);
+                _selectedEndDate);
             if (repoResult.Success)
             {
-                _leaveRequestList = repoResult.Value!;
+                _regularRequestList = repoResult.Value!;
             }
             else
             {
