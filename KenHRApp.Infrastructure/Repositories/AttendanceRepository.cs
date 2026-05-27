@@ -1379,7 +1379,7 @@ namespace KenHRApp.Infrastructure.Repositories
                         EmployeeNo = e.EmployeeNo,
                         EmployeeName = e.EmployeeName,
                         CostCenter = e.CostCenter,
-                        CostCenterName = e.CostCenter,
+                        CostCenterName = e.CostCenterName,
                         AttendanceDate = e.AttendanceDate,
                         ROACode = e.ROACode,
                         ROADesc = e.ROADesc,

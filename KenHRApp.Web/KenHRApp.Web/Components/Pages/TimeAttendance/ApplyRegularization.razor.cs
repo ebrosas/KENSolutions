@@ -393,8 +393,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     Navigation.NavigateTo("/TimeAttendance/tnadashboard");
                     break;
 
-                case "LeaveInquiry":
-                    Navigation.NavigateTo("/TimeAttendance/leaveinquiry");
+                case "RegularInquiry":
+                    Navigation.NavigateTo("/TimeAttendance/regularinquiry");
                     break;
 
                 case "ApprovalDashboard":

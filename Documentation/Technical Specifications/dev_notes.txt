@@ -65,7 +65,8 @@ Regularization Request Page:
 
 To-do Task:
 1. After successfull submission of the regularization request, change the page title to display the requisition number.
-2. Create the Regularization Inquiry page
+2. Create the Regularization Inquiry page -done
+3. Fix the Apply Regularization page when a submitted request has been opened from the Inquiry page
 
 
 
