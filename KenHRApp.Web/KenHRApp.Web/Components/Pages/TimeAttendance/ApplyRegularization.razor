@@ -81,14 +81,17 @@
 
                     @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
                     {
-                        <MudButton Variant="Variant.Filled"
-                                   StartIcon="@Icons.Material.Filled.Cancel"
-                                   Size="Size.Small"
-                                   Color="Color.Error"
-                                   Disabled="@(_isEditMode)"
-                                   OnClick="ConfirmCancel">
-                            Cancel Leave
-                        </MudButton>
+                        @if (_regularRequest.StatusHandlingCode == "Open")
+                        {
+                            <MudButton Variant="Variant.Filled"
+                                       StartIcon="@Icons.Material.Filled.Cancel"
+                                       Size="Size.Small"
+                                       Color="Color.Error"
+                                       Disabled="@(_isEditMode)"
+                                       OnClick="ConfirmCancel">
+                                Cancel Request
+                            </MudButton>
+                        }
 
                         <MudButton Variant="Variant.Text"
                                    StartIcon="@Icons.Material.Filled.ArrowBackIos"
@@ -131,7 +134,7 @@
 
         <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
             <MudPaper Elevation="0" Square="true" Class="w-100 px-2 mt-4">
-                <MudGrid Spacing="5">
+                <MudGrid Spacing="5" hidden>
                     <MudItem xs="12" sm="6">
                         @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
                         {
@@ -176,8 +179,9 @@
                                                        Date="@_selectedDate"
                                                        DateChanged="OnDateChanged"
                                                        Style="@_pickerStyle"
-                                                       PickerDayContent="CalendarDayTemplate"
-                                                       MaxDate="@DateTime.Today">
+                                                       PickerDayContent="CalendarDayTemplate"                                                       
+                                                       MaxDate="@DateTime.Today"
+                                                       ReadOnly="@_isDisabled">
                                         </MudDatePicker>
                                     </div>
                                 </MudBreakpointProvider>
@@ -190,18 +194,39 @@
                             <MudGrid Spacing="5" Class="my-0 py-0">
                                 <MudItem xs="6">
                                     <MudPaper Elevation="0" Class="p-0 w-100">
-                                        <MudAutocomplete @bind-Value="_regularRequest.EmployeeFullName"
-                                                         SearchFunc="SearchEmployee!"
-                                                         Variant="Variant.Text"
-                                                         Label="Select Employee"
-                                                         Margin="Margin.Normal"
-                                                         Dense="true"
-                                                         Placeholder="Please Select"
-                                                         Clearable="true" Typo="Typo.subtitle2"
-                                                         MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
-                                                         Disabled="@_isDisabled"
-                                                         Required="true" RequiredError="Employee is required"
-                                                         Modal="true" />
+                                       @*  <MudAutocomplete @bind-Value="_regularRequest.EmployeeFullName"
+                                            For="@(() => _regularRequest.EmployeeFullName)"
+                                            SearchFunc="SearchEmployee!"
+                                            Variant="Variant.Text"
+                                            Label="Select Employee"
+                                            Margin="Margin.Normal"
+                                            Dense="true"
+                                            Placeholder="Please Select"
+                                            Clearable="true" Typo="Typo.subtitle2"
+                                            MaxItems="@(_employeeList != null ? _employeeList.Count : 10)"
+                                            Disabled="@_isDisabled"
+                                            Required="true" RequiredError="Employee is required"
+                                            Modal="true" /> *@
+
+                                        <MudSelect T="int"
+                                                   Value="_regularRequest.EmployeeNo"
+                                                   ValueChanged="@((v) => OnEmployeeChanged(v))"
+                                                   Disabled="@_isDisabled"
+                                                   Label="Select Employee"
+                                                   Variant="Variant.Text"
+                                                   Margin="Margin.Dense"
+                                                   Placeholder="Please Select"
+                                                   AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                                   AdornmentColor="Color.Default"
+                                                   HelperText="Type a key to search for value"
+                                                   HelperTextOnFocus="true"
+                                                   Immediate="true"
+                                                   Typo="Typo.subtitle2">
+                                            @foreach (var emp in _employeeList!)
+                                            {
+                                                <MudSelectItem Value="emp.EmployeeNo">@emp.EmployeeNameWithCode</MudSelectItem>
+                                            }
+                                        </MudSelect>
                                     </MudPaper>
                                 </MudItem>
                                 <MudItem xs="6">
@@ -238,9 +263,6 @@
                                 <MudItem xs="6">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                         <MudText Typo="Typo.subtitle2" Class="fw-bold">Actual Timing:</MudText>
-                                        @* <MudText Typo="Typo.body2">
-                                        @_regularRequest.ActualTiming
-                                        </MudText> *@
                                         <MudStack Justify="@Justify.Center" Class="mud-width-full">
                                             <MudChipSet T="string" SelectedColor="Color.Default" Disabled="true"
                                                         AllClosable="false"
@@ -319,6 +341,7 @@
                                         <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt"
                                                        Label="Regularized In Time" Required="true"
                                                        RequiredError="Regularized In Time is required"
+                                                       Disabled="@_isDisabled"
                                                        @bind-Time="_regularRequest.RegularizedTimeIn" />
                                     </MudPaper>
                                 </MudItem>
@@ -327,6 +350,7 @@
                                         <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt"
                                                        Label="Regularized Out Time" Required="true"
                                                        RequiredError="Regularized Out Time is required"
+                                                       Disabled="@_isDisabled"
                                                        @bind-Time="_regularRequest.RegularizedTimeOut" />
                                     </MudPaper>
                                 </MudItem>
@@ -470,8 +494,7 @@
                 </MudGrid>
             </MudPaper>
 
-            <MudScrollToTop TopOffset="100"
-                            Style="position: fixed !important;bottom: 20px;left: 50%;transform: translateX(-50%);right: auto !important;z-index: 2000;"
+            <MudScrollToTop TopOffset="100"                            
                             Selector="#mainPanel"
                             VisibleCssClass="visible absolute"
                             HiddenCssClass="hidden absolute">

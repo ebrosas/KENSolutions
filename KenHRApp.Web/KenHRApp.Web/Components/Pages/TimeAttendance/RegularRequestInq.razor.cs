@@ -80,7 +80,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Regularization Request", href: null, icon: @Icons.Material.Filled.AccountBalance, disabled: true)
+            new("Regularization Inquiry", href: null, icon: @Icons.Material.Filled.ManageSearch, disabled: true)
         ];
 
         private string[]? _roaArray = null;
@@ -340,7 +340,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         public void ApplyRegularization()
         {
-            Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=Add&CallerForm=regularinquiry");
+            Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=Add&CallerForm=RegularInquiry");
         }
 
         public void OpenRegularizationRequest(RegularRequestDTO item)

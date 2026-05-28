@@ -16,7 +16,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
-    public partial class ApplyRegularization : IPageAuthorization, IWorkflowProcess
+    public partial class ApplyRegularization : ComponentBase, IPageAuthorization, IWorkflowProcess
     {
         #region Parameters and Injections
         [Inject] private IAttendanceService AttendanceService { get; set; } = default!;
@@ -61,7 +61,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string _pageTitle = "Apply Regularization";
         private int _currentWFIndex = 0;
         private MudDatePicker _picker;
-        private DateTime? _selectedDate; //= DateTime.Today;
+        private DateTime? _selectedDate; 
         private Orientation _calOrientation = Orientation.Portrait;
         private string _pickerStyle = "width: 420px;";
         #endregion
@@ -93,7 +93,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Regularization Request", href: null, disabled: true, @Icons.Material.Filled.CardTravel)
+            new("Regularization Inquiry", href: "/TimeAttendance/regularinquiry?ForceLoad=true", icon: Icons.Material.Filled.ManageSearch),
+            new("Apply Regularization", href: null, disabled: true, @Icons.Material.Filled.CardTravel)
         ];
 
         private List<UserDefinedCodeDTO> _actionList = new List<UserDefinedCodeDTO>();
@@ -107,7 +108,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private Guid _calendarRenderKey = Guid.NewGuid();
         private List<AttendanceSwipeDTO> _attendanceChips { get; set; } = new();
-        private List<UserDefinedCodeDTO> _leaveStatusList = new();
+        private List<UserDefinedCodeDTO> _requestStatusList = new();
         private List<WorkflowDetailResultDTO> _workflowList = new List<WorkflowDetailResultDTO>();
         #endregion
 
@@ -253,7 +254,128 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _regularRequest.CreatedUserID = UserName;
                     _regularRequest.ActionDescription = CONST_REGULARIZATION;
 
-                    BeginLoadComboboxTask();
+                    if (ActionType == ActionTypes.Edit.ToString() ||
+                        ActionType == ActionTypes.View.ToString())
+                    {
+                        if (RequestNo > 0)
+                        {
+                            #region Load regularization request details and workflow
+
+                            #region Get UDCs
+                            #region Get all UDC group codes
+                            List<UserDefinedCodeGroupDTO>? udcGroupList = new();
+                            int groupID = 0;
+
+                            var resultUDC = await EmployeeService.GetUserDefinedCodeGroupAsync();
+                            if (resultUDC.Success)
+                            {
+                                udcGroupList = resultUDC!.Value;
+                            }
+                            else
+                                _errorMessage.Append(resultUDC.Error);
+                            #endregion
+
+                            // Get UDC dataset
+                            var result = await EmployeeService.GetUserDefinedCodeAllAsync();
+                            if (result.Success)
+                            {
+                                var udcData = result.Value;
+                                if (udcData!.Any() && udcGroupList!.Any())
+                                {
+                                    #region Get ROA Types
+                                    //try
+                                    //{
+                                    //    groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ROATYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                                    //}
+                                    //catch (Exception ex)
+                                    //{
+                                    //    _errorMessage.Append($"Error getting ROA group id: {ex.Message}");
+                                    //}
+
+                                    //if (groupID > 0)
+                                    //{
+                                    //    _roaList = udcData!.Where(a => a.GroupID == groupID && a.IsActive == true).ToList();
+                                    //    if (_roaList != null)
+                                    //        _roaArray = _roaList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                                    //}
+                                    #endregion
+
+                                    #region Attendance Action Types
+                                    //try
+                                    //{
+                                    //    groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ATTENDACT.ToString()).FirstOrDefault()!.UDCGroupId;
+                                    //}
+                                    //catch (Exception ex)
+                                    //{
+                                    //    _errorMessage.Append($"Error getting Action Types group id: {ex.Message}");
+                                    //}
+
+                                    //if (groupID > 0)
+                                    //{
+                                    //    _actionList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                                    //    if (_actionList != null)
+                                    //        _actionArray = _actionList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                                    //}
+                                    #endregion
+
+                                    #region Request Statuses
+                                    try
+                                    {
+                                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.STATUS.ToString()).FirstOrDefault()!.UDCGroupId;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _errorMessage.Append($"Error getting Leave Status group id: {ex.Message}");
+                                    }
+
+                                    if (groupID > 0)
+                                    {
+                                        _requestStatusList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                                    }
+                                    #endregion
+                                }
+                            }
+                            #endregion
+
+                            // Load regularization details
+                            await GetRegularizationDetail(RequestNo);
+
+                            #region Get the workflow data
+                            var wfRepo = await WorkflowService.GetWorkflowStatusAsync(WorkflowHelper.CONST_REGULARIZATION, RequestNo);
+                            if (wfRepo.Success)
+                            {
+                                _workflowList = wfRepo.Value!;
+
+                                if (_workflowList.Any())
+                                {
+                                    #region Find the current pending activity
+                                    WorkflowDetailResultDTO currentAct = _workflowList.Where(w => w.IsCurrent == true).FirstOrDefault()!;
+                                    if (currentAct != null)
+                                    {
+                                        _currentWFIndex = _workflowList.IndexOf(currentAct);
+                                    }
+                                    #endregion
+                                }
+                            }
+                            else
+                            {
+                                // Set the error message
+                                _errorMessage.Append(result.Error);
+
+                                ShowHideError(true);
+                            }
+                            #endregion
+
+                            #endregion
+
+                            //BeginLoadRegularRequest(RequestNo);
+
+                            // Refresh the page
+                            StateHasChanged(); 
+                        }
+                    }
+                    else
+                        BeginLoadComboboxTask();
                 }
                 else
                     GoToLogin();
@@ -272,6 +394,19 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             try
             {
+                #region Perform Data Validation
+                // Check if Absent or has NPH
+                if (!(_regularRequest.RemarkCode == "A" || _regularRequest.NoPayHours > 0))
+                {
+                    _hasValidationError = true;
+                    _validationMessages.Add("Regularization is applicable only if the employee is either Absent or has deficit hours.");
+                }
+
+                if (_hasValidationError && _validationMessages.Any())
+                    return;
+                #endregion
+
+                // If we got here, model is valid
                 _hasValidationError = false;
                 _validationMessages.Clear();
 
@@ -394,7 +529,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     break;
 
                 case "RegularInquiry":
-                    Navigation.NavigateTo("/TimeAttendance/regularinquiry");
+                    Navigation.NavigateTo("/TimeAttendance/regularinquiry?ForceLoad=true");
                     break;
 
                 case "ApprovalDashboard":
@@ -451,7 +586,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Cancel"},
                 { "DialogIcon", _iconCancel },
-                { "ContentText", "Are you sure you want to cancel regularization request?" },
+                { "ContentText", "Are you sure you want to cancel regularization application?" },
                 { "ConfirmText", "Yes" },
                 { "CancelText", "No" },
                 { "Color", Color.Success }
@@ -463,7 +598,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                CancelRequest();
+                HandleBackButton();
+                //CancelRequest();
             }
         }
 
@@ -610,7 +746,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Cancel"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to cancel leave requsition no. '{_regularRequest.RegularizationId}'?" },
+                { "ContentText", $"Are you sure you want to cancel Regularization Request No. '{_regularRequest.RegularizationId}'?" },
                 { "ConfirmText", "Proceed" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -625,11 +761,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 BackdropClick = false       // Prevent clicking outside to close
             };
 
-            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Cancel Leave Confirmation", parameters, options);
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Cancel Confirmation", parameters, options);
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                //BeginLeaveCancellation(_regularRequest);
+                BeginRequestCancellation(_regularRequest);
             }
         }
 
@@ -648,9 +784,32 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         }
 
         private async void OnDateChanged(DateTime? date)
-        {            
-            if (date.HasValue)
-                await GetAttendanceInfoAsync(UserEmpNo, date!.Value);
+        {
+            if (date.HasValue &&
+                _regularRequest.EmployeeNo > 0)
+            {
+                await GetAttendanceInfoAsync(_regularRequest.EmployeeNo, date!.Value);
+            }
+        }
+
+        private void OnEmployeeChanged(int newValue)
+        {
+            if (_regularRequest.EmployeeNo != newValue)
+            {
+                _regularRequest.EmployeeNo = newValue;
+
+                // Get the employee details
+                if (_employeeList.Any())
+                {
+                    EmployeeResultDTO? employee = _employeeList.Where(e => e.EmployeeNo == newValue).FirstOrDefault();
+                    if (employee != null)
+                    {
+                        _regularRequest.EmployeeNo = employee.EmployeeNo;
+                        _regularRequest.CostCenter = employee!.DepartmentCode;
+                        _regularRequest.EmployeeName = employee.EmployeeFullName;
+                    }
+                }
+            }
         }
 
         private string GetOrdinal(int day)
@@ -823,7 +982,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     }
                     #endregion
 
-                    #region Leave Statuses
+                    #region Request Statuses
                     try
                     {
                         groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.STATUS.ToString()).FirstOrDefault()!.UDCGroupId;
@@ -835,7 +994,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                     if (groupID > 0)
                     {
-                        _leaveStatusList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        _requestStatusList = udcData!.Where(a => a.GroupID == groupID).ToList();
                     }
                     #endregion
                 }
@@ -872,6 +1031,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                         _regularRequest.ShiftPattern = attendanceInfo.ShiftRoster;
                         _regularRequest.ShiftTiming = attendanceInfo.ShiftTiming;
                         _regularRequest.WorkDuration = attendanceInfo.TotalWorkMinute;
+                        _regularRequest.NoPayHours = attendanceInfo.TotalDeficitMinute;
+                        _regularRequest.RemarkCode = attendanceInfo.RemarkCode;
 
                         #region Populate the raw swipe chips
                         if (attendanceInfo.SwipeLogList != null && attendanceInfo.SwipeLogList.Any())
@@ -913,18 +1074,18 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             string errorMsg = string.Empty;
 
             #region Get the selected employee information 
-            if (!string.IsNullOrEmpty(_regularRequest.EmployeeFullName))
-            {
-                EmployeeResultDTO? selectedEmployee = _employeeList
-                    .Where(a => a.EmployeeNameWithCode == _regularRequest.EmployeeFullName)
-                    .FirstOrDefault();
-                if (selectedEmployee != null)
-                {
-                    _regularRequest.EmployeeNo = selectedEmployee.EmployeeNo;
-                    _regularRequest.CostCenter = selectedEmployee!.DepartmentCode;
-                    _regularRequest.EmployeeName = selectedEmployee.EmployeeFullName;
-                }
-            }
+            //if (!string.IsNullOrEmpty(_regularRequest.EmployeeFullName))
+            //{
+            //    EmployeeResultDTO? selectedEmployee = _employeeList
+            //        .Where(a => a.EmployeeNameWithCode == _regularRequest.EmployeeFullName)
+            //        .FirstOrDefault();
+            //    if (selectedEmployee != null)
+            //    {
+            //        _regularRequest.EmployeeNo = selectedEmployee.EmployeeNo;
+            //        _regularRequest.CostCenter = selectedEmployee!.DepartmentCode;
+            //        _regularRequest.EmployeeName = selectedEmployee.EmployeeFullName;
+            //    }
+            //}
             #endregion
 
             #region Get the selected ROA
@@ -972,9 +1133,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _regularRequest.CreatedDate = DateTime.Now;
 
                 #region Set status to "Waiting for Approval" 
-                if (_leaveStatusList != null && _leaveStatusList.Any())
+                if (_requestStatusList != null && _requestStatusList.Any())
                 {
-                    UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_WAITING_FOR_APPROVAL).FirstOrDefault();
+                    UserDefinedCodeDTO? statusFlag = _requestStatusList.Where(s => s.UDCCode == CONST_WAITING_FOR_APPROVAL).FirstOrDefault();
                     if (statusFlag != null)
                     {
                         _regularRequest.StatusCode = statusFlag.UDCCode;
@@ -1000,7 +1161,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _regularRequest.RegularizationId = addResult.Value;
 
                     // Display the requisition number in the page title
-                    //_pageTitle = $" Submitted Leave Request No. {addResult.Value}";
+                    _pageTitle = $" Regularization Request No. {addResult.Value}";
                 }
             }
             else
@@ -1009,9 +1170,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _regularRequest.LastUpdatedDate = DateTime.Now;
 
                 #region Set request status to "Request Sent" 
-                if (_leaveStatusList != null && _leaveStatusList.Any())
+                if (_requestStatusList != null && _requestStatusList.Any())
                 {
-                    UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_REQUEST_SENT).FirstOrDefault();
+                    UserDefinedCodeDTO? statusFlag = _requestStatusList.Where(s => s.UDCCode == CONST_REQUEST_SENT).FirstOrDefault();
                     if (statusFlag != null)
                     {
                         _regularRequest.StatusCode = statusFlag.UDCCode;
@@ -1102,6 +1263,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 _regularRequest = result.Value!;
 
+                // Display the requisition number in the page title
+                _pageTitle = $" Regularization Request #{_regularRequest.RegularizationId} (Created On: {_regularRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")} | Status: {_regularRequest.StatusSummary})";
+
                 // Recreate the EditContext with the loaded _regularRequest
                 _editContext = new EditContext(_regularRequest);
             }
@@ -1111,6 +1275,109 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _errorMessage.Append(result.Error);
 
                 ShowHideError(true);
+            }
+        }
+
+        private void BeginRequestCancellation(RegularRequestDTO regularRequest)
+        {
+            try
+            {
+                // Exit process if leave status is Cancelled
+                if (regularRequest.StatusHandlingCode == "Cancelled")
+                {
+                    _hasValidationError = true;
+                    _validationMessages.Add("Unable to cancel request because it was already been cancelled!");
+                    return;
+                }
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Cancelling request, please wait...";
+
+                _ = CancelRequestAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    StateHasChanged();
+
+                }, regularRequest);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Leave cancellation aborted (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task CancelRequestAsync(Func<Task> callback, RegularRequestDTO regularRequest)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = true;
+            string errorMsg = string.Empty;
+
+            // Set the user who update the record and the timestamp
+            regularRequest.LastUpdatedDate = DateTime.Now;
+
+            #region Set workflow status to "101 - Cancelled by User" 
+            if (_requestStatusList != null && _requestStatusList.Any())
+            {
+                UserDefinedCodeDTO? statusFlag = _requestStatusList.Where(s => s.UDCCode == CONST_CANCELLED_BY_USER).FirstOrDefault();
+                if (statusFlag != null)
+                {
+                    regularRequest.StatusCode = statusFlag.UDCCode;
+                    regularRequest.StatusID = statusFlag.UDCId;
+                    regularRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
+                }
+            }
+            #endregion
+
+            var saveResult = await AttendanceService.CancelRegularRequestAsync(regularRequest, _cts.Token);
+            isSuccess = saveResult.Success;
+            if (!isSuccess)
+                errorMsg = saveResult.Error!;
+
+            if (isSuccess)
+            {
+                // Reset flags
+                _isEditMode = false;
+                _saveBtnEnabled = false;
+                _isDisabled = true;
+
+                // Hide error message if any
+                ShowHideError(false);
+
+                // Show notification
+                ShowNotification("Regularization request has been cancelled successfully!", NotificationType.Success);
+
+                HandleBackButton();
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.AppendLine(errorMsg);
+                ShowHideError(true);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
             }
         }
         #endregion

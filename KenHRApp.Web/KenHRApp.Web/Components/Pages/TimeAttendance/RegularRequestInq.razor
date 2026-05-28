@@ -306,17 +306,17 @@
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.WorkDuration" Title="Total Hours" Class="col-WorkDuration" Editable="false">
                             <CellTemplate>
-                                @context.Item.WorkDuration.ToString("N0")
+                                @(context.Item.WorkDuration.HasValue ? context.Item!.WorkDuration.Value.ToString("N0") : "0")
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.NoPayHours" Title="Deficit Hours" Class="col-NoPayHours" Editable="false">
                             <CellTemplate>
-                                @context.Item.NoPayHours.ToString("N0")
+                                @(context.Item.NoPayHours.HasValue ? context.Item!.NoPayHours.Value.ToString("N0") : "0")
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.StatusDesc" Title="Current Status" Class="col-StatusDesc" Editable="false">
                             <CellTemplate Context="row">
-                                <MudChip T="string" Size=Size.Small Variant="Variant.Filled"
+                                <MudChip T="string" Size=Size.Small Variant="Variant.Outlined"
                                     Color="@(row.Item.StatusHandlingCode == "Open" ? Color.Info
                                      : row.Item.StatusHandlingCode == "Closed" ? Color.Surface
                                      : row.Item.StatusHandlingCode == "Rejected" ? Color.Error
@@ -333,7 +333,7 @@
                                                Class="show-btn fa-icon-btn"
                                                Color="Color.Info" 
                                                Size="Size.Small"
-                                               Icon="far fa-eye"
+                                               Icon="fas fa-eye-slash"
                                                OnClick="@(()=>OpenRegularizationRequest(row.Item))">
                                 </MudIconButton>
                             </CellTemplate>

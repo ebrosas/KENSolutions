@@ -235,8 +235,8 @@
                             <CellTemplate Context="row">
                                 <MudChip T="long" 
                                     Size=Size.Small
-                                          Color="Color.Info"
-                                          Label="true" 
+                                    Color="Color.Secondary"
+                                    Label="true" 
                                     Class="fw-bold" 
                                     Style="font-size: 14px;"
                                     OnClick="@(()=>OpenLeaveRequest(row.Item))">
@@ -312,22 +312,22 @@
                         <PropertyColumn Property="x => x.StatusDesc" Title="Current Status" Class="col-StatusDesc" Editable="false">
                             <CellTemplate Context="row">
                                 <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" 
-                                    Color="@(row.Item.StatusHandlingCode == "Open" ? Color.Primary
-                                     : row.Item.StatusHandlingCode == "Closed" ? Color.Tertiary 
+                                    Color="@(row.Item.StatusHandlingCode == "Open" ? Color.Info
+                                     : row.Item.StatusHandlingCode == "Closed" ? Color.Surface 
                                      : row.Item.StatusHandlingCode == "Rejected" ? Color.Error
                                      : row.Item.StatusHandlingCode == "Cancelled" ? Color.Warning
                                      : row.Item.StatusHandlingCode == "Approved" ? Color.Success
-                                     : Color.Surface)">
+                                     : Color.Dark)">
                                     @row.Item.StatusDesc
                                 </MudChip>
                             </CellTemplate>
                         </PropertyColumn>
                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                              <CellTemplate Context="row">
-                                 <MudIconButton title="View leave information"
+                                 <MudIconButton title="View leave details"
                                     Class="show-btn fa-icon-btn"
                                     Color="Color.Info" Size="Size.Small"
-                                    Icon="@Icons.Material.Rounded.Edit"
+                                               Icon="fas fa-eye-slash"
                                     OnClick="@row.Actions.StartEditingItemAsync">
                                  </MudIconButton>
                                  <MudIconButton Color="Color.Error" hidden title="Delete department record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">

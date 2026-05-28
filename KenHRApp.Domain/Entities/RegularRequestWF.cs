@@ -71,6 +71,12 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "varchar(20)")]
         public string CostCenter { get; set; } = null!;
+
+        [Column(TypeName = "varchar(100)")]
+        public string? ShiftTiming { get; set; } = null;
+
+        public int? WorkDuration { get; set; } = null;
+        public int? NoPayHours { get; set; } = null;
         #endregion
 
         #region Unmapped Properties
@@ -81,16 +87,7 @@ namespace KenHRApp.Domain.Entities
         public string ActionDescription { get; set; } = null!;
 
         [NotMapped]
-        public string? ShiftTiming { get; set; } = null;
-
-        [NotMapped]
-        public string? ActualTiming { get; set; } = null;
-
-        [NotMapped]
-        public int WorkDuration { get; set; }
-
-        [NotMapped]
-        public int NoPayHours { get; set; }
+        public string? ActualTiming { get; set; } = null;                
         #endregion
 
         #region Public Methods

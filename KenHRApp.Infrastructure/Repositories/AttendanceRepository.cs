@@ -1049,8 +1049,10 @@ namespace KenHRApp.Infrastructure.Repositories
                     attendanceInfo.ShiftRosterDesc = model[0].ShiftRosterDesc;
                     attendanceInfo.ShiftTiming = model[0].ShiftTiming;
                     attendanceInfo.TotalDeficitHour = model[0].TotalDeficitHour;
+                    attendanceInfo.TotalDeficitMinute = model[0].TotalDeficitMinute;
                     attendanceInfo.TotalWorkHour = model[0].TotalWorkHour;
                     attendanceInfo.TotalWorkMinute = model[0].TotalWorkMinute;
+                    attendanceInfo.RemarkCode = model[0].RemarkCode;
 
                     #region Get the swipe logs
                     List<AttendanceSwipeLog> swipeLogs = new List<AttendanceSwipeLog>();
@@ -1105,6 +1107,9 @@ namespace KenHRApp.Infrastructure.Repositories
                     RegularizedTimeIn = dto.RegularizedTimeIn,
                     RegularizedTimeOut = dto.RegularizedTimeOut,
                     ShiftPattern = dto.ShiftPattern,
+                    ShiftTiming = dto.ShiftTiming,
+                    WorkDuration = dto.WorkDuration,
+                    NoPayHours = dto.NoPayHours,
                     RegularizedDescription = dto.RegularizedDescription,
                     StatusCode = dto.StatusCode,
                     StatusID = dto.StatusID,
@@ -1213,7 +1218,9 @@ namespace KenHRApp.Infrastructure.Repositories
         /// <summary>
         /// Cancel Regularization Request
         /// </summary>
-        public async Task<Result<int>> CancelRegularRequestAsync(RegularRequestWF regularRequest, CancellationToken cancellationToken = default)
+        public async Task<Result<int>> CancelRegularRequestAsync(
+            RegularRequestWF regularRequest, 
+            CancellationToken cancellationToken = default)
         {
             int rowsUpdated = 0;
 
@@ -1289,7 +1296,10 @@ namespace KenHRApp.Infrastructure.Repositories
                     regularRequest.RegularizedTimeIn = model[0].RegularizedTimeIn;
                     regularRequest.RegularizedTimeOut = model[0].RegularizedTimeOut;
                     regularRequest.ShiftPattern = model[0].ShiftPattern;
-                    regularRequest.RegularizedDescription = model[0].RegularizedDescription;
+                    regularRequest.ShiftTiming = model[0].ShiftTiming;
+                    regularRequest.WorkDuration = model[0].WorkDuration;
+                    regularRequest.NoPayHours = model[0].NoPayHours;
+                    regularRequest.RegularizedDescription = model[0].RegularizedDescription;                    
                     regularRequest.StatusID = model[0].StatusID;
                     regularRequest.StatusCode = model[0].StatusCode;
                     regularRequest.StatusDesc = model[0].StatusDesc;
@@ -1388,6 +1398,9 @@ namespace KenHRApp.Infrastructure.Repositories
                         RegularizedTimeIn = e.RegularizedTimeIn,
                         RegularizedTimeOut = e.RegularizedTimeOut,
                         ShiftPattern = e.ShiftPattern,
+                        ShiftTiming = e.ShiftTiming,
+                        WorkDuration = e.WorkDuration,
+                        NoPayHours = e.NoPayHours,
                         RegularizedDescription = e.RegularizedDescription,
                         StatusID = e.StatusID,
                         StatusCode = e.StatusCode,

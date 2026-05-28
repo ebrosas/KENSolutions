@@ -57,9 +57,10 @@ namespace KenHRApp.Application.DTOs
         [Display(Name = "Actual Timing")]
         public string? ActualTiming { get; set; } = null;
 
-        public int WorkDuration { get; set; }
-        public int NoPayHours { get; set; }
-                
+        public int? WorkDuration { get; set; }
+        public int? NoPayHours { get; set; }
+        public string? RemarkCode { get; set; } = null;
+
         public string StatusCode { get; set; } = null!;
         public string? StatusDesc { get; set; } = null;
 
@@ -98,7 +99,7 @@ namespace KenHRApp.Application.DTOs
             {
                 if (WorkDuration > 0)
                 {
-                    TimeSpan duration = TimeSpan.FromMinutes(WorkDuration);
+                    TimeSpan duration = TimeSpan.FromMinutes(Convert.ToDouble(WorkDuration));
                     return $"{(int)duration.TotalHours:00}:{duration.Minutes:00}";
                 }
                 else
@@ -113,7 +114,7 @@ namespace KenHRApp.Application.DTOs
             {
                 if (NoPayHours > 0)
                 {
-                    TimeSpan duration = TimeSpan.FromMinutes(NoPayHours);
+                    TimeSpan duration = TimeSpan.FromMinutes(Convert.ToDouble(NoPayHours));
                     return $"{(int)duration.TotalHours:00}:{duration.Minutes:00}";
                 }
                 else
@@ -158,6 +159,18 @@ namespace KenHRApp.Application.DTOs
             get
             {
                 return $"{CostCenter} - {CostCenterName}";
+            }
+        }
+
+        [Display(Name = "Status")]
+        public string StatusSummary
+        {
+            get
+            {
+                if (StatusHandlingCode == "Open")
+                    return $"{StatusHandlingCode} - {StatusDesc}";
+                else
+                    return StatusDesc!;
             }
         }
         #endregion

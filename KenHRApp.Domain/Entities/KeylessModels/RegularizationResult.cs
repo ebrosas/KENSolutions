@@ -25,6 +25,9 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public TimeSpan RegularizedTimeIn { get; set; }
         public TimeSpan RegularizedTimeOut { get; set; }
         public string? ShiftPattern { get; set; } = null;
+        public string? ShiftTiming { get; set; } = null;
+        public int? WorkDuration { get; set; } = null;
+        public int? NoPayHours { get; set; } = null;
         public string RegularizedDescription { get; set; } = null!;
         public int? StatusID { get; set; }
         public string StatusCode { get; set; } = null!;

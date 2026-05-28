@@ -64,9 +64,12 @@ To-do List (As of 15-Apr-2026):
 Regularization Request Page:
 
 To-do Task:
-1. After successfull submission of the regularization request, change the page title to display the requisition number.
+1. After successfull submission of the regularization request, change the page title to display the requisition number. -done
 2. Create the Regularization Inquiry page -done
-3. Fix the Apply Regularization page when a submitted request has been opened from the Inquiry page
+3. Fix the Apply Regularization page when a submitted request has been opened from the Inquiry page -done
+4. Disable the calendar when opening a submitted regularization request.
+5. Fix the data validation that checks for absent and NPH
+
 
 
 

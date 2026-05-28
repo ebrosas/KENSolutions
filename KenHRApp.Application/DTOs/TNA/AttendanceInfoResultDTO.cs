@@ -17,8 +17,11 @@ namespace KenHRApp.Application.DTOs.TNA
         public string ShiftRosterDesc { get; set; } = null!;
         public string ShiftTiming { get; set; } = null!;
         public decimal TotalDeficitHour { get; set; }
+        public int TotalDeficitMinute { get; set; }
         public decimal TotalWorkHour { get; set; }
         public int TotalWorkMinute { get; set; }
+        public string? RemarkCode { get; set; } = null;
+
         public List<AttendanceSwipeDTO>? SwipeLogList { get; set; }
         #endregion
 

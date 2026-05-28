@@ -460,7 +460,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         //    // Set the overlay message
         //    overlayMessage = "Cancelling leave request, please wait...";
 
-        //    _ = CancelLeaveRequestAsync(async () =>
+        //    _ = CancelRequestAsync(async () =>
         //    {
         //        // Reset the flags
         //        _isEditMode = false;

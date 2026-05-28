@@ -6,7 +6,7 @@
 *
 *	Date			Author		Rev. #		Comments:
 *	22/05/2026		Ervin		1.0			Created
-*
+*	28/05/2025		Ervin		1.1			Added "TotalDeficitMinute", "RemarkCode" in the result dataset
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetAttendanceDetails
@@ -27,9 +27,18 @@ BEGIN
 			b.ShiftPatternDescription AS ShiftRosterDesc,			
 			FORMAT(CAST(b.SchedTimeIn AS DATETIME), 'hh:mm tt') + ' - ' + FORMAT(CAST(b.SchedTimeOut AS DATETIME), 'hh:mm tt') AS ShiftTiming,
 			ISNULL(g.TotalDeficitHour, 0) AS TotalDeficitHour,
+			ISNULL(g.TotalDeficitMinute, 0) AS TotalDeficitMinute,		--Rev. #1.1
 			ISNULL(g.TotalWorkHour, 0) AS TotalWorkHour,
-			isnull(g.TotalWorkMinute, 0) AS TotalWorkMinute
+			isnull(g.TotalWorkMinute, 0) AS TotalWorkMinute,
+			att.RemarkCode		--Rev. #1.1
 	FROM kenuser.Employee a WITH (NOLOCK)
+		CROSS APPLY
+		(
+			SELECT * FROM kenuser.AttendanceTimesheet x WITH (NOLOCK) 
+			WHERE x.EmpNo = a.EmployeeNo 
+				AND x.AttendanceDate = @attendanceDate 
+				AND x.IsLastRow = 1
+		) att
 		OUTER APPLY 
 		(
 			SELECT x.ShiftPatternCode, spt.ShiftPatternDescription, y.ShiftCode, y.ShiftDescription, z.ArrivalTo AS SchedTimeIn, z.DepartFrom AS SchedTimeOut 
@@ -44,6 +53,9 @@ BEGIN
 			SELECT
 				-- Total deficit hours
 				CAST(SUM(ISNULL(NoPayHours, 0)) AS DECIMAL) / 60 AS TotalDeficitHour,
+				
+				-- Total deficit minutes
+				SUM(ISNULL(x.NoPayHours, 0)) AS TotalDeficitMinute,		--Rev. #1.1
 
 				-- Total work hours
 				CAST(SUM(ISNULL(DurationWorkedCumulative, 0)) AS DECIMAL) / 60 AS TotalWorkHour,
