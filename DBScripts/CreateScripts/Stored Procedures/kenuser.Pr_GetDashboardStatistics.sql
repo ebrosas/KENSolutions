@@ -75,6 +75,7 @@ BEGIN
 					and x.StepDefinitionId = a.StepDefinitionId
 			) d
 		WHERE RTRIM(d.ActivityStatus) = 'Pending'
+			AND RTRIM(req.StatusHandlingCode) = 'Open'
 			AND (d.ApproverNo = @empNo OR @empNo IS NULL)
 			AND (RTRIM(b.EntityName) = @requestType OR @requestType IS NULL)
 		ORDER BY c.EntityId DESC
@@ -230,7 +231,7 @@ END
 
 	--Staging database
 	EXEC kenuser.Pr_GetDashboardStatistics 1
-	EXEC kenuser.Pr_GetDashboardStatistics 1, 10003632		
+	EXEC kenuser.Pr_GetDashboardStatistics 1, 10003666		
 	EXEC kenuser.Pr_GetDashboardStatistics 10003635, 'RTYPELEAVE'
 
 	EXEC kenuser.Pr_GetDashboardStatistics 2, 10003632

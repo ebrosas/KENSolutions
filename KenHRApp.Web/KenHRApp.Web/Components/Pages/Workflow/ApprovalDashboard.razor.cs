@@ -326,9 +326,13 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             var result = await dialog.Result;
         }
 
-        public void OpenLeaveRequest(ApprovalRequestResultDTO item)
+        public void OpenRequestDetail(ApprovalRequestResultDTO item)
         {
-            Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+            if (item.RequestTypeCode == WorkflowHelper.CONST_LEAVE_REQUEST)
+                Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+
+            else if (item.RequestTypeCode == WorkflowHelper.CONST_REGULARIZATION)
+                Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=View&RequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
         }
 
         private void OnSelectedValueChanged(RequestTypeDTO value)

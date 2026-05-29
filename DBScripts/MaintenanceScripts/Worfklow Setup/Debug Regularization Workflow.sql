@@ -1,5 +1,5 @@
 DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPEREGULAR',
-		@requestNo			BIGINT = 5
+		@requestNo			BIGINT = 6
 
 	--Get request info
 	SELECT a.* 

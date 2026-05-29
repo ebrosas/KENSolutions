@@ -156,7 +156,7 @@
                                                          Label="true"
                                                          Class="fw-bold"
                                                          Style="font-size: 14px;"
-                                                         OnClick="@(()=>OpenLeaveRequest(row.Item))">
+                                                         OnClick="@(()=>OpenRequestDetail(row.Item))">
                                                     @row.Item.RequestNo
                                                 </MudChip>
                                             </CellTemplate>
@@ -240,7 +240,7 @@
                                                     }
                                                     <MudIconButton Color="Color.Info" title="View request details" Size="Size.Small"
                                                         Icon="far fa-eye"
-                                                        OnClick="@(() => OpenLeaveRequest(row.Item))">
+                                                        OnClick="@(() => OpenRequestDetail(row.Item))">
                                                      </MudIconButton>
                                                 </MudStack>                                                                                          
                                             </EditTemplate>

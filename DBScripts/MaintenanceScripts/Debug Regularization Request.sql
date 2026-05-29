@@ -21,4 +21,6 @@
 	ORDER BY a.RegularizationId desc
 
 	SELECT * FROM kenuser.FileAttachments a
+
+	SELECT * FROM kenuser.WorkflowApprovalRoles
 		
