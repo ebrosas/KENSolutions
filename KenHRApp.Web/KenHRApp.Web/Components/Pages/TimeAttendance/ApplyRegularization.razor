@@ -181,7 +181,7 @@
                                                        Style="@_pickerStyle"
                                                        PickerDayContent="CalendarDayTemplate"                                                       
                                                        MaxDate="@DateTime.Today"
-                                                       ReadOnly="@_isDisabled">
+                                                       IsDateDisabledFunc="@DisableAllDates">
                                         </MudDatePicker>
                                     </div>
                                 </MudBreakpointProvider>

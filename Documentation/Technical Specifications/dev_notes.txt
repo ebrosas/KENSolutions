@@ -67,8 +67,8 @@ To-do Task:
 1. After successfull submission of the regularization request, change the page title to display the requisition number. -done
 2. Create the Regularization Inquiry page -done
 3. Fix the Apply Regularization page when a submitted request has been opened from the Inquiry page -done
-4. Disable the calendar when opening a submitted regularization request.
-5. Fix the data validation that checks for absent and NPH
+4. Disable the calendar when opening a submitted regularization request.  -done
+5. Fix the data validation that checks for absent and NPH. Note NPH should be calculated in the Timesheet Processing Service.
 
 
 

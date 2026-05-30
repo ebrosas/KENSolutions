@@ -370,6 +370,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                             //BeginLoadRegularRequest(RequestNo);
 
+                            _isDisabled = true;
+
                             // Refresh the page
                             StateHasChanged(); 
                         }
@@ -502,7 +504,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             //}, _shiftPattern.RegularizationId);
         }
 
-        private async Task HandleRefreshButton()
+        private void HandleRefreshButton()
         {
             // Reset Leave Request object
             _regularRequest = new();
@@ -866,6 +868,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
 
             return _employeeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private bool DisableAllDates(DateTime date)
+        {
+            return _isDisabled;
         }
         #endregion
 

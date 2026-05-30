@@ -21,7 +21,8 @@ BEGIN
 	--Tell SQL Engine not to return the row-count information
 	SET NOCOUNT ON 
 
-	SELECT	a.EmpNo,
+	SELECT	DISTINCT 
+			a.EmpNo,
 			a.AttendanceDate,
 			CASE WHEN RTRIM(a.RemarkCode) = 'A' THEN 'ALABSENT'
 				WHEN RTRIM(a.LeaveType) = 'AL' THEN 'ALLEAVE'
@@ -48,6 +49,7 @@ BEGIN
 	WHERE a.EmpNo = @empNo
 		AND YEAR(a.AttendanceDate) = @year
 		AND MONTH(a.AttendanceDate) = @month
+	ORDER BY a.AttendanceDate
 	
 	
 END
@@ -59,6 +61,6 @@ PARAMETERS:
 	@year		INT,
 	@month		INT 
 
-	EXEC kenuser.Pr_GetAttendanceLegend 10003632, 2026, 3
+	EXEC kenuser.Pr_GetAttendanceLegend 10003632, 2026, 5
 
 */

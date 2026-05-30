@@ -168,6 +168,12 @@ namespace KenHRApp.Infrastructure.Data
                 entity.HasNoKey();
                 entity.ToView(null); // prevents migration
             });
+
+            modelBuilder.Entity<TimecardResult>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView(null); // prevents migration
+            });
             #endregion
 
             #region Configure models
