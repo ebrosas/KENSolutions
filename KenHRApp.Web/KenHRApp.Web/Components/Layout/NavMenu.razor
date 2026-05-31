@@ -95,7 +95,7 @@
         <MudNavLink Href="/security" Icon="fas fa-theater-masks" Class="navMenu navlink-icon-sm" hidden>Face Attendance</MudNavLink>
         <MudNavLink Href="/security" Icon="far fa-clock" Class="navMenu navlink-icon-sm" hidden>Punch In/Out</MudNavLink>
         <MudNavLink Href="/security" Icon="fas fa-person-booth" Class="navMenu navlink-icon-sm" hidden>Time Office</MudNavLink>
-        <MudNavLink Href="/TimeCard" Icon="fas fa-user-clock" Class="navMenu navlink-icon-sm">Time Card</MudNavLink>
+        <MudNavLink Icon="fas fa-user-clock" Class="navMenu navlink-icon-sm" OnClick="OpenTimeCard">Time Card</MudNavLink>
     </MudNavGroup>
     <MudNavGroup Title="Employee Life Cycle" Icon="fas fa-cogs" Class="navMenu navlink-icon-sm">
         <MudNavLink Href="/EmployeeProfile" Icon="fas fa-user-lock" Class="navMenu navlink-icon-sm">Employee Profile</MudNavLink>
@@ -255,6 +255,12 @@
     {
         // NavigationManager.NavigateTo("/TimeAttendance/regularization?ActionType=Add");
         NavigationManager.NavigateTo("/TimeAttendance/regularinquiry");
+        Actions.InvokeShowHideDrawer();
+    }
+
+    private void OpenTimeCard()
+    {
+        NavigationManager.NavigateTo("/TimeAttendance/TimeCard");
         Actions.InvokeShowHideDrawer();
     }
     #endregion

@@ -1209,6 +1209,63 @@ namespace KenHRApp.Application.Services
                 return Result<List<RegularRequestDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the leave requisition records from the database.");
             }
         }
+
+        public async Task<Result<List<TimecardResultDTO>>> SearchTimecardAsync(
+            DateTime? startDate,
+            DateTime? endDate,
+            string? costCenter,
+            int? empNo)
+        {
+            List<TimecardResultDTO> attendanceList = new();
+
+            try
+            {
+                var repoResult = await _repository.SearchTimecardAsync(startDate, endDate, costCenter, empNo);
+                if (!repoResult.Success)
+                {
+                    return Result<List<TimecardResultDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var e = repoResult.Value;
+                if (e != null && e.Any())
+                {
+                    attendanceList = e.Select(e => new TimecardResultDTO
+                    {
+                        AutoId = e.AutoId,
+                        CostCenter = e.CostCenter,
+                        CostCenterName = e.CostCenterName,
+                        EmpNo = e.EmpNo,
+                        EmployeeName = e.EmployeeName,
+                        Position = e.Position,
+                        AttendanceDate = e.AttendanceDate,
+                        DOW = e.DOW,
+                        ShiftPatCode = e.ShiftPatCode,
+                        SchedShiftCode = e.SchedShiftCode,
+                        ShiftDescription = e.ShiftDescription,
+                        ShiftTiming = e.ShiftTiming,
+                        FirstTimeIn = e.FirstTimeIn,
+                        LastTimeOut = e.LastTimeOut,
+                        DurationRequired = e.DurationRequired,
+                        WorkDuration = e.WorkDuration,
+                        NoPayHours = e.NoPayHours,
+                        RemarkCode = e.RemarkCode,
+                        LeaveType = e.LeaveType,
+                        AbsenceReasonCode = e.AbsenceReasonCode,
+                        ROADesc = e.ROADesc,
+                        AttendanceStatus = e.AttendanceStatus,
+                        AttendanceRemarks = e.AttendanceRemarks,
+                        OTDuration = e.OTDuration,
+                        OTStatus = e.OTStatus
+                    }).ToList();
+                }
+
+                return Result<List<TimecardResultDTO>>.SuccessResult(attendanceList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<TimecardResultDTO>>.Failure(ex.Message.ToString() ?? "Unknown error occured when fetching the Time Card data from the database.");
+            }
+        }
         #endregion
     }
 }

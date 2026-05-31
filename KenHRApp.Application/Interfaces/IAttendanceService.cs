@@ -60,6 +60,12 @@ namespace KenHRApp.Application.Interfaces
             string? status,
             DateTime? startDate,
             DateTime? endDate);
+
+        Task<Result<List<TimecardResultDTO>>> SearchTimecardAsync(
+            DateTime? startDate,
+            DateTime? endDate,
+            string? costCenter,
+            int? empNo);
         #endregion
     }
 }

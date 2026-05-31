@@ -49,6 +49,12 @@ namespace KenHRApp.Infrastructure.Repositories
             string? status,
             DateTime? startDate,
             DateTime? endDate);
+
+        Task<Result<List<TimecardResult>>> SearchTimecardAsync(
+            DateTime? startDate,
+            DateTime? endDate,
+            string? costCenter,
+            int? empNo);
         #endregion
     }
 }

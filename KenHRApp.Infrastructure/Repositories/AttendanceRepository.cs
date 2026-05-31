@@ -1451,6 +1451,72 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<List<RegularizationResult>>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Search Regularization Requests 
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <param name="costCenter"></param>
+        /// <param name="empNo"></param>
+        /// <returns>List<TimecardResult></returns>
+        public async Task<Result<List<TimecardResult>>> SearchTimecardAsync(
+            DateTime? startDate,
+            DateTime? endDate,
+            string? costCenter,
+            int? empNo)
+        {
+            List<TimecardResult> attendanceList = new();
+
+            try
+            {
+                var model = (await _db.Set<TimecardResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetAttendanceTimeCard @startDate = {0}, @endDate = {1}, @costCenter = {2}, @empNo = {3}",
+                    startDate!,
+                    endDate!,
+                    costCenter!,
+                    empNo!)
+                    .ToListAsync());
+                if (model != null && model.Any())
+                {
+                    attendanceList = model.Select(e => new TimecardResult
+                    {
+                        AutoId = e.AutoId,
+                        CostCenter = e.CostCenter,
+                        CostCenterName = e.CostCenterName,
+                        EmpNo = e.EmpNo,
+                        EmployeeName = e.EmployeeName,
+                        Position = e.Position,                        
+                        AttendanceDate = e.AttendanceDate,
+                        DOW = e.DOW,
+                        ShiftPatCode = e.ShiftPatCode,
+                        SchedShiftCode = e.SchedShiftCode,
+                        ShiftDescription = e.ShiftDescription,
+                        ShiftTiming = e.ShiftTiming,
+                        FirstTimeIn = e.FirstTimeIn,
+                        LastTimeOut = e.LastTimeOut,
+                        DurationRequired = e.DurationRequired,
+                        WorkDuration = e.WorkDuration,
+                        NoPayHours = e.NoPayHours,
+                        RemarkCode = e.RemarkCode,
+                        LeaveType = e.LeaveType,
+                        AbsenceReasonCode = e.AbsenceReasonCode,
+                        ROADesc = e.ROADesc,
+                        AttendanceStatus = e.AttendanceStatus,
+                        AttendanceRemarks = e.AttendanceRemarks,
+                        OTDuration = e.OTDuration,
+                        OTStatus = e.OTStatus
+                    }).ToList();
+                }
+
+                return Result<List<TimecardResult>>.SuccessResult(attendanceList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<TimecardResult>>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

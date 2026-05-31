@@ -12,13 +12,17 @@ ALTER PROCEDURE kenuser.Pr_GetAttendanceTimeCard
 (   	
 	@startDate		DATETIME,
 	@endDate		DATETIME,
-	@empNo			INT = 0
+	@costCenter		VARCHAR(20) = '',
+	@empNo			INT = 0	
 )
 AS
 BEGIN
 
 	--Tell SQL Engine not to return the row-count information
 	SET NOCOUNT ON 
+
+	IF ISNULL(@costCenter, 0) = ''
+		SET @costCenter = NULL
 
 	IF ISNULL(@empNo, 0) = 0
 		SET @empNo = NULL
@@ -102,6 +106,7 @@ BEGIN
 		--		AND RTRIM(x.UDCCode) = RTRIM(b.Position)
 		--) jt
 	WHERE a.IsLastRow = 1
+		AND (RTRIM(b.DepartmentCode) = @costCenter OR @costCenter IS NULL)
 		AND (a.EmpNo = @empNo OR @empNo IS NULL)
 		AND a.AttendanceDate BETWEEN @startDate AND @endDate
 	ORDER BY a.EmpNo, a.AttendanceDate DESC
@@ -111,11 +116,13 @@ END
 /*	Debug:
 
 	EXEC kenuser.Pr_GetAttendanceTimeCard '05/01/2026', '05/31/2026'
-	EXEC kenuser.Pr_GetAttendanceTimeCard '05/01/2026', '05/31/2026', 10003632
+	EXEC kenuser.Pr_GetAttendanceTimeCard '05/01/2026', '05/31/2026', '7600'
+	EXEC kenuser.Pr_GetAttendanceTimeCard '05/01/2026', '05/31/2026', '', 10003632
 
 PARAMETERS:   	
 	@startDate		DATETIME,
 	@endDate		DATETIME,
-	@empNo			INT = 0
+	@costCenter		VARCHAR(20) = '',
+	@empNo			INT = 0	
 
 */

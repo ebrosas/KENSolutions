@@ -852,9 +852,9 @@ namespace KenHRApp.Web.Components.Pages.Recruitment
             bool? onHold = null;
 
             #region Get the department code            
-            //if (!string.IsNullOrEmpty(_selectedDepartment))
+            //if (!string.IsNullOrEmpty(_selectedCostCenter))
             //{
-            //    DepartmentDTO? departmentDTO = _departmentList.Where(d => d.DepartmentName == _selectedDepartment).FirstOrDefault();
+            //    DepartmentDTO? departmentDTO = _departmentList.Where(d => d.DepartmentName == _selectedCostCenter).FirstOrDefault();
             //    if (departmentDTO != null)
             //        _departmentCode = departmentDTO.DepartmentCode;
             //}

@@ -131,14 +131,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Page Events
         protected override void OnInitialized()
         {
-            //if (RegularEmpNo.HasValue && RegularEmpNo > 0)
-            //    _empNo = RegularEmpNo;
+            //if (SearchEmpNo.HasValue && SearchEmpNo > 0)
+            //    _empNo = SearchEmpNo;
 
-            //if (RegularStartDate.HasValue)
-            //    _selectedStartDate = RegularStartDate;
+            //if (SearchStartDate.HasValue)
+            //    _selectedStartDate = SearchStartDate;
 
-            //if (RegularEndDate.HasValue)
-            //    _selectedEndDate = RegularEndDate;
+            //if (SearchEndDate.HasValue)
+            //    _selectedEndDate = SearchEndDate;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -447,7 +447,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Clear field mappings
             //_requestNo = null;
             //_empNo = null;
-            //_selectedDepartment = string.Empty;
+            //_selectedCostCenter = string.Empty;
             //_selectedROAType = string.Empty;
             //_selectedStatus = string.Empty;
             //_selectedStartDate = null;

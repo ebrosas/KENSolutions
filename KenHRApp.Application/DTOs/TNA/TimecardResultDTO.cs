@@ -28,6 +28,9 @@ namespace KenHRApp.Application.DTOs.TNA
         public int? DurationRequired { get; set; }
         public int? WorkDuration { get; set; }
         public int? NoPayHours { get; set; }
+        public string? RemarkCode { get; set; } = null;
+        public string? LeaveType { get; set; } = null;
+        public string? AbsenceReasonCode { get; set; } = null;
         public string? ROADesc { get; set; } = null;
         public string? AttendanceStatus { get; set; } = null;
         public string? AttendanceRemarks { get; set; } = null;
@@ -47,7 +50,7 @@ namespace KenHRApp.Application.DTOs.TNA
                     return $"{(int)duration.TotalHours:00}:{duration.Minutes:00}";
                 }
                 else
-                    return "0";
+                    return "";
             }
         }
 
@@ -62,16 +65,31 @@ namespace KenHRApp.Application.DTOs.TNA
                     return $"{(int)duration.TotalHours:00}:{duration.Minutes:00}";
                 }
                 else
-                    return "0";
+                    return "";
             }
         }
 
-        [Display(Name = "Shift Details")]
+        [Display(Name = "Overtime Duration")]
+        public string TotalOTDuration
+        {
+            get
+            {
+                if (OTDuration > 0)
+                {
+                    TimeSpan duration = TimeSpan.FromMinutes(Convert.ToDouble(OTDuration));
+                    return $"{(int)duration.TotalHours:00}:{duration.Minutes:00}";
+                }
+                else
+                    return "";
+            }
+        }
+
+        [Display(Name = "Scheduled Shift")]
         public string ShiftDetails
         {
             get
             {
-                if (!string.IsNullOrWhiteSpace(ShiftPatCode) &&
+                if (string.IsNullOrWhiteSpace(SchedShiftCode) &&
                     !string.IsNullOrWhiteSpace(ShiftTiming))
                 {
                     return $"{ShiftPatCode} - {ShiftTiming}";

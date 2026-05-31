@@ -1,4 +1,7 @@
 
+	--Get Timecard data
+	EXEC kenuser.Pr_GetAttendanceTimeCard '05/01/2026', '05/31/2026', 10003632
+
 	SELECT a.ShiftPatCode, a.SchedShiftCode, a.DurationRequired, a.DurationWorked, a.DurationWorkedCumulative, 
 		a.TimeIn, a.TimeOut,
 		a.* 
