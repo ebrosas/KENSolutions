@@ -10,8 +10,8 @@
 
 ALTER PROCEDURE kenuser.Pr_GetAttendanceTimeCard
 (   	
-	@startDate		DATETIME,
-	@endDate		DATETIME,
+	@startDate		DATETIME = NULL,
+	@endDate		DATETIME = NULL,
 	@costCenter		VARCHAR(20) = '',
 	@empNo			INT = 0	
 )
@@ -108,16 +108,22 @@ BEGIN
 	WHERE a.IsLastRow = 1
 		AND (RTRIM(b.DepartmentCode) = @costCenter OR @costCenter IS NULL)
 		AND (a.EmpNo = @empNo OR @empNo IS NULL)
-		AND a.AttendanceDate BETWEEN @startDate AND @endDate
+		AND 
+		(
+			(a.AttendanceDate BETWEEN @startDate AND @endDate AND @startDate IS NOT NULL AND @endDate IS NOT NULL)
+			OR (@startDate IS NULL AND @endDate IS NULL)
+		)
 	ORDER BY a.EmpNo, a.AttendanceDate DESC
 
 END 
 
 /*	Debug:
 
+	EXEC kenuser.Pr_GetAttendanceTimeCard
 	EXEC kenuser.Pr_GetAttendanceTimeCard '05/01/2026', '05/31/2026'
 	EXEC kenuser.Pr_GetAttendanceTimeCard '05/01/2026', '05/31/2026', '7600'
 	EXEC kenuser.Pr_GetAttendanceTimeCard '05/01/2026', '05/31/2026', '', 10003632
+	EXEC kenuser.Pr_GetAttendanceTimeCard '05/01/2026', '05/31/2026', '', NULL
 
 PARAMETERS:   	
 	@startDate		DATETIME,

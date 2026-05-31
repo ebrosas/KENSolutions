@@ -13,7 +13,7 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public string CostCenter { get; set; } = null!;
         public string? CostCenterName { get; set; } = null;
         public int EmpNo { get; set; }
-        public string EmployeeName { get; set; } = null!;
+        public string? EmployeeName { get; set; } = null;
         public string? Position { get; set; } = null;
         public DateTime? AttendanceDate { get; set; } = null;
         public string? DOW { get; set; } = null;

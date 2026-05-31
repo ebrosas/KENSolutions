@@ -370,19 +370,19 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _validationMessages.Clear();
 
             #region Check if start date is specified
-            if (!_selectedStartDate.HasValue)
-            {
-                _hasValidationError = true;
-                _validationMessages.Add("Start Date is required.");
-            }
+            //if (!_selectedStartDate.HasValue)
+            //{
+            //    _hasValidationError = true;
+            //    _validationMessages.Add("Start Date is required.");
+            //}
             #endregion
 
             #region Check if end date is specified
-            if (!_selectedEndDate.HasValue)
-            {
-                _hasValidationError = true;
-                _validationMessages.Add("End Date is required.");
-            }
+            //if (!_selectedEndDate.HasValue)
+            //{
+            //    _hasValidationError = true;
+            //    _validationMessages.Add("End Date is required.");
+            //}
             #endregion
 
             #region Check if date period is valid
@@ -468,14 +468,18 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             #endregion
 
             var repoResult = await AttendanceService.SearchTimecardAsync(
-                _selectedStartDate,
-                _selectedEndDate,                
-                costCenter,
-                _empNo);
+               _selectedStartDate,
+               _selectedEndDate,
+               costCenter,
+               _empNo);
             if (repoResult.Success)
             {
                 // Set the page title
-                _pageTitle = $"Time Card for Attandance Cycle from {_selectedStartDate!.Value.ToString("dd MMMM yyyy")} to {_selectedEndDate!.Value.ToString("dd MMMM yyyy")}";
+                if (_selectedStartDate.HasValue && _selectedEndDate.HasValue)
+                    _pageTitle = $"Time Card for Attandance Cycle from {_selectedStartDate!.Value.ToString("dd MMMM yyyy")} to {_selectedEndDate!.Value.ToString("dd MMMM yyyy")}";
+                else
+                    _pageTitle = "Time Card";
+
                 _timeCardList = repoResult.Value!;
             }
             else
