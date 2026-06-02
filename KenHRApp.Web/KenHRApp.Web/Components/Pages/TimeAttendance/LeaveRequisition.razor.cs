@@ -1104,7 +1104,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             #region Get the selected leave type
             //if (!string.IsNullOrEmpty(_leaveRequest.LeaveTypeDesc))
             //{
-            //    UserDefinedCodeDTO? selectedLeaveType = _roaList
+            //    UserDefinedCodeDTO? selectedLeaveType = _otReasonList
             //        .Where(a => a.UDCDesc1 == _leaveRequest.LeaveTypeDesc)
             //        .FirstOrDefault();
             //    if (selectedLeaveType != null)

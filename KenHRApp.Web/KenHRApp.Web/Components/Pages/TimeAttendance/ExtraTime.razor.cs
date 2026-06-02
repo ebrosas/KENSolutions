@@ -1,22 +1,18 @@
 ﻿using KenHRApp.Application.Common.Interfaces;
+using KenHRApp.Application.DTOs;
+using KenHRApp.Application.DTOs.TNA;
 using KenHRApp.Application.Interfaces;
-using KenHRApp.Application.Services;
 using KenHRApp.Web.Components.Common.Helpers;
 using KenHRApp.Web.Components.Common.Interface;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components;
-using MudBlazor;
-using KenHRApp.Application.DTOs.TNA;
-using KenHRApp.Application.DTOs;
-using System.Text;
 using KenHRApp.Web.Components.Shared;
-using System.Collections.Generic;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using MudBlazor;
+using System.Text;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
-    public partial class ApplyRegularization : ComponentBase, IPageAuthorization, IWorkflowProcess
+    public partial class ExtraTime : ComponentBase, IPageAuthorization, IWorkflowProcess
     {
         #region Parameters and Injections
         [Inject] private IAttendanceService AttendanceService { get; set; } = default!;
@@ -61,7 +57,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string _pageTitle = "Apply Regularization";
         private int _currentWFIndex = 0;
         private MudDatePicker _picker;
-        private DateTime? _selectedDate; 
+        private DateTime? _selectedDate;
         private Orientation _calOrientation = Orientation.Portrait;
         private string _pickerStyle = "width: 420px;";
         #endregion
@@ -87,21 +83,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Objects and Collections       
-        private RegularRequestDTO _regularRequest = new();
+        private ExtraTimeRequestDTO _overtimeRequest = new();
         private IReadOnlyList<IBrowserFile> _files = Array.Empty<IBrowserFile>();
 
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Regularization Inquiry", href: "/TimeAttendance/regularinquiry?ForceLoad=true", icon: Icons.Material.Filled.ManageSearch),
-            new("Apply Regularization", href: null, disabled: true, @Icons.Material.Filled.CardTravel)
+            new("Extra-time Inquiry", href: "/TimeAttendance/OvertimeInquiry?ForceLoad=true", icon: Icons.Material.Filled.YoutubeSearchedFor),
+            new("Apply Extra Time", href: null, disabled: true, @Icons.Material.Filled.CardTravel)
         ];
 
         private List<UserDefinedCodeDTO> _actionList = new List<UserDefinedCodeDTO>();
         private string[]? _actionArray = null;
 
-        private List<UserDefinedCodeDTO> _roaList = new List<UserDefinedCodeDTO>();
-        private string[]? _roaArray = null;
+        private List<UserDefinedCodeDTO> _otReasonList = new List<UserDefinedCodeDTO>();
+        private string[]? _otReasonArray = null;
 
         private string[]? _employeeArray = null;
         private IReadOnlyList<EmployeeResultDTO> _employeeList = new List<EmployeeResultDTO>();
@@ -116,7 +112,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private readonly string CONST_CANCELLED_BY_USER = "101";         // Cancelled by User
         private readonly string CONST_REQUEST_SENT = "02";              // Request Sent
         private readonly string CONST_WAITING_FOR_APPROVAL = "05";      // Waiting for Approval
-        private readonly string CONST_REGULARIZATION = "Regularization";
+        private readonly string CONST_EXTRA_TIME = "Extra Time";
         #endregion
 
         #endregion
@@ -183,7 +179,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Initialize the cancellation token
                 _cts = new CancellationTokenSource();
 
-                var repoResult = await WorkflowService.StartWorkflowAsync(WorkflowHelper.CONST_REGULARIZATION,
+                var repoResult = await WorkflowService.StartWorkflowAsync(WorkflowHelper.CONST_EXTRA_TIME,
                     requestNo, Environment.WebRootPath, originatorEmpNo, _cts.Token);
                 if (repoResult.Success)
                 {
@@ -206,9 +202,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         #region Page Events
         protected override void OnInitialized()
-        {            
+        {
             // Initialize the EditContext 
-            _editContext = new EditContext(_regularRequest);
+            _editContext = new EditContext(_overtimeRequest);
 
             if (AttendanceDate.HasValue)
                 _selectedDate = AttendanceDate.Value;
@@ -248,11 +244,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     UserEmail = UserSession.CurrentUser!.EmailAddress;
                     UserCostCenter = UserSession.CurrentUser!.CostCenter;
 
-                    // Initialize the Leave Request object
-                    _regularRequest.CreatedBy = UserEmpNo;
-                    _regularRequest.CreatedEmail = UserEmail;
-                    _regularRequest.CreatedUserID = UserName;
-                    _regularRequest.ActionDescription = CONST_REGULARIZATION;
+                    // Initialize the request object
+                    _overtimeRequest.CreatedBy = UserEmpNo;
+                    _overtimeRequest.CreatedEmail = UserEmail;
+                    _overtimeRequest.CreatedUserID = UserName;
+                    _overtimeRequest.ActionDescription = CONST_EXTRA_TIME;
 
                     if (ActionType == ActionTypes.Edit.ToString() ||
                         ActionType == ActionTypes.View.ToString())
@@ -338,10 +334,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             #endregion
 
                             // Load regularization details
-                            await GetRegularizationDetail(RequestNo);
+                            await GetExtraTimeDetail(RequestNo);
 
                             #region Get the workflow data
-                            var wfRepo = await WorkflowService.GetWorkflowStatusAsync(WorkflowHelper.CONST_REGULARIZATION, RequestNo);
+                            var wfRepo = await WorkflowService.GetWorkflowStatusAsync(WorkflowHelper.CONST_EXTRA_TIME, RequestNo);
                             if (wfRepo.Success)
                             {
                                 _workflowList = wfRepo.Value!;
@@ -373,7 +369,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             _isDisabled = true;
 
                             // Refresh the page
-                            StateHasChanged(); 
+                            StateHasChanged();
                         }
                     }
                     else
@@ -410,27 +406,26 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 if (_hasValidationError && _validationMessages.Any())
                     return;
                 #endregion
-                
 
                 // Set flag to display the loading panel
                 _isRunning = true;
 
                 // Set the overlay message
-                overlayMessage = "Submitting regularization request, please wait...";
+                overlayMessage = "Submitting extratime request, please wait...";
 
-                _ = SubmitRegularRequestAsync(async () =>
+                _ = SubmitOvertimeRequestAsync(async () =>
                 {
                     _isRunning = false;
 
                     // Shows the spinner overlay
                     await InvokeAsync(StateHasChanged);
 
-                    if (_regularRequest.RegularizationId > 0)
+                    if (_overtimeRequest.ExtratimeId > 0)
                     {
                         // Initiate the workflow
-                        await InitializeWorkflowAsync(_regularRequest.RegularizationId, _regularRequest.EmployeeNo);
+                        await InitializeWorkflowAsync(_overtimeRequest.ExtratimeId, _overtimeRequest.EmployeeNo);
 
-                        BeginLoadRegularRequest(_regularRequest.RegularizationId);
+                        BeginLoadOvertimeRequest(_overtimeRequest.ExtratimeId);
                     }
                 });
             }
@@ -501,16 +496,16 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             //    // Shows the spinner overlay
             //    await InvokeAsync(StateHasChanged);
-            //}, _shiftPattern.RegularizationId);
+            //}, _shiftPattern.ExtratimeId);
         }
 
         private void HandleRefreshButton()
         {
             // Reset Leave Request object
-            _regularRequest = new();
-            _regularRequest.CreatedBy = UserEmpNo;
-            _regularRequest.CreatedEmail = UserEmail;
-            _regularRequest.CreatedUserID = UserName;
+            _overtimeRequest = new();
+            _overtimeRequest.CreatedBy = UserEmpNo;
+            _overtimeRequest.CreatedEmail = UserEmail;
+            _overtimeRequest.CreatedUserID = UserName;
 
             #region Reset file attachments
             _files = Array.Empty<IBrowserFile>();
@@ -518,7 +513,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             StateHasChanged();
             #endregion
         }
-        
+
         private void HandleBackButton()
         {
             if (string.IsNullOrEmpty(CallerForm))
@@ -530,12 +525,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     Navigation.NavigateTo("/TimeAttendance/tnadashboard");
                     break;
 
-                case "RegularInquiry":
-                    Navigation.NavigateTo("/TimeAttendance/regularinquiry?ForceLoad=true");
-                    break;
-
                 case "ApprovalDashboard":
                     Navigation.NavigateTo("/Workflow/ApprovalDashboard");
+                    break;
+
+                case "OvertimeInquiry":
+                    Navigation.NavigateTo("/TimeAttendance/OvertimeInquiry?ForceLoad=true");
                     break;
 
                 default:
@@ -567,7 +562,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Delete"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", "Do you really want to delete this leave request? Note that this process cannot be undone." },
+                { "ContentText", "Do you really want to delete this extra time request? Note that this process cannot be undone." },
                 { "ConfirmText", "Delete" },
                 { "Color", Color.Error }
             };
@@ -588,7 +583,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Cancel"},
                 { "DialogIcon", _iconCancel },
-                { "ContentText", "Are you sure you want to cancel regularization application?" },
+                { "ContentText", "Are you sure you want to cancel extra time application?" },
                 { "ConfirmText", "Yes" },
                 { "CancelText", "No" },
                 { "Color", Color.Success }
@@ -601,27 +596,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (result != null && !result.Canceled)
             {
                 HandleBackButton();
-                //CancelRequest();
             }
-        }
-
-        private void CancelRequest()
-        {
-            if (!string.IsNullOrEmpty(CallerForm))
-            {
-                switch (CallerForm)
-                {
-                    case "LeaveInquiry":
-                        Navigation.NavigateTo("/TimeAttendance/leaveinquiry");
-                        break;
-
-                    default:
-                        Navigation.NavigateTo("/TimeAttendance/tnadashboard");
-                        break;
-                }
-            }
-            else
-                Navigation.NavigateTo("/TimeAttendance/tnadashboard");
         }
 
         private void ShowNotification(string message, NotificationType type)
@@ -660,24 +635,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     break;
             }
         }
-
-        private void ResetForm()
-        {
-            //_shiftPattern = new ShiftPatternMasterDTO
-            //{
-            //    IsActive = true,
-            //    IsFlexiTime = false,
-            //    ShiftPatternCode = string.Empty
-            //};
-        }
-
-        private async Task ConfirmDelete(RegularRequestDTO request)
+        private async Task ConfirmDelete(ExtraTimeRequestDTO request)
         {
             var parameters = new DialogParameters
             {
                 { "DialogTitle", "Confirm Delete"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to delete Regularization Request No. '{request.RegularizationId}'?" },
+                { "ContentText", $"Are you sure you want to delete Extra Time Request No. '{request.ExtratimeId}'?" },
                 { "ConfirmText", "Delete" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -740,7 +704,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             //_files.Remove(file);
             _files = _files.Where(f => f != file).ToList();
-        }               
+        }
 
         private async Task ConfirmCancel()
         {
@@ -748,7 +712,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Cancel"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to cancel Regularization Request No. '{_regularRequest.RegularizationId}'?" },
+                { "ContentText", $"Are you sure you want to cancel Extra Time Request No. '{_overtimeRequest.ExtratimeId}'?" },
                 { "ConfirmText", "Proceed" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -767,7 +731,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                BeginRequestCancellation(_regularRequest);
+                BeginRequestCancellation(_overtimeRequest);
             }
         }
 
@@ -776,7 +740,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (breakpoint <= Breakpoint.Sm)
             {
                 _calOrientation = Orientation.Landscape;
-                _pickerStyle = "width: 420px; padding-top: 15px;";                
+                _pickerStyle = "width: 420px; padding-top: 15px;";
             }
             else
             {
@@ -788,17 +752,17 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private async void OnDateChanged(DateTime? date)
         {
             if (date.HasValue &&
-                _regularRequest.EmployeeNo > 0)
+                _overtimeRequest.EmployeeNo > 0)
             {
-                await GetAttendanceInfoAsync(_regularRequest.EmployeeNo, date!.Value);
+                await GetAttendanceInfoAsync(_overtimeRequest.EmployeeNo, date!.Value);
             }
         }
 
         private void OnEmployeeChanged(int newValue)
         {
-            if (_regularRequest.EmployeeNo != newValue)
+            if (_overtimeRequest.EmployeeNo != newValue)
             {
-                _regularRequest.EmployeeNo = newValue;
+                _overtimeRequest.EmployeeNo = newValue;
 
                 // Get the employee details
                 if (_employeeList.Any())
@@ -806,9 +770,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     EmployeeResultDTO? employee = _employeeList.Where(e => e.EmployeeNo == newValue).FirstOrDefault();
                     if (employee != null)
                     {
-                        _regularRequest.EmployeeNo = employee.EmployeeNo;
-                        _regularRequest.CostCenter = employee!.DepartmentCode;
-                        _regularRequest.EmployeeName = employee.EmployeeFullName;
+                        _overtimeRequest.EmployeeNo = employee.EmployeeNo;
+                        _overtimeRequest.CostCenter = employee!.DepartmentCode;
+                        _overtimeRequest.EmployeeName = employee.EmployeeFullName;
                     }
                 }
             }
@@ -842,7 +806,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             return _actionArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        private async Task<IEnumerable<string>> SearchReasonOfAbsence(string value, CancellationToken token)
+        private async Task<IEnumerable<string>> SearchOTReason(string value, CancellationToken token)
         {
             // In real life use an asynchronous function for fetching data from an api.
             await Task.Delay(5, token);
@@ -850,10 +814,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // if text is null or empty, show complete list
             if (string.IsNullOrEmpty(value))
             {
-                return _roaArray!;
+                return _otReasonArray!;
             }
 
-            return _roaArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+            return _otReasonArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
 
         private async Task<IEnumerable<string>> SearchEmployee(string value, CancellationToken token)
@@ -890,8 +854,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _ = LoadComboboxAsync(async () =>
             {
                 // Set the default employee to the current logged in user
-                _regularRequest.EmployeeNo = UserEmpNo;
-                _regularRequest.EmployeeName = UserFullName;
+                _overtimeRequest.EmployeeNo = UserEmpNo;
+                _overtimeRequest.EmployeeName = UserFullName;
 
                 _isRunning = false;
 
@@ -905,7 +869,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 if (RequestNo > 0)
                 {
-                    BeginLoadRegularRequest(RequestNo);
+                    BeginLoadOvertimeRequest(RequestNo);
                 }
             });
         }
@@ -965,9 +929,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                     if (groupID > 0)
                     {
-                        _roaList = udcData!.Where(a => a.GroupID == groupID && a.IsActive == true).ToList();
-                        if (_roaList != null)
-                            _roaArray = _roaList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                        _otReasonList = udcData!.Where(a => a.GroupID == groupID && a.IsActive == true).ToList();
+                        if (_otReasonList != null)
+                            _otReasonArray = _otReasonList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
                     }
                     #endregion
 
@@ -1034,12 +998,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     AttendanceInfoResultDTO attendanceInfo = result.Value!;
                     if (attendanceInfo != null)
                     {
-                        _regularRequest.AttendanceDate = attendanceInfo.AttendanceDate;
-                        _regularRequest.ShiftPattern = attendanceInfo.ShiftRoster;
-                        _regularRequest.ShiftTiming = attendanceInfo.ShiftTiming;
-                        _regularRequest.WorkDuration = attendanceInfo.TotalWorkMinute;
-                        _regularRequest.NoPayHours = attendanceInfo.TotalDeficitMinute;
-                        _regularRequest.RemarkCode = attendanceInfo.RemarkCode;
+                        _overtimeRequest.AttendanceDate = attendanceInfo.AttendanceDate;
+                        _overtimeRequest.ShiftPattern = attendanceInfo.ShiftRoster;
+                        _overtimeRequest.ShiftTiming = attendanceInfo.ShiftTiming;
+                        _overtimeRequest.WorkDuration = attendanceInfo.TotalWorkMinute;
 
                         #region Populate the raw swipe chips
                         if (attendanceInfo.SwipeLogList != null && attendanceInfo.SwipeLogList.Any())
@@ -1064,7 +1026,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task SubmitRegularRequestAsync(Func<Task> callback)
+        private async Task SubmitOvertimeRequestAsync(Func<Task> callback)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(500);
@@ -1072,7 +1034,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Reset error messages
             _errorMessage.Clear();
 
-            bool isNewRequition = _regularRequest.RegularizationId == 0;
+            bool isNewRequition = _overtimeRequest.ExtratimeId == 0;
 
             // Initialize the cancellation token
             _cts = new CancellationTokenSource();
@@ -1095,49 +1057,49 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             //}
             #endregion
 
-            #region Get the selected ROA
-            if (!string.IsNullOrEmpty(_regularRequest.ROADescription))
+            #region Get the selected OT Reason
+            if (!string.IsNullOrEmpty(_overtimeRequest.OTReasonDesc))
             {
-                UserDefinedCodeDTO? selectedROA = _roaList
-                    .Where(a => a.UDCDesc1 == _regularRequest.ROADescription)
+                UserDefinedCodeDTO? selectedReason = _otReasonList
+                    .Where(a => a.UDCDesc1 == _overtimeRequest.OTReasonDesc)
                     .FirstOrDefault();
-                if (selectedROA != null)
-                    _regularRequest.ROACode = selectedROA.UDCCode;
+                if (selectedReason != null)
+                    _overtimeRequest.OTReasonCode = selectedReason.UDCCode;
             }
             #endregion
 
             #region Get the selected Action
-            if (!string.IsNullOrEmpty(_regularRequest.ActionDescription))
+            if (!string.IsNullOrEmpty(_overtimeRequest.ActionDescription))
             {
                 UserDefinedCodeDTO? selectedAction = _actionList
-                    .Where(a => a.UDCDesc1 == _regularRequest.ActionDescription)
+                    .Where(a => a.UDCDesc1 == _overtimeRequest.ActionDescription)
                     .FirstOrDefault();
                 if (selectedAction != null)
-                    _regularRequest.ActionCode = selectedAction.UDCCode;
+                    _overtimeRequest.ActionCode = selectedAction.UDCCode;
             }
             #endregion
 
             #region Initialize File Attachment DTO
-            var fileDtos = new List<FileUploadDTO>();
+            //var fileDtos = new List<FileUploadDTO>();
 
-            foreach (var file in _files)
-            {
-                var stream = file.OpenReadStream(10 * 1024 * 1024);
+            //foreach (var file in _files)
+            //{
+            //    var stream = file.OpenReadStream(10 * 1024 * 1024);
 
-                fileDtos.Add(new FileUploadDTO
-                {
-                    FileName = file.Name,
-                    ContentType = file.ContentType,
-                    Size = file.Size,
-                    Content = stream
-                });
-            }
+            //    fileDtos.Add(new FileUploadDTO
+            //    {
+            //        FileName = file.Name,
+            //        ContentType = file.ContentType,
+            //        Size = file.Size,
+            //        Content = stream
+            //    });
+            //}
             #endregion
 
             if (isNewRequition)
             {
                 // Set leave request information and flags 
-                _regularRequest.CreatedDate = DateTime.Now;
+                _overtimeRequest.CreatedDate = DateTime.Now;
 
                 #region Set status to "Waiting for Approval" 
                 if (_requestStatusList != null && _requestStatusList.Any())
@@ -1145,54 +1107,54 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     UserDefinedCodeDTO? statusFlag = _requestStatusList.Where(s => s.UDCCode == CONST_WAITING_FOR_APPROVAL).FirstOrDefault();
                     if (statusFlag != null)
                     {
-                        _regularRequest.StatusCode = statusFlag.UDCCode;
-                        _regularRequest.StatusID = statusFlag.UDCId;
-                        _regularRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
+                        _overtimeRequest.StatusCode = statusFlag.UDCCode;
+                        _overtimeRequest.StatusID = statusFlag.UDCId;
+                        _overtimeRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
                     }
                 }
                 #endregion
 
-                var addResult = await AttendanceService.AddRegularRequestAsync(_regularRequest, fileDtos, Environment.WebRootPath, _cts.Token);
-                isSuccess = addResult.Success;
-                if (!isSuccess)
-                    errorMsg = addResult.Error!;
-                else
-                {
-                    // Set flag to enable reload when navigating back to the caller page
-                    _forceLoad = true;
+                //var addResult = await AttendanceService.AddRegularRequestAsync(_overtimeRequest, fileDtos, Environment.WebRootPath, _cts.Token);
+                //isSuccess = addResult.Success;
+                //if (!isSuccess)
+                //    errorMsg = addResult.Error!;
+                //else
+                //{
+                //    // Set flag to enable reload when navigating back to the caller page
+                //    _forceLoad = true;
 
-                    // Set action type flag
-                    ActionType = ActionTypes.Edit.ToString();
+                //    // Set action type flag
+                //    ActionType = ActionTypes.Edit.ToString();
 
-                    // Get the new identity seed value
-                    _regularRequest.RegularizationId = addResult.Value;
+                //    // Get the new identity seed value
+                //    _overtimeRequest.ExtratimeId = addResult.Value;
 
-                    // Display the requisition number in the page title
-                    _pageTitle = $" Regularization Request No. {addResult.Value}";
-                }
+                //    // Display the requisition number in the page title
+                //    _pageTitle = $" Regularization Request No. {addResult.Value}";
+                //}
             }
             else
             {
                 // Set the user who update the record and the timestamp
-                _regularRequest.LastUpdatedDate = DateTime.Now;
+                _overtimeRequest.LastUpdatedDate = DateTime.Now;
 
                 #region Set request status to "Request Sent" 
                 if (_requestStatusList != null && _requestStatusList.Any())
                 {
-                    UserDefinedCodeDTO? statusFlag = _requestStatusList.Where(s => s.UDCCode == CONST_REQUEST_SENT).FirstOrDefault();
+                    UserDefinedCodeDTO? statusFlag = _requestStatusList.Where(s => s.UDCCode == CONST_WAITING_FOR_APPROVAL).FirstOrDefault();
                     if (statusFlag != null)
                     {
-                        _regularRequest.StatusCode = statusFlag.UDCCode;
-                        _regularRequest.StatusID = statusFlag.UDCId;
-                        _regularRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
+                        _overtimeRequest.StatusCode = statusFlag.UDCCode;
+                        _overtimeRequest.StatusID = statusFlag.UDCId;
+                        _overtimeRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
                     }
                 }
                 #endregion
 
-                var saveResult = await AttendanceService.UpdateRegularizRequestAsync(_regularRequest, _cts.Token);
-                isSuccess = saveResult.Success;
-                if (!isSuccess)
-                    errorMsg = saveResult.Error!;
+                //var saveResult = await AttendanceService.UpdateRegularizRequestAsync(_overtimeRequest, _cts.Token);
+                //isSuccess = saveResult.Success;
+                //if (!isSuccess)
+                //    errorMsg = saveResult.Error!;
             }
 
             if (isSuccess)
@@ -1207,9 +1169,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 // Show notification
                 if (isNewRequition)
-                    ShowNotification("Regularization request has been submitted successfully!", NotificationType.Success);
+                    ShowNotification("Extra time request has been submitted successfully!", NotificationType.Success);
                 else
-                    ShowNotification("Regularization request has been updated successfully!", NotificationType.Success);
+                    ShowNotification("Extra time request has been updated successfully!", NotificationType.Success);
             }
             else
             {
@@ -1225,13 +1187,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async void BeginLoadRegularRequest(long requestNo)
+        private async void BeginLoadOvertimeRequest(long requestNo)
         {
             // Load regularization details
-            await GetRegularizationDetail(requestNo);
+            await GetExtraTimeDetail(requestNo);
 
             #region Get the workflow data
-            var result = await WorkflowService.GetWorkflowStatusAsync(WorkflowHelper.CONST_REGULARIZATION, requestNo);
+            var result = await WorkflowService.GetWorkflowStatusAsync(WorkflowHelper.CONST_EXTRA_TIME, requestNo);
             if (result.Success)
             {
                 _workflowList = result.Value!;
@@ -1257,7 +1219,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             #endregion
         }
 
-        private async Task GetRegularizationDetail(long requestNo)
+        private async Task GetExtraTimeDetail(long requestNo)
         {
             // Reset error messages
             _errorMessage.Clear();
@@ -1268,13 +1230,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             var result = await AttendanceService.GetRegularRequestAsync(requestNo);
             if (result.Success)
             {
-                _regularRequest = result.Value!;
+                //_overtimeRequest = result.Value!;
 
                 // Display the requisition number in the page title
-                _pageTitle = $" Regularization Request #{_regularRequest.RegularizationId} (Created On: {_regularRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")} | Status: {_regularRequest.StatusSummary})";
+                _pageTitle = $" Regularization Request #{_overtimeRequest.ExtratimeId} (Created On: {_overtimeRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")} | Status: {_overtimeRequest.StatusSummary})";
 
                 // Recreate the EditContext with the loaded _overtimeRequest
-                _editContext = new EditContext(_regularRequest);
+                _editContext = new EditContext(_overtimeRequest);
             }
             else
             {
@@ -1285,7 +1247,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private void BeginRequestCancellation(RegularRequestDTO regularRequest)
+        private void BeginRequestCancellation(ExtraTimeRequestDTO regularRequest)
         {
             try
             {
@@ -1324,7 +1286,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task CancelRequestAsync(Func<Task> callback, RegularRequestDTO regularRequest)
+        private async Task CancelRequestAsync(Func<Task> callback, ExtraTimeRequestDTO regularRequest)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(500);
@@ -1354,10 +1316,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
             #endregion
 
-            var saveResult = await AttendanceService.CancelRegularRequestAsync(regularRequest, _cts.Token);
-            isSuccess = saveResult.Success;
-            if (!isSuccess)
-                errorMsg = saveResult.Error!;
+            //var saveResult = await AttendanceService.CancelRegularRequestAsync(regularRequest, _cts.Token);
+            //isSuccess = saveResult.Success;
+            //if (!isSuccess)
+            //    errorMsg = saveResult.Error!;
 
             if (isSuccess)
             {
@@ -1370,7 +1332,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 ShowHideError(false);
 
                 // Show notification
-                ShowNotification("Regularization request has been cancelled successfully!", NotificationType.Success);
+                ShowNotification("Extra time request has been cancelled successfully!", NotificationType.Success);
 
                 HandleBackButton();
             }

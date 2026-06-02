@@ -83,7 +83,7 @@
     </MudNavGroup>
     <MudNavGroup Title="Time & Attendance" Icon="fas fa-calendar-check" Class="navlink-icon-sm navMenu">
         <MudNavLink Icon="fas fa-chart-bar" Class="navMenu navlink-icon-sm" OnClick="OpenEmployeeDashboard">Attendance Dashboard</MudNavLink>
-        <MudNavLink Href="/ExtraTime" Icon="far fa-calendar-plus" Class="navMenu navlink-icon-sm">Extra Time Request</MudNavLink>
+        <MudNavLink Icon="far fa-calendar-plus" Class="navMenu navlink-icon-sm" OnClick="OpenExtraTime">Extra Time Request</MudNavLink>
         <MudNavLink Href="/DigitalID" Icon="fas fa-address-card" Class="navMenu navlink-icon-sm" hidden>Digital ID</MudNavLink>        
         <MudNavLink Href="/SelfService" Icon="fas fa-user-edit" Class="navMenu navlink-icon-sm" hidden>Self Service</MudNavLink>
         <MudNavLink Icon="far fa-calendar-check" Class="navMenu navlink-icon-sm" OnClick="OpenRegularization">Regularization Request</MudNavLink>
@@ -261,6 +261,12 @@
     private void OpenTimeCard()
     {
         NavigationManager.NavigateTo("/TimeAttendance/TimeCard");
+        Actions.InvokeShowHideDrawer();
+    }
+
+    private void OpenExtraTime()
+    {
+        NavigationManager.NavigateTo("/TimeAttendance/ExtraTime?ActionType=Add");
         Actions.InvokeShowHideDrawer();
     }
     #endregion
