@@ -285,7 +285,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                                     #region Get ROA Types
                                     //try
                                     //{
-                                    //    groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ROATYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                                    //    groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.OTREASON.ToString()).FirstOrDefault()!.UDCGroupId;
                                     //}
                                     //catch (Exception ex)
                                     //{

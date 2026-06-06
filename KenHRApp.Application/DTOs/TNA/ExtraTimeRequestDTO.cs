@@ -11,6 +11,7 @@ namespace KenHRApp.Application.DTOs.TNA
     {
         #region Properties
         public long ExtratimeId { get; set; }       // Identity column  
+        public long TS_AutoId { get; set; }
         public Guid AttachmentId { get; set; } = Guid.NewGuid();
         public Guid WorkflowId { get; set; } = Guid.NewGuid();
         public int EmployeeNo { get; set; }
@@ -85,6 +86,7 @@ namespace KenHRApp.Application.DTOs.TNA
         public string? LastUpdatedUserID { get; set; } = null;
         public string? LastUpdatedEmail { get; set; } = null;
         public List<FileAttachmentDTO> Files { get; set; } = new();
+        public List<AttendanceSwipeDTO>? SwipeLogList { get; set; }
         #endregion
 
         #region Extended Properties

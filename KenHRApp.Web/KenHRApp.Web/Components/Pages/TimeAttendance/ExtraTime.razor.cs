@@ -145,7 +145,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private enum UDCKeys
         {
-            ROATYPE,            // ROA Types
+            OTREASON,           // Overtime Reasons
             ATTENDACT,          // Attendance Action Types
             LEAVEAPORTION,      // Leave Day Portions
             STATUS              // Leave Statuses
@@ -281,7 +281,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                                     #region Get ROA Types
                                     //try
                                     //{
-                                    //    groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ROATYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                                    //    groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.OTREASON.ToString()).FirstOrDefault()!.UDCGroupId;
                                     //}
                                     //catch (Exception ex)
                                     //{
@@ -920,11 +920,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     #region Get ROA Types
                     try
                     {
-                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ROATYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.OTREASON.ToString()).FirstOrDefault()!.UDCGroupId;
                     }
                     catch (Exception ex)
                     {
-                        _errorMessage.Append($"Error getting ROA group id: {ex.Message}");
+                        _errorMessage.Append($"Error fetching data to OT Reasons drop-down box: {ex.Message}");
                     }
 
                     if (groupID > 0)
@@ -1043,18 +1043,19 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             string errorMsg = string.Empty;
 
             #region Get the selected employee information 
-            //if (!string.IsNullOrEmpty(_overtimeRequest.EmployeeFullName))
-            //{
-            //    EmployeeResultDTO? selectedEmployee = _employeeList
-            //        .Where(a => a.EmployeeNameWithCode == _overtimeRequest.EmployeeFullName)
-            //        .FirstOrDefault();
-            //    if (selectedEmployee != null)
-            //    {
-            //        _overtimeRequest.EmployeeNo = selectedEmployee.EmployeeNo;
-            //        _overtimeRequest.CostCenter = selectedEmployee!.DepartmentCode;
-            //        _overtimeRequest.EmployeeName = selectedEmployee.EmployeeFullName;
-            //    }
-            //}
+            if (String.IsNullOrWhiteSpace(_overtimeRequest.EmployeeName) ||
+                String.IsNullOrWhiteSpace(_overtimeRequest.CostCenter))
+            {
+                EmployeeResultDTO? selectedEmployee = _employeeList
+                    .Where(a => a.EmployeeNo == _overtimeRequest.EmployeeNo)
+                    .FirstOrDefault();
+                if (selectedEmployee != null)
+                {
+                    _overtimeRequest.EmployeeNo = selectedEmployee.EmployeeNo;
+                    _overtimeRequest.CostCenter = selectedEmployee!.DepartmentCode;
+                    _overtimeRequest.EmployeeName = selectedEmployee.EmployeeFullName;
+                }
+            }
             #endregion
 
             #region Get the selected OT Reason
@@ -1114,24 +1115,24 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 }
                 #endregion
 
-                //var addResult = await AttendanceService.AddRegularRequestAsync(_overtimeRequest, fileDtos, Environment.WebRootPath, _cts.Token);
-                //isSuccess = addResult.Success;
-                //if (!isSuccess)
-                //    errorMsg = addResult.Error!;
-                //else
-                //{
-                //    // Set flag to enable reload when navigating back to the caller page
-                //    _forceLoad = true;
+                var addResult = await AttendanceService.AddOTRequestAsync(_overtimeRequest, _cts.Token);
+                isSuccess = addResult.Success;
+                if (!isSuccess)
+                    errorMsg = addResult.Error!;
+                else
+                {
+                    // Set flag to enable reload when navigating back to the caller page
+                    _forceLoad = true;
 
-                //    // Set action type flag
-                //    ActionType = ActionTypes.Edit.ToString();
+                    // Set action type flag
+                    ActionType = ActionTypes.Edit.ToString();
 
-                //    // Get the new identity seed value
-                //    _overtimeRequest.ExtratimeId = addResult.Value;
+                    // Get the new identity seed value
+                    _overtimeRequest.ExtratimeId = addResult.Value;
 
-                //    // Display the requisition number in the page title
-                //    _pageTitle = $" Regularization Request No. {addResult.Value}";
-                //}
+                    // Display the requisition number in the page title
+                    _pageTitle = $" Overtime Request No. {addResult.Value}";
+                }
             }
             else
             {
@@ -1151,10 +1152,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 }
                 #endregion
 
-                //var saveResult = await AttendanceService.UpdateRegularizRequestAsync(_overtimeRequest, _cts.Token);
-                //isSuccess = saveResult.Success;
-                //if (!isSuccess)
-                //    errorMsg = saveResult.Error!;
+                var saveResult = await AttendanceService.UpdateOTRequestAsync(_overtimeRequest, _cts.Token);
+                isSuccess = saveResult.Success;
+                if (!isSuccess)
+                    errorMsg = saveResult.Error!;
             }
 
             if (isSuccess)
@@ -1227,13 +1228,18 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Clear attachment list
             _files = Array.Empty<IBrowserFile>();
 
-            var result = await AttendanceService.GetRegularRequestAsync(requestNo);
+            var result = await AttendanceService.GetOTRequestAsync(requestNo);
             if (result.Success)
             {
-                //_overtimeRequest = result.Value!;
+                _overtimeRequest = result.Value!;
+
+                #region Populate raw swipe chips
+                if (_overtimeRequest.SwipeLogList != null && _overtimeRequest.SwipeLogList.Any())
+                    _attendanceChips.AddRange(_overtimeRequest.SwipeLogList.ToList());
+                #endregion
 
                 // Display the requisition number in the page title
-                _pageTitle = $" Regularization Request #{_overtimeRequest.ExtratimeId} (Created On: {_overtimeRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")} | Status: {_overtimeRequest.StatusSummary})";
+                _pageTitle = $" Overtime Request #{_overtimeRequest.ExtratimeId} (Created On: {_overtimeRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")} | Status: {_overtimeRequest.StatusSummary})";
 
                 // Recreate the EditContext with the loaded _overtimeRequest
                 _editContext = new EditContext(_overtimeRequest);
@@ -1316,10 +1322,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
             #endregion
 
-            //var saveResult = await AttendanceService.CancelRegularRequestAsync(regularRequest, _cts.Token);
-            //isSuccess = saveResult.Success;
-            //if (!isSuccess)
-            //    errorMsg = saveResult.Error!;
+            var saveResult = await AttendanceService.CancelOTRequestAsync(regularRequest, _cts.Token);
+            isSuccess = saveResult.Success;
+            if (!isSuccess)
+                errorMsg = saveResult.Error!;
 
             if (isSuccess)
             {

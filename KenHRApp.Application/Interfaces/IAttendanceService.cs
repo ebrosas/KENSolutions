@@ -66,6 +66,20 @@ namespace KenHRApp.Application.Interfaces
             DateTime? endDate,
             string? costCenter,
             int? empNo);
+
+        Task<Result<long>> AddOTRequestAsync(
+            ExtraTimeRequestDTO dto,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<int>> UpdateOTRequestAsync(
+            ExtraTimeRequestDTO dto,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<int>> CancelOTRequestAsync(
+            ExtraTimeRequestDTO dto,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<ExtraTimeRequestDTO?>> GetOTRequestAsync(long requestNo);
         #endregion
     }
 }

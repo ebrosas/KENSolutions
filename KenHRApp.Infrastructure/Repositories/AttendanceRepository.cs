@@ -1517,6 +1517,262 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<List<TimecardResult>>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Add new overtime request 
+        /// </summary>
+        /// <param name="OTRequestWF"></param>
+        /// <returns>Result<long></returns>
+        public async Task<Result<long>> AddOTRequestAsync(
+            OTRequestWF dto, 
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (dto is null)
+                    throw new ArgumentNullException(nameof(dto));
+
+                #region Initialize entity
+                var otRequest = new OTRequestWF
+                {
+                    TS_AutoId = dto.TS_AutoId,
+                    EmployeeNo = dto.EmployeeNo,
+                    EmployeeName = dto.EmployeeName,
+                    CostCenter = dto.CostCenter,
+                    AttendanceDate = dto.AttendanceDate,
+                    OTReasonCode = dto.OTReasonCode,
+                    ActionCode = dto.ActionCode,
+                    OTStartTime = dto.OTStartTime,
+                    OTEndTime = dto.OTEndTime,
+                    ShiftPattern = dto.ShiftPattern,
+                    ShiftTiming = dto.ShiftTiming,
+                    WorkDuration = dto.WorkDuration,
+                    OTDuration = dto.OTDuration,
+                    Remarks = dto.Remarks,
+                    StatusCode = dto.StatusCode,
+                    StatusID = dto.StatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    CreatedDate = dto.CreatedDate,
+                    CreatedBy = dto.CreatedBy,
+                    CreatedUserID = dto.CreatedUserID,
+                    CreatedEmail = dto.CreatedEmail,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedEmail = dto.LastUpdatedEmail
+                };
+                #endregion
+
+                // Save to database
+                await _db.OTRequestWF.AddAsync(otRequest);
+                await _db.SaveChangesAsync(cancellationToken);
+
+                // ✅ EF Core automatically populates identity after SaveChanges
+                long generatedId = otRequest.ExtratimeId;
+
+                return Result<long>.SuccessResult(generatedId);
+
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<long>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<long>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Update overtime request 
+        /// </summary>
+        /// <param name="OTRequestWF"></param>
+        /// <returns>Result<long></returns>
+        public async Task<Result<int>> UpdateOTRequestAsync(
+            OTRequestWF otRequest, 
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (otRequest == null)
+                    throw new ArgumentNullException(nameof(otRequest));
+
+                var existing = await _db.OTRequestWF
+                    .FirstOrDefaultAsync(e =>
+                        e.ExtratimeId == otRequest.ExtratimeId,
+                        cancellationToken);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find overtime request with the specified no.");
+
+                #region Update request information
+                existing.OTReasonCode = otRequest.OTReasonCode;
+                existing.OTStartTime = otRequest.OTStartTime;
+                existing.OTEndTime = otRequest.OTEndTime;
+                existing.Remarks = otRequest.Remarks;
+                existing.StatusCode = otRequest.StatusCode;
+                existing.StatusID = otRequest.StatusID;
+                existing.StatusHandlingCode = otRequest.StatusHandlingCode;
+                existing.LastUpdatedDate = otRequest.LastUpdatedDate;
+                existing.LastUpdatedBy = otRequest.LastUpdatedBy;
+                existing.LastUpdatedUserID = otRequest.LastUpdatedUserID;
+                existing.LastUpdatedEmail = otRequest.LastUpdatedEmail;
+
+                #endregion
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Cancel overtime request 
+        /// </summary>
+        /// <param name="OTRequestWF"></param>
+        /// <returns>Result<long></returns>
+        public async Task<Result<int>> CancelOTRequestAsync(
+            OTRequestWF otRequest,
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (otRequest == null)
+                    throw new ArgumentNullException(nameof(otRequest));
+
+                var existing = await _db.OTRequestWF
+                    .FirstOrDefaultAsync(e =>
+                        e.ExtratimeId == otRequest.ExtratimeId,
+                        cancellationToken);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find overtime request with the specified request no.");
+
+                #region Set overtime status to "Cancelled by User"
+                existing.StatusCode = otRequest.StatusCode;
+                existing.StatusID = otRequest.StatusID;
+                existing.StatusHandlingCode = otRequest.StatusHandlingCode;
+                existing.LastUpdatedDate = otRequest.LastUpdatedDate;
+                existing.LastUpdatedBy = otRequest.LastUpdatedBy;
+                existing.LastUpdatedUserID = otRequest.LastUpdatedUserID;
+                existing.LastUpdatedEmail = otRequest.LastUpdatedEmail;
+                #endregion
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get Overtime Request details
+        /// </summary>
+        /// <param name="requestNo"></param>
+        /// <returns></returns>
+        public async Task<Result<OTRequestResult>> GetOTRequestAsync(long requestNo)
+        {
+            OTRequestResult otRequest = new();
+
+            try
+            {
+                var model = await _db.Set<OTRequestResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetRegularizationDetail @requestNo = {0}",
+                    requestNo)
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    otRequest.ExtratimeId = model[0].ExtratimeId;
+                    otRequest.TS_AutoId = model[0].TS_AutoId;
+                    otRequest.WorkflowId = model[0].WorkflowId;
+                    otRequest.EmployeeNo = model[0].EmployeeNo;
+                    otRequest.EmployeeName = model[0].EmployeeName;
+                    otRequest.CostCenter = model[0].CostCenter;
+                    otRequest.CostCenterName = model[0].CostCenter;
+                    otRequest.AttendanceDate = model[0].AttendanceDate;
+                    otRequest.OTReasonCode = model[0].OTReasonCode;
+                    otRequest.OTReasonDesc = model[0].OTReasonDesc;
+                    otRequest.ActionCode = model[0].ActionCode;
+                    otRequest.ActionDesc = model[0].ActionDesc;
+                    otRequest.OTStartTime = model[0].OTStartTime;
+                    otRequest.OTEndTime = model[0].OTEndTime;
+                    otRequest.ShiftPattern = model[0].ShiftPattern;
+                    otRequest.ShiftTiming = model[0].ShiftTiming;
+                    otRequest.WorkDuration = model[0].WorkDuration;
+                    otRequest.OTDuration = model[0].OTDuration;
+                    otRequest.Remarks = model[0].Remarks;
+                    otRequest.StatusID = model[0].StatusID;
+                    otRequest.StatusCode = model[0].StatusCode;
+                    otRequest.StatusDesc = model[0].StatusDesc;
+                    otRequest.StatusHandlingCode = model[0].StatusHandlingCode;
+                    otRequest.CreatedDate = model[0].CreatedDate;
+                    otRequest.CreatedBy = model[0].CreatedBy;
+                    otRequest.CreatedUserID = model[0].CreatedUserID;
+                    otRequest.CreatedEmail = model[0].CreatedEmail;
+                    otRequest.CreatedByName = model[0].CreatedByName;
+                    otRequest.LastUpdatedDate = model[0].LastUpdatedDate;
+                    otRequest.LastUpdatedBy = model[0].LastUpdatedBy;
+                    otRequest.LastUpdatedUserID = model[0].LastUpdatedUserID;
+                    otRequest.LastUpdatedEmail = model[0].LastUpdatedEmail;
+
+                    #region Get the swipe logs
+                    List<AttendanceSwipeLog> swipeLogs = new List<AttendanceSwipeLog>();
+
+                    var swipeModel = await (from log in _db.AttendanceSwipeLogs
+                                            where log.EmpNo == otRequest.EmployeeNo &&
+                                                log.SwipeDate == otRequest.AttendanceDate
+                                            select log).ToListAsync();
+                    if (swipeModel != null)
+                    {
+                        otRequest.SwipeLogList = swipeModel.Select(e => new AttendanceSwipeLog
+                        {
+                            SwipeID = e.SwipeID,
+                            EmpNo = e.EmpNo,
+                            SwipeDate = e.SwipeDate,
+                            SwipeTime = e.SwipeTime,
+                            SwipeType = e.SwipeType,
+                            SwipeLogDate = e.SwipeLogDate
+                        }).ToList();
+                    }
+                    #endregion
+                }
+
+                return Result<OTRequestResult>.SuccessResult(otRequest);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<OTRequestResult>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

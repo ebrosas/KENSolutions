@@ -2983,6 +2983,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 
 	END 
 
+
 /*	Check records:
 
 	--Leave Request Types

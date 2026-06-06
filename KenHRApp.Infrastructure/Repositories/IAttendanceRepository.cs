@@ -55,6 +55,20 @@ namespace KenHRApp.Infrastructure.Repositories
             DateTime? endDate,
             string? costCenter,
             int? empNo);
+
+        Task<Result<long>> AddOTRequestAsync(
+            OTRequestWF dto,
+            CancellationToken cancellationToken);
+
+        Task<Result<int>> UpdateOTRequestAsync(
+            OTRequestWF otRequest,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<int>> CancelOTRequestAsync(
+            OTRequestWF otRequest,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<OTRequestResult>> GetOTRequestAsync(long requestNo);
         #endregion
     }
 }

@@ -1266,6 +1266,213 @@ namespace KenHRApp.Application.Services
                 return Result<List<TimecardResultDTO>>.Failure(ex.Message.ToString() ?? "Unknown error occured when fetching the Time Card data from the database.");
             }
         }
+
+        public async Task<Result<long>> AddOTRequestAsync(
+            ExtraTimeRequestDTO dto,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Create "ExtraTimeRequestDTO" entity from DTO
+                OTRequestWF otRequest = new OTRequestWF
+                {
+                    EmployeeNo = dto.EmployeeNo,
+                    EmployeeName = dto.EmployeeName,
+                    CostCenter = dto.CostCenter,
+                    AttendanceDate = Convert.ToDateTime(dto.AttendanceDate),
+                    OTReasonCode = dto!.OTReasonCode,
+                    ActionCode = dto!.ActionCode,
+                    OTStartTime = dto.OTStartTime!.Value,
+                    OTEndTime = dto.OTEndTime!.Value,
+                    ShiftPattern = dto.ShiftPattern,
+                    ShiftTiming = dto.ShiftTiming,
+                    WorkDuration = dto.WorkDuration,
+                    OTDuration = dto.OTDuration,
+                    Remarks = dto.Remarks,
+                    StatusCode = dto.StatusCode,
+                    StatusID = dto.StatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    CreatedDate = dto.CreatedDate,
+                    CreatedBy = dto.CreatedBy,
+                    CreatedUserID = dto.CreatedUserID,
+                    CreatedEmail = dto.CreatedEmail,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedEmail = dto.LastUpdatedEmail
+                };
+                #endregion
+
+                var result = await _repository.AddOTRequestAsync(otRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to save overtime request due to error. Please check the data entry then try to save again!");
+                }
+
+                return Result<long>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<long>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<int>> UpdateOTRequestAsync(
+            ExtraTimeRequestDTO dto,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Create "OTRequestWF" entity from DTO
+                OTRequestWF otRequest = new OTRequestWF
+                {
+                    ExtratimeId = dto.ExtratimeId,
+                    TS_AutoId = dto.TS_AutoId,
+                    EmployeeNo = dto.EmployeeNo,
+                    AttendanceDate = Convert.ToDateTime(dto.AttendanceDate),
+                    OTReasonCode = dto!.OTReasonCode,
+                    OTStartTime = dto.OTStartTime!.Value,
+                    OTEndTime = dto.OTEndTime!.Value,
+                    Remarks = dto.Remarks,
+                    StatusCode = dto.StatusCode,
+                    StatusID = dto.StatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedEmail = dto.LastUpdatedEmail
+                };
+                #endregion
+
+                var result = await _repository.UpdateOTRequestAsync(otRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to save overtime request due to error. Please check the data entry then try to save again!");
+                }
+
+                return Result<int>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<int>> CancelOTRequestAsync(
+            ExtraTimeRequestDTO dto,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Create "OTRequestWF" entity from DTO
+                OTRequestWF otRequest = new OTRequestWF
+                {
+                    ExtratimeId = dto.ExtratimeId,
+                    StatusCode = dto.StatusCode,
+                    StatusID = dto.StatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedEmail = dto.LastUpdatedEmail
+                };
+                #endregion
+
+                var result = await _repository.CancelOTRequestAsync(otRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to cancel overtime request due to unhandled error. Please check the data entry then try again!");
+                }
+
+                return Result<int>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<ExtraTimeRequestDTO?>> GetOTRequestAsync(long requestNo)
+        {
+            ExtraTimeRequestDTO? regularRequest = null;
+
+            try
+            {
+                var repoResult = await _repository.GetOTRequestAsync(requestNo);
+                if (!repoResult.Success)
+                {
+                    return Result<ExtraTimeRequestDTO?>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null)
+                {
+                    regularRequest = new ExtraTimeRequestDTO
+                    {
+                        ExtratimeId = model.ExtratimeId,
+                        TS_AutoId = model.TS_AutoId,
+                        WorkflowId = model.WorkflowId,
+                        EmployeeNo = model.EmployeeNo,
+                        EmployeeName = model.EmployeeName,
+                        CostCenter = model.CostCenter,
+                        CostCenterName = model.CostCenter,
+                        AttendanceDate = model.AttendanceDate,
+                        OTReasonCode = model.OTReasonCode,
+                        OTReasonDesc = model.OTReasonDesc,
+                        ActionCode = model.ActionCode,
+                        ActionDescription = model.ActionDesc,
+                        OTStartTime = model.OTStartTime,
+                        OTEndTime = model.OTEndTime,
+                        ShiftPattern = model.ShiftPattern,
+                        ShiftTiming = model.ShiftTiming,
+                        WorkDuration = model.WorkDuration,
+                        OTDuration = model.OTDuration,
+                        Remarks = model.Remarks,
+                        StatusID = model.StatusID,
+                        StatusCode = model.StatusCode,
+                        StatusDesc = model.StatusDesc,
+                        StatusHandlingCode = model.StatusHandlingCode,
+                        CreatedDate = model.CreatedDate,
+                        CreatedBy = model.CreatedBy,
+                        CreatedUserID = model.CreatedUserID,
+                        CreatedEmail = model.CreatedEmail,
+                        CreatedByName = model.CreatedByName,
+                        LastUpdatedDate = model.LastUpdatedDate,
+                        LastUpdatedBy = model.LastUpdatedBy,
+                        LastUpdatedUserID = model.LastUpdatedUserID,
+                        LastUpdatedEmail = model.LastUpdatedEmail,                                                
+                    };
+
+                    if (model.SwipeLogList != null && model.SwipeLogList.Any())
+                    {
+                        regularRequest.SwipeLogList = model.SwipeLogList!.Select(e => new AttendanceSwipeDTO
+                        {
+                            SwipeID = e.SwipeID,
+                            EmpNo = e.EmpNo,
+                            SwipeDate = e.SwipeDate,
+                            SwipeTime = e.SwipeTime,
+                            SwipeType = e.SwipeType,
+                            SwipeLogDate = e.SwipeLogDate
+                        }).ToList();
+                    }
+                }
+
+                return Result<ExtraTimeRequestDTO?>.SuccessResult(regularRequest);
+            }
+            catch (Exception ex)
+            {
+                return Result<ExtraTimeRequestDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching leave request record from the database.");
+            }
+        }
         #endregion
     }
 }

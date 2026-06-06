@@ -58,6 +58,7 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<WorkflowApprovalRole> WorkflowApprovalRoles => Set<WorkflowApprovalRole>();
         public DbSet<RegularRequestWF> RegularRequestWFs => Set<RegularRequestWF>();
         public DbSet<FileAttachment> FileAttachments => Set<FileAttachment>();
+        public DbSet<OTRequestWF> OTRequestWF => Set<OTRequestWF>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -86,6 +87,7 @@ namespace KenHRApp.Infrastructure.Data
             new WorkflowApprovalRoleConfig().Configure(modelBuilder.Entity<WorkflowApprovalRole>());
             new RegularRequestWFConfig().Configure(modelBuilder.Entity<RegularRequestWF>());
             new FileAttachmentConfig().Configure(modelBuilder.Entity<FileAttachment>());
+            new OTRequestWFConfig().Configure(modelBuilder.Entity<OTRequestWF>());
             #endregion
 
             #region Configure keyless models that are mapped to views or stored procedures
@@ -170,6 +172,12 @@ namespace KenHRApp.Infrastructure.Data
             });
 
             modelBuilder.Entity<TimecardResult>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView(null); // prevents migration
+            });
+
+            modelBuilder.Entity<OTRequestResult>(entity =>
             {
                 entity.HasNoKey();
                 entity.ToView(null); // prevents migration
