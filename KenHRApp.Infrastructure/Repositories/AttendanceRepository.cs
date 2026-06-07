@@ -1694,7 +1694,7 @@ namespace KenHRApp.Infrastructure.Repositories
         }
 
         /// <summary>
-        /// Get Overtime Request details
+        /// Get OvertimeRequest Request details
         /// </summary>
         /// <param name="requestNo"></param>
         /// <returns></returns>
@@ -1705,7 +1705,7 @@ namespace KenHRApp.Infrastructure.Repositories
             try
             {
                 var model = await _db.Set<OTRequestResult>()
-                    .FromSqlRaw("EXEC kenuser.Pr_GetRegularizationDetail @requestNo = {0}",
+                    .FromSqlRaw("EXEC kenuser.Pr_GetOvertimeDetail @requestNo = {0}",
                     requestNo)
                     .ToListAsync();
                 if (model != null && model.Any())
@@ -1771,6 +1771,113 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 // Log error here if needed (Serilog, NLog, etc.)
                 return Result<OTRequestResult>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Search Regularization Requests 
+        /// </summary>
+        /// <param name="requestNo"></param>
+        /// <param name="empNo"></param>
+        /// <param name="costCenter"></param>
+        /// <param name="otReasonCode"></param>
+        /// <param name="status"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        public async Task<Result<List<OTRequestResult>>> SearchOvertimeAsync(
+            long? requestNo,
+            int? empNo,
+            string? costCenter,
+            string? otReasonCode,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate)
+        {
+            List<OTRequestResult> regularizationList = new();
+
+            try
+            {
+                var model = (await _db.Set<OTRequestResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetOvertimeDetail @requestNo = {0}, @empNo = {1}, @costCenter = {2}, @otReasonCode = {3}, @status = {4}, @startDate = {5}, @endDate = {6}",
+                    requestNo!,
+                    empNo!,
+                    costCenter!,
+                    otReasonCode!,
+                    status!,
+                    startDate!,
+                    endDate!)
+                    .ToListAsync()).AsEnumerable().OrderByDescending(a => a.ExtratimeId);
+                if (model != null && model.Any())
+                {
+                    regularizationList = model.Select(e => new OTRequestResult
+                    {
+                        ExtratimeId = e.ExtratimeId,
+                        TS_AutoId = e.TS_AutoId,
+                        WorkflowId = e.WorkflowId,
+                        EmployeeNo = e.EmployeeNo,
+                        EmployeeName = e.EmployeeName,
+                        CostCenter = e.CostCenter,
+                        CostCenterName = e.CostCenterName,
+                        AttendanceDate = e.AttendanceDate,
+                        OTReasonCode = e.OTReasonCode,
+                        OTReasonDesc = e.OTReasonDesc,
+                        ActionCode = e.ActionCode,
+                        ActionDesc = e.ActionDesc,
+                        OTStartTime = e.OTStartTime,
+                        OTEndTime = e.OTEndTime,
+                        ShiftPattern = e.ShiftPattern,
+                        ShiftTiming = e.ShiftTiming,
+                        WorkDuration = e.WorkDuration,
+                        OTDuration = e.OTDuration,
+                        Remarks = e.Remarks,
+                        StatusID = e.StatusID,
+                        StatusCode = e.StatusCode,
+                        StatusDesc = e.StatusDesc,
+                        StatusHandlingCode = e.StatusHandlingCode,
+                        CreatedDate = e.CreatedDate,
+                        CreatedBy = e.CreatedBy,
+                        CreatedUserID = e.CreatedUserID,
+                        CreatedEmail = e.CreatedEmail,
+                        CreatedByName = e.CreatedByName,
+                        LastUpdatedDate = e.LastUpdatedDate,
+                        LastUpdatedBy = e.LastUpdatedBy,
+                        LastUpdatedUserID = e.LastUpdatedUserID,
+                        LastUpdatedEmail = e.LastUpdatedEmail
+                    }).ToList();
+
+                    //if (regularizationList.Any())
+                    //{
+                    //    foreach (var item in regularizationList)
+                    //    {
+                    //        #region Get the file attachments
+                    //        var attachModel = await (from attach in _db.FileAttachments
+                    //                                 where attach.AttachmentId == item.AttachmentId
+                    //                                 select attach).ToListAsync();
+                    //        if (attachModel != null)
+                    //        {
+                    //            item.AttachmentList = attachModel.Select(e => new FileAttachment
+                    //            {
+                    //                Id = e.Id,
+                    //                AttachmentId = e.AttachmentId,
+                    //                RequestType = e.RequestType,
+                    //                FileName = e.FileName,
+                    //                StoredFileName = e.StoredFileName,
+                    //                ContentType = e.ContentType,
+                    //                FileSize = e.FileSize
+                    //            }).ToList();
+                    //        }
+                    //        #endregion
+                    //    }
+                    //}
+                }
+
+                return Result<List<OTRequestResult>>.SuccessResult(regularizationList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<OTRequestResult>>.Failure($"Database error: {ex.Message}");
             }
         }
         #endregion

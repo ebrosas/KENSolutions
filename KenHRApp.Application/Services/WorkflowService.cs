@@ -40,7 +40,7 @@ namespace KenHRApp.Application.Services
         {
             NotDefined,
             LeaveRequisition,
-            Overtime,
+            OvertimeRequest,
             Regularization,
             TravelRequest,
             ExpenseClaim,
@@ -214,6 +214,10 @@ namespace KenHRApp.Application.Services
                         case "RTYPEREGULAR":
                             this.RequestType = WorkflowRequestType.Regularization;
                             break;
+
+                        case "RTYPEOT":
+                            this.RequestType = WorkflowRequestType.OvertimeRequest;
+                            break;
                     }
                     #endregion
                 }
@@ -237,6 +241,12 @@ namespace KenHRApp.Application.Services
                         subject = "Regularization Request for Approval";
                         requestTypeDesc = "Regularization Request";
                         requestLink = $"{baseUrl}/TimeAttendance/regularization?ActionType=View&RequestNo={entityId}&CallerForm=LeaveInquiry";
+                    }
+                    else if (this.RequestType == WorkflowRequestType.OvertimeRequest)
+                    {
+                        subject = "Extra Time Request for Approval";
+                        requestTypeDesc = "Extra Time Request";
+                        requestLink = $"{baseUrl}/TimeAttendance/ExtraTime?ActionType=View&RequestNo={entityId}&CallerForm=OvertimeInquiry";
                     }
                     #endregion
 
@@ -294,6 +304,10 @@ namespace KenHRApp.Application.Services
                         case "RTYPEREGULAR":
                             this.RequestType = WorkflowRequestType.Regularization;
                             break;
+
+                        case "RTYPEOT":
+                            this.RequestType = WorkflowRequestType.OvertimeRequest;
+                            break;
                     }
                     #endregion
                 }
@@ -321,6 +335,14 @@ namespace KenHRApp.Application.Services
                             subject = "Regularization Request for Approval";
                             requestTypeDesc = "Regularization Request";
                             requestLink = $"{baseUrl}/TimeAttendance/regularization?ActionType=View&RequestNo={entityId}&CallerForm=ApprovalDashboard";
+                            #endregion
+                        }
+                        else if (this.RequestType == WorkflowRequestType.OvertimeRequest)
+                        {
+                            #region Build email parameters for Overtime Request
+                            subject = "Extra Time Request for Approval";
+                            requestTypeDesc = "Extra Time Request";
+                            requestLink = $"{baseUrl}/TimeAttendance/ExtraTime?ActionType=View&RequestNo={entityId}&CallerForm=ApprovalDashboard";
                             #endregion
                         }
 
@@ -371,6 +393,10 @@ namespace KenHRApp.Application.Services
                         case "RTYPEREGULAR":
                             this.RequestType = WorkflowRequestType.Regularization;
                             break;
+
+                        case "RTYPEOT":
+                            this.RequestType = WorkflowRequestType.OvertimeRequest;
+                            break;
                     }
                     #endregion
                 }
@@ -401,6 +427,14 @@ namespace KenHRApp.Application.Services
                                 subject = "Rejected Regularization Request";
                                 requestTypeDesc = "Regularization Request";
                                 requestLink = $"{baseUrl}/TimeAttendance/regularization?ActionType=View&RequestNo={entityId}&CallerForm=ApprovalDashboard";
+                                #endregion
+                            }
+                            else if (this.RequestType == WorkflowRequestType.OvertimeRequest)
+                            {
+                                #region Build email parameters for Extra Time Request
+                                subject = "Rejected Extra Time Request";
+                                requestTypeDesc = "Extra Time Request";
+                                requestLink = $"{baseUrl}/TimeAttendance/ExtraTime?ActionType=View&RequestNo={entityId}&CallerForm=ApprovalDashboard";
                                 #endregion
                             }
 

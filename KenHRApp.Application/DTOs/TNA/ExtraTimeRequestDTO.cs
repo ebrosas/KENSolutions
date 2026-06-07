@@ -31,7 +31,7 @@ namespace KenHRApp.Application.DTOs.TNA
 
         [Display(Name = "Select Action")]
         [Required(ErrorMessage = "Action is required")]
-        public string ActionDescription { get; set; } = null!;
+        public string ActionDesc { get; set; } = null!;
 
         [Required(ErrorMessage = "OT Start Time is required")]
         [Display(Name = "OT Start Time")]

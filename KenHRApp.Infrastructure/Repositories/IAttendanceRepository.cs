@@ -69,6 +69,15 @@ namespace KenHRApp.Infrastructure.Repositories
             CancellationToken cancellationToken = default);
 
         Task<Result<OTRequestResult>> GetOTRequestAsync(long requestNo);
+
+        Task<Result<List<OTRequestResult>>> SearchOvertimeAsync(
+            long? requestNo,
+            int? empNo,
+            string? costCenter,
+            string? otReasonCode,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate);
         #endregion
     }
 }

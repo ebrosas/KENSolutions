@@ -17,6 +17,13 @@ namespace KenHRApp.Infrastructure.Repositories
         #region Fields
         private readonly AppDbContext _db;
 
+        #region Constants
+        public static readonly string CONST_LEAVE_REQUEST = "RTYPELEAVE";
+        public static readonly string CONST_REGULARIZATION = "RTYPEREGULAR";
+        public static readonly string CONST_EXTRA_TIME = "RTYPEOT";
+        #endregion                
+
+        #region Enumerations
         private enum WorkflowStatus
         {
             Running,
@@ -33,12 +40,14 @@ namespace KenHRApp.Infrastructure.Repositories
         {
             NotDefined,
             LeaveRequisition,
-            Overtime,
+            OvertimeRequest,
             Regularization,
             TravelRequest,
             ExpenseClaim,
             RecruitmentOffer
         }
+        #endregion
+
         #endregion
 
         #region Constructors                
@@ -153,6 +162,10 @@ namespace KenHRApp.Infrastructure.Repositories
                         case "RTYPEREGULAR":
                             requestType = WorkflowRequestType.Regularization;
                             break;
+
+                        case "RTYPEOT":
+                            requestType = WorkflowRequestType.OvertimeRequest;
+                            break;
                     }
                 }
 
@@ -172,6 +185,17 @@ namespace KenHRApp.Infrastructure.Repositories
                     var entity = await _db.RegularRequestWFs
                             .AsNoTracking()
                             .FirstOrDefaultAsync(x => x.RegularizationId == instance.EntityId);
+                    if (entity != null)
+                    {
+                        // Set the request entity
+                        requestEntity = entity;
+                    }
+                }
+                else if (requestType == WorkflowRequestType.OvertimeRequest)
+                {
+                    var entity = await _db.OTRequestWF
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(x => x.ExtratimeId == instance.EntityId);
                     if (entity != null)
                     {
                         // Set the request entity
@@ -307,6 +331,14 @@ namespace KenHRApp.Infrastructure.Repositories
                             assigneeEmpNo = Convert.ToInt32(employeeInfo.ReportingManagerCode);
                         }
                     }
+                    else if (entity is OTRequestWF overtime)
+                    {
+                        var employeeInfo = await _db.Employees.FirstAsync(x => x.EmployeeNo == overtime.EmployeeNo);
+                        if (employeeInfo != null && employeeInfo.ReportingManagerCode.HasValue)
+                        {
+                            assigneeEmpNo = Convert.ToInt32(employeeInfo.ReportingManagerCode);
+                        }
+                    }
                     #endregion
                 }
                 else if (approver.GroupType == 2)
@@ -328,6 +360,14 @@ namespace KenHRApp.Infrastructure.Repositories
                             assigneeEmpNo = Convert.ToInt32(departmentInfo.SuperintendentEmpNo);
                         }
                     }
+                    else if (entity is OTRequestWF overtime)
+                    {
+                        var departmentInfo = await _db.DepartmentMasters.FirstAsync(x => x.DepartmentCode == overtime.CostCenter);
+                        if (departmentInfo != null && departmentInfo.SuperintendentEmpNo.HasValue)
+                        {
+                            assigneeEmpNo = Convert.ToInt32(departmentInfo.SuperintendentEmpNo);
+                        }
+                    }
                     #endregion
                 }
                 else if (approver.GroupType == 3)
@@ -344,6 +384,14 @@ namespace KenHRApp.Infrastructure.Repositories
                     else if (entity is RegularRequestWF regular)
                     {
                         var departmentInfo = await _db.DepartmentMasters.FirstAsync(x => x.DepartmentCode == regular.CostCenter);
+                        if (departmentInfo != null && departmentInfo.ManagerEmpNo.HasValue)
+                        {
+                            assigneeEmpNo = Convert.ToInt32(departmentInfo.ManagerEmpNo);
+                        }
+                    }
+                    else if (entity is OTRequestWF overtime)
+                    {
+                        var departmentInfo = await _db.DepartmentMasters.FirstAsync(x => x.DepartmentCode == overtime.CostCenter);
                         if (departmentInfo != null && departmentInfo.ManagerEmpNo.HasValue)
                         {
                             assigneeEmpNo = Convert.ToInt32(departmentInfo.ManagerEmpNo);
@@ -614,6 +662,10 @@ namespace KenHRApp.Infrastructure.Repositories
                         case "RTYPEREGULAR":
                             requestType = WorkflowRequestType.Regularization;
                             break;
+
+                        case "RTYPEOT":
+                            requestType = WorkflowRequestType.OvertimeRequest;
+                            break;
                     }
                 }
 
@@ -633,6 +685,17 @@ namespace KenHRApp.Infrastructure.Repositories
                     var entity = await _db.RegularRequestWFs
                                 .AsNoTracking()
                                 .FirstOrDefaultAsync(x => x.RegularizationId == dbInstance.EntityId);
+                    if (entity != null)
+                    {
+                        // Set the request entity
+                        requestEntity = entity;
+                    }
+                }
+                else if (requestType == WorkflowRequestType.OvertimeRequest)
+                {
+                    var entity = await _db.OTRequestWF
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(x => x.ExtratimeId == dbInstance.EntityId);
                     if (entity != null)
                     {
                         // Set the request entity
@@ -707,13 +770,6 @@ namespace KenHRApp.Infrastructure.Repositories
         {
             try
             {
-                //dynamic entity = null;
-
-                //if (requestType == WorkflowRequestType.LeaveRequisition)
-                //{
-                    
-                //}
-
                 var entity = _db.LeaveRequisitionWFs
                         .AsNoTracking()
                         .FirstOrDefault(x => x.LeaveRequestId == entityId);
@@ -1087,6 +1143,13 @@ namespace KenHRApp.Infrastructure.Repositories
                     else if (entity is RegularRequestWF regular)
                     {
                         var queryable = new List<RegularRequestWF> { regular }.AsQueryable();
+
+                        return queryable.Any(normalized);
+                    }
+
+                    else if (entity is OTRequestWF overtime)
+                    {
+                        var queryable = new List<OTRequestWF> { overtime }.AsQueryable();
 
                         return queryable.Any(normalized);
                     }

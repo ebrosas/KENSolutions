@@ -80,6 +80,15 @@ namespace KenHRApp.Application.Interfaces
             CancellationToken cancellationToken = default);
 
         Task<Result<ExtraTimeRequestDTO?>> GetOTRequestAsync(long requestNo);
+
+        Task<Result<List<ExtraTimeRequestDTO>>> SearchOvertimeAsync(
+            long? requestNo,
+            int? empNo,
+            string? costCenter,
+            string? otReasonCode,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate);
         #endregion
     }
 }

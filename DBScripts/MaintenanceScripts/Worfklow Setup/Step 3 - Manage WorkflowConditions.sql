@@ -1,6 +1,6 @@
 DECLARE	@actionType				TINYINT = 0,		--(Notes: 0 = Check records, 1 = Create new workflow, 2 = Update record)
 		@isCommitTrans			BIT = 0,
-		@workflowTypeCode		VARCHAR(100) = 'RTYPELEAVE',
+		@workflowTypeCode		VARCHAR(100) = 'RTYPEOT',
 		@approvalRole			VARCHAR(50),
 		@nextApprovalRole		VARCHAR(50),
 		@fieldName				VARCHAR(100),

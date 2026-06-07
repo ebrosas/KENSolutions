@@ -1429,7 +1429,7 @@ namespace KenHRApp.Application.Services
                         OTReasonCode = model.OTReasonCode,
                         OTReasonDesc = model.OTReasonDesc,
                         ActionCode = model.ActionCode,
-                        ActionDescription = model.ActionDesc,
+                        ActionDesc = model.ActionDesc,
                         OTStartTime = model.OTStartTime,
                         OTEndTime = model.OTEndTime,
                         ShiftPattern = model.ShiftPattern,
@@ -1471,6 +1471,84 @@ namespace KenHRApp.Application.Services
             catch (Exception ex)
             {
                 return Result<ExtraTimeRequestDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching leave request record from the database.");
+            }
+        }
+
+        public async Task<Result<List<ExtraTimeRequestDTO>>> SearchOvertimeAsync(
+            long? requestNo,
+            int? empNo,
+            string? costCenter,
+            string? otReasonCode,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate)
+        {
+            List<ExtraTimeRequestDTO> overtimeList = new();
+
+            try
+            {
+                var repoResult = await _repository.SearchOvertimeAsync(requestNo, empNo, costCenter, otReasonCode, status, startDate, endDate);
+                if (!repoResult.Success)
+                {
+                    return Result<List<ExtraTimeRequestDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var e = repoResult.Value;
+                if (e != null && e.Any())
+                {
+                    overtimeList = e.Select(e => new ExtraTimeRequestDTO
+                    {
+                        ExtratimeId = e.ExtratimeId,
+                        TS_AutoId = e.TS_AutoId,
+                        WorkflowId = e.WorkflowId,
+                        EmployeeNo = e.EmployeeNo,
+                        EmployeeName = e.EmployeeName,
+                        CostCenter = e.CostCenter,
+                        CostCenterName = e.CostCenterName,
+                        AttendanceDate = e.AttendanceDate,
+                        OTReasonCode = e.OTReasonCode,
+                        OTReasonDesc = e.OTReasonDesc,
+                        ActionCode = e.ActionCode,
+                        ActionDesc = e.ActionDesc,
+                        OTStartTime = e.OTStartTime,
+                        OTEndTime = e.OTEndTime,
+                        ShiftPattern = e.ShiftPattern,
+                        ShiftTiming = e.ShiftTiming,
+                        WorkDuration = e.WorkDuration,
+                        OTDuration = e.OTDuration,
+                        Remarks = e.Remarks,
+                        StatusID = e.StatusID,
+                        StatusCode = e.StatusCode,
+                        StatusDesc = e.StatusDesc,
+                        StatusHandlingCode = e.StatusHandlingCode,
+                        CreatedDate = e.CreatedDate,
+                        CreatedBy = e.CreatedBy,
+                        CreatedUserID = e.CreatedUserID,
+                        CreatedEmail = e.CreatedEmail,
+                        CreatedByName = e.CreatedByName,
+                        LastUpdatedDate = e.LastUpdatedDate,
+                        LastUpdatedBy = e.LastUpdatedBy,
+                        LastUpdatedUserID = e.LastUpdatedUserID,
+                        LastUpdatedEmail = e.LastUpdatedEmail
+
+                        //Files = e.AttachmentList!.Select(e => new FileAttachmentDTO
+                        //{
+                        //    Id = e.Id,
+                        //    RequestType = e.RequestType,
+                        //    AttachmentId = e.AttachmentId,
+                        //    FileName = e.FileName,
+                        //    StoredFileName = e.StoredFileName,
+                        //    ContentType = e.ContentType,
+                        //    FileSize = e.FileSize
+                        //}).ToList(),
+                    }).ToList();
+                }
+
+                return Result<List<ExtraTimeRequestDTO>>.SuccessResult(overtimeList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<ExtraTimeRequestDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the leave requisition records from the database.");
             }
         }
         #endregion

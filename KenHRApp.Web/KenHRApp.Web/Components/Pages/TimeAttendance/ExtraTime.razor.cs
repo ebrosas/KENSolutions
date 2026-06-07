@@ -145,7 +145,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private enum UDCKeys
         {
-            OTREASON,           // Overtime Reasons
+            OTREASON,           // OvertimeRequest Reasons
             ATTENDACT,          // Attendance Action Types
             LEAVEAPORTION,      // Leave Day Portions
             STATUS              // Leave Statuses
@@ -248,7 +248,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _overtimeRequest.CreatedBy = UserEmpNo;
                     _overtimeRequest.CreatedEmail = UserEmail;
                     _overtimeRequest.CreatedUserID = UserName;
-                    _overtimeRequest.ActionDescription = CONST_EXTRA_TIME;
+                    _overtimeRequest.ActionDesc = CONST_EXTRA_TIME;
 
                     if (ActionType == ActionTypes.Edit.ToString() ||
                         ActionType == ActionTypes.View.ToString())
@@ -1070,31 +1070,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             #endregion
 
             #region Get the selected Action
-            if (!string.IsNullOrEmpty(_overtimeRequest.ActionDescription))
+            if (!string.IsNullOrEmpty(_overtimeRequest.ActionDesc))
             {
                 UserDefinedCodeDTO? selectedAction = _actionList
-                    .Where(a => a.UDCDesc1 == _overtimeRequest.ActionDescription)
+                    .Where(a => a.UDCDesc1 == _overtimeRequest.ActionDesc)
                     .FirstOrDefault();
                 if (selectedAction != null)
                     _overtimeRequest.ActionCode = selectedAction.UDCCode;
             }
-            #endregion
-
-            #region Initialize File Attachment DTO
-            //var fileDtos = new List<FileUploadDTO>();
-
-            //foreach (var file in _files)
-            //{
-            //    var stream = file.OpenReadStream(10 * 1024 * 1024);
-
-            //    fileDtos.Add(new FileUploadDTO
-            //    {
-            //        FileName = file.Name,
-            //        ContentType = file.ContentType,
-            //        Size = file.Size,
-            //        Content = stream
-            //    });
-            //}
             #endregion
 
             if (isNewRequition)
@@ -1131,7 +1114,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _overtimeRequest.ExtratimeId = addResult.Value;
 
                     // Display the requisition number in the page title
-                    _pageTitle = $" Overtime Request No. {addResult.Value}";
+                    _pageTitle = $" Extra Time Request No. {addResult.Value}";
                 }
             }
             else
@@ -1239,7 +1222,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 #endregion
 
                 // Display the requisition number in the page title
-                _pageTitle = $" Overtime Request #{_overtimeRequest.ExtratimeId} (Created On: {_overtimeRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")} | Status: {_overtimeRequest.StatusSummary})";
+                _pageTitle = $" Extra Time Request #{_overtimeRequest.ExtratimeId} (Created On: {_overtimeRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")} | Status: {_overtimeRequest.StatusSummary})";
 
                 // Recreate the EditContext with the loaded _overtimeRequest
                 _editContext = new EditContext(_overtimeRequest);

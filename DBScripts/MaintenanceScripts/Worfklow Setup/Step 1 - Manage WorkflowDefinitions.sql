@@ -16,10 +16,17 @@ DECLARE	@actionType				TINYINT,		--(Notes: 0 = Check records, 1 = Create new wor
 	--		@isActive				= 1	
 
 	--Regularization Request Workflow
+	--SELECT	@actionType				= 0,		
+	--		@isCommitTrans			= 0,
+	--		@workflowName			= 'Regularization',
+	--		@workflowTypeCode		= 'RTYPEREGULAR',
+	--		@isActive				= 1	
+
+	--Regularization Request Workflow
 	SELECT	@actionType				= 0,		
 			@isCommitTrans			= 0,
-			@workflowName			= 'Regularization',
-			@workflowTypeCode		= 'RTYPEREGULAR',
+			@workflowName			= 'Overtime Request',
+			@workflowTypeCode		= 'RTYPEOT',
 			@isActive				= 1	
 
 	IF @actionType = 0
