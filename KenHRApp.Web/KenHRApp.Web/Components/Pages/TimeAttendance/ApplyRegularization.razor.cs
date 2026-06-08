@@ -1081,18 +1081,19 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             string errorMsg = string.Empty;
 
             #region Get the selected employee information 
-            //if (!string.IsNullOrEmpty(_overtimeRequest.EmployeeFullName))
-            //{
-            //    EmployeeResultDTO? selectedEmployee = _employeeList
-            //        .Where(a => a.EmployeeNameWithCode == _overtimeRequest.EmployeeFullName)
-            //        .FirstOrDefault();
-            //    if (selectedEmployee != null)
-            //    {
-            //        _overtimeRequest.EmployeeNo = selectedEmployee.EmployeeNo;
-            //        _overtimeRequest.CostCenter = selectedEmployee!.DepartmentCode;
-            //        _overtimeRequest.EmployeeName = selectedEmployee.EmployeeFullName;
-            //    }
-            //}
+            if (string.IsNullOrWhiteSpace(_regularRequest.EmployeeName) ||
+                string.IsNullOrWhiteSpace(_regularRequest.CostCenter))
+            {
+                EmployeeResultDTO? selectedEmployee = _employeeList
+                    .Where(a => a.EmployeeNo == _regularRequest.EmployeeNo)
+                    .FirstOrDefault();
+                if (selectedEmployee != null)
+                {
+                    _regularRequest.EmployeeNo = selectedEmployee.EmployeeNo;
+                    _regularRequest.CostCenter = selectedEmployee!.DepartmentCode;
+                    _regularRequest.EmployeeName = selectedEmployee.EmployeeFullName;
+                }
+            }
             #endregion
 
             #region Get the selected ROA
@@ -1269,6 +1270,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (result.Success)
             {
                 _regularRequest = result.Value!;
+
+                #region Populate raw swipe chips
+                if (_regularRequest.SwipeLogList != null && _regularRequest.SwipeLogList.Any())
+                    _attendanceChips.AddRange(_regularRequest.SwipeLogList.ToList());
+                #endregion
 
                 // Display the requisition number in the page title
                 _pageTitle = $" Regularization Request #{_regularRequest.RegularizationId} (Created On: {_regularRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")} | Status: {_regularRequest.StatusSummary})";

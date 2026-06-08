@@ -1,5 +1,6 @@
 ﻿using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.DTOs;
+using KenHRApp.Application.DTOs.TNA;
 using KenHRApp.Application.Interfaces;
 using KenHRApp.Web.Components.Common.Interface;
 using KenHRApp.Web.Components.Shared;
@@ -9,7 +10,7 @@ using System.Text;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
-    public partial class RegularRequestInq : ComponentBase, IPageAuthorization
+    public partial class ExtraTimeInq : ComponentBase, IPageAuthorization
     {
         #region Parameters and Injections
         [Inject] private IAttendanceService AttendanceService { get; set; } = default!;
@@ -26,22 +27,22 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         [Parameter]
         [SupplyParameterFromQuery]
-        public int? RegularEmpNo { get; set; } = null;
+        public int? SearchEmpNo { get; set; } = null;
 
         [Parameter]
         [SupplyParameterFromQuery]
-        public DateTime? RegularStartDate { get; set; } = null;
+        public DateTime? SearchStartDate { get; set; } = null;
 
         [Parameter]
         [SupplyParameterFromQuery]
-        public DateTime? RegularEndDate { get; set; } = null;
+        public DateTime? SearchEndDate { get; set; } = null;
         #endregion
 
         #region Fields
         private StringBuilder _errorMessage = new StringBuilder();
         private int? _empNo = null;
         private int? _requestNo = null;
-        private string _selectedROAType = string.Empty;
+        private string _selectedOTReason = string.Empty;
         private string _selectedDepartment = string.Empty;
         private string _selectedStatus = string.Empty;
         private DateTime? _selectedStartDate = null;
@@ -67,24 +68,23 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _showErrorAlert = false;
         private bool _enableFilter = false;
         private bool _isActive = true;
-        private bool _redirected;
         private bool _hasValidationError = false;
         #endregion
 
         #region Objects and collections
         private MudDatePicker _startDatePicker;
         private MudDatePicker _endDatePicker;
-        private List<RegularRequestDTO> _regularRequestList = new List<RegularRequestDTO>();
+        private List<ExtraTimeRequestDTO> _otRequestList = new();
         private List<string> _validationMessages = new();
 
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Regularization Inquiry", href: null, icon: @Icons.Material.Filled.ManageSearch, disabled: true)
+            new("Extra Time Inquiry", href: null, icon: @Icons.Material.Filled.ManageSearch, disabled: true)
         ];
 
-        private string[]? _roaArray = null;
-        private List<UserDefinedCodeDTO> _roaList = new List<UserDefinedCodeDTO>();
+        private string[]? _otReasonArray = null;
+        private List<UserDefinedCodeDTO> _otReasonList = new List<UserDefinedCodeDTO>();
 
         private string[]? _requestStatusArray = null;
         private List<UserDefinedCodeDTO> _requestStatusList = new List<UserDefinedCodeDTO>();
@@ -98,8 +98,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Enums
         private enum UDCKeys
         {
-            ROATYPE,        // Reason of Absence Types
-            STATUS,         // Request Statuses
+            OTREASON,       // OT Reasons
+            STATUS,         // Request Status
             DEPARTMENT      // Departments
         }
 
@@ -138,14 +138,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Page Events
         protected override void OnInitialized()
         {
-            if (RegularEmpNo.HasValue && RegularEmpNo > 0)
-                _empNo = RegularEmpNo;
+            if (SearchEmpNo.HasValue && SearchEmpNo > 0)
+                _empNo = SearchEmpNo;
 
-            if (RegularStartDate.HasValue)
-                _selectedStartDate = RegularStartDate;
+            if (SearchStartDate.HasValue)
+                _selectedStartDate = SearchStartDate;
 
-            if (RegularEndDate.HasValue)
-                _selectedEndDate = RegularEndDate;
+            if (SearchEndDate.HasValue)
+                _selectedEndDate = SearchEndDate;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -178,7 +178,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Grid Events 
-        private Func<RegularRequestDTO, bool> _quickFilter => x =>
+        private Func<ExtraTimeRequestDTO, bool> _quickFilter => x =>
         {
             if (string.IsNullOrWhiteSpace(_searchString))
                 return true;
@@ -192,13 +192,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (!string.IsNullOrEmpty(x.CostCenterName) && x.CostCenterName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (!string.IsNullOrEmpty(x.ROADescription) && x.ROADescription!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(x.OTReasonDesc) && x.OTReasonDesc!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             if (!string.IsNullOrEmpty(x.ShiftPattern) && x.ShiftPattern!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (!string.IsNullOrEmpty(x.RegularizedDescription) && x.RegularizedDescription!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(x.Remarks) && x.Remarks!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             if (!string.IsNullOrEmpty(x.CreatedByName) && x.CreatedByName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
@@ -207,28 +207,28 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             return false;
         };
 
-        private void StartedEditingItem(RegularRequestDTO item)
+        private void StartedEditingItem(ExtraTimeRequestDTO item)
         {
             _events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
         }
 
-        private void CanceledEditingItem(RegularRequestDTO item)
+        private void CanceledEditingItem(ExtraTimeRequestDTO item)
         {
             _events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
         }
 
-        private void CommittedItemChanges(RegularRequestDTO item)
+        private void CommittedItemChanges(ExtraTimeRequestDTO item)
         {
 
         }
 
-        private async Task ConfirmDelete(RegularRequestDTO regularRequest)
+        private async Task ConfirmDelete(ExtraTimeRequestDTO regularRequest)
         {
             var parameters = new DialogParameters
             {
                 { "DialogTitle", "Confirm Delete"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to delete leave requisition no. '{regularRequest.RegularizationId}'?" },
+                { "ContentText", $"Are you sure you want to delete extra time request no. '{regularRequest.ExtratimeId}'?" },
                 { "ConfirmText", "Delete" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -341,17 +341,17 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             var result = await dialog.Result;
         }
 
-        public void ApplyRegularization()
+        public void ApplyExtraTime()
         {
-            Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=Add&CallerForm=RegularInquiry");
+            Navigation.NavigateTo($"/TimeAttendance/ExtraTime?ActionType=Add&CallerForm=ExtraTimeInq");
         }
 
-        public void OpenRegularizationRequest(RegularRequestDTO item)
+        public void OpenExtraTimeRequest(ExtraTimeRequestDTO item)
         {
-            Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=View&RequestNo={item.RegularizationId}&CallerForm=RegularInquiry");
+            Navigation.NavigateTo($"/TimeAttendance/ExtraTime?ActionType=View&RequestNo={item.ExtratimeId}&CallerForm=ExtraTimeInq");
         }
 
-        private async Task<IEnumerable<string>> SearchROATypes(string value, CancellationToken token)
+        private async Task<IEnumerable<string>> SearchOTReason(string value, CancellationToken token)
         {
             // In real life use an asynchronous function for fetching data from an api.
             await Task.Delay(5, token);
@@ -359,10 +359,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // if text is null or empty, show complete list
             if (string.IsNullOrEmpty(value))
             {
-                return _roaArray!;
+                return _otReasonArray!;
             }
 
-            return _roaArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+            return _otReasonArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
 
         private async Task<IEnumerable<string>> SearchRequestStatus(string value, CancellationToken token)
@@ -419,7 +419,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 if (ForceLoad)
                 {
-                    BeginSearchRegularization(ForceLoad);
+                    BeginSearchExtraTime(ForceLoad);
                 }
             });
         }
@@ -433,20 +433,20 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _requestNo = null;
             _empNo = null;
             _selectedDepartment = string.Empty;
-            _selectedROAType = string.Empty;
+            _selectedOTReason = string.Empty;
             _selectedStatus = string.Empty;
             _selectedStartDate = null;
             _selectedEndDate = null;
 
             // Clear datagrid datasource
-            _regularRequestList = new();
+            _otRequestList = new();
 
             // Reset validation error messages
             _hasValidationError = false;
             _validationMessages.Clear();
         }
 
-        private void BeginSearchRegularization(bool forceLoad = false)
+        private void BeginSearchExtraTime(bool forceLoad = false)
         {
             // Reset validation errors
             _hasValidationError = false;
@@ -471,9 +471,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (!UserSession.IsAuthenticated())
                 overlayMessage = "Authentication required. Redirecting to login page...";
             else
-                overlayMessage = "Loading regularization requests, please wait...";
+                overlayMessage = "Loading extra time requests, please wait...";
 
-            _ = SearchRegularizationAsync(async () =>
+            _ = SearchExtraTimeAsync(async () =>
             {
                 _isTaskFinished = true;
                 _isRunning = false;
@@ -530,21 +530,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 var udcData = result.Value;
                 if (udcData!.Any() && udcGroupList!.Any())
                 {
-                    #region Get ROA Types
+                    #region Get OT Reasons
                     try
                     {
-                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ROATYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.OTREASON.ToString()).FirstOrDefault()!.UDCGroupId;
                     }
                     catch (Exception ex)
                     {
-                        _errorMessage.Append($"Error getting ROA Types: {ex.Message}");
+                        _errorMessage.Append($"Error fetching data to OT Reasons drop-down box: {ex.Message}");
                     }
 
                     if (groupID > 0)
                     {
-                        _roaList = udcData!.Where(a => a.GroupID == groupID).ToList();
-                        if (_roaList != null)
-                            _roaArray = _roaList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                        _otReasonList = udcData!.Where(a => a.GroupID == groupID && a.IsActive == true).ToList();
+                        if (_otReasonList != null)
+                            _otReasonArray = _otReasonList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
                     }
                     #endregion
 
@@ -580,7 +580,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task SearchRegularizationAsync(Func<Task> callback, bool forceLoad = false)
+        private async Task SearchExtraTimeAsync(Func<Task> callback, bool forceLoad = false)
         {
             await Task.Delay(500);
 
@@ -597,13 +597,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
             #endregion
 
-            #region Get the selected ROA Type
-            string roaType = string.Empty;
-            if (!string.IsNullOrEmpty(_selectedROAType))
+            #region Get the selected OT Reason
+            string otReason = string.Empty;
+            if (!string.IsNullOrEmpty(_selectedOTReason))
             {
-                UserDefinedCodeDTO? roaTypeUDC = _roaList.Where(d => d.UDCDesc1 == _selectedROAType).FirstOrDefault();
+                UserDefinedCodeDTO? roaTypeUDC = _otReasonList.Where(d => d.UDCDesc1 == _selectedOTReason).FirstOrDefault();
                 if (roaTypeUDC != null)
-                    roaType = roaTypeUDC.UDCCode;
+                    otReason = roaTypeUDC.UDCCode;
             }
             #endregion
 
@@ -617,17 +617,17 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
             #endregion
 
-            var repoResult = await AttendanceService.SearchRegularizationAsync(
+            var repoResult = await AttendanceService.SearchOvertimeAsync(
                 _requestNo,
                 _empNo,
                 costCenter,
-                roaType,
+                otReason,
                 _selectedStatus,
                 _selectedStartDate,
                 _selectedEndDate);
             if (repoResult.Success)
             {
-                _regularRequestList = repoResult.Value!;
+                _otRequestList = repoResult.Value!;
             }
             else
             {

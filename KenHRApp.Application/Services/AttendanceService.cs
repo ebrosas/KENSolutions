@@ -1125,6 +1125,19 @@ namespace KenHRApp.Application.Services
                             FileSize = e.FileSize
                         }).ToList(),
                     };
+
+                    if (model.SwipeLogList != null && model.SwipeLogList.Any())
+                    {
+                        regularRequest.SwipeLogList = model.SwipeLogList!.Select(e => new AttendanceSwipeDTO
+                        {
+                            SwipeID = e.SwipeID,
+                            EmpNo = e.EmpNo,
+                            SwipeDate = e.SwipeDate,
+                            SwipeTime = e.SwipeTime,
+                            SwipeType = e.SwipeType,
+                            SwipeLogDate = e.SwipeLogDate
+                        }).ToList();
+                    }
                 }
 
                 return Result<RegularRequestDTO?>.SuccessResult(regularRequest);

@@ -89,7 +89,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Extra-time Inquiry", href: "/TimeAttendance/OvertimeInquiry?ForceLoad=true", icon: Icons.Material.Filled.YoutubeSearchedFor),
+            new("Extra Time Inquiry", href: "/TimeAttendance/ExtraTimeInq?ForceLoad=true", icon: Icons.Material.Filled.YoutubeSearchedFor),
             new("Apply Extra Time", href: null, disabled: true, @Icons.Material.Filled.CardTravel)
         ];
 
@@ -529,8 +529,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     Navigation.NavigateTo("/Workflow/ApprovalDashboard");
                     break;
 
-                case "OvertimeInquiry":
-                    Navigation.NavigateTo("/TimeAttendance/OvertimeInquiry?ForceLoad=true");
+                case "ExtraTimeInq":
+                    Navigation.NavigateTo("/TimeAttendance/ExtraTimeInq?ForceLoad=true");
                     break;
 
                 default:
@@ -917,7 +917,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 var udcData = result.Value;
                 if (udcData!.Any() && udcGroupList!.Any())
                 {
-                    #region Get ROA Types
+                    #region Get OT Reasons
                     try
                     {
                         groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.OTREASON.ToString()).FirstOrDefault()!.UDCGroupId;

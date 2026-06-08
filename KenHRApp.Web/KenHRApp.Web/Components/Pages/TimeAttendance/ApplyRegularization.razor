@@ -191,7 +191,7 @@
 
                     <MudItem sm="12" md="9">
                         <MudPaper Elevation="0" Square="true" Class="w-100 px-5 mt-0">
-                            <MudGrid Spacing="5" Class="my-0 py-0">
+                            <MudGrid Spacing="0" Class="my-0 py-0">
                                 <MudItem xs="6">
                                     <MudPaper Elevation="0" Class="p-0 w-100">
                                        @*  <MudAutocomplete @bind-Value="_regularRequest.EmployeeFullName"
@@ -233,7 +233,7 @@
 
                                 </MudItem>
                             </MudGrid>
-                            <MudGrid Spacing="5" Class="mt-0">
+                            <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="6">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                         <MudText Typo="Typo.subtitle2" Class="fw-bold">Date:</MudText>
@@ -251,7 +251,7 @@
                                     </MudStack>
                                 </MudItem>
                             </MudGrid>
-                            <MudGrid Spacing="5" Class="mt-0">
+                            <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="6">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                         <MudText Typo="Typo.subtitle2" Class="fw-bold">Scheduled Timing:</MudText>
@@ -280,7 +280,7 @@
                                     </MudStack>
                                 </MudItem>
                             </MudGrid>
-                            <MudGrid Spacing="5" Class="mt-0">
+                            <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="6">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                         <MudText Typo="Typo.subtitle2" Class="fw-bold">Total Hours:</MudText>
@@ -298,7 +298,7 @@
                                     </MudStack>
                                 </MudItem>
                             </MudGrid>
-                            <MudGrid Spacing="5" Class="mt-0">
+                            <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="6">
                                     <MudPaper Elevation="0" Class="p-0 w-100">
                                         <MudAutocomplete @bind-Value="_regularRequest.ActionDescription"
@@ -335,35 +335,38 @@
                                     </MudPaper>
                                 </MudItem>
                             </MudGrid>
-                            <MudGrid Spacing="5" Class="mt-0">
+                            <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="6">
                                     <MudPaper Elevation="0" Class="p-0 w-100">
                                         <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt"
-                                                       Label="Regularized In Time" Required="true"
-                                                       RequiredError="Regularized In Time is required"
-                                                       Disabled="@_isDisabled"
-                                                       @bind-Time="_regularRequest.RegularizedTimeIn" />
+                                            Label="Regularized In Time" Required="true"
+                                            RequiredError="Regularized In Time is required"
+                                            Variant="Variant.Text" 
+                                            Margin="Margin.Dense"
+                                            Disabled="@_isDisabled"
+                                            @bind-Time="_regularRequest.RegularizedTimeIn" />
                                     </MudPaper>
                                 </MudItem>
                                 <MudItem xs="6">
                                     <MudPaper Elevation="0" Class="p-0 w-100">
                                         <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt"
-                                                       Label="Regularized Out Time" Required="true"
-                                                       RequiredError="Regularized Out Time is required"
-                                                       Disabled="@_isDisabled"
-                                                       @bind-Time="_regularRequest.RegularizedTimeOut" />
+                                            Label="Regularized Out Time" Required="true"
+                                            RequiredError="Regularized Out Time is required"
+                                                       Variant="Variant.Text"
+                                                       Margin="Margin.Dense"
+                                            Disabled="@_isDisabled"
+                                            @bind-Time="_regularRequest.RegularizedTimeOut" />
                                     </MudPaper>
                                 </MudItem>
                             </MudGrid>
-                            <MudGrid Spacing="5" Class="mt-0">
+                            <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="12">
-                                    <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudPaper Elevation="3" Class="p-0 w-100">
                                         <MudTextField @bind-Value="_regularRequest.RegularizedDescription" Label="Description"
-                                                      For="@(() => _regularRequest.RegularizedDescription)"
-                                                      HelperText="Max. text input is 500 chars."
-                                                      Variant="Variant.Text" HelperTextOnFocus="true" Counter="500" MaxLength="500" Lines="4"
-                                                      Required="true" RequiredError="Description is required"
-                                                      Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                            For="@(() => _regularRequest.RegularizedDescription)"
+                                            Variant="Variant.Filled" MaxLength="500" Lines="4"
+                                            Required="true" RequiredError="Description is required"
+                                            Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                     </MudPaper>
                                 </MudItem>
                             </MudGrid>

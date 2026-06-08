@@ -1,4 +1,5 @@
-﻿using KenHRApp.Domain.Entities;
+﻿using Azure.Core;
+using KenHRApp.Domain.Entities;
 using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Data;
@@ -1334,6 +1335,27 @@ namespace KenHRApp.Infrastructure.Repositories
                         }).ToList();
                     }
                     #endregion
+
+                    #region Get the swipe logs
+                    List<AttendanceSwipeLog> swipeLogs = new List<AttendanceSwipeLog>();
+
+                    var swipeModel = await (from log in _db.AttendanceSwipeLogs
+                                            where log.EmpNo == regularRequest.EmployeeNo &&
+                                                log.SwipeDate == regularRequest.AttendanceDate
+                                            select log).ToListAsync();
+                    if (swipeModel != null)
+                    {
+                        regularRequest.SwipeLogList = swipeModel.Select(e => new AttendanceSwipeLog
+                        {
+                            SwipeID = e.SwipeID,
+                            EmpNo = e.EmpNo,
+                            SwipeDate = e.SwipeDate,
+                            SwipeTime = e.SwipeTime,
+                            SwipeType = e.SwipeType,
+                            SwipeLogDate = e.SwipeLogDate
+                        }).ToList();
+                    }
+                    #endregion
                 }
 
                 return Result<RegularizationResult>.SuccessResult(regularRequest);
@@ -1845,31 +1867,6 @@ namespace KenHRApp.Infrastructure.Repositories
                         LastUpdatedUserID = e.LastUpdatedUserID,
                         LastUpdatedEmail = e.LastUpdatedEmail
                     }).ToList();
-
-                    //if (regularizationList.Any())
-                    //{
-                    //    foreach (var item in regularizationList)
-                    //    {
-                    //        #region Get the file attachments
-                    //        var attachModel = await (from attach in _db.FileAttachments
-                    //                                 where attach.AttachmentId == item.AttachmentId
-                    //                                 select attach).ToListAsync();
-                    //        if (attachModel != null)
-                    //        {
-                    //            item.AttachmentList = attachModel.Select(e => new FileAttachment
-                    //            {
-                    //                Id = e.Id,
-                    //                AttachmentId = e.AttachmentId,
-                    //                RequestType = e.RequestType,
-                    //                FileName = e.FileName,
-                    //                StoredFileName = e.StoredFileName,
-                    //                ContentType = e.ContentType,
-                    //                FileSize = e.FileSize
-                    //            }).ToList();
-                    //        }
-                    //        #endregion
-                    //    }
-                    //}
                 }
 
                 return Result<List<OTRequestResult>>.SuccessResult(regularizationList);

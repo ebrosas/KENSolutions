@@ -450,7 +450,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         public void ApplyRegularization()
         {
-            Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=Add&AttendanceDate={_selectedDate!.Value.ToString()}");
+            Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=Add&AttendanceDate={_selectedDate!.Value.ToString()}&CallerForm=TNADashboard");
+        }
+
+        public void ApplyExtraTime()
+        {
+            Navigation.NavigateTo($"/TimeAttendance/ExtraTime?ActionType=Add&AttendanceDate={_selectedDate!.Value.ToString()}&CallerForm=TNADashboard");
         }
 
         public void OpenLeaveInquiry()

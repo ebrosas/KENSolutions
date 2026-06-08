@@ -2724,6 +2724,133 @@ h1:focus {
 }
 /* #endregion */
 
+/* #region Extra Time Grid Stylesheets  */
+.extratime-grid .no-data-box {
+    display: flex;
+    justify-content: flex-start; /* align content to the LEFT */
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    background-color: #f8f9fa; /* light gray */
+    border: 1px solid #FBE9E7;
+    border-radius: 6px;
+    color: #856404; /* dark yellow-brown */
+    font-weight: 600;
+}
+
+.extratime-grid .no-data-icon {
+    font-size: 20px;
+    color: #6c757d; /* muted gray */
+}
+
+.extratime-grid .mud-table {
+    table-layout: fixed;
+    width: 100%;
+    text-align: left;
+}
+
+/* Format table header */
+.extratime-grid .mud-table-head {
+    background-color: #BBDEFB;
+    font-weight: bold;
+    text-align: center !important;
+    font-size: 14px !important;
+    text-decoration: underline;
+    height: 20px;
+    line-height: 20px;
+}
+
+/* Format table cell */
+.extratime-grid .mud-table-cell {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
+    font-size: 14px;
+}
+
+/* Grid Column widths */
+.extratime-grid .col-ExtratimeId {
+    width: 80px !important;
+    text-align: left;
+}
+
+.extratime-grid .col-EmployeeNo {
+    width: 80px !important;
+    text-align: left;
+}
+
+.extratime-grid .col-EmployeeName {
+    width: 150px !important;
+    text-align: left;
+}
+
+.extratime-grid .col-DepartmentFullName {
+    width: 200px !important;
+    text-align: left;
+}
+
+.extratime-grid .col-ShiftPattern {
+    width: 100px !important;
+    text-align: left;
+}
+
+.extratime-grid .col-ShiftTiming {
+    width: 100px !important;
+    text-align: left;
+}
+
+.extratime-grid .col-AttendanceDate {
+    width: 100px !important;
+    text-align: left;
+}
+
+.extratime-grid .col-OTStartTime {
+    width: 100px !important;
+    text-align: left;
+}
+
+.extratime-grid .col-OTEndTime {
+    width: 100px !important;
+    text-align: left;
+}
+
+.extratime-grid .col-OTReasonDesc {
+    width: 150px !important;
+    text-align: left;
+}
+
+.extratime-grid .col-Remarks {
+    width: 250px !important;
+    text-align: left;
+}
+
+.extratime-grid .col-WorkDuration {
+    width: 100px !important;
+    min-width: 80px !important;
+    text-align: left;
+}
+
+.extratime-grid .col-OTDuration {
+    width: 100px !important;
+    text-align: left;
+}
+
+.extratime-grid .col-StatusDesc {
+    width: 100px !important;
+    text-align: left;
+}
+
+.extratime-grid .flex-column {
+    width: auto; /* allow flex growth */
+    flex: 1; /* take remaining space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* adds ... if too long */
+}
+/* #endregion */
+
 /* #region <ToolBarContent> styling within MudDataGrid */
 .shift-grid .mud-datagrid-toolbar {
     height: 150px;

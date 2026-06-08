@@ -1,4 +1,5 @@
 ﻿using KenHRApp.Application.Common.Validations;
+using KenHRApp.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -89,6 +90,7 @@ namespace KenHRApp.Application.DTOs
         public string? LastUpdatedUserID { get; set; } = null;
         public string? LastUpdatedEmail { get; set; } = null;
         public List<FileAttachmentDTO> Files { get; set; } = new();
+        public List<AttendanceSwipeDTO>? SwipeLogList { get; set; } = new();
         #endregion
 
         #region Extended Properties

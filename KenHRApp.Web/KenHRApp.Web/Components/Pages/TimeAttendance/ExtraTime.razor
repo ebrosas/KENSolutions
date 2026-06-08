@@ -191,7 +191,7 @@
 
                     <MudItem sm="12" md="9">
                         <MudPaper Elevation="0" Square="true" Class="w-100 px-5 mt-0">
-                            <MudGrid Spacing="5" Class="my-0 py-0">
+                            <MudGrid Spacing="0" Class="my-0 py-0">
                                 <MudItem xs="6">
                                     <MudPaper Elevation="0" Class="p-0 w-100">
                                         <MudSelect T="int"
@@ -219,7 +219,7 @@
 
                                 </MudItem>
                             </MudGrid>
-                            <MudGrid Spacing="5" Class="mt-0">
+                            <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="6">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                         <MudText Typo="Typo.subtitle2" Class="fw-bold">Date:</MudText>
@@ -237,7 +237,7 @@
                                     </MudStack>
                                 </MudItem>
                             </MudGrid>
-                            <MudGrid Spacing="5" Class="mt-0">
+                            <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="6">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
                                         <MudText Typo="Typo.subtitle2" Class="fw-bold">Scheduled Timing:</MudText>
@@ -266,10 +266,10 @@
                                     </MudStack>
                                 </MudItem>
                             </MudGrid>
-                            <MudGrid Spacing="5" Class="mt-0">
+                            <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="6">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                        <MudText Typo="Typo.subtitle2" Class="fw-bold">Total Hours:</MudText>
+                                        <MudText Typo="Typo.subtitle2" Class="fw-bold">Total Work Hours:</MudText>
                                         <MudText Typo="Typo.body2">
                                             @_overtimeRequest.TotalWorkHours
                                         </MudText>
@@ -277,14 +277,14 @@
                                 </MudItem>
                                 <MudItem xs="6">
                                     <MudStack AlignItems="AlignItems.Start" Justify="Justify.Center" Spacing="0">
-                                        <MudText Typo="Typo.subtitle2" Class="fw-bold">Total Overtime:</MudText>
+                                        <MudText Typo="Typo.subtitle2" Class="fw-bold">Overtime Duration:</MudText>
                                         <MudText Typo="Typo.body2">
                                             @_overtimeRequest.TotalOTHours
                                         </MudText>
                                     </MudStack>
                                 </MudItem>
                             </MudGrid>
-                            <MudGrid Spacing="5" Class="mt-0">
+                            <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="6">
                                     <MudPaper Elevation="0" Class="p-0 w-100">
                                         <MudAutocomplete @bind-Value="_overtimeRequest.ActionDesc"
@@ -309,7 +309,7 @@
                                                          Variant="Variant.Text"
                                                          Label="Select Reason"
                                                          Margin="Margin.Normal"
-                                                         Dense="true"
+                                                         Dense="true" 
                                                          Placeholder="Please Select"
                                                          HelperText="Type a key to search for reason"
                                                          HelperTextOnFocus="true"
@@ -321,35 +321,39 @@
                                     </MudPaper>
                                 </MudItem>
                             </MudGrid>
-                            <MudGrid Spacing="5" Class="mt-0">
+                            <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="6">
                                     <MudPaper Elevation="0" Class="p-0 w-100">
                                         <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt"
-                                                       Label="OT Start Time" Required="true"
-                                                       RequiredError="OT Start Time is required" 
-                                                       Disabled="@_isDisabled"
-                                                       @bind-Time="_overtimeRequest.OTStartTime" />
+                                            Label="OT Start Time" Required="true"
+                                            RequiredError="OT Start Time is required" 
+                                            Variant="Variant.Text" 
+                                            Margin="Margin.Dense"
+                                            Disabled="@_isDisabled"
+                                            @bind-Time="_overtimeRequest.OTStartTime" />
                                     </MudPaper>
                                 </MudItem>
                                 <MudItem xs="6">
                                     <MudPaper Elevation="0" Class="p-0 w-100">
                                         <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt"
-                                                       Label="OT End Time" Required="true"
-                                                       RequiredError="OT End Time is required"
-                                                       Disabled="@_isDisabled"
-                                                       @bind-Time="_overtimeRequest.OTEndTime" />
+                                            Label="OT End Time" Required="true" 
+                                            RequiredError="OT End Time is required"
+                                            Variant="Variant.Text"
+                                            Margin="Margin.Dense"
+                                            Disabled="@_isDisabled"
+                                            @bind-Time="_overtimeRequest.OTEndTime" />
                                     </MudPaper>
                                 </MudItem>
                             </MudGrid>
-                            <MudGrid Spacing="5" Class="mt-0">
+                            <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="12">
-                                    <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudPaper Elevation="3" Class="p-0 w-100">
                                         <MudTextField @bind-Value="_overtimeRequest.Remarks" Label="Remarks"
-                                                      For="@(() => _overtimeRequest.Remarks)"
-                                                      HelperText="Max. text input is 500 chars."
-                                                      Variant="Variant.Text" HelperTextOnFocus="true" Counter="500" MaxLength="500" Lines="4"
-                                                      Required="true" RequiredError="Description is required"
-                                                      Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                            For="@(() => _overtimeRequest.Remarks)"
+                                            Variant="Variant.Filled"                                                     
+                                            MaxLength="500" Lines="4"
+                                            Required="true" RequiredError="Description is required"
+                                            Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                     </MudPaper>
                                 </MudItem>
                             </MudGrid>

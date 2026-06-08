@@ -1,12 +1,13 @@
-﻿@page "/TimeAttendance/regularinquiry"
+﻿@page "/TimeAttendance/ExtraTimeInq"
+@using KenHRApp.Application.DTOs.TNA
 
 <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
-     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Regularization Request</MudText>
+     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Extra Time Request</MudText>
      <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserFullName</MudText>
     </MudStack>
 
-<MudContainer MaxWidth="MaxWidth.False" Class="px-4">
-    @if (_hasValidationError && _validationMessages.Any())
+    <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
+        @if (_hasValidationError && _validationMessages.Any())
     {
         <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
             <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
@@ -43,7 +44,7 @@
                             FullWidth="false"
                             Size="Size.Small"
                             StartIcon="@Icons.Material.Filled.PersonSearch"
-                            OnClick="@(() => BeginSearchRegularization(true))"
+                            OnClick="@(() => BeginSearchExtraTime(true))"
                             Disabled="@_isRunning">
                      @if (_isRunning)
                     {
@@ -120,10 +121,10 @@
                     </MudItem>
                     <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudAutocomplete @bind-Value="_selectedROAType"
+                            <MudAutocomplete @bind-Value="_selectedOTReason"
                                              FullWidth="true"
-                                             Label="Reason of Absence"
-                                             SearchFunc="SearchROATypes!"
+                                             Label="Overtime Reason"
+                                             SearchFunc="SearchOTReason!"
                                              Variant="Variant.Text"
                                              Margin="Margin.Dense"
                                              Dense="true"
@@ -132,7 +133,7 @@
                                              HelperTextOnFocus="true"
                                              Clearable="true"
                                              Typo="Typo.subtitle2"
-                                             MaxItems="@(_roaList != null ? _roaList.Count : 10)"
+                                             MaxItems="@(_otReasonList != null ? _otReasonList.Count : 10)"
                                              Modal="true" />
                         </MudPaper>
                     </MudItem>
@@ -194,26 +195,26 @@
             </MudPaper>
 
             <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
-                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">REGULARIZATION LIST</MudText>
+                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">EXTRA TIME LIST</MudText>
                 <MudSpacer />
                 <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply Regularization" OnClick="ApplyRegularization" />
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply Regularization" OnClick="ApplyExtraTime" />
                  </MudMenu>
              </MudAppBar>
              <MudPaper Elevation="5" Square="true" Class="w-100 mb-3">
-                 <MudDataGrid T="RegularRequestDTO" Items="@_regularRequestList" Hover="true" Striped="true" Class="regularization-grid"
-                              Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
-                              QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
-                              EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
-                              EditDialogOptions="new DialogOptions
-                        {
-                            MaxWidth = MaxWidth.Small,
-                            FullWidth = true,
-                            BackdropClick = false,
-                            CloseOnEscapeKey = false
-                        }"
-                        StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
-                        TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                 <MudDataGrid T="ExtraTimeRequestDTO" Items="@_otRequestList" Hover="true" Striped="true" Class="extratime-grid"
+                    Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                    QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                    EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                    EditDialogOptions="new DialogOptions
+                    {
+                        MaxWidth = MaxWidth.Small,
+                        FullWidth = true,
+                        BackdropClick = false,
+                        CloseOnEscapeKey = false
+                    }"
+                    StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
+                    TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
                      <ToolBarContent>
                          <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
                              <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
@@ -225,26 +226,26 @@
                          <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
                              <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
                              <MudPaper Class="ms-3" Elevation="0">
-                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Create new regularization request" OnClick="ApplyRegularization" />
+                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Create new regularization request" OnClick="ApplyExtraTime" />
                              </MudPaper>
                          </MudPaper>
                      </ToolBarContent>
                      <Columns>
-                         <PropertyColumn Property="x => x.RegularizationId" Title="Request No." Class="col-RegularizationId"
-                                         StickyLeft="true" Editable="false">
-                             <CellTemplate Context="row">
+                         <PropertyColumn Property="x => x.ExtratimeId" Title="Request No." Class="col-ExtratimeId"
+                            StickyLeft="true" Editable="false">
+                            <CellTemplate Context="row">
                                  <MudChip T="long"
                                           Size=Size.Small
                                           Color="Color.Secondary"
                                           Label="true"
                                           Class="fw-bold"
                                           Style="font-size: 14px;"
-                                          OnClick="@(()=>OpenRegularizationRequest(row.Item))">
-                                     @row.Item.RegularizationId
+                                          OnClick="@(()=>OpenExtraTimeRequest(row.Item))">
+                                     @row.Item.ExtratimeId
                                 </MudChip>
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.ROACode" Hidden Editable="false">
+                        <PropertyColumn Property="x => x.OTReasonCode" Hidden Editable="false">
                              <EditTemplate>
 
                              </EditTemplate>
@@ -279,46 +280,48 @@
                                 @context.Item.AttendanceDate!.Value.ToString("dd-MMM-yyyy")
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.RegularizedTimeIn" Title="Regularized Time In" Class="col-RegularizedTimeIn">
+                        <PropertyColumn Property="x => x.WorkDuration" Title="Total Work Hours" Class="col-WorkDuration" Editable="false">
                             <CellTemplate>
-                                @(context.Item.RegularizedTimeIn?.ToString(@"hh\:mm"))
+                                @* @(context.Item.WorkDuration.HasValue ? context.Item!.WorkDuration.Value.ToString("N0") : "0") *@
+                                @context.Item.TotalWorkHours
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.OTStartTime" Title="OT Start Time" Class="col-OTStartTime">
+                            <CellTemplate>
+                                @(context.Item.OTStartTime?.ToString(@"hh\:mm"))
                             </CellTemplate>
                             <EditTemplate Context="row">
-                                <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RegularizedTimeIn" />
+                                <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.OTStartTime" />
                             </EditTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.RegularizedTimeOut" Title="Regularized Time Out" Class="col-RegularizedTimeOut">
+                        <PropertyColumn Property="x => x.OTEndTime" Title="OT End Time" Class="col-OTEndTime">
                             <CellTemplate>
-                                @(context.Item.RegularizedTimeOut?.ToString(@"hh\:mm"))
+                                @(context.Item.OTEndTime?.ToString(@"hh\:mm"))
                             </CellTemplate>
                             <EditTemplate Context="row">
-                                <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.RegularizedTimeOut" />
+                                <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt" @bind-Time="row.Item.OTEndTime" />
                             </EditTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.ROADescription" Title="Reason" Class="col-ROADescription" Editable="false">
+                        <PropertyColumn Property="x => x.OTDuration" Title="Overtime Duration" Class="col-OTDuration" Editable="false">
                             <CellTemplate>
-                                @context.Item.ROADescription
+                                @* @(context.Item.OTDuration.HasValue ? context.Item!.OTDuration.Value.ToString("N0") : "0") *@
+                                @context.Item.TotalOTHours
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.RegularizedDescription" Title="Description" Class="col-Description" Editable="false">
+                        <PropertyColumn Property="x => x.OTReasonDesc" Title="Reason" Class="col-OTReasonDesc" Editable="false">
                             <CellTemplate>
-                                @context.Item.RegularizedDescription
+                                @context.Item.OTReasonDesc
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.WorkDuration" Title="Total Hours" Class="col-WorkDuration" Editable="false">
+                        <PropertyColumn Property="x => x.Remarks" Title="Remarks" Class="col-Remarks" Editable="false">
                             <CellTemplate>
-                                @(context.Item.WorkDuration.HasValue ? context.Item!.WorkDuration.Value.ToString("N0") : "0")
+                                @context.Item.Remarks
                             </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.NoPayHours" Title="Deficit Hours" Class="col-NoPayHours" Editable="false">
-                            <CellTemplate>
-                                @(context.Item.NoPayHours.HasValue ? context.Item!.NoPayHours.Value.ToString("N0") : "0")
-                            </CellTemplate>
-                        </PropertyColumn>
+                        </PropertyColumn>                        
                         <PropertyColumn Property="x => x.StatusDesc" Title="Current Status" Class="col-StatusDesc" Editable="false">
                             <CellTemplate Context="row">
                                 <MudChip T="string" Size=Size.Small Variant="Variant.Outlined"
-                                    Color="@(row.Item.StatusHandlingCode == "Open" ? Color.Info
+                                         Color="@(row.Item.StatusHandlingCode == "Open" ? Color.Info
                                      : row.Item.StatusHandlingCode == "Closed" ? Color.Surface
                                      : row.Item.StatusHandlingCode == "Rejected" ? Color.Error
                                      : row.Item.StatusHandlingCode == "Cancelled" ? Color.Warning
@@ -330,12 +333,12 @@
                         </PropertyColumn>
                         <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
                             <CellTemplate Context="row">
-                                <MudIconButton title="View regularization details"
+                                <MudIconButton title="View extra time details"
                                                Class="show-btn fa-icon-btn"
-                                               Color="Color.Info" 
+                                               Color="Color.Info"
                                                Size="Size.Small"
                                                Icon="fas fa-eye-slash"
-                                               OnClick="@(()=>OpenRegularizationRequest(row.Item))">
+                                               OnClick="@(()=>OpenExtraTimeRequest(row.Item))">
                                 </MudIconButton>
                             </CellTemplate>
                         </TemplateColumn>
@@ -347,7 +350,7 @@
                         </div>
                     </NoRecordsContent>
                     <PagerContent>
-                        <MudDataGridPager T="RegularRequestDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                        <MudDataGridPager T="ExtraTimeRequestDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
                     </PagerContent>
                 </MudDataGrid>
             </MudPaper>
