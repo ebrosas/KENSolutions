@@ -1877,6 +1877,70 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<List<OTRequestResult>>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Search Regularization Requests 
+        /// </summary>
+        /// <param name="requestNo"></param>
+        /// <param name="empNo"></param>
+        /// <param name="costCenter"></param>
+        /// <param name="requestType"></param>
+        /// <param name="status"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        public async Task<Result<List<AttendanceCorrectionResult>>> SearchAttendanceCorrectionAsync(
+            long? requestNo,
+            int? empNo,
+            string? costCenter,
+            string? requestType,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate)
+        {
+            List<AttendanceCorrectionResult> correctionList = new();
+
+            try
+            {
+                var model = (await _db.Set<AttendanceCorrectionResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_SearchAttendanceCorrection @requestNo = {0}, @empNo = {1}, @costCenter = {2}, @requestType = {3}, @status = {4}, @startDate = {5}, @endDate = {6}",
+                    requestNo!,
+                    empNo!,
+                    costCenter!,
+                    requestType!,
+                    status!,
+                    startDate!,
+                    endDate!)
+                    .ToListAsync());
+                if (model != null && model.Any())
+                {
+                    correctionList = model.Select(e => new AttendanceCorrectionResult
+                    {
+                        RequestTypeCode = e.RequestTypeCode,
+                        RequestTypeDesc = e.RequestTypeDesc,
+                        RequestNo = e.RequestNo,
+                        RequestDate = e.RequestDate,
+                        OrigEmpNo = e.OrigEmpNo,
+                        OrigEmpName = e.OrigEmpName,
+                        CostCenter = e.CostCenter,
+                        CostCenterName = e.CostCenterName,
+                        AppliedDate = e.AppliedDate,
+                        RequestedByNo = e.RequestedByNo,
+                        RequestedByName = e.RequestedByName,
+                        RequestDetail = e.RequestDetail,
+                        //CreatedByEmpNo = e.CreatedByEmpNo,
+                        CurrentStatus = e.CurrentStatus
+                    }).ToList();
+                }
+
+                return Result<List<AttendanceCorrectionResult>>.SuccessResult(correctionList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<AttendanceCorrectionResult>>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

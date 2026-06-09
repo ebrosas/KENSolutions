@@ -89,6 +89,15 @@ namespace KenHRApp.Application.Interfaces
             string? status,
             DateTime? startDate,
             DateTime? endDate);
+
+        Task<Result<List<AttendanceCorrectionDTO>>> SearchAttendanceCorrectionAsync(
+            long? requestNo,
+            int? empNo,
+            string? costCenter,
+            string? requestType,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate);
         #endregion
     }
 }

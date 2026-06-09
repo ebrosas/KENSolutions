@@ -294,9 +294,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                                     //if (groupID > 0)
                                     //{
-                                    //    _otReasonList = udcData!.Where(a => a.GroupID == groupID && a.IsActive == true).ToList();
-                                    //    if (_otReasonList != null)
-                                    //        _otReasonArray = _otReasonList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                                    //    _requestTypeList = udcData!.Where(a => a.GroupID == groupID && a.IsActive == true).ToList();
+                                    //    if (_requestTypeList != null)
+                                    //        _requestTypeArray = _requestTypeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
                                     //}
                                     #endregion
 
@@ -536,6 +536,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 case "ApprovalDashboard":
                     Navigation.NavigateTo("/Workflow/ApprovalDashboard");
+                    break;
+
+                case "AttendanceCorrectInq":
+                    Navigation.NavigateTo("/TimeAttendance/AttendanceCorrectInq?ForceLoad=true");
                     break;
 
                 default:

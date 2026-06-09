@@ -54,9 +54,9 @@ BEGIN
 				WHEN RTRIM(a.SchedShiftCode) = 'O' THEN 'Weekly Off'
 				WHEN RTRIM(a.RemarkCode) = 'A' THEN 'Absent'
 				WHEN ISNULL(a.LeaveType, '') <> '' THEN
-					CASE WHEN RTRIM(a.LeaveType) = 'AL' THEN 'On Annual Leave'
-						WHEN RTRIM(a.LeaveType) = 'SL' THEN 'On Sick Leave'
-						WHEN RTRIM(a.LeaveType) = 'IL' THEN 'On Injury Leave'
+					CASE WHEN RTRIM(a.LeaveType) = 'AL' THEN 'Annual Leave'
+						WHEN RTRIM(a.LeaveType) = 'SL' THEN 'Sick Leave'
+						WHEN RTRIM(a.LeaveType) = 'IL' THEN 'Injury Leave'
 						ELSE 'On Leave'
 					END
 				WHEN ISNULL(a.AbsenceReasonCode, '') <> '' THEN ROA.ROADesc

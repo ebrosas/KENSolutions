@@ -448,7 +448,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             //_requestNo = null;
             //_empNo = null;
             //_selectedCostCenter = string.Empty;
-            //_selectedOTReason = string.Empty;
+            //_selectedRequestType = string.Empty;
             //_selectedStatus = string.Empty;
             //_selectedStartDate = null;
             //_selectedEndDate = null;

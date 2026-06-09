@@ -1543,17 +1543,6 @@ namespace KenHRApp.Application.Services
                         LastUpdatedBy = e.LastUpdatedBy,
                         LastUpdatedUserID = e.LastUpdatedUserID,
                         LastUpdatedEmail = e.LastUpdatedEmail
-
-                        //Files = e.AttachmentList!.Select(e => new FileAttachmentDTO
-                        //{
-                        //    Id = e.Id,
-                        //    RequestType = e.RequestType,
-                        //    AttachmentId = e.AttachmentId,
-                        //    FileName = e.FileName,
-                        //    StoredFileName = e.StoredFileName,
-                        //    ContentType = e.ContentType,
-                        //    FileSize = e.FileSize
-                        //}).ToList(),
                     }).ToList();
                 }
 
@@ -1562,6 +1551,55 @@ namespace KenHRApp.Application.Services
             catch (Exception ex)
             {
                 return Result<List<ExtraTimeRequestDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the leave requisition records from the database.");
+            }
+        }
+
+        public async Task<Result<List<AttendanceCorrectionDTO>>> SearchAttendanceCorrectionAsync(
+            long? requestNo,
+            int? empNo,
+            string? costCenter,
+            string? requestType,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate)
+        {
+            List<AttendanceCorrectionDTO> correctionList = new();
+
+            try
+            {
+                var repoResult = await _repository.SearchAttendanceCorrectionAsync(requestNo, empNo, costCenter, requestType, status, startDate, endDate);
+                if (!repoResult.Success)
+                {
+                    return Result<List<AttendanceCorrectionDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var e = repoResult.Value;
+                if (e != null && e.Any())
+                {
+                    correctionList = e.Select(e => new AttendanceCorrectionDTO
+                    {
+                        RequestTypeCode = e.RequestTypeCode,
+                        RequestTypeDesc = e.RequestTypeDesc,
+                        RequestNo = e.RequestNo,
+                        RequestDate = e.RequestDate,
+                        OrigEmpNo = e.OrigEmpNo,
+                        OrigEmpName = e.OrigEmpName,
+                        CostCenter = e.CostCenter,
+                        CostCenterName = e.CostCenterName,
+                        AppliedDate = e.AppliedDate,
+                        RequestedByNo = e.RequestedByNo,
+                        RequestedByName = e.RequestedByName,
+                        RequestDetail = e.RequestDetail,
+                        //CreatedByEmpNo = e.CreatedByEmpNo,
+                        CurrentStatus = e.CurrentStatus
+                    }).ToList();
+                }
+
+                return Result<List<AttendanceCorrectionDTO>>.SuccessResult(correctionList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<AttendanceCorrectionDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while searching for attendance correction requests from the database.");
             }
         }
         #endregion

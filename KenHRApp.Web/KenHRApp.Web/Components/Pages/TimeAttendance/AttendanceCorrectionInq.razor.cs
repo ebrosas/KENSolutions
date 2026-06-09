@@ -1,18 +1,17 @@
 ﻿using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.DTOs;
+using KenHRApp.Application.DTOs.TNA;
 using KenHRApp.Application.Interfaces;
+using KenHRApp.Web.Components.Common.Helpers;
 using KenHRApp.Web.Components.Common.Interface;
 using KenHRApp.Web.Components.Shared;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Text;
 
-using KenHRApp.Web.Components.Common.Interface;
-using KenHRApp.Application.DTOs.TNA;
-
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
-    public partial class TimeCard: ComponentBase, IPageAuthorization
+    public partial class AttendanceCorrectionInq : ComponentBase, IPageAuthorization
     {
         #region Parameters and Injections
         [Inject] private IAttendanceService AttendanceService { get; set; } = default!;
@@ -41,26 +40,18 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Fields
-        private string _pageTitle = "Time Card";
         private StringBuilder _errorMessage = new StringBuilder();
         private int? _empNo = null;
-        private string _selectedCostCenter = string.Empty;
+        private int? _requestNo = null;
+        private string _selectedRequestType = string.Empty;
+        private string _selectedDepartment = string.Empty;
+        private string _selectedStatus = string.Empty;
         private DateTime? _selectedStartDate = null;
         private DateTime? _selectedEndDate = null;
         private string _searchString = string.Empty;
         private string overlayMessage = "Please wait...";
         private List<string> _events = new();
         private CancellationTokenSource? _cts;
-
-        #region Constants
-        private readonly string CONST_PRESENT = "Present";
-        private readonly string CONST_ABSENT = "Absent";
-        private readonly string CONST_HOLIDAY = "Holiday";
-        private readonly string CONST_DAY_OFF = "Weekly Off";
-        private readonly string CONST_ANNUAL_LEAVE = "Annual Leave";
-        private readonly string CONST_SICK_LEAVE = "Sick Leave";
-        private readonly string CONST_INJURY_LEAVE = "Injury Leave";
-        #endregion
 
         #region Dialog Box Button Icons
         private readonly string _iconDelete = "fas fa-trash-alt";
@@ -75,20 +66,27 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _isRunning = false;
         private bool _showErrorAlert = false;
         private bool _enableFilter = false;
+        private bool _isActive = true;
         private bool _hasValidationError = false;
         #endregion
 
         #region Objects and collections
         private MudDatePicker _startDatePicker;
         private MudDatePicker _endDatePicker;
-        private List<TimecardResultDTO> _timeCardList = new List<TimecardResultDTO>();
+        private List<AttendanceCorrectionDTO> _correctionList = new();
         private List<string> _validationMessages = new();
 
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Time Card", href: null, icon: @Icons.Material.Filled.ManageSearch, disabled: true)
+            new("Attendance Correction Inquiry", href: null, icon: @Icons.Material.Filled.ManageSearch, disabled: true)
         ];
+
+        private string[]? _requestTypeArray = null;
+        private List<UserDefinedCodeDTO> _requestTypeList = new List<UserDefinedCodeDTO>();
+
+        private string[]? _requestStatusArray = null;
+        private List<UserDefinedCodeDTO> _requestStatusList = new List<UserDefinedCodeDTO>();
 
         private string[]? _departmentArray = null;
         private IReadOnlyList<DepartmentDTO> _departmentList = new List<DepartmentDTO>();
@@ -99,6 +97,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Enums
         private enum UDCKeys
         {
+            REQTYPE,        // Request Types
+            STATUS,         // Request Status
             DEPARTMENT      // Departments
         }
 
@@ -117,6 +117,28 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             Confirm,
             Warning,
             Error
+        }
+
+        private enum WorkflowStatus
+        {
+            Running,
+            Pending,
+            InProgress,
+            Approved,
+            Rejected,
+            Cancelled,
+            Skipped,
+            Completed
+        }
+
+        private enum RequestStatus
+        {
+            Draft,
+            Open,
+            Approved,
+            Closed,
+            Rejected,
+            Cancelled
         }
         #endregion
 
@@ -177,9 +199,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Grid Events 
-        private Func<TimecardResultDTO, bool> _quickFilter => x =>
+        private Func<AttendanceCorrectionDTO, bool> _quickFilter => x =>
         {
             if (string.IsNullOrWhiteSpace(_searchString))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.OrigEmpName) && x.OrigEmpName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             if (!string.IsNullOrEmpty(x.CostCenter) && x.CostCenter.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
@@ -188,34 +213,60 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (!string.IsNullOrEmpty(x.CostCenterName) && x.CostCenterName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (!string.IsNullOrEmpty(x.EmployeeName) && x.EmployeeName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(x.RequestTypeDesc) && x.RequestTypeDesc!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (!string.IsNullOrEmpty(x.Position) && x.Position!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(x.RequestedByName) && x.RequestedByName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (!string.IsNullOrEmpty(x.ShiftDetails) && x.ShiftDetails!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
-
-            if (!string.IsNullOrEmpty(x.AttendanceRemarks) && x.AttendanceRemarks!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(x.RequestDetail) && x.RequestDetail!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             return false;
         };
 
-        private void StartedEditingItem(TimecardResultDTO item)
+        private void StartedEditingItem(AttendanceCorrectionDTO item)
         {
             _events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
         }
 
-        private void CanceledEditingItem(TimecardResultDTO item)
+        private void CanceledEditingItem(AttendanceCorrectionDTO item)
         {
             _events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
         }
 
-        private void CommittedItemChanges(TimecardResultDTO item)
+        private void CommittedItemChanges(AttendanceCorrectionDTO item)
         {
 
+        }
+
+        private async Task ConfirmDelete(AttendanceCorrectionDTO regularRequest)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to delete request no. '{regularRequest.RequestNo}'?" },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error },
+                { "DialogIconColor", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Confirmation", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                //BeginDeleteDepartment(leaveRequest);
+            }
         }
         #endregion
 
@@ -308,6 +359,43 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             var result = await dialog.Result;
         }
 
+        public void OpenRequestDetail(AttendanceCorrectionDTO item)
+        {
+            if (item.RequestTypeCode == WorkflowHelper.CONST_EXTRA_TIME)
+                Navigation.NavigateTo($"/TimeAttendance/ExtraTime?ActionType=View&RequestNo={item.RequestNo}&CallerForm=AttendanceCorrectInq");
+
+            else if (item.RequestTypeCode == WorkflowHelper.CONST_REGULARIZATION)
+                Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=View&RequestNo={item.RequestNo}&CallerForm=AttendanceCorrectInq");
+        }
+
+        private async Task<IEnumerable<string>> SearchRequestType(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _requestTypeArray!;
+            }
+
+            return _requestTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchRequestStatus(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _requestStatusArray!;
+            }
+
+            return _requestStatusArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
         private async Task<IEnumerable<string>> SearchDepartment(string value, CancellationToken token)
         {
             // In real life use an asynchronous function for fetching data from an api.
@@ -348,7 +436,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 if (ForceLoad)
                 {
-                    BeginSearchTimeCard(ForceLoad);
+                    BeginSearchAttendanceCorrection(ForceLoad);
                 }
             });
         }
@@ -359,41 +447,27 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _errorMessage.Clear();
 
             // Clear field mappings
-            _pageTitle = "Time Card";
+            _requestNo = null;
             _empNo = null;
-            _selectedCostCenter = string.Empty;
+            _selectedDepartment = string.Empty;
+            _selectedRequestType = string.Empty;
+            _selectedStatus = string.Empty;
             _selectedStartDate = null;
             _selectedEndDate = null;
 
             // Clear datagrid datasource
-            _timeCardList = new();
+            _correctionList = new();
 
             // Reset validation error messages
             _hasValidationError = false;
             _validationMessages.Clear();
         }
 
-        private void BeginSearchTimeCard(bool forceLoad = false)
+        private void BeginSearchAttendanceCorrection(bool forceLoad = false)
         {
             // Reset validation errors
             _hasValidationError = false;
             _validationMessages.Clear();
-
-            #region Check if start date is specified
-            //if (!_selectedStartDate.HasValue)
-            //{
-            //    _hasValidationError = true;
-            //    _validationMessages.Add("Start Date is required.");
-            //}
-            #endregion
-
-            #region Check if end date is specified
-            //if (!_selectedEndDate.HasValue)
-            //{
-            //    _hasValidationError = true;
-            //    _validationMessages.Add("End Date is required.");
-            //}
-            #endregion
 
             #region Check if date period is valid
             if (_selectedStartDate.HasValue && _selectedEndDate.HasValue &&
@@ -414,9 +488,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (!UserSession.IsAuthenticated())
                 overlayMessage = "Authentication required. Redirecting to login page...";
             else
-                overlayMessage = "Loading regularization requests, please wait...";
+                overlayMessage = "Loading extra time requests, please wait...";
 
-            _ = SearchTimecardAsync(async () =>
+            _ = SearchAttendanceCorrectionAsync(async () =>
             {
                 _isTaskFinished = true;
                 _isRunning = false;
@@ -452,7 +526,73 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     .Select(d => d.DepartmentFullName).ToArray();
             }
             #endregion
-           
+
+            #region Get all UDC group codes
+            List<UserDefinedCodeGroupDTO>? udcGroupList = new();
+            int groupID = 0;
+
+            var resultUDC = await EmployeeService.GetUserDefinedCodeGroupAsync();
+            if (resultUDC.Success)
+            {
+                udcGroupList = resultUDC!.Value;
+            }
+            else
+                _errorMessage.Append(resultUDC.Error);
+            #endregion
+
+            // Get UDC dataset
+            var result = await EmployeeService.GetUserDefinedCodeAllAsync();
+            if (result.Success)
+            {
+                var udcData = result.Value;
+                if (udcData!.Any() && udcGroupList!.Any())
+                {
+                    #region Get attendance related request types
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.REQTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error fetching data to OT Reasons drop-down box: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _requestTypeList = udcData!.Where(a => a.GroupID == groupID && 
+                            a.IsActive == true &&
+                            a.UDCSpecialHandlingCode == "ATTENDANCE"
+                        ).ToList();
+                        if (_requestTypeList != null)
+                            _requestTypeArray = _requestTypeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Get Request Statuses
+                    try
+                    {
+                        groupID = udcGroupList!
+                            .Where(a => a.UDCGCode == UDCKeys.STATUS.ToString())
+                            .FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Request Status: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _requestStatusList = udcData!
+                            .Where(a => a.GroupID == groupID)
+                            .DistinctBy(s => s.UDCSpecialHandlingCode)
+                            .ToList();
+                        if (_requestStatusList != null)
+                            _requestStatusArray = _requestStatusList.Select(s => s.UDCSpecialHandlingCode).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+                }
+            }
+
             if (callback != null)
             {
                 // Hide the spinner overlay
@@ -460,7 +600,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task SearchTimecardAsync(Func<Task> callback, bool forceLoad = false)
+        private async Task SearchAttendanceCorrectionAsync(Func<Task> callback, bool forceLoad = false)
         {
             await Task.Delay(500);
 
@@ -469,28 +609,45 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             #region Get the selected Department 
             string costCenter = string.Empty;
-            if (!string.IsNullOrEmpty(_selectedCostCenter))
+            if (!string.IsNullOrEmpty(_selectedDepartment))
             {
-                DepartmentDTO? deptDTO = _departmentList.Where(d => d.DepartmentFullName == _selectedCostCenter).FirstOrDefault();
+                DepartmentDTO? deptDTO = _departmentList.Where(d => d.DepartmentFullName == _selectedDepartment).FirstOrDefault();
                 if (deptDTO != null)
                     costCenter = deptDTO.DepartmentCode;
             }
             #endregion
 
-            var repoResult = await AttendanceService.SearchTimecardAsync(
-               _selectedStartDate,
-               _selectedEndDate,
-               costCenter,
-               _empNo);
+            #region Get the selected request type
+            string requestType = string.Empty;
+            if (!string.IsNullOrEmpty(_selectedRequestType))
+            {
+                UserDefinedCodeDTO? requestTypeUDC = _requestTypeList.Where(d => d.UDCDesc1 == _selectedRequestType).FirstOrDefault();
+                if (requestTypeUDC != null)
+                    requestType = requestTypeUDC.UDCCode;
+            }
+            #endregion
+
+            #region Get the selected status
+            string status = string.Empty;
+            if (!string.IsNullOrEmpty(_selectedStatus))
+            {
+                UserDefinedCodeDTO? statusUDC = _requestStatusList.Where(d => d.UDCSpecialHandlingCode == _selectedStatus).FirstOrDefault();
+                if (statusUDC != null)
+                    status = statusUDC.UDCCode;
+            }
+            #endregion
+
+            var repoResult = await AttendanceService.SearchAttendanceCorrectionAsync(
+                _requestNo,
+                _empNo,
+                costCenter,
+                requestType,
+                _selectedStatus,
+                _selectedStartDate,
+                _selectedEndDate);
             if (repoResult.Success)
             {
-                // Set the page title
-                if (_selectedStartDate.HasValue && _selectedEndDate.HasValue)
-                    _pageTitle = $"Time Card for Attandance Cycle from {_selectedStartDate!.Value.ToString("dd MMMM yyyy")} to {_selectedEndDate!.Value.ToString("dd MMMM yyyy")}";
-                else
-                    _pageTitle = "Time Card";
-
-                _timeCardList = repoResult.Value!;
+                _correctionList = repoResult.Value!;
             }
             else
             {

@@ -1,8 +1,8 @@
-﻿@page "/TimeAttendance/TimeCard"
+﻿@page "/TimeAttendance/AttendanceCorrectInq"
 @using KenHRApp.Application.DTOs.TNA
 
 <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
-     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">@_pageTitle</MudText>
+     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Attendance Corrections</MudText>
      <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserFullName</MudText>
     </MudStack>
 
@@ -44,7 +44,7 @@
                             FullWidth="false"
                             Size="Size.Small"
                             StartIcon="@Icons.Material.Filled.PersonSearch"
-                            OnClick="@(() => BeginSearchTimeCard(true))"
+                            OnClick="@(() => BeginSearchAttendanceCorrection(true))"
                             Disabled="@_isRunning">
                      @if (_isRunning)
                     {
@@ -59,6 +59,7 @@
                 <MudButton Variant="Variant.Filled"
                            ButtonType="ButtonType.Reset"
                            Color="Color.Warning"
+                           Style="background-color:#004165;"
                            FullWidth="false"
                            Class="mt-1 px-4"
                            Size="Size.Small"
@@ -78,6 +79,20 @@
                     <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudNumericField HideSpinButtons="true"
+                                             @bind-Value="_requestNo"
+                                             Label="Request No."
+                                             Variant="Variant.Text"
+                                             HelperText="Enter numeric value only"
+                                             HelperTextOnFocus="true"
+                                             MaxLength="10"
+                                             Clearable="true"
+                                             Immediate="true"
+                                             Min="0" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudNumericField HideSpinButtons="true"
                                              @bind-Value="_empNo"
                                              Label="Employee No."
                                              Variant="Variant.Text"
@@ -91,7 +106,7 @@
                     </MudItem>
                     <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudAutocomplete @bind-Value="_selectedCostCenter"
+                            <MudAutocomplete @bind-Value="_selectedDepartment"
                                              SearchFunc="SearchDepartment!"
                                              Variant="Variant.Text"
                                              Label="Department"
@@ -101,6 +116,44 @@
                                              HelperTextOnFocus="true"
                                              Clearable="true" Typo="Typo.subtitle2"
                                              MaxItems="@(_departmentList != null ? _departmentList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="_selectedRequestType"
+                                             FullWidth="true"
+                                             Label="Request Type"
+                                             SearchFunc="SearchRequestType!"
+                                             Variant="Variant.Text"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for value"
+                                             HelperTextOnFocus="true"
+                                             Clearable="true"
+                                             Typo="Typo.subtitle2"
+                                             MaxItems="@(_requestTypeList != null ? _requestTypeList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="5">
+                    <MudItem xs="6" sm="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="_selectedStatus"
+                                             FullWidth="true"
+                                             Label="Status"
+                                             SearchFunc="SearchRequestStatus!"
+                                             Variant="Variant.Text"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for value"
+                                             HelperTextOnFocus="true"
+                                             Clearable="true"
+                                             Typo="Typo.subtitle2"
+                                             MaxItems="@(_requestStatusList != null ? _requestStatusList.Count : 10)"
                                              Modal="true" />
                         </MudPaper>
                     </MudItem>
@@ -142,27 +195,27 @@
             </MudPaper>
 
             <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
-                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">ATTENDANCE SHEET</MudText>
+                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">ATTENDANCE CORRECTIONS</MudText>
                 <MudSpacer />
-                <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
-                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Dark" Label="Export data to Excel" />
+                <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu" hidden>
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply Regularization" />
                  </MudMenu>
              </MudAppBar>
              <MudPaper Elevation="5" Square="true" Class="w-100 mb-3">
-                 <MudDataGrid T="TimecardResultDTO" Items="@_timeCardList" Hover="true" Striped="true" Class="timecard-grid"
-                              Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
-                              QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
-                              EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
-                              EditDialogOptions="new DialogOptions
-                        {
-                            MaxWidth = MaxWidth.Small,
-                            FullWidth = true,
-                            BackdropClick = false,
-                            CloseOnEscapeKey = false
-                        }"
-                        StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
-                        TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
-                     <ToolBarContent>
+                 <MudDataGrid T="AttendanceCorrectionDTO" Items="@_correctionList" Hover="true" Striped="true" Class="attcorrect-grid"
+                    Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                    QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                    EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                    EditDialogOptions="new DialogOptions
+                    {
+                        MaxWidth = MaxWidth.Small,
+                        FullWidth = true,
+                        BackdropClick = false,
+                        CloseOnEscapeKey = false
+                    }"
+                    StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
+                    TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                    <ToolBarContent>
                          <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
                              <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
                                            Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"
@@ -175,151 +228,74 @@
                          </MudPaper>
                      </ToolBarContent>
                      <Columns>
-                        <PropertyColumn Property="x => x.AutoId" Hidden Editable="false">
-                             <EditTemplate>
-                                 @* Empty to prevent rendering *@
-                             </EditTemplate>
-                         </PropertyColumn>
-                         <PropertyColumn Property="x => x.RemarkCode" Hidden Editable="false">
-                             <EditTemplate>
-                                 @* Empty to prevent rendering *@
-                             </EditTemplate>
-                         </PropertyColumn>
-                         <PropertyColumn Property="x => x.LeaveType" Hidden Editable="false">
-                             <EditTemplate>
-                                 @* Empty to prevent rendering *@
-                             </EditTemplate>
-                         </PropertyColumn>
-                         <PropertyColumn Property="x => x.AbsenceReasonCode" Hidden Editable="false">
-                             <EditTemplate>
-                                 @* Empty to prevent rendering *@
-                             </EditTemplate>
-                         </PropertyColumn>
-                         @* <PropertyColumn Property="x => x.EmpNo" Title="Request No." Class="col-EmpNo"
+                        <PropertyColumn Property="x => x.RequestTypeCode" Hidden Editable="false">
+                                <EditTemplate>
+                                    @* Empty to prevent rendering *@
+                                </EditTemplate>
+                        </PropertyColumn>
+                         <PropertyColumn Property="x => x.RequestNo" Title="Request No." Class="col-RequestNo"
                             StickyLeft="true" Editable="false">
-                            <CellTemplate Context="row">
+                             <CellTemplate Context="row">
                                  <MudChip T="long"
                                           Size=Size.Small
                                           Color="Color.Secondary"
                                           Label="true"
                                           Class="fw-bold"
-                                          Style="font-size: 14px;">
-                                     @row.Item.EmpNo
+                                          Style="font-size: 14px;"
+                                          OnClick="@(()=>OpenRequestDetail(row.Item))">
+                                     @row.Item.RequestNo
                                 </MudChip>
                             </CellTemplate>
-                        </PropertyColumn> *@
-                         <PropertyColumn Property="x => x.EmpNo" Title="Employee No." Class="col-EmpNo" 
-                             StickyLeft="true" Editable="false">
-                            <CellTemplate>
-                                 @context.Item.EmpNo
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.RequestTypeDesc" Title="Request Type" Class="col-RequestTypeDesc" Editable="false">
+                                <CellTemplate>
+                                    @context.Item.RequestTypeDesc
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.EmployeeName" Title="Employee Name" Class="col-EmployeeName" Editable="false">
+                        <PropertyColumn Property="x => x.AppliedDate" Title="Applied Date" Class="col-AppliedDate" Editable="false">
                             <CellTemplate>
-                                @context.Item.EmployeeName
+                                @(context.Item.AppliedDate.HasValue ? context.Item.AppliedDate.Value.ToString("dd-MMM-yyyy") : "")
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.Position" Title="Position" Class="col-Position" Editable="false">
+                        <PropertyColumn Property="x => x.RequesterName" Title="Requested By" Class="col-RequesterName" Editable="false">
                             <CellTemplate>
-                                @context.Item.Position
+                                @context.Item.RequesterName
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.DepartmentFullName" Title="Department" Class="col-DepartmentFullName" Editable="false">
-                            <CellTemplate>
-                                @context.Item.DepartmentFullName
-                            </CellTemplate>
-                        </PropertyColumn>
-
-                        @* <PropertyColumn Property="x => x.AttendanceDate" Title="Date" Class="col-AttendanceDate" Editable="false">
-                            <CellTemplate>
-                                @context.Item.AttendanceDate!.Value.ToString("dd-MMM-yyyy")
-                            </CellTemplate>
-                        </PropertyColumn> *@
-                        <PropertyColumn Property="x => x.AttendanceDate" Title="Date" Class="col-AttendanceDate" Editable="false">
+                        <PropertyColumn Property="x => x.RequestDetail" Title="Details" Class="col-RequestDetail" Editable="false">
                             <CellTemplate Context="row">
-                                <MudChip T="string" 
-                                    Variant="Variant.Text"
-                                    Size=Size.Small
-                                    Color="Color.Info"
-                                    Label="false">
-                                    @row.Item.AttendanceDate!.Value.ToString("dd-MMM-yyyy")
-                                </MudChip>
+                                <div style="white-space: pre-line; line-height: 1.5; font-size: 13px; color: #333;">
+                                    @row.Item.RequestDetail
+                                </div>
                             </CellTemplate>
                         </PropertyColumn>
-
-                        <PropertyColumn Property="x => x.DOW" Title="Day" Class="col-DOW" Editable="false">
+                        <PropertyColumn Property="x => x.CurrentStatus" Title="Status" Class="col-CurrentStatus" Editable="false">
                             <CellTemplate>
-                                @context.Item.DOW
-                            </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.ShiftPatCode" Title="Shift Roster" Class="col-ShiftPattern" Editable="false">
-                            <CellTemplate>
-                                @context.Item.ShiftPatCode
-                            </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.ShiftDetails" Title="Scheduled Shift" Class="col-ShiftDetails" Editable="false">
-                            <CellTemplate>
-                                @context.Item.ShiftDetails
-                            </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.FirstTimeIn" Title="First In" Class="col-FirstTimeIn" Editable="false">
-                            <CellTemplate>
-                                @(context.Item.FirstTimeIn.HasValue ? context.Item.FirstTimeIn!.Value.ToString("dd-MMM-yyyy HH:mm tt") : "")
-                            </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.LastTimeOut" Title="Last Out" Class="col-LastTimeOut" Editable="false">
-                            <CellTemplate>
-                                @(context.Item.LastTimeOut.HasValue ? context.Item.LastTimeOut!.Value.ToString("dd-MMM-yyyy HH:mm tt") : "")
-                            </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.TotalWorkHours" Title="Working Hours" Class="col-TotalWorkHours" Editable="false">
-                            <CellTemplate>
-                                @context.Item.TotalWorkHours
-                            </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.TotalDeficitHours" Title="Deficit Hours" Class="col-TotalDeficitHours" Editable="false">
-                            <CellTemplate>
-                                @context.Item.TotalDeficitHours
-                            </CellTemplate>
-                        </PropertyColumn>
-
-                        @* <PropertyColumn Property="x => x.AttendanceStatus" Title="Attendance Status" Class="col-ShiftTiming" Editable="false">
-                            <CellTemplate>
-                                @context.Item.AttendanceStatus
-                            </CellTemplate>
-                        </PropertyColumn> *@
-                        <PropertyColumn Property="x => x.AttendanceStatus" Title="Attendance Status" Class="col-ShiftTiming" Editable="false">
-                            <CellTemplate>
-                                @context.Item.AttendanceStatus
+                                @context.Item.CurrentStatus
                             </CellTemplate>
                             <CellTemplate Context="row">
-                                <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" 
-                                    Color="@(row.Item.AttendanceStatus == CONST_PRESENT ? Color.Success
-                                    : row.Item.AttendanceStatus == CONST_ABSENT ? Color.Error
-                                    : row.Item.AttendanceStatus == CONST_HOLIDAY ? Color.Tertiary
-                                    : row.Item.AttendanceStatus == CONST_DAY_OFF ? Color.Dark
-                                    : (row.Item.AttendanceStatus == CONST_ANNUAL_LEAVE || row.Item.AttendanceStatus == CONST_SICK_LEAVE || row.Item.AttendanceStatus == CONST_INJURY_LEAVE) ? Color.Primary
-                                    : Color.Surface)">
-                                    @row.Item.AttendanceStatus
+                                <MudChip T="string" Size=Size.Small Variant="Variant.Outlined"
+                                    Color="@(row.Item.CurrentStatus == RequestStatus.Open.ToString() ? Color.Info
+                                        : row.Item.CurrentStatus == RequestStatus.Closed.ToString() ? Color.Tertiary
+                                        : row.Item.CurrentStatus == RequestStatus.Rejected.ToString() ? Color.Error
+                                        : row.Item.CurrentStatus == RequestStatus.Cancelled.ToString() ? Color.Warning
+                                        : row.Item.CurrentStatus == RequestStatus.Approved.ToString() ? Color.Success
+                                        : row.Item.CurrentStatus == RequestStatus.Draft.ToString() ? Color.Surface
+                                        : Color.Dark)">
+                                    @row.Item.CurrentStatus
                                 </MudChip>
                             </CellTemplate>
                         </PropertyColumn>
-
-                        <PropertyColumn Property="x => x.AttendanceRemarks" Title="Remarks" Class="col-Remarks" Editable="false">
-                            <CellTemplate>
-                                @context.Item.AttendanceRemarks
-                            </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.TotalOTDuration" Title="Overtime Duration" Class="col-OTDuration" Editable="false">
-                            <CellTemplate>
-                                @context.Item.TotalOTDuration
-                            </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.OTStatus" Title="Overtime Status" Class="col-OTStatus" Editable="false">
-                            <CellTemplate>
-                                @context.Item.OTStatus
-                            </CellTemplate>
-                        </PropertyColumn>
+                        <TemplateColumn CellClass="d-flex align-center justify-end action-cell" Title="Actions">
+                            <EditTemplate Context="row">
+                                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Spacing="0" Class="pt-3">
+                                    <MudIconButton Color="Color.Info" title="View request details" Size="Size.Small"
+                                        Icon="far fa-eye"
+                                        OnClick="@(() => OpenRequestDetail(row.Item))">
+                                        </MudIconButton>
+                                </MudStack>                                                                                          
+                            </EditTemplate>
+                        </TemplateColumn>
                     </Columns>
                     <NoRecordsContent>
                         <div class="no-data-box">
@@ -328,7 +304,7 @@
                         </div>
                     </NoRecordsContent>
                     <PagerContent>
-                        <MudDataGridPager T="TimecardResultDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                        <MudDataGridPager T="AttendanceCorrectionDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
                     </PagerContent>
                 </MudDataGrid>
             </MudPaper>

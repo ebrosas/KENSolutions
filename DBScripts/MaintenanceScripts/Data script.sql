@@ -297,3 +297,14 @@
 	COMMIT TRAN T1
 
 */
+
+/*	Set attendance related request types
+
+	BEGIN TRAN T1
+
+	UPDATE kenuser.UserDefinedCode
+	SET UDCSpecialHandlingCode = 'ATTENDANCE'
+	WHERE RTRIM(UDCCode) IN ('RTYPELEAVE', 'RTYPEOT', 'RTYPEREGULAR')
+	COMMIT TRAN T1
+
+*/

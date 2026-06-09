@@ -54,7 +54,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private string _searchString = string.Empty;
         private StringBuilder _errorMessage = new StringBuilder();
         private decimal _leaveDuration = 0;
-        private string _pageTitle = "Apply Regularization";
+        private string _pageTitle = "Apply Extra Time";
         private int _currentWFIndex = 0;
         private MudDatePicker _picker;
         private DateTime? _selectedDate;
@@ -290,9 +290,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                                     //if (groupID > 0)
                                     //{
-                                    //    _otReasonList = udcData!.Where(a => a.GroupID == groupID && a.IsActive == true).ToList();
-                                    //    if (_otReasonList != null)
-                                    //        _otReasonArray = _otReasonList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                                    //    _requestTypeList = udcData!.Where(a => a.GroupID == groupID && a.IsActive == true).ToList();
+                                    //    if (_requestTypeList != null)
+                                    //        _requestTypeArray = _requestTypeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
                                     //}
                                     #endregion
 
@@ -531,6 +531,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 case "ExtraTimeInq":
                     Navigation.NavigateTo("/TimeAttendance/ExtraTimeInq?ForceLoad=true");
+                    break;
+
+                case "AttendanceCorrectInq":
+                    Navigation.NavigateTo("/TimeAttendance/AttendanceCorrectInq?ForceLoad=true");
                     break;
 
                 default:

@@ -78,6 +78,15 @@ namespace KenHRApp.Infrastructure.Repositories
             string? status,
             DateTime? startDate,
             DateTime? endDate);
+
+        Task<Result<List<AttendanceCorrectionResult>>> SearchAttendanceCorrectionAsync(
+            long? requestNo,
+            int? empNo,
+            string? costCenter,
+            string? requestType,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate);
         #endregion
     }
 }
