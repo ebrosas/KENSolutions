@@ -59,6 +59,7 @@
                 <MudButton Variant="Variant.Filled"
                            ButtonType="ButtonType.Reset"
                            Color="Color.Warning"
+                           Style="background-color:#004165;"
                            FullWidth="false"
                            Class="mt-1 px-4"
                            Size="Size.Small"
@@ -240,7 +241,7 @@
                                 <MudChip T="string" 
                                     Variant="Variant.Text"
                                     Size=Size.Small
-                                    Color="Color.Info"
+                                    Color="Color.Secondary"
                                     Label="false">
                                     @row.Item.AttendanceDate!.Value.ToString("dd-MMM-yyyy")
                                 </MudChip>
@@ -282,12 +283,6 @@
                                 @context.Item.TotalDeficitHours
                             </CellTemplate>
                         </PropertyColumn>
-
-                        @* <PropertyColumn Property="x => x.AttendanceStatus" Title="Attendance Status" Class="col-ShiftTiming" Editable="false">
-                            <CellTemplate>
-                                @context.Item.AttendanceStatus
-                            </CellTemplate>
-                        </PropertyColumn> *@
                         <PropertyColumn Property="x => x.AttendanceStatus" Title="Attendance Status" Class="col-ShiftTiming" Editable="false">
                             <CellTemplate>
                                 @context.Item.AttendanceStatus
@@ -297,14 +292,13 @@
                                     Color="@(row.Item.AttendanceStatus == CONST_PRESENT ? Color.Success
                                     : row.Item.AttendanceStatus == CONST_ABSENT ? Color.Error
                                     : row.Item.AttendanceStatus == CONST_HOLIDAY ? Color.Tertiary
-                                    : row.Item.AttendanceStatus == CONST_DAY_OFF ? Color.Dark
+                                    : row.Item.AttendanceStatus == CONST_DAY_OFF ? Color.Info
                                     : (row.Item.AttendanceStatus == CONST_ANNUAL_LEAVE || row.Item.AttendanceStatus == CONST_SICK_LEAVE || row.Item.AttendanceStatus == CONST_INJURY_LEAVE) ? Color.Primary
-                                    : Color.Surface)">
+                                    : Color.Dark)">
                                     @row.Item.AttendanceStatus
                                 </MudChip>
                             </CellTemplate>
                         </PropertyColumn>
-
                         <PropertyColumn Property="x => x.AttendanceRemarks" Title="Remarks" Class="col-Remarks" Editable="false">
                             <CellTemplate>
                                 @context.Item.AttendanceRemarks

@@ -22,10 +22,50 @@
             @_errorMessage
         </MudAlert>
     }
-    <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
+
+    <MudPaper class="paper-header w-100 px-2" Elevation="0">  
         <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
-                        CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
-        
+            CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
+        <MudSpacer></MudSpacer>
+
+        <MudPaper Elevation="0">
+            <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full mt-0" Spacing="2">
+                 <MudButton Variant="Variant.Filled"
+                            Color="Color.Primary"
+                            Style="background-color:#004165;"
+                            Class="mt-1 px-4"
+                            FullWidth="false"
+                            Size="Size.Small"
+                            StartIcon="@Icons.Material.Filled.PersonSearch"
+                            OnClick="@(() => BeginSearchDepartmentTask(true))"
+                            Disabled="@_isRunning">
+                     @if (_isRunning)
+                    {
+                        <span>Searching...</span>
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+                    }
+                    else
+                    {
+                        <span>Search</span>
+                    }
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           ButtonType="ButtonType.Reset"
+                           Color="Color.Warning"
+                           Style="background-color:#004165;"
+                           FullWidth="false"
+                           Class="mt-1 px-4"
+                           Size="Size.Small"
+                           Disabled="@_isRunning"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           OnClick="BeginRefreshPageTask">
+                    Reset
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    </MudPaper>
+
+    <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
         <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-5 mb-0">
             <MudPaper Elevation="0" Square="true" Class="w-100">
                 <MudGrid Spacing="5">
@@ -87,42 +127,9 @@
                 
                 <MudGrid Spacing="5">
                     <MudItem xs="2">
-                        <MudSwitch @bind-Value="_isActive" Color="Color.Primary">Active?</MudSwitch>
+                        <MudSwitch @bind-Value="_isActive" Color="Color.Tertiary">Active?</MudSwitch>
                     </MudItem>
-                    <MudItem xs="10">
-                        <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full mt-0" Spacing="2">
-                            <MudButton Variant="Variant.Filled"                            
-                                Color="Color.Primary"
-                                Style="background-color:#004165;"
-                                Class="mt-1 px-4"
-                                FullWidth="false"
-                                Size="Size.Small"
-                                StartIcon="@Icons.Material.Filled.PersonSearch"
-                                        OnClick="@(() => BeginSearchDepartmentTask(true))"
-                                Disabled="@_isRunning">
-                                @if (_isRunning)
-                                {                                    
-                                    <span>Searching...</span>
-                                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
-                                }
-                                else
-                                {
-                                    <span>Search</span>
-                                }
-                            </MudButton>
-                            <MudButton Variant="Variant.Filled"
-                                ButtonType="ButtonType.Reset"
-                                Color="Color.Warning"
-                                FullWidth="false"
-                                Class="mt-1 px-4"
-                                Size="Size.Small"
-                                Disabled="@_isRunning"
-                                StartIcon="@Icons.Material.Filled.Refresh"
-                                OnClick="BeginRefreshPageTask">
-                                Reset
-                            </MudButton>
-                        </MudStack>
-
+                    <MudItem xs="10">                        
                         @* <MudPaper Class="d-flex gap-2 justify-content-end me-1 mt-0 p-0" Elevation="0">
                             <div @onmouseover="() => _isSearchHovered = true" @onmouseout="() => _isSearchHovered = false">
                                 <MudButton Variant="@(_isSearchHovered ? Variant.Filled : Variant.Outlined)"
@@ -288,7 +295,9 @@
                         </PropertyColumn>   
                          <PropertyColumn Property="x => x.IsActiveDesc" Title="Is Active?" Class="col-active" Required="false">
                              <CellTemplate Context="row">
-                                 <MudChip T="string" Size=Size.Small Color="@(row.Item.IsActiveDesc == "Yes" ? Color.Success : Color.Error)">
+                                 <MudChip T="string" Size=Size.Small 
+                                    Variant="Variant.Outlined"
+                                    Color="@(row.Item.IsActiveDesc == "Yes" ? Color.Success : Color.Error)">
                                      @row.Item.IsActiveDesc
                                 </MudChip>
                             </CellTemplate>
@@ -305,18 +314,37 @@
                             <CellTemplate>
                                 @context.Item.UpdatedAt?.ToString("dd-MMM-yyyy")
                             </CellTemplate>
-                        </PropertyColumn>                        
-                        <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                        </PropertyColumn>  
+                        @* <TemplateColumn Class="flex-column" Title="Actions">
                             <CellTemplate Context="row">
-                                <MudIconButton title="View and edit employee information" 
+                                <MudIconButton title="Edit details"
+                                               Color="Color.Surface"
+                                               Icon="fas fa-pen-alt"
+                                               Size="Size.Small"
+                                               OnClick="@row.Actions.StartEditingItemAsync">
+                                </MudIconButton>
+                                <MudIconButton Color="Color.Error" Class="pl-2"
+                                               title="Delete record"
+                                               Icon="fas fa-trash-alt"
+                                               Size="Size.Small"
+                                               OnClick="() => ConfirmDelete(row.Item)">
+                                </MudIconButton>
+                            </CellTemplate>
+                        </TemplateColumn> *@
+                        <TemplateColumn CellClass="d-flex justify-end" Title="Actions">
+                            <CellTemplate Context="row">
+                                <MudIconButton title="Edit details" 
                                     Class="show-btn fa-icon-btn"
-                                    Style="color:#004165;"
+                                    Color="Color.Surface"
                                     OnClick="@row.Actions.StartEditingItemAsync">
                                     <ChildContent>
-                                        <i class="fas fa-edit fa-1x"></i>
+                                        <i class="fas fa-pen-alt fa-1x"></i>
                                     </ChildContent>
                                 </MudIconButton>
-                                <MudIconButton Color="Color.Error" title="Delete department record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
+                                <MudIconButton title="Delete record" 
+                                    Class="fa-icon-btn" 
+                                    Color="Color.Error"
+                                    OnClick="() => ConfirmDelete(row.Item)">
                                     <ChildContent>
                                         <i class="fas fa-trash-alt fa-1x"></i>
                                     </ChildContent>

@@ -238,7 +238,7 @@
                              <CellTemplate Context="row">
                                  <MudChip T="long"
                                           Size=Size.Small
-                                          Color="Color.Secondary"
+                                          Color="Color.Info"
                                           Label="true"
                                           Class="fw-bold"
                                           Style="font-size: 14px;"
@@ -286,16 +286,31 @@
                                 </MudChip>
                             </CellTemplate>
                         </PropertyColumn>
-                        <TemplateColumn CellClass="d-flex align-center justify-end action-cell" Title="Actions">
-                            <EditTemplate Context="row">
-                                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Spacing="0" Class="pt-3">
-                                    <MudIconButton Color="Color.Info" title="View request details" Size="Size.Small"
-                                        Icon="far fa-eye"
-                                        OnClick="@(() => OpenRequestDetail(row.Item))">
-                                        </MudIconButton>
-                                </MudStack>                                                                                          
-                            </EditTemplate>
-                        </TemplateColumn>
+                        @* <TemplateColumn Class="flex-column" Title="Action">
+                            <CellTemplate Context="row">
+                                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Spacing="0">
+                                    <MudIconButton title="View request details"
+                                               Class="show-btn fa-icon-btn"
+                                               Color="Color.Surface"
+                                               Size="Size.Small"
+                                               Icon="fas fa-eye-slash"
+                                               OnClick="@(()=>OpenRequestDetail(row.Item))">
+                                    </MudIconButton>
+                                </MudStack>                                
+                            </CellTemplate>
+                        </TemplateColumn> *@
+                        <TemplateColumn Class="flex-column" Title="Action">
+                             <CellTemplate Context="row">
+                                 <MudIconButton title="View details"
+                                                Class="show-btn fa-icon-btn"
+                                                Color="Color.Surface"
+                                                OnClick="@(()=>OpenRequestDetail(row.Item))">
+                                     <ChildContent>
+                                         <i class="fas fa-eye-slash fa-1x"></i>
+                                     </ChildContent>
+                                 </MudIconButton>
+                             </CellTemplate>
+                         </TemplateColumn>
                     </Columns>
                     <NoRecordsContent>
                         <div class="no-data-box">

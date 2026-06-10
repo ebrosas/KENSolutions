@@ -20,3 +20,15 @@
 	COMMIT TRAN T1
 
 */
+
+/*	Change Overtime to Extra Time
+
+	BEGIN TRAN T1
+
+	UPDATE kenuser.UserDefinedCode
+	SET UDCDesc1 = 'Extra Time'
+	WHERE RTRIM(UDCCode) IN ('RTYPEOT')
+
+	COMMIT TRAN T1
+
+*/

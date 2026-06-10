@@ -116,16 +116,37 @@
                             <CellTemplate>
                                 @context.Item.LastUpdateDate?.ToString("dd-MMM-yyyy hh:mm tt")
                             </CellTemplate>
-                        </PropertyColumn>      
-                        <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                        </PropertyColumn>    
+                        @* <TemplateColumn Class="flex-column" Title="Actions">
                             <CellTemplate Context="row">
-                                <MudIconButton Style="color:#004165;" title="View shift roster details" Class="show-btn fa-icon-btn"
+                                <MudIconButton title="View shift roster"
+                                               Color="Color.Surface"
+                                               Icon="fas fa-eye-slash"
+                                               Size="Size.Small"
+                                               OnClick="() => GetShiftRosterDetail(row.Item)">
+                                </MudIconButton>
+                                <MudIconButton Color="Color.Error" Class="pl-2"
+                                               title="Delete shift roster"
+                                               Icon="fas fa-trash-alt"
+                                               Size="Size.Small"
+                                               OnClick="() => ConfirmDelete(row.Item)">
+                                </MudIconButton>
+                            </CellTemplate>
+                        </TemplateColumn> *@
+                        <TemplateColumn CellClass="d-flex justify-end" Title="Actions">
+                            <CellTemplate Context="row">
+                                <MudIconButton title="Edit details"
+                                               Class="show-btn fa-icon-btn"
+                                               Color="Color.Surface"
                                                OnClick="() => GetShiftRosterDetail(row.Item)">
                                     <ChildContent>
-                                        <i class="fas fa-edit fa-1x"></i>
+                                        <i class="fas fa-pen-alt fa-1x"></i>
                                     </ChildContent>
                                 </MudIconButton>
-                                <MudIconButton Color="Color.Error" title="Delete shift roster record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
+                                <MudIconButton title="Delete record"
+                                               Class="fa-icon-btn"
+                                               Color="Color.Error"
+                                               OnClick="() => ConfirmDelete(row.Item)">
                                     <ChildContent>
                                         <i class="fas fa-trash-alt fa-1x"></i>
                                     </ChildContent>

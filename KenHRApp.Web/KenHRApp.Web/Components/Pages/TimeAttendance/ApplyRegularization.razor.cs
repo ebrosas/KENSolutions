@@ -93,7 +93,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Regularization Inquiry", href: "/TimeAttendance/regularinquiry?ForceLoad=true", icon: Icons.Material.Filled.ManageSearch),
+            //new("Regularization Inquiry", href: "/TimeAttendance/regularinquiry?ForceLoad=true", icon: Icons.Material.Filled.ManageSearch),
+            new("Attendance Corrections", href: "/TimeAttendance/AttendanceCorrectInq?ForceLoad=true", icon: Icons.Material.Filled.ManageSearch),
             new("Apply Regularization", href: null, disabled: true, @Icons.Material.Filled.CardTravel)
         ];
 
@@ -1279,6 +1280,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 if (_regularRequest.SwipeLogList != null && _regularRequest.SwipeLogList.Any())
                     _attendanceChips.AddRange(_regularRequest.SwipeLogList.ToList());
                 #endregion
+
+                // Set the calendar's selected date
+                _selectedDate = _regularRequest.AttendanceDate;
 
                 // Display the requisition number in the page title
                 _pageTitle = $" Regularization Request #{_regularRequest.RegularizationId} (Created On: {_regularRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")} | Status: {_regularRequest.StatusSummary})";

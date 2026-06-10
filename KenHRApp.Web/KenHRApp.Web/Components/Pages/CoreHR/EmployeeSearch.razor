@@ -20,8 +20,50 @@
             @_errorMessage
         </MudAlert>
     }
-    <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;"> 
-        <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-primary-text" />
+
+    <MudPaper class="paper-header w-100 px-2" Elevation="0">   
+        <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" 
+            CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-primary-text" />
+        <MudSpacer></MudSpacer>
+
+        <MudPaper Elevation="0">
+            <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full mt-0" Spacing="2">
+                    <MudButton Variant="Variant.Filled"
+                            Color="Color.Primary"
+                            Style="background-color:#004165;"
+                            Class="mt-1 px-4"
+                            FullWidth="false"
+                            Size="Size.Small"
+                            StartIcon="@Icons.Material.Filled.PersonSearch"
+                            OnClick="@(() => BeginSearchEmployeeTask(true))"
+                            Disabled="@_isRunning">
+                        @if (_isRunning)
+                    {
+                        <span>Searching...</span>
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+                    }
+                    else
+                    {
+                        <span>Search</span>
+                    }
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                            ButtonType="ButtonType.Reset"
+                            Color="Color.Warning"
+                            Style="background-color:#004165;"
+                            FullWidth="false"
+                            Class="mt-1 px-4"
+                            Size="Size.Small"
+                            Disabled="@_isRunning"
+                            StartIcon="@Icons.Material.Filled.Refresh"
+                            OnClick="BeginRefreshPageTask">
+                    Reset
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    </MudPaper>
+
+    <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">         
         
         <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-5 mb-0">
             <MudPaper Elevation="0" Square="true" Class="w-100 p-0 m-0">
@@ -156,64 +198,7 @@
                     </MudItem>                    
                 </MudGrid>
             </MudPaper>
-            <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full mt-0" Spacing="2">
-                <MudButton Variant="Variant.Filled"                            
-                    Color="Color.Primary"
-                    Style="background-color:#004165;"
-                    Class="mt-1 px-4"
-                    FullWidth="false"
-                    Size="Size.Small"
-                    StartIcon="@Icons.Material.Filled.PersonSearch"                    
-                    OnClick="@(() => BeginSearchEmployeeTask(true))"
-                    Disabled="@_isRunning">
-                    @if (_isRunning)
-                    {                        
-                        <span>Searching...</span>
-                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
-                    }
-                    else
-                    {
-                        <span>Search</span>
-                    }
-                </MudButton>
-                <MudButton Variant="Variant.Filled"
-                    ButtonType="ButtonType.Reset"
-                    Color="Color.Warning"
-                    FullWidth="false"
-                    Class="mt-1 px-4"
-                    Size="Size.Small"
-                    Disabled="@_isRunning"
-                           StartIcon="@Icons.Material.Filled.Refresh"
-                    OnClick="BeginRefreshPageTask">
-                    Reset
-                </MudButton>
-                <!--
-                 <div @onmouseover="() => _isSearchHovered = true" @onmouseout="() => _isSearchHovered = false">
-                     <MudButton Variant="@(_isSearchHovered ? Variant.Filled : Variant.Outlined)"
-                                StartIcon="@Icons.Material.Filled.PersonSearch" Class="px-5"
-                                Color="Color.Info" Size="Size.Small" OnClick="@(() => BeginSearchEmployeeTask(true))">
-                         <MudText Typo="Typo.button" HtmlTag="h3">Search</MudText>
-                         @*  @if (_isRunning)
-                        {
-                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                        <MudText Typo="Typo.button" HtmlTag="h3" Class="ms-2">Processing</MudText>
-                        }
-                        else
-                        {
-                        <MudText Typo="Typo.button" HtmlTag="h3">Search</MudText>
-                        } *@
-                     </MudButton>
-                 </div>
-                 <div @onmouseover="() => _isResetHovered = true" @onmouseout="() => _isResetHovered = false">
-                     <MudButton Variant="@(_isResetHovered ? Variant.Filled : Variant.Outlined)"
-                                StartIcon="@Icons.Material.Filled.Refresh" Class="px-5"
-                                Color="Color.Warning" Size="Size.Small" OnClick="BeginRefreshPageTask">
-                         <MudText Typo="Typo.button" HtmlTag="h3">Reset</MudText>
-                     </MudButton>
-                 </div>
-                 -->
-            </MudStack>
-
+            
             <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
                 <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LIST OF EMPLOYEES</MudText>
                 <MudSpacer />
@@ -224,10 +209,7 @@
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Upload" IconColor="Color.Dark" Label="Upload Employees" hidden />
                  </MudMenu>
             </MudAppBar>
-            <MudPaper Elevation="4" Square="true" Class="w-100">
-                @* <MudDataGrid T="EmployeeMasterDTO" Items="@employeeList" Hover="true" Striped="true" Class="employee-master-grid"
-                    TableLayout="TableLayout.Fixed" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true"> *@
-
+            <MudPaper Elevation="4" Square="true" Class="w-100">                
                  <MudDataGrid T="EmployeeMasterDTO" Items="@employeeList" Hover="true" Striped="true" Class="employee-master-grid"
                     Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                     QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
@@ -294,18 +276,29 @@
                                 </MudChip>
                             </CellTemplate>
                         </PropertyColumn>
-                        <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                        @* <TemplateColumn Class="flex-column" Title="Actions">
+                            <CellTemplate Context="row">
+                                <MudIconButton title="View employee details"
+                                               Color="Color.Surface"
+                                               Icon="fas fa-eye-slash"
+                                               Size="Size.Small"
+                                               OnClick="() => GoToEmployeeDetail(row.Item)">
+                                </MudIconButton>
+                            </CellTemplate>
+                        </TemplateColumn> *@
+                        <TemplateColumn CellClass="d-flex justify-end" Title="Actions">
                             <CellTemplate>
-                                <MudIconButton title="View and edit employee information"
+                                <MudIconButton title="View details"
                                     Class="show-btn fa-icon-btn"
-                                               Style="color:#004165;"
+                                    Color="Color.Surface"
                                     OnClick="@(()=>GoToEmployeeDetail(context.Item))">
                                     <ChildContent>
-                                        <i class="fas fa-edit fa-1x"></i>
+                                        <i class="fas fa-eye-slash fa-1x"></i>
                                     </ChildContent>
                                 </MudIconButton>
-                                <MudIconButton Color="Color.Error" title="Delete employee record"
-                                               Class="fa-icon-btn" hidden
+                                <MudIconButton title="Delete record" hidden                                       
+                                    Class="fa-icon-btn"
+                                    Color="Color.Error" 
                                     OnClick="@context.Actions.StartEditingItemAsync">
                                     <ChildContent>
                                         <i class="fas fa-trash-alt fa-1x"></i>

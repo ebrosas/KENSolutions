@@ -236,7 +236,7 @@
                             <CellTemplate Context="row">
                                 <MudChip T="long" 
                                     Size=Size.Small
-                                    Color="Color.Secondary"
+                                    Color="Color.Info"
                                     Label="true" 
                                     Class="fw-bold" 
                                     Style="font-size: 14px;"
@@ -323,21 +323,34 @@
                                 </MudChip>
                             </CellTemplate>
                         </PropertyColumn>
-                        <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                       @*  <TemplateColumn Class="flex-column" Title="Action">
                              <CellTemplate Context="row">
                                  <MudIconButton title="View leave details"
                                     Class="show-btn fa-icon-btn"
-                                    Color="Color.Info" Size="Size.Small"
-                                               Icon="fas fa-eye-slash"
+                                    Color="Color.Surface" Size="Size.Small"
+                                    Icon="fas fa-eye-slash"
                                     OnClick="@row.Actions.StartEditingItemAsync">
                                  </MudIconButton>
-                                 <MudIconButton Color="Color.Error" hidden title="Delete department record" Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
+                                 <MudIconButton Color="Color.Error" hidden title="Delete department record" 
+                                    Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
                                      <ChildContent>
                                          <i class="fas fa-trash-alt fa-sm"></i>
                                      </ChildContent>
                                  </MudIconButton>
                              </CellTemplate>
-                         </TemplateColumn>
+                         </TemplateColumn> *@
+                        <TemplateColumn Class="flex-column" Title="Action">
+                            <CellTemplate Context="row">
+                                <MudIconButton title="View details"
+                                               Class="show-btn fa-icon-btn"
+                                               Color="Color.Surface"
+                                               OnClick="@row.Actions.StartEditingItemAsync">
+                                    <ChildContent>
+                                        <i class="fas fa-eye-slash fa-1x"></i>
+                                    </ChildContent>
+                                </MudIconButton>
+                            </CellTemplate>
+                        </TemplateColumn>
                     </Columns>
                      <NoRecordsContent>
                          <div class="no-data-box">

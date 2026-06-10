@@ -89,7 +89,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Extra Time Inquiry", href: "/TimeAttendance/ExtraTimeInq?ForceLoad=true", icon: Icons.Material.Filled.YoutubeSearchedFor),
+            //new("Extra Time Inquiry", href: "/TimeAttendance/ExtraTimeInq?ForceLoad=true", icon: Icons.Material.Filled.YoutubeSearchedFor),
+            new("Attendance Corrections", href: "/TimeAttendance/AttendanceCorrectInq?ForceLoad=true", icon: Icons.Material.Filled.ManageSearch),
             new("Apply Extra Time", href: null, disabled: true, @Icons.Material.Filled.CardTravel)
         ];
 
@@ -1224,6 +1225,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 if (_overtimeRequest.SwipeLogList != null && _overtimeRequest.SwipeLogList.Any())
                     _attendanceChips.AddRange(_overtimeRequest.SwipeLogList.ToList());
                 #endregion
+
+                // Set the calendar's selected date
+                _selectedDate = _overtimeRequest.AttendanceDate;
 
                 // Display the requisition number in the page title
                 _pageTitle = $" Extra Time Request #{_overtimeRequest.ExtratimeId} (Created On: {_overtimeRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")} | Status: {_overtimeRequest.StatusSummary})";

@@ -1415,15 +1415,11 @@ h1:focus {
 .department-master-grid .col-dept-name {
     width: 200px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .department-master-grid .col-group-name {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .department-master-grid .col-description {
@@ -1439,22 +1435,16 @@ h1:focus {
 .department-master-grid .col-superintendent {
     width: 180px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .department-master-grid .col-manager {
     width: 280px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .department-master-grid .col-created-date {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .department-master-grid .col-updated-date {
@@ -1882,66 +1872,48 @@ h1:focus {
 .shift-roster-grid .col-shift-pattern {
     width: 90px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
     min-width: 20px;
 }
 
 .shift-roster-grid .col-shift-description {
     width: 200px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-shift-timing {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-shift-pointer {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-shift-time {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
     min-width: 80px;
 }
 
 .shift-roster-grid .col-created-date {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-created-by {
     width: 200px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-updated-date {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-updated-by {
     width: 250px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-active {
@@ -1957,20 +1929,16 @@ h1:focus {
 .shift-roster-grid .col-change-type {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-effective-date {
     width: 70px !important;
     text-align: left;
-    overflow: hidden;
 }
 
 .shift-roster-grid .col-ending-date {
     width: 70px !important;
     text-align: left;
-    overflow: hidden;
 }
 
 .shift-roster-grid .col-employee-no {
@@ -1981,36 +1949,26 @@ h1:focus {
 .shift-roster-grid .col-employee-name {
     width: 250px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-employment-type {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-reporting-manager {
     width: 150px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-department {
     width: 250px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .shift-roster-grid .col-position {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .shift-roster-grid .flex-column {
@@ -2082,15 +2040,11 @@ h1:focus {
 .leave-grid .col-LeaveEmpNo {
     width: 80px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .leave-grid .col-LeaveEmpName {
     width: 150px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .leave-grid .col-DepartmentFullName {
@@ -2098,19 +2052,14 @@ h1:focus {
     text-align: left;
 }
 
-
 .leave-grid .col-LeaveStartDate {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .leave-grid .col-LeaveResumeDate {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 
@@ -2123,29 +2072,21 @@ h1:focus {
 .leave-grid .col-LeaveDuration {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .leave-grid .col-StartDayModeDesc {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .leave-grid .col-EndDayModeDesc {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .leave-grid .col-StatusFullDescription {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .leave-grid .flex-column {
@@ -2207,113 +2148,81 @@ h1:focus {
 .entitlement-grid .col-EmployeeName {
     width: 200px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-DepartmentFullName {
     width: 200px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-ALEntitlementCount {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-LeaveUOMDesc {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-ALRenewalTypeDesc {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-SLEntitlementCount {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-SickLeaveUOMDesc {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-SLRenewalTypeDesc {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-EffectiveDate {
     width: 110px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-LeaveBalance {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-SLBalance {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-DILBalance {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-CreatedUserID {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-CreatedDate {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-LastUpdatedUserID {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .col-LastUpdatedDate {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .entitlement-grid .flex-column {

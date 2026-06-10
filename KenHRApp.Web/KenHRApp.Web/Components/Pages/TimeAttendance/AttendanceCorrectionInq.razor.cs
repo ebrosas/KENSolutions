@@ -79,7 +79,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Attendance Correction Inquiry", href: null, icon: @Icons.Material.Filled.ManageSearch, disabled: true)
+            new("Attendance Corrections", href: null, icon: @Icons.Material.Filled.ManageSearch, disabled: true)
         ];
 
         private string[]? _requestTypeArray = null;
