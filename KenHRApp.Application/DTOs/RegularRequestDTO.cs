@@ -26,6 +26,7 @@ namespace KenHRApp.Application.DTOs
         public string? ROACode { get; set; } = null;
 
         [Display(Name = "Description")]
+        [Required(ErrorMessage = "Regularization Reason is required")]
         [StringLength(500, ErrorMessage = "Description can't be more than 500 characters.")]
         public string ROADescription { get; set; } = null!;
 
@@ -36,10 +37,12 @@ namespace KenHRApp.Application.DTOs
 
         [Required(ErrorMessage = "Regularized In Time is required")]
         [Display(Name = "Regularized In Time")]
+        [RegularizationTimeValidation("RegularizedTimeOut")] // ✅ custom validation
         public TimeSpan? RegularizedTimeIn { get; set; }
 
         [Required(ErrorMessage = "Regularized Out Time is required")]
         [Display(Name = "Regularized Out Time")]
+        [RegularizationTimeValidation("RegularizedTimeIn")] // ✅ custom validation
         public TimeSpan? RegularizedTimeOut { get; set; }
 
         [Display(Name = "Shift Name")]

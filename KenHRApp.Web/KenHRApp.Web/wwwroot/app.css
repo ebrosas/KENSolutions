@@ -3067,5 +3067,13 @@ employee-autocomplete .mud-input-adornment .mud-icon-button {
 }
 /* #endregion */
 
+/* #region Miscelenous Settings */
+.required-field .mud-input-label::after {
+    content: " *";
+    color: #d32f2f;
+    font-weight: 700;
+}
+/* #endregion*/
+
 
 

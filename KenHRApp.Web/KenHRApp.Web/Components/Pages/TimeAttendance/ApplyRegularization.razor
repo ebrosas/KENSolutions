@@ -319,9 +319,11 @@
                                 <MudItem xs="6">
                                     <MudPaper Elevation="0" Class="p-0 w-100">
                                         <MudAutocomplete @bind-Value="_regularRequest.ROADescription"
+                                                         For="@(() => _regularRequest.ROADescription)"
                                                          SearchFunc="SearchReasonOfAbsence!"
                                                          Variant="Variant.Text"
                                                          Label="Select Reason"
+                                                         Class="required-field"
                                                          Margin="Margin.Normal"
                                                          Dense="true"
                                                          Placeholder="Please Select"
@@ -330,42 +332,44 @@
                                                          Clearable="true" Typo="Typo.subtitle2"
                                                          MaxItems="@(_roaList != null ? _roaList.Count : 10)"
                                                          Disabled="@_isDisabled"
-                                                         Required="true" RequiredError="Reason is required"
                                                          Modal="true" />
                                     </MudPaper>
                                 </MudItem>
                             </MudGrid>
                             <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="6">
-                                    <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
                                         <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt"
-                                            Label="Regularized In Time" Required="true"
-                                            RequiredError="Regularized In Time is required"
+                                            Label="Regularized In Time"
+                                            Class="required-field"
+                                            @bind-Time="_regularRequest.RegularizedTimeIn"
+                                            For="@(() => _regularRequest.RegularizedTimeIn)"                                            
                                             Variant="Variant.Text" 
                                             Margin="Margin.Dense"
-                                            Disabled="@_isDisabled"
-                                            @bind-Time="_regularRequest.RegularizedTimeIn" />
+                                            Disabled="@_isDisabled" />
                                     </MudPaper>
                                 </MudItem>
                                 <MudItem xs="6">
-                                    <MudPaper Elevation="0" Class="p-0 w-100">
+                                    <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
                                         <MudTimePicker Color="Color.Info" AmPm="true" TimeFormat="h:mm tt"
-                                            Label="Regularized Out Time" Required="true"
-                                            RequiredError="Regularized Out Time is required"
-                                                       Variant="Variant.Text"
-                                                       Margin="Margin.Dense"
-                                            Disabled="@_isDisabled"
-                                            @bind-Time="_regularRequest.RegularizedTimeOut" />
+                                            Label="Regularized Out Time"
+                                            Class="required-field"
+                                            @bind-Time="_regularRequest.RegularizedTimeOut"
+                                            For="@(() => _regularRequest.RegularizedTimeOut)"   
+                                            Variant="Variant.Text"
+                                            Margin="Margin.Dense"
+                                            Disabled="@_isDisabled" />
                                     </MudPaper>
                                 </MudItem>
                             </MudGrid>
                             <MudGrid Spacing="3" Class="mt-0">
                                 <MudItem xs="12">
                                     <MudPaper Elevation="3" Class="p-0 w-100">
-                                        <MudTextField @bind-Value="_regularRequest.RegularizedDescription" Label="Description"
+                                        <MudTextField Label="Description"
+                                            Class="required-field"
+                                            @bind-Value="_regularRequest.RegularizedDescription" 
                                             For="@(() => _regularRequest.RegularizedDescription)"
                                             Variant="Variant.Filled" MaxLength="500" Lines="4"
-                                            Required="true" RequiredError="Description is required"
                                             Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                     </MudPaper>
                                 </MudItem>

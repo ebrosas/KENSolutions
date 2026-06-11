@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KenHRApp.Application.Common.Validations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -35,10 +36,12 @@ namespace KenHRApp.Application.DTOs.TNA
 
         [Required(ErrorMessage = "OT Start Time is required")]
         [Display(Name = "OT Start Time")]
+        [OTTimeValidation("OTEndTime")] // ✅ custom validation
         public TimeSpan? OTStartTime { get; set; }
 
-        [Required(ErrorMessage = "OT Start Time is required")]
+        [Required(ErrorMessage = "OT End Time is required")]
         [Display(Name = "OT End Time")]
+        [OTTimeValidation("OTStartTime")] // ✅ custom validation
         public TimeSpan? OTEndTime { get; set; }
 
         [Display(Name = "Shift Name")]
