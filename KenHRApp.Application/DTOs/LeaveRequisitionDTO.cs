@@ -55,6 +55,7 @@ namespace KenHRApp.Application.DTOs
 
         [Display(Name = "Start Date")]
         [DataType(DataType.Date)]
+        [Required(ErrorMessage = "Start Date is required")]
         [LeaveDateValidation("LeaveResumeDate")] // ✅ custom validation
         public DateTime? LeaveStartDate { get; set; }
 
@@ -64,6 +65,7 @@ namespace KenHRApp.Application.DTOs
 
         [Display(Name = "Resume Date")]
         [DataType(DataType.Date)]
+        [Required(ErrorMessage = "Resume Date is required")]
         [LeaveDateValidation("LeaveStartDate")] // ✅ custom validation
         public DateTime? LeaveResumeDate { get; set; }
 

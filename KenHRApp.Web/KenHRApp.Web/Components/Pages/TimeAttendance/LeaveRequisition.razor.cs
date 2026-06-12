@@ -41,10 +41,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Parameter]
         [SupplyParameterFromQuery]
         public string CallerForm { get; set; } = "";
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string LeaveType { get; set; } = "";
         #endregion
 
         #region Fields
-                
+
         #region General fields
         private EditForm _editForm;
         private EditContext? _editContext;
@@ -243,27 +247,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             if (firstRender)
             {
-                #region Old authentication Logic
-                //if (!State.IsAuthenticated)
-                //    GoToLogin();
-
-                //if (State.AuthenticatedUser != null)
-                //{
-                //    UserName = State.AuthenticatedUser!.EmployeeFullName;
-                //    UserEmpNo = State.AuthenticatedUser.EmployeeNo;
-                //    UserID = State.AuthenticatedUser!.UserID;
-                //    UserEmail = State.AuthenticatedUser!.OfficialEmail;
-                //    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
-
-                //    // Initialize the Leave Request object
-                //    _leaveRequest.LeaveCreatedBy = UserEmpNo;
-                //    _leaveRequest.LeaveCreatedEmail = UserEmail;
-                //    _leaveRequest.LeaveCreatedUserID = UserID;
-
-                //    BeginLoadComboboxTask();                                        
-                //}
-                #endregion
-
                 bool isAuthenticated = UserSession.IsAuthenticated();
                 if (!isAuthenticated)
                 {
@@ -284,7 +267,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     // Initialize the Leave Request object
                     _leaveRequest.LeaveCreatedBy = UserEmpNo;
                     _leaveRequest.LeaveCreatedEmail = UserEmail;
-                    _leaveRequest.LeaveCreatedUserID = UserName;
+                    _leaveRequest.LeaveCreatedUserID = UserName;                                        
 
                     BeginLoadComboboxTask();
                 }
@@ -442,6 +425,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _leaveRequest.LeaveCreatedUserID = UserName;
             _leaveRequest.StartDayMode = null;
             _leaveRequest.EndDayMode = null;
+            _hasValidationError = false;
+            _validationMessages.Clear();
+
+            ShowHideError(false);
 
             #region Reset file attachments
             _files = Array.Empty<IBrowserFile>();
@@ -481,9 +468,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private void HandleBackButton()
         {
-            if (string.IsNullOrEmpty(CallerForm))
-                return;
-
             switch(CallerForm)
             {
                 case "TNADashboard":
@@ -971,6 +955,17 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 if (_errorMessage.Length > 0)
                     ShowHideError(true);
 
+                // Set leave type if specified in the query string
+                if (!string.IsNullOrWhiteSpace(this.LeaveType) &&
+                    _leaveTypeList.Any())
+                {
+                    UserDefinedCodeDTO? selectedLeaveType = _leaveTypeList
+                        .Where(a => a.UDCCode == this.LeaveType)
+                        .FirstOrDefault();
+                    if (selectedLeaveType != null)
+                        _leaveRequest.LeaveTypeDesc = selectedLeaveType.UDCDesc1;
+                }
+
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
 
@@ -1102,14 +1097,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             string errorMsg = string.Empty;
 
             #region Get the selected leave type
-            //if (!string.IsNullOrEmpty(_leaveRequest.LeaveTypeDesc))
-            //{
-            //    UserDefinedCodeDTO? selectedLeaveType = _requestTypeList
-            //        .Where(a => a.UDCDesc1 == _leaveRequest.LeaveTypeDesc)
-            //        .FirstOrDefault();
-            //    if (selectedLeaveType != null)
-            //        _leaveRequest.LeaveType = selectedLeaveType.UDCCode;
-            //}
+            if (!string.IsNullOrEmpty(_leaveRequest.LeaveTypeDesc))
+            {
+                UserDefinedCodeDTO? selectedLeaveType = _leaveTypeList
+                    .Where(a => a.UDCDesc1 == _leaveRequest.LeaveTypeDesc)
+                    .FirstOrDefault();
+                if (selectedLeaveType != null)
+                    _leaveRequest.LeaveType = selectedLeaveType.UDCCode;
+            }
             #endregion
 
             #region Get the selected employee information 

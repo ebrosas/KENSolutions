@@ -1,5 +1,15 @@
 ﻿@page "/Recruitment/recruitmenthome"
 
+<style>
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        height: 100%;
+    }
+</style>
+
 <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-0 ps-4 fw-bolder" Style="color: #004165;">Recruitment Management</MudText>
 <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
     <EditForm EditContext="@_editContext" @ref="_editForm"
@@ -44,179 +54,196 @@
                                  <MudSpacer />
                                  <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
                                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Info" Label="Add New Budget" OnClick="AddBudgetAsync" />
-                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Info" Label="Export Grid Data to Excel" />
-                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Info" Label="Download Master Data" />
+                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.ImportExport" IconColor="Color.Info" Label="Export Grid Data to Excel" hidden />
+                                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Download" IconColor="Color.Info" Label="Download Master Data" hidden />
                                  </MudMenu>
                              </MudAppBar>
-                             <MudPaper Elevation="5" Square="true" Class="w-100">
-                                <div class="budget-grid mb-4">                                
-                                    <MudDataGrid T="RecruitmentBudgetDTO" Items="@_budgetList" Hover="true" Striped="true" 
-                                        Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
-                                        QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
-                                        EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
-                                        StartedEditingItem="@StartedEditingItem"
-                                        CommittedItemChanges="@CommittedItemChanges"
-                                        TableClass="fixed-table" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
-                                         <ToolBarContent>                        
-                                             <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
-                                                 <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
-                                                               Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"   
-                                                               AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
-                                                 </MudTextField>
-                                             </MudPaper>
-                                            <MudSpacer />
-                                            <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
-                                                 @* <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch> *@
-                                                 <MudSwitch @bind-Value="_enableFilter" Color="Color.Success" UncheckedColor="Color.Default"
-                                                    Label="Enable Custom Filter" LabelPlacement="Placement.Start" />
-                                                 <MudPaper Class="ms-3" Elevation="0">
-                                                     <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new recruitment budget" OnClick="AddBudgetAsync" />
-                                                 </MudPaper>                             
+                             <MudPaper Elevation="5" Square="true" Class="w-100 mb-3">
+                                <MudDataGrid T="RecruitmentBudgetDTO" Items="@_budgetList" Hover="true" Striped="true" Class="budget-grid" 
+                                    Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                                    QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
+                                    EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
+                                    EditDialogOptions="new DialogOptions 
+                                    { 
+                                        MaxWidth = MaxWidth.Medium, 
+                                        FullWidth = true,
+                                        BackdropClick = false,
+                                        CloseOnEscapeKey = false
+                                    }"
+                                    StartedEditingItem="@StartedEditingItem"
+                                    CommittedItemChanges="@CommittedItemChanges"
+                                    TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                                        <ToolBarContent>                        
+                                            <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                                                <MudTextField @bind-Value="_searchString" Placeholder="Enter search string" Adornment="Adornment.Start"
+                                                            Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"   
+                                                            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                                                </MudTextField>
                                             </MudPaper>
-                                        </ToolBarContent>
-                                         <Columns>
-                                             <PropertyColumn Property="x => x.BudgetId" Hidden Editable="false">
-                                                 <EditTemplate Context="row">
-                                                     @* Empty to prevent rendering *@
-                                                 </EditTemplate>
+                                        <MudSpacer />
+                                        <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                                @* <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch> *@
+                                                <MudSwitch @bind-Value="_enableFilter" Color="Color.Success" UncheckedColor="Color.Default"
+                                                Label="Enable Custom Filter" LabelPlacement="Placement.Start" />
+                                                <MudPaper Class="ms-3" Elevation="0">
+                                                    <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new recruitment budget" OnClick="AddBudgetAsync" />
+                                                </MudPaper>                             
+                                        </MudPaper>
+                                    </ToolBarContent>
+                                    <Columns>
+                                        <PropertyColumn Property="x => x.BudgetId" Hidden Editable="false">
+                                                <EditTemplate Context="row">
+                                                    @* Empty to prevent rendering *@
+                                                </EditTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.DepartmentCode" Hidden Required="false">
+                                            <EditTemplate Context="row">
+                                                @* Empty to prevent rendering *@
+                                            </EditTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.DepartmentCode" Hidden Required="false">
-                                                 <EditTemplate Context="row">
-                                                     @* Empty to prevent rendering *@
-                                                 </EditTemplate>
-                                             </PropertyColumn>
-                                             <PropertyColumn Property="x => x.DepartmentName" Title="Department" Class="col-dept-name" Editable="false" StickyLeft="true">
-                                                 <CellTemplate Context="row">
-                                                     <MudChip T="string" Size=Size.Small Color="Color.Primary" Label="true" Class="fw-bold" Style="font-size: 14px;">
-                                                         @row.Item.DepartmentName
-                                                    </MudChip>
-                                                </CellTemplate>
+                                            <PropertyColumn Property="x => x.DepartmentName" Title="Department" Class="col-dept-name" Editable="false" StickyLeft="true">
+                                                <CellTemplate Context="row">
+                                                    <MudChip T="string" Size=Size.Small Color="Color.Info" Label="true" Class="fw-bold" Style="font-size: 14px;">
+                                                        @row.Item.DepartmentName
+                                                </MudChip>
+                                            </CellTemplate>
+                                            @* <EditTemplate Context="row">
+                                                    <MudAutocomplete @bind-Value="row.Item.DepartmentName"
+                                                        SearchFunc="SearchDepartment!"
+                                                        Variant="Variant.Text"
+                                                        Label="Department"
+                                                        Margin="Margin.Normal"
+                                                        Dense="true"
+                                                        Placeholder="Please Select"
+                                                        HelperText="Type a key to search for department"
+                                                        HelperTextOnFocus="true"
+                                                        Clearable="true" Typo="Typo.subtitle2"
+                                                        MaxItems="@(_departmentList != null ? _departmentList.Count : 10)"
+                                                        Modal="true" />
+                                            </EditTemplate> *@
+                                        </PropertyColumn>
+                                            <PropertyColumn Property="x => x.BudgetDescription" Title="Budget Description" Class="col-description">
+                                                <EditTemplate Context="row">
+                                                <MudTextField @bind-Value="row.Item.BudgetDescription" For="@(() => row.Item.BudgetDescription)"
+                                                    Label="Budget Description" 
+                                                    HelperText="Maximum input is 200 chars."
+                                                    Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="200" MaxLength="200"
+                                                    Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                        <PropertyColumn Property="x => x.BudgetHeadCount" Title="Head Count Budget" Class="col-head-count">
+                                                <EditTemplate Context="row">
+                                                    <MudNumericField @bind-Value="row.Item.BudgetHeadCount" Label="Head Count Budget"
+                                                    For="@(() => row.Item.BudgetHeadCount)"
+                                                    Variant="Variant.Outlined"
+                                                    HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                    Required RequiredError="Head Count Budget is required"
+                                                    Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                            </EditTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.ActiveCount" Title="Active Employees" Class="col-active-count">
+                                                <EditTemplate Context="row">
+                                                    <MudNumericField @bind-Value="row.Item.ActiveCount" Label="Active Employees"
+                                                                    For="@(() => row.Item.ActiveCount)"
+                                                    Variant="Variant.Outlined"
+                                                    HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                    Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                            </EditTemplate>
+                                        </PropertyColumn>
+                                            <PropertyColumn Property="x => x.RequisitionCount" Title="Active Requisitions" Class="col-requisition-count" Editable="false">
+                                                <CellTemplate Context="row">
+                                                    <MudBadge Content="row.Item.RequisitionCount" Color="@(row.Item.RequisitionCount > 0 ? Color.Success : Color.Default)" title="@($"{row.Item.RequisitionCount} active requisitions")"
+                                                    Overlap="true" Bordered="false" Class="mx-6 my-4">
+                                                        <MudIconButton Icon="@Icons.Material.Filled.People" Color="@(row.Item.RequisitionCount > 0 ? Color.Info : Color.Default)" OnClick="@(() => OpenActiveRecruitments(row.Item))" />
+                                                </MudBadge>
+                                            </CellTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.ExitCount" Title="Exit Employees" Class="col-exit-count">
+                                                <EditTemplate Context="row">
+                                                    <MudNumericField @bind-Value="row.Item.ExitCount" Label="Exit Employees"
+                                                    For="@(() => row.Item.ExitCount)"
+                                                    Variant="Variant.Outlined"
+                                                    HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                    Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.NetGapCount" Title="Net Gap" Class="col-gap-count" Editable="false">
                                                 @* <EditTemplate Context="row">
-                                                     <MudAutocomplete @bind-Value="row.Item.DepartmentName"
-                                                            SearchFunc="SearchDepartment!"
-                                                            Variant="Variant.Text"
-                                                            Label="Department"
-                                                            Margin="Margin.Normal"
-                                                            Dense="true"
-                                                            Placeholder="Please Select"
-                                                            HelperText="Type a key to search for department"
-                                                            HelperTextOnFocus="true"
-                                                            Clearable="true" Typo="Typo.subtitle2"
-                                                            MaxItems="@(_departmentList != null ? _departmentList.Count : 10)"
-                                                            Modal="true" />
+                                                    <MudNumericField @bind-Value="row.Item.NetGapCount" Label="Net Gap" Variant="Variant.Outlined"
+                                                                    HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                                    Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                                 </EditTemplate> *@
                                             </PropertyColumn>
-                                             <PropertyColumn Property="x => x.BudgetDescription" Title="Budget Description" Class="col-description">
-                                                 <EditTemplate Context="row">
-                                                    <MudTextField @bind-Value="row.Item.BudgetDescription" For="@(() => row.Item.BudgetDescription)"
-                                                        Label="Budget Description" 
-                                                        HelperText="Maximum input is 200 chars."
-                                                        Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="200" MaxLength="200"
-                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                 </EditTemplate>
-                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.BudgetHeadCount" Title="Head Count Budget" Class="col-head-count">
-                                                 <EditTemplate Context="row">
-                                                     <MudNumericField @bind-Value="row.Item.BudgetHeadCount" Label="Head Count Budget"
-                                                        For="@(() => row.Item.BudgetHeadCount)"
-                                                        Variant="Variant.Outlined"
-                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
-                                                        Required RequiredError="Head Count Budget is required"
-                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                </EditTemplate>
-                                            </PropertyColumn>
-                                            <PropertyColumn Property="x => x.ActiveCount" Title="Active Employees" Class="col-active-count">
-                                                 <EditTemplate Context="row">
-                                                     <MudNumericField @bind-Value="row.Item.ActiveCount" Label="Active Employees"
-                                                                      For="@(() => row.Item.ActiveCount)"
-                                                        Variant="Variant.Outlined"
-                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
-                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                </EditTemplate>
-                                            </PropertyColumn>
-                                             <PropertyColumn Property="x => x.RequisitionCount" Title="Active Requisitions" Class="col-requisition-count" Editable="false">
-                                                 <CellTemplate Context="row">
-                                                     <MudBadge Content="row.Item.RequisitionCount" Color="@(row.Item.RequisitionCount > 0 ? Color.Success : Color.Default)" title="@($"{row.Item.RequisitionCount} active requisitions")"
-                                                        Overlap="true" Bordered="false" Class="mx-6 my-4">
-                                                         @* <MudIcon Icon="@Icons.Material.Filled.People" Color="@(row.Item.RequisitionCount > 0 ? Color.Info : Color.Default)" onclick="@(() => OpenActiveRecruitments(row.Item))" /> *@
-                                                         <MudIconButton Icon="@Icons.Material.Filled.People" Color="@(row.Item.RequisitionCount > 0 ? Color.Info : Color.Default)" OnClick="@(() => OpenActiveRecruitments(row.Item))" />
-                                                    </MudBadge>
-                                                </CellTemplate>
-                                            </PropertyColumn>
-                                            <PropertyColumn Property="x => x.ExitCount" Title="Exit Employees" Class="col-exit-count">
-                                                 <EditTemplate Context="row">
-                                                     <MudNumericField @bind-Value="row.Item.ExitCount" Label="Exit Employees"
-                                                        For="@(() => row.Item.ExitCount)"
-                                                        Variant="Variant.Outlined"
-                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
-                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                 </EditTemplate>
-                                             </PropertyColumn>
-                                             <PropertyColumn Property="x => x.NetGapCount" Title="Net Gap" Class="col-gap-count" Editable="false">
-                                                 @* <EditTemplate Context="row">
-                                                     <MudNumericField @bind-Value="row.Item.NetGapCount" Label="Net Gap" Variant="Variant.Outlined"
-                                                                      HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
-                                                                      Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                 </EditTemplate> *@
-                                             </PropertyColumn>
-                                             <PropertyColumn Property="x => x.NewIndentCount" Title="New Indent" Class="col-indent-count">
-                                                 <EditTemplate Context="row">
-                                                     <MudNumericField @bind-Value="row.Item.NewIndentCount" Label="New Indent"
-                                                        For="@(() => row.Item.NewIndentCount)"
-                                                        Variant="Variant.Outlined"
-                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
-                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                 </EditTemplate>
-                                             </PropertyColumn>
-                                             <PropertyColumn Property="x => x.OnHoldDesc" Title="On-hold?" Class="col-onhold" Required="false">
-                                                 <CellTemplate Context="row">
-                                                     <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" Color="@(row.Item.OnHoldDesc == "Yes" ? Color.Error : Color.Success)">
-                                                         @row.Item.OnHoldDesc
-                                                    </MudChip>
-                                                </CellTemplate>
+                                            <PropertyColumn Property="x => x.NewIndentCount" Title="New Indent" Class="col-indent-count">
                                                 <EditTemplate Context="row">
-                                                    <MudSwitch @bind-Value="row.Item.OnHold" Color="Color.Error" UncheckedColor="Color.Default" Label="On-hold?" />
+                                                    <MudNumericField @bind-Value="row.Item.NewIndentCount" Label="New Indent"
+                                                    For="@(() => row.Item.NewIndentCount)"
+                                                    Variant="Variant.Outlined"
+                                                    HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                    Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                                 </EditTemplate>
                                             </PropertyColumn>
-                                             <PropertyColumn Property="x => x.CreatedDate" Title="Created Date" Class="col-created-date" Editable="false">
-                                                 <CellTemplate Context="row">
-                                                     @row.Item.CreatedDate?.ToString("dd-MMM-yyyy")
-                                                </CellTemplate>
-                                            </PropertyColumn>
-                                            <PropertyColumn Property="x => x.LastUpdateDate" Title="Last Updated Date" Class="col-updated-date" Editable="false">
+                                            <PropertyColumn Property="x => x.OnHoldDesc" Title="On-hold?" Class="col-onhold" Required="false">
                                                 <CellTemplate Context="row">
-                                                    @row.Item.LastUpdateDate?.ToString("dd-MMM-yyyy")
-                                                </CellTemplate>
-                                            </PropertyColumn>                        
-                                            <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                                                    <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" Color="@(row.Item.OnHoldDesc == "Yes" ? Color.Error : Color.Success)">
+                                                        @row.Item.OnHoldDesc
+                                                </MudChip>
+                                            </CellTemplate>
+                                            <EditTemplate Context="row">
+                                                <MudSwitch @bind-Value="row.Item.OnHold" Color="Color.Error" UncheckedColor="Color.Default" Label="On-hold?" />
+                                            </EditTemplate>
+                                        </PropertyColumn>
+                                            <PropertyColumn Property="x => x.CreatedDate" Title="Created Date" Class="col-created-date" Editable="false">
                                                 <CellTemplate Context="row">
-                                                    <MudIconButton Color="Color.Info" title="Edit budget details" 
-                                                        Icon="@Icons.Material.Rounded.Edit"
-                                                        OnClick="@(() => EditBudgetAsync(row.Item))">
-                                                    </MudIconButton>
-                                                    <MudIconButton Color="Color.Tertiary" title="Create requisition"
-                                                        Icon="@Icons.Material.Rounded.CreateNewFolder"
-                                                        Disabled="@(row.Item.NewIndentCount == 0)"
+                                                    @row.Item.CreatedDate?.ToString("dd-MMM-yyyy")
+                                            </CellTemplate>
+                                        </PropertyColumn>
+                                        <PropertyColumn Property="x => x.LastUpdateDate" Title="Last Updated Date" Class="col-updated-date" Editable="false">
+                                            <CellTemplate Context="row">
+                                                @row.Item.LastUpdateDate?.ToString("dd-MMM-yyyy")
+                                            </CellTemplate>
+                                        </PropertyColumn>                        
+                                        <TemplateColumn CellClass="text-center align-middle" Title="Actions">
+                                            <CellTemplate Context="row">
+                                                <div class="action-buttons">
+                                                    <MudIconButton title="Create requisition" 
+                                                        Class="show-btn fa-icon-btn"
+                                                        Color="Color.Surface"
                                                         OnClick="@(()=>AddRequisition(row.Item))">
+                                                        <ChildContent>
+                                                            <i class="fas fa-plus-circle fa-1x"></i>
+                                                        </ChildContent>
                                                     </MudIconButton>
-                                                    <MudIconButton Color="Color.Error" title="Delete budget record"
-                                                                   Icon="@Icons.Material.Rounded.DeleteForever"
+                                                    <MudIconButton title="Edit budget details" 
+                                                        Class="show-btn fa-icon-btn"
+                                                        Color="Color.Surface"
+                                                        OnClick="@(() => EditBudgetAsync(row.Item))">
+                                                        <ChildContent>
+                                                            <i class="fas fa-pen-alt fa-1x"></i>
+                                                        </ChildContent>
+                                                    </MudIconButton>
+                                                    <MudIconButton title="Delete budget record" 
+                                                        Class="fa-icon-btn" 
+                                                        Color="Color.Error"
                                                         OnClick="() => ConfirmDeleteBudget(row.Item)">
+                                                        <ChildContent>
+                                                            <i class="fas fa-trash-alt fa-1x"></i>
+                                                        </ChildContent>
                                                     </MudIconButton>
-                                                </CellTemplate>
-                                            </TemplateColumn>
-                                        </Columns>
-                                        <NoRecordsContent>
-                                            <div class="no-data-box">
-                                                <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
-                                                <span>No data found</span>
-                                            </div>
-                                        </NoRecordsContent>
-                                        <PagerContent>
-                                            <MudDataGridPager T="RecruitmentBudgetDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
-                                        </PagerContent>
-                                    </MudDataGrid>
-                                </div>
+                                                </div>                                                
+                                            </CellTemplate>
+                                        </TemplateColumn>
+                                    </Columns>
+                                    <NoRecordsContent>
+                                        <div class="no-data-box">
+                                            <MudIcon Icon="@Icons.Material.Filled.Info" Class="no-data-icon" />
+                                            <span>No data found</span>
+                                        </div>
+                                    </NoRecordsContent>
+                                    <PagerContent>
+                                        <MudDataGridPager T="RecruitmentBudgetDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                                    </PagerContent>
+                                </MudDataGrid>
                             </MudPaper>
                         </MudStack>
                     </MudStep>

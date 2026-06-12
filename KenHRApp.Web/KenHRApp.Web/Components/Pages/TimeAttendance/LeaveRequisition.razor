@@ -11,7 +11,7 @@
     <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserFullName</MudText>
 </MudStack>
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="px-4">
+<MudContainer MaxWidth="MaxWidth.Medium" Class="px-4">
     <EditForm EditContext="@_editContext" @ref="_editForm"
               OnValidSubmit="HandleValidSubmit"
               OnInvalidSubmit="HandleInvalidSubmit">
@@ -70,8 +70,7 @@
                             Reset
                         </MudButton>
 
-                        <MudButton Variant="Variant.Filled"
-                                   StartIcon="@Icons.Material.Filled.Cancel"
+                        <MudButton Variant="Variant.Filled"                                   
                                    OnClick="ShowCancelDialog"
                                    Size="Size.Small"
                                    Color="Color.Surface">
@@ -203,29 +202,29 @@
                 <MudGrid Spacing="5" Class="mt-0">
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="w-100">
-                            @* <MudAutocomplete @bind-Value="_leaveRequest.LeaveTypeDesc"
-                                             For="@(() => _leaveRequest.LeaveTypeDesc)"
-                                             Class="employee-autocomplete"
-                                             Label="Leave Type"
-                                             SearchFunc="SearchLeaveTypes!"
-                                             Variant="Variant.Text"
-                                             Margin="Margin.Dense"
-                                             Dense="true"
-                                             Placeholder="Please Select"
-                                             HelperText="Type a key to search for value"
-                                             HelperTextOnFocus="true"
-                                             Clearable="true"
-                                             Typo="Typo.subtitle2"
-                                             Disabled="@_isDisabled"
-                                             MaxItems="@(_leaveTypeList != null ? _leaveTypeList.Count : 10)"
-                                             Required="true" RequiredError="Leave Type is required"
-                                             Modal="true" /> *@
+                            <MudAutocomplete @bind-Value="_leaveRequest.LeaveTypeDesc"
+                                For="@(() => _leaveRequest.LeaveTypeDesc)"
+                                Class="required-field"
+                                Label="Leave Type"
+                                SearchFunc="SearchLeaveTypes!"
+                                Variant="Variant.Text"
+                                Margin="Margin.Dense"
+                                Dense="true"
+                                Placeholder="Please Select"
+                                HelperText="Type a key to search for value"
+                                HelperTextOnFocus="true"
+                                Clearable="true"
+                                Typo="Typo.subtitle2"
+                                Disabled="@_isDisabled"
+                                MaxItems="@(_leaveTypeList != null ? _leaveTypeList.Count : 10)"
+                                Modal="true" />
 
-                            <MudSelect T="string"
+                            @* <MudSelect T="string"
                                        Value="_leaveRequest.LeaveType"
                                        ValueChanged="@((v) => OnLeaveTypeChanged(v))"
                                        Disabled="@_isDisabled"
                                        Label="Leave Type"
+                                       Class="required-field"
                                        Variant="Variant.Text"
                                        Margin="Margin.Dense"
                                        Placeholder="Please Select"
@@ -240,7 +239,7 @@
                                 {
                                     <MudSelectItem Value="leave.UDCCode">@leave.UDCDesc1</MudSelectItem>
                                 }
-                            </MudSelect>
+                            </MudSelect> *@
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="6">
@@ -270,20 +269,20 @@
 
                 <MudGrid Spacing="5">
                     <MudItem xs="6">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
                             <MudDatePicker Label="Start Date" Editable="true" AutoClose="true"
-                                        For="@(() => _leaveRequest.LeaveStartDate)"
-                                        Margin="Margin.Dense" 
-                                        HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" 
-                                        Clearable="false" Disabled="@_isDisabled" 
-                                        Color="Color.Surface"
-                                        Required="true" RequiredError="Start Date is required"
-                                        Date="_leaveRequest.LeaveStartDate"
-                                        DateChanged="OnStartDateChanged"
-                                        Mask="@(new DateMask("dd/MM/yyyy"))" 
-                                        DateFormat="dd/MM/yyyy" 
-                                        Placeholder="dd/MM/yyyy" 
-                                        Variant="Variant.Text">
+                                    Class="required-field"
+                                    For="@(() => _leaveRequest.LeaveStartDate)"
+                                    Margin="Margin.Dense" 
+                                    HelperText="Specify start period of leave" HelperTextOnFocus="true" 
+                                    Clearable="false" Disabled="@_isDisabled" 
+                                    Color="Color.Surface"
+                                    Date="_leaveRequest.LeaveStartDate"
+                                    DateChanged="OnStartDateChanged"
+                                    Mask="@(new DateMask("dd/MM/yyyy"))" 
+                                    DateFormat="dd/MM/yyyy" 
+                                    Placeholder="dd/MM/yyyy" 
+                                    Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = DateTime.Today))">Today</MudButton>
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = null))">Clear</MudButton>
@@ -335,21 +334,21 @@
 
                 <MudGrid Spacing="5">
                     <MudItem xs="6">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                        <MudDatePicker Label="Resume Date" Editable="true" AutoClose="true"
-                                        Date="_leaveRequest.LeaveResumeDate"
-                                        DateChanged="OnResumeDateChanged"
-                                        For="@(() => _leaveRequest.LeaveResumeDate)"
-                                        Margin="Margin.Dense"
-                                        HelperText="Enter date in dd/MM/yyyy format" HelperTextOnFocus="true" 
-                                        Clearable="false" 
-                                        Disabled="@_isDisabled" 
-                                        Color="Color.Surface"
-                                        Required="true" RequiredError="Resume Date is required"
-                                        Mask="@(new DateMask("dd/MM/yyyy"))" 
-                                        DateFormat="dd/MM/yyyy" 
-                                        Placeholder="dd/MM/yyyy" 
-                                        Variant="Variant.Text">
+                        <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
+                            <MudDatePicker Label="Resume Date" Editable="true" AutoClose="true"
+                                    Class="required-field"
+                                    Date="_leaveRequest.LeaveResumeDate"
+                                    DateChanged="OnResumeDateChanged"
+                                    For="@(() => _leaveRequest.LeaveResumeDate)"
+                                    Margin="Margin.Dense"
+                                    HelperText="Specify resume date of work" HelperTextOnFocus="true"
+                                    Clearable="false" 
+                                    Disabled="@_isDisabled" 
+                                    Color="Color.Surface"
+                                    Mask="@(new DateMask("dd/MM/yyyy"))" 
+                                    DateFormat="dd/MM/yyyy" 
+                                    Placeholder="dd/MM/yyyy" 
+                                    Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveResumeDate = DateTime.Today))">Today</MudButton>
                                     <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveResumeDate = null))">Clear</MudButton>
@@ -402,12 +401,12 @@
                 <MudGrid Spacing="5">
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudTextField @bind-Value="_leaveRequest.LeaveRemarks" Label="Leave Reason"
-                                          For="@(() => _leaveRequest.LeaveRemarks)"
-                                          HelperText="Max. text input is 500 chars."
-                                          Variant="Variant.Text" HelperTextOnFocus="true" Counter="500" MaxLength="500" Lines="3"
-                                           Required="true" RequiredError="Leave Reason is required"
-                                          Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                            <MudTextField @bind-Value="_leaveRequest.LeaveRemarks" 
+                                    For="@(() => _leaveRequest.LeaveRemarks)"
+                                    Label="Leave Reason"
+                                    HelperText="Max. text input is 500 chars."
+                                    Variant="Variant.Filled" HelperTextOnFocus="true" Counter="500" MaxLength="500" Lines="3"
+                                    Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                         </MudPaper>
                     </MudItem>
 

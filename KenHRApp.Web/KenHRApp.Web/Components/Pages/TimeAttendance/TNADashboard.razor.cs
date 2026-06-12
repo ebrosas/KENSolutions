@@ -438,9 +438,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }, date);
         }
 
-        public void GoToLeaveRequest()
+        public void ApplyLeaveRequest(string leaveType = "")
         {
-            Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=Add");
+            if (!string.IsNullOrWhiteSpace(leaveType))
+                Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=Add&CallerForm=TNADashboard&LeaveType={leaveType}");
+            else
+                Navigation.NavigateTo("/TimeAttendance/leaverequest?ActionType=Add&CallerForm=TNADashboard");
         }
 
         public void OpenLeaveRequest()

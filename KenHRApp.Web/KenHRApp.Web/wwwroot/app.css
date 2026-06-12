@@ -2907,6 +2907,7 @@ h1:focus {
     line-height: 1; /* keep it vertically centered */
     width: 10px; /* button container size */
     padding: 0px;
+    display: block; /* eliminates the baseline spacing. */
 }
 
 /* #endregion*/

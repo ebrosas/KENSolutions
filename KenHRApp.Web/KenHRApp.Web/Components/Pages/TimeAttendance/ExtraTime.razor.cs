@@ -517,8 +517,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private void HandleBackButton()
         {
-            if (string.IsNullOrEmpty(CallerForm))
-                return;
+            //if (string.IsNullOrEmpty(CallerForm))
+            //    return;
 
             switch (CallerForm)
             {

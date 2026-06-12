@@ -224,9 +224,9 @@
                                                               Clearable="true" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                             </EditTemplate>
                                         </PropertyColumn>                                        
-                                        <TemplateColumn CellClass="d-flex align-center justify-end action-cell" Title="Actions">
+                                        <TemplateColumn CellClass="text-center align-middle" Title="Actions">
                                             <EditTemplate Context="row">
-                                                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Spacing="0" Class="pt-3">
+                                                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Spacing="2" Class="pt-3">
                                                     @if (_isPendingClicked)
                                                     {
                                                         <MudIconButton Color="Color.Success" title="Approve request" Size="Size.Small"

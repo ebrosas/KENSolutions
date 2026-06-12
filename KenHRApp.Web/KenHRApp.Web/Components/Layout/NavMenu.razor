@@ -255,20 +255,20 @@
     private void OpenRegularization()
     {        
         // NavigationManager.NavigateTo("/TimeAttendance/regularinquiry");
-        NavigationManager.NavigateTo("/TimeAttendance/regularization?ActionType=Add");
+        NavigationManager.NavigateTo("/TimeAttendance/regularization?ActionType=Add&CallerForm=TNADashboard");
         Actions.InvokeShowHideDrawer();
     }
 
     private void OpenTimeCard()
     {
-        NavigationManager.NavigateTo("/TimeAttendance/TimeCard");
+        NavigationManager.NavigateTo("/TimeAttendance/TimeCard?CallerForm=TNADashboard");
         Actions.InvokeShowHideDrawer();
     }
 
     private void OpenExtraTime()
     {
         // NavigationManager.NavigateTo("/TimeAttendance/ExtraTimeInq");
-        NavigationManager.NavigateTo("/TimeAttendance/ExtraTime?ActionType=Add");
+        NavigationManager.NavigateTo("/TimeAttendance/ExtraTime?ActionType=Add&CallerForm=TNADashboard");
         Actions.InvokeShowHideDrawer();
     }
 
