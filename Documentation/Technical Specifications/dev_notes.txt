@@ -74,6 +74,8 @@ To-do Task:
 Extra Time Request page:
 1. When opening the request from the inquiry screen, the attendance date is not binding to the calendar control and the date text in the Apply Regularization page.  -Done
 
+Approval Dashboard:
+1. When opening the assigned request, the Cancel Request button should be disabled since only the creator can cancel request.
 
 
 

@@ -337,6 +337,9 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	SELECT * FROM [kenuser].[UserDefinedCodeGroup]
 	ORDER BY UDCGDesc1
 
+	SELECT * FROM [kenuser].[UserDefinedCodeGroup] a
+	ORDER BY a.UDCGroupID
+
 	BEGIN TRAN T1
 
 	DELETE FROM [kenuser].[UserDefinedCodeGroup]

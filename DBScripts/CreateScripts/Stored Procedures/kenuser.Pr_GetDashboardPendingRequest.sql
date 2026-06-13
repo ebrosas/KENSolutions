@@ -8,7 +8,9 @@
 *	25/04/2026		Ervin		1.0			Created
 *	01/05/2026		Ervin		1.1			Added "StepInstanceId" field in the returned dataset
 *	02/05/2026		Ervin		1.2			Added "CreatedByEmpNo" field in the returned dataset
-*	30/05/2026		Ervin		1.3			Populated dataset for Regularization Request
+*	28/05/2026		Ervin		1.3			Populated dataset for Regularization Request
+*	13/06/2026		Ervin		1.4			Populated dataset for Extra Time Request
+*
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetDashboardPendingRequest
@@ -23,7 +25,8 @@ BEGIN
 	SET NOCOUNT ON 
 
 	DECLARE @CONST_LEAVE_REQUEST VARCHAR(20) = 'RTYPELEAVE',
-			@CONST_REGULARIZATION_REQUEST VARCHAR(20) = 'RTYPEREGULAR'
+			@CONST_REGULARIZATION_REQUEST VARCHAR(20) = 'RTYPEREGULAR',
+			@CONST_EXTRATIME VARCHAR(20) = 'RTYPEOT'
 
 	--Validate parameters
 	IF ISNULL(@empNo, 0) = 0
@@ -97,7 +100,7 @@ BEGIN
 				) d
 			WHERE RTRIM(d.ActivityStatus) = 'Pending'
 				AND (d.ApproverNo = @empNo OR @empNo IS NULL)
-				AND RTRIM(b.EntityName) = @requestType
+				AND RTRIM(b.EntityName) = 'RTYPELEAVE'
 			ORDER BY c.EntityId
 		END 
 
@@ -164,7 +167,75 @@ BEGIN
 				) d
 			WHERE RTRIM(d.ActivityStatus) = 'Pending'
 				AND (d.ApproverNo = @empNo OR @empNo IS NULL)
-				AND RTRIM(b.EntityName) = @requestType
+				AND RTRIM(b.EntityName) = 'RTYPEREGULAR'
+			ORDER BY c.EntityId
+		END 
+
+		ELSE IF @requestType = @CONST_EXTRATIME	--Rev. #1.4
+		BEGIN
+
+			SELECT	DISTINCT			
+					c.EntityId AS RequestNo,
+					RTRIM(b.EntityName) AS RequestTypeCode,
+					udc.RequestTypeDesc,
+					lv.AppliedDate,
+					lv.RequestedByNo,
+					lv.RequestedByName,
+					lv.RegularizationDetail AS Detail,
+					a.ApprovalStageDesc as ApprovalRole,			
+					d.ActivityStatus AS CurrentStatus,
+					d.ApproverNo,
+					d.ApproverName,
+					d.PendingDays,
+					d.StepInstanceId,	--Rev. #1.1
+					lv.CreatedByEmpNo	--Rev. #1.2
+			FROM kenuser.WorkflowStepDefinitions a WITH (NOLOCK)
+				INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
+				INNER JOIN kenuser.WorkflowInstances c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
+				CROSS APPLY
+				(
+					SELECT RTRIM(x.UDCDesc1) AS RequestTypeDesc  
+					FROM kenuser.UserDefinedCode x WITH (NOLOCK)
+					WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'REQTYPE')
+						AND RTRIM(x.UDCCode) = RTRIM(b.EntityName)
+				) udc 
+				CROSS APPLY
+				(
+					SELECT	x.CreatedDate AS AppliedDate,
+							x.CreatedBy AS RequestedByNo,	
+							RTRIM(ISNULL(y.FirstName, '')) + ' ' + RTRIM(ISNULL(y.MiddleName, '')) + ' ' + RTRIM(ISNULL(y.LastName, '')) AS RequestedByName,
+							'Overtine Reason: ' + RTRIM(udc.UDCDesc1) + CHAR(13) + CHAR(10) + 
+								'Employee: ' + x.EmployeeName + CHAR(13) + CHAR(10) + 
+								'Attendance Date: ' + FORMAT(x.AttendanceDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) +
+								'OT Start Time: ' + FORMAT(CAST(x.OTStartTime AS DATETIME), 'hh:mm tt') + CHAR(13) + CHAR(10) +
+								'OT End Time: ' + FORMAT(CAST(x.OTEndTime AS DATETIME), 'hh:mm tt')  + CHAR(13) + CHAR(10) AS RegularizationDetail,
+							x.CreatedBy AS CreatedByEmpNo		--Rev. #1.2
+					FROM kenuser.OTRequestWF x WITH (NOLOCK) 
+						INNER JOIN kenuser.Employee y WITh (NOLOCK) ON x.CreatedBy = y.EmployeeNo
+						CROSS APPLY
+						(
+							SELECT * FROM kenuser.UserDefinedCode WITH (NOLOCK)
+							WHERE GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'OTREASON')
+								AND RTRIM(UDCCode) = RTRIM(x.OTReasonCode)
+						) udc 
+					WHERE x.ExtratimeId = c.EntityId
+				) lv
+				OUTER APPLY
+				(
+					SELECT	x.[Status] as ActivityStatus,
+							x.ApproverEmpNo AS ApproverNo,
+							RTRIM(ISNULL(y.FirstName, '')) + ' ' + RTRIM(ISNULL(y.MiddleName, '')) + ' ' + RTRIM(ISNULL(y.LastName, '')) AS ApproverName,
+							DATEDIFF(DAY, x.ActionDate, GETDATE()) AS PendingDays,
+							x.StepInstanceId		--Rev. #1.1
+					FROM kenuser.WorkflowStepInstances x WITH (NOLOCK)
+						LEFT JOIN kenuser.Employee y WITH (NOLOCK) ON x.ApproverEmpNo = y.EmployeeNo
+					WHERE x.WorkflowInstanceId = c.WorkflowInstanceId
+						and x.StepDefinitionId = a.StepDefinitionId
+				) d
+			WHERE RTRIM(d.ActivityStatus) = 'Pending'
+				AND (d.ApproverNo = @empNo OR @empNo IS NULL)
+				AND RTRIM(b.EntityName) = 'RTYPEOT'
+				--AND RTRIM(b.EntityName) = @requestType
 			ORDER BY c.EntityId
 		END 
 	END
@@ -231,6 +302,7 @@ BEGIN
 					and x.StepDefinitionId = a.StepDefinitionId
 			) d
 		WHERE RTRIM(d.ActivityStatus) = 'Pending'
+			AND RTRIM(b.EntityName) = 'RTYPELEAVE'
 			AND (d.ApproverNo = @empNo OR @empNo IS NULL)
 
 		UNION
@@ -295,6 +367,72 @@ BEGIN
 					and x.StepDefinitionId = a.StepDefinitionId
 			) d
 		WHERE RTRIM(d.ActivityStatus) = 'Pending'
+			AND RTRIM(b.EntityName) = 'RTYPEREGULAR'	
+			AND (d.ApproverNo = @empNo OR @empNo IS NULL)
+
+		UNION
+
+		--Extra Time Requests (Rev. #1.4)
+		SELECT	DISTINCT			
+				c.EntityId AS RequestNo,
+				RTRIM(b.EntityName) AS RequestTypeCode,
+				udc.RequestTypeDesc,
+				lv.AppliedDate,
+				lv.RequestedByNo,
+				lv.RequestedByName,
+				lv.RegularizationDetail AS Detail,
+				a.ApprovalStageDesc as ApprovalRole,			
+				d.ActivityStatus AS CurrentStatus,
+				d.ApproverNo,
+				d.ApproverName,
+				d.PendingDays,
+				d.StepInstanceId,	
+				lv.CreatedByEmpNo	
+		FROM kenuser.WorkflowStepDefinitions a WITH (NOLOCK)
+			INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
+			INNER JOIN kenuser.WorkflowInstances c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
+			CROSS APPLY
+			(
+				SELECT RTRIM(x.UDCDesc1) AS RequestTypeDesc  
+				FROM kenuser.UserDefinedCode x WITH (NOLOCK)
+				WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'REQTYPE')
+					AND RTRIM(x.UDCCode) = RTRIM(b.EntityName)
+			) udc 
+			CROSS APPLY
+			(
+				SELECT	x.CreatedDate AS AppliedDate,
+						x.CreatedBy AS RequestedByNo,	
+						RTRIM(ISNULL(y.FirstName, '')) + ' ' + RTRIM(ISNULL(y.MiddleName, '')) + ' ' + RTRIM(ISNULL(y.LastName, '')) AS RequestedByName,
+						'Overtine Reason: ' + RTRIM(udc.UDCDesc1) + CHAR(13) + CHAR(10) + 
+							'Employee: ' + x.EmployeeName + CHAR(13) + CHAR(10) + 
+							'Attendance Date: ' + FORMAT(x.AttendanceDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) +
+							'OT Start Time: ' + FORMAT(CAST(x.OTStartTime AS DATETIME), 'hh:mm tt') + CHAR(13) + CHAR(10) +
+							'OT End Time: ' + FORMAT(CAST(x.OTEndTime AS DATETIME), 'hh:mm tt')  + CHAR(13) + CHAR(10) AS RegularizationDetail,
+						x.CreatedBy AS CreatedByEmpNo		--Rev. #1.2
+				FROM kenuser.OTRequestWF x WITH (NOLOCK) 
+					INNER JOIN kenuser.Employee y WITh (NOLOCK) ON x.CreatedBy = y.EmployeeNo
+					CROSS APPLY
+					(
+						SELECT * FROM kenuser.UserDefinedCode WITH (NOLOCK)
+						WHERE GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'OTREASON')
+							AND RTRIM(UDCCode) = RTRIM(x.OTReasonCode)
+					) udc 
+				WHERE x.ExtratimeId = c.EntityId
+			) lv
+			OUTER APPLY
+			(
+				SELECT	x.[Status] as ActivityStatus,
+						x.ApproverEmpNo AS ApproverNo,
+						RTRIM(ISNULL(y.FirstName, '')) + ' ' + RTRIM(ISNULL(y.MiddleName, '')) + ' ' + RTRIM(ISNULL(y.LastName, '')) AS ApproverName,
+						DATEDIFF(DAY, x.ActionDate, GETDATE()) AS PendingDays,
+						x.StepInstanceId		--Rev. #1.1
+				FROM kenuser.WorkflowStepInstances x WITH (NOLOCK)
+					LEFT JOIN kenuser.Employee y WITH (NOLOCK) ON x.ApproverEmpNo = y.EmployeeNo
+				WHERE x.WorkflowInstanceId = c.WorkflowInstanceId
+					and x.StepDefinitionId = a.StepDefinitionId
+			) d
+		WHERE RTRIM(d.ActivityStatus) = 'Pending'
+			AND RTRIM(b.EntityName) = 'RTYPEOT'
 			AND (d.ApproverNo = @empNo OR @empNo IS NULL)
 		ORDER BY c.EntityId
 	END 

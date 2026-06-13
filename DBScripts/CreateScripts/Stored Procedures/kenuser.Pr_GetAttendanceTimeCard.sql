@@ -6,6 +6,7 @@
 *
 *	Date			Author		Rev. #		Comments:
 *	30/05/2026		Ervin		1.0			Created
+*	13/06/2026		Ervin		1.1			Fixed bug the causes duplicate records
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetAttendanceTimeCard
@@ -74,6 +75,7 @@ BEGIN
 			FROM kenuser.MasterShiftPattern x WITH (NOLOCK) 
 				INNER JOIN kenuser.MasterShiftTime y WITH (NOLOCK) ON RTRIM(x.ShiftPatternCode) = RTRIM(y.ShiftPatternCode) AND RTRIM(x.ShiftCode) = RTRIM(y.ShiftCode)
 			WHERE RTRIM(x.ShiftPatternCode) = RTRIM(a.ShiftPatCode)
+				AND RTRIM(y.ShiftCode) = RTRIM(a.SchedShiftCode)		--Rev. #1.1
 		) sp
 		OUTER APPLY
 		(
@@ -119,7 +121,7 @@ END
 
 /*	Debug:
 
-	EXEC kenuser.Pr_GetAttendanceTimeCard
+	EXEC kenuser.Pr_GetAttendanceTimeCard null, null, '', 10003633
 	EXEC kenuser.Pr_GetAttendanceTimeCard '05/01/2026', '05/31/2026'
 	EXEC kenuser.Pr_GetAttendanceTimeCard '05/01/2026', '05/31/2026', '7600'
 	EXEC kenuser.Pr_GetAttendanceTimeCard '05/01/2026', '05/31/2026', '', 10003632

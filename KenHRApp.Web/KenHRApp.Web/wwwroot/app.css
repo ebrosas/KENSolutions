@@ -2836,12 +2836,12 @@ h1:focus {
 }
 
 .attcorrect-grid .col-RequesterName {
-    width: 150px !important;
+    width: 250px !important;
     text-align: left;
 }
 
 .attcorrect-grid .col-RequestDetail {
-    width: 300px !important;
+    width: 350px !important;
     text-align: left;
 }
 

@@ -37,8 +37,10 @@ BEGIN
 
 		SELECT	DISTINCT			
 				c.EntityId AS RequestNo,
-				RTRIM(b.EntityName) AS RequestTypeCode,
-				udc.RequestTypeDesc,
+				req.RequestTypeCode,
+				req.RequestTypeDesc,
+				--RTRIM(b.EntityName) AS RequestTypeCode,
+				--udc.RequestTypeDesc,
 				req.AppliedDate,
 				req.RequestedByNo,
 				req.RequestedByName,
@@ -54,13 +56,13 @@ BEGIN
 		FROM kenuser.WorkflowStepDefinitions a WITH (NOLOCK)
 			INNER JOIN kenuser.WorkflowDefinitions b WITH (NOLOCK) ON a.WorkflowDefinitionId = b.WorkflowDefinitionId
 			INNER JOIN kenuser.WorkflowInstances c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
-			CROSS APPLY
-			(
-				SELECT RTRIM(x.UDCDesc1) AS RequestTypeDesc  
-				FROM kenuser.UserDefinedCode x WITH (NOLOCK)
-				WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'REQTYPE')
-					AND RTRIM(x.UDCCode) = RTRIM(b.EntityName)
-			) udc 
+			--CROSS APPLY
+			--(
+			--	SELECT RTRIM(x.UDCDesc1) AS RequestTypeDesc  
+			--	FROM kenuser.UserDefinedCode x WITH (NOLOCK)
+			--	WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'REQTYPE')
+			--		AND RTRIM(x.UDCCode) = RTRIM(b.EntityName)
+			--) udc 
 			INNER JOIN kenuser.Vw_RequestDetail req WITH (NOLOCK) ON req.RequestNo = c.EntityId
 			OUTER APPLY
 			(
@@ -231,7 +233,7 @@ END
 
 	--Staging database
 	EXEC kenuser.Pr_GetDashboardStatistics 1
-	EXEC kenuser.Pr_GetDashboardStatistics 1, 10003666		
+	EXEC kenuser.Pr_GetDashboardStatistics 1, 10003637
 	EXEC kenuser.Pr_GetDashboardStatistics 10003635, 'RTYPELEAVE'
 
 	EXEC kenuser.Pr_GetDashboardStatistics 2, 10003632

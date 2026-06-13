@@ -13,6 +13,7 @@ using MudBlazor;
 using MudBlazor.Utilities;
 using System.Globalization;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
@@ -453,12 +454,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         public void ApplyRegularization()
         {
-            Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=Add&AttendanceDate={_selectedDate!.Value.ToString()}&CallerForm=TNADashboard");
+            string formattedDate = _selectedDate?.ToString("yyyy-MM-dd") ?? string.Empty;
+            Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=Add&AttendanceDate={formattedDate}&CallerForm=TNADashboard");
         }
 
         public void ApplyExtraTime()
         {
-            Navigation.NavigateTo($"/TimeAttendance/ExtraTime?ActionType=Add&AttendanceDate={_selectedDate!.Value.ToString()}&CallerForm=TNADashboard");
+            string formattedDate = _selectedDate?.ToString("yyyy-MM-dd") ?? string.Empty;
+            Navigation.NavigateTo($"/TimeAttendance/ExtraTime?ActionType=Add&AttendanceDate={formattedDate}&CallerForm=TNADashboard");
         }
 
         public void OpenLeaveInquiry()

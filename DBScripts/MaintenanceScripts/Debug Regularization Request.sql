@@ -14,7 +14,7 @@
 		a.* 
 	FROM kenuser.AttendanceTimesheet a WITH (NOLOCK) 
 	WHERE a.EmpNo = 10003632
-		AND a.AttendanceDate = '05/22/2026'
+		--AND a.AttendanceDate = '05/22/2026'
 	ORDER By a.AttendanceDate Desc
 
 	SELECT * FROM kenuser.RegularRequestWFs a

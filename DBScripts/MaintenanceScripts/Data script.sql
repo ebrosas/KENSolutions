@@ -184,19 +184,21 @@
 		AND ISNULL(a.HalfDayLeaveFlag, 0) > 0
 
 	SELECT * FROM kenuser.PayrollPeriod a
+	WHERE a.FiscalYear = 2026
+	ORDER BY a.FiscalMonth
 
 /*	Manage Payroll Period:
+	
 	BEGIN TRAN T1
 	
 	UPDATE kenuser.PayrollPeriod
 	SET IsActive = 0
 	WHERE FiscalYear = 2026
-		AND FiscalMonth = 2
 
 	UPDATE kenuser.PayrollPeriod
 	SET IsActive = 1
 	WHERE FiscalYear = 2026
-		AND FiscalMonth = 4
+		AND FiscalMonth = 6
 
 	COMMIT TRAN T1
 

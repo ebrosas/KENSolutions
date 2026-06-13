@@ -57,7 +57,7 @@ AS
 			a.CreatedDate AS AppliedDate,
 			a.CreatedBy AS RequestedByNo,	
 			RTRIM(ISNULL(b.FirstName, '')) + ' ' + RTRIM(ISNULL(b.MiddleName, '')) + ' ' + RTRIM(ISNULL(b.LastName, '')) AS RequestedByName,			
-			'Reason: ' + RTRIM(udc.UDCDesc1) + CHAR(13) + CHAR(10) + 
+			'Regularization Reason: ' + RTRIM(udc.UDCDesc1) + CHAR(13) + CHAR(10) + 
 				'Employee: ' + a.EmployeeName + CHAR(13) + CHAR(10) + 
 				'Attendance Date: ' + FORMAT(a.AttendanceDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) +
 				'Total Hours: ' + ISNULL(dur.WorkDurationText, '') + CHAR(13) + CHAR(10) +
@@ -101,7 +101,7 @@ AS
 			a.CreatedDate AS AppliedDate,
 			a.CreatedBy AS RequestedByNo,	
 			RTRIM(ISNULL(b.FirstName, '')) + ' ' + RTRIM(ISNULL(b.MiddleName, '')) + ' ' + RTRIM(ISNULL(b.LastName, '')) AS RequestedByName,			
-			'Reason: ' + RTRIM(udc.UDCDesc1) + CHAR(13) + CHAR(10) + 
+			'Overtime Reason: ' + RTRIM(udc.UDCDesc1) + CHAR(13) + CHAR(10) + 
 				'Employee: ' + a.EmployeeName + CHAR(13) + CHAR(10) + 
 				'Attendance Date: ' + FORMAT(a.AttendanceDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) +
 				'Total Hours: ' + ISNULL(dur.WorkDurationText, '') + CHAR(13) + CHAR(10) +
