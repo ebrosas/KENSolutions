@@ -13,5 +13,6 @@ namespace KenHRApp.Application.Interfaces
         bool IsAuthenticated { get; set; }
         RecruitmentRequestDTO? RecruitmentRequest { get; set; }
         EmployeeDTO? AuthenticatedUser { get; set; }
+        ApprovalRequestResultDTO? RequestItem { get; set; }
     }
 }

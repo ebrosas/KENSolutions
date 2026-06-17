@@ -193,7 +193,7 @@ namespace KenHRApp.Web.Components.Pages
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Employee Master", href: "/CoreHR/employeesearch", icon: @Icons.Material.Filled.PeopleAlt),
+            new("Employee Master", href: "/CoreHR/employeesearch?ForceLoad=true", icon: @Icons.Material.Filled.PeopleAlt),
             new("Employee Detail", href: null, disabled: true, @Icons.Material.Filled.EditNote)
         ];
         #endregion
@@ -258,7 +258,7 @@ namespace KenHRApp.Web.Components.Pages
                 }
                 #endregion
 
-                await PopulateDropDownBoxes();
+                await LoadComboboxAsync();
 
                 if (_errorMessage.Length > 0)
                     ShowHideError(true);
@@ -1670,7 +1670,7 @@ namespace KenHRApp.Web.Components.Pages
             }
         }
 
-        private async Task PopulateDropDownBoxes()
+        private async Task LoadComboboxAsync()
         {
             #region Get all UDC group codes
             List<UserDefinedCodeGroupDTO>? udcGroupList = new();
@@ -1975,18 +1975,18 @@ namespace KenHRApp.Web.Components.Pages
                     #endregion
 
                     #region Populate Reporting Manager dropdown
-                    bool isEmployeeExist = false;
-                    if (!string.IsNullOrEmpty(EmployeeCacheKey))
-                    {
-                        isEmployeeExist = await AppCacheService.CheckIfKeyExistAsync(EmployeeCacheKey);
+                    //bool isEmployeeExist = false;
+                    //if (!string.IsNullOrEmpty(EmployeeCacheKey))
+                    //{
+                    //    isEmployeeExist = await AppCacheService.CheckIfKeyExistAsync(EmployeeCacheKey);
 
-                    }
-                    if (isEmployeeExist)
-                    {
-                        _managerList = await AppCacheService.GetEmployeesAsync(EmployeeCacheKey);
-                    }
-                    else
-                    {
+                    //}
+                    //if (isEmployeeExist)
+                    //{
+                    //    _managerList = await AppCacheService.GetEmployeesAsync(EmployeeCacheKey);
+                    //}
+                    //else
+                    //{
                         // Get reporting managers from DB
                         var managerResult = await LookupCache.GetReportingManagerAsync();
                         if (managerResult.Success)
@@ -1998,7 +1998,7 @@ namespace KenHRApp.Web.Components.Pages
                             // Set the error message
                             _errorMessage.AppendLine(managerResult.Error);
                         }
-                    }
+                    //}
 
                     if (_managerList != null && _managerList.Count > 0)
                         _managerArray = _managerList.Select(d => d.EmployeeFullName).OrderBy(d => d).ToArray();

@@ -79,7 +79,31 @@
                         </MudButton>
                     }
 
-                    @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
+                    @if (ActionType == ActionTypes.Approval.ToString())
+                    {
+                        @if (_overtimeRequest.StatusHandlingCode == "Open")
+                        {
+                            <MudButton Variant="Variant.Filled"
+                                       StartIcon="fas fa-thumbs-up"
+                                       Size="Size.Small"
+                                       Color="Color.Success"
+                                       Disabled="@(_isEditMode)"
+                                       OnClick="BeginApproveRequest">
+                                Approve
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled"
+                                       StartIcon="fas fa-thumbs-down"
+                                       Size="Size.Small"
+                                       Color="Color.Error"
+                                       Disabled="@(_isEditMode)"
+                                       OnClick="ConfirmReject">
+                                Reject
+                            </MudButton>
+                        }
+                    }
+
+                    @if (ActionType == ActionTypes.Edit.ToString() || 
+                        ActionType == ActionTypes.View.ToString())
                     {
                         @if (_overtimeRequest.StatusHandlingCode == "Open")
                         {
@@ -92,15 +116,6 @@
                                 Cancel Request
                             </MudButton>
                         }
-
-                        <MudButton Variant="Variant.Text"
-                                   StartIcon="@Icons.Material.Filled.ArrowBackIos"
-                                   Size="Size.Small"
-                                   Color="Color.Surface"
-                                   Disabled="@(_isEditMode)"
-                                   OnClick="HandleBackButton">
-                            Go back
-                        </MudButton>
 
                         <MudButton Variant="Variant.Filled" hidden
                                    StartIcon="@Icons.Material.Filled.Edit"
@@ -126,6 +141,20 @@
                                    Disabled="@_isEditMode"
                                    OnClick="ShowDeleteDialog">
                             Delete
+                        </MudButton>
+                    }       
+                    
+                    @if (ActionType == ActionTypes.Edit.ToString() || 
+                        ActionType == ActionTypes.View.ToString() ||
+                        ActionType == ActionTypes.Approval.ToString())
+                    {
+                        <MudButton Variant="Variant.Text"
+                                   StartIcon="@Icons.Material.Filled.ArrowBackIos"
+                                   Size="Size.Small"
+                                   Color="Color.Surface"
+                                   Disabled="@(_isEditMode)"
+                                   OnClick="HandleBackButton">
+                            Go back
                         </MudButton>
                     }
                 </MudStack>

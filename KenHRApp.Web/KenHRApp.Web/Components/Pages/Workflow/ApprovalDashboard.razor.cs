@@ -333,6 +333,16 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
             else if (item.RequestTypeCode == WorkflowHelper.CONST_REGULARIZATION)
                 Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=View&RequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+
+            else if (item.RequestTypeCode == WorkflowHelper.CONST_EXTRA_TIME)
+            {
+                #region Initialize DTO object to be passed to  the Extra Time page
+                // Pass via NavigationManager and a shared state service 
+                State.RequestItem = item;
+                #endregion
+
+                Navigation.NavigateTo($"/TimeAttendance/ExtraTime?ActionType=Approval&RequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+            }
         }
 
         private void OnSelectedValueChanged(RequestTypeDTO value)

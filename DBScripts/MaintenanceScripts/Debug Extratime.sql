@@ -12,7 +12,7 @@
 		a.TimeIn, a.TimeOut,
 		a.* 
 	FROM kenuser.AttendanceTimesheet a WITH (NOLOCK) 
-	WHERE a.EmpNo = 10003632
+	WHERE a.EmpNo = 10003633
 		AND (a.TimeIn is not null and a.[TimeOut] IS NOT NULL)
 		--AND a.AttendanceDate = '05/22/2026'
 	ORDER By a.AttendanceDate Desc

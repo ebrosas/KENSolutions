@@ -238,8 +238,11 @@
                                                             OnClick="() => ConfirmReject(row.Item)">
                                                         </MudIconButton>
                                                     }
-                                                    <MudIconButton Color="Color.Info" title="View request details" Size="Size.Small"
-                                                        Icon="far fa-eye"
+                                                    <MudIconButton Color="Color.Surface" 
+                                                        title="View request details"
+                                                        Class="show-btn fa-icon-btn"
+                                                        Size="Size.Small"
+                                                        Icon="fas fa-eye-slash"
                                                         OnClick="@(() => OpenRequestDetail(row.Item))">
                                                      </MudIconButton>
                                                 </MudStack>                                                                                          

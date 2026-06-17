@@ -6,7 +6,7 @@
 *
 *	Date			Author		Rev. #		Comments:
 *	25/08/2025		Ervin		1.0			Created
-*	
+*	17/06/2026		Ervin		1.1			Format null into empty when fetching the Reporting Manager
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_SearchEmployee
@@ -60,7 +60,7 @@ BEGIN
 			a.EmploymentTypeCode,
 			empType.UDCDesc1 AS EmploymentType,
 			a.ReportingManagerCode,
-			RTRIM(c.FirstName) + ' ' + RTRIM(c.MiddleName) + ' ' + RTRIM(c.LastName) AS ReportingManager, 
+			RTRIM(ISNULL(c.FirstName, '')) + ' ' + RTRIM(ISNULL(c.MiddleName, '')) + ' ' + RTRIM(ISNULL(c.LastName, '')) AS ReportingManager,	--Rev. #1.1
 			a.DepartmentCode,
 			dep.DepartmentName,
 			a.EmployeeStatusCode,
