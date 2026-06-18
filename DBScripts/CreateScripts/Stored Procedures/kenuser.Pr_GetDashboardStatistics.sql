@@ -7,7 +7,7 @@
 *	Date			Author		Rev. #		Comments:
 *	25/04/2026		Ervin		1.0			Created
 *	06/05/2026		Ervin		1.1			Added "Remarks" field in the returned dataset
-*
+*	18/06/2026		Ervin		1.2			Fixed bud that cause duplicate records based on request type code
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetDashboardStatistics
@@ -79,7 +79,7 @@ BEGIN
 		WHERE RTRIM(d.ActivityStatus) = 'Pending'
 			AND RTRIM(req.StatusHandlingCode) = 'Open'
 			AND (d.ApproverNo = @empNo OR @empNo IS NULL)
-			AND (RTRIM(b.EntityName) = @requestType OR @requestType IS NULL)
+			AND (RTRIM(req.RequestTypeCode) = @requestType OR @requestType IS NULL)		--Rev. #1.2
 		ORDER BY c.EntityId DESC
 	END 
 
@@ -110,7 +110,7 @@ BEGIN
 				WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'REQTYPE')
 					AND RTRIM(x.UDCCode) = RTRIM(app.RequestTypeCode)
 			) udc 
-			INNER JOIN kenuser.Vw_RequestDetail req WITH (NOLOCK) ON app.RequisitionNo = req.RequestNo
+			INNER JOIN kenuser.Vw_RequestDetail req WITH (NOLOCK) ON app.RequisitionNo = req.RequestNo AND RTRIM(app.RequestTypeCode) = RTRIM(req.RequestTypeCode)
 			CROSS APPLY 
 			(
 				SELECT	c.ApprovalRole,
@@ -158,7 +158,7 @@ BEGIN
 				WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'REQTYPE')
 					AND RTRIM(x.UDCCode) = RTRIM(app.RequestTypeCode)
 			) udc 
-			INNER JOIN kenuser.Vw_RequestDetail req WITH (NOLOCK) ON app.RequisitionNo = req.RequestNo
+			INNER JOIN kenuser.Vw_RequestDetail req WITH (NOLOCK) ON app.RequisitionNo = req.RequestNo AND RTRIM(app.RequestTypeCode) = RTRIM(req.RequestTypeCode)
 			CROSS APPLY 
 			(
 				SELECT	c.ApprovalRole,
@@ -206,7 +206,7 @@ BEGIN
 				WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'REQTYPE')
 					AND RTRIM(x.UDCCode) = RTRIM(app.RequestTypeCode)
 			) udc 
-			INNER JOIN kenuser.Vw_RequestDetail req WITH (NOLOCK) ON app.RequisitionNo = req.RequestNo
+			INNER JOIN kenuser.Vw_RequestDetail req WITH (NOLOCK) ON app.RequisitionNo = req.RequestNo AND RTRIM(app.RequestTypeCode) = RTRIM(req.RequestTypeCode)
 			CROSS APPLY 
 			(
 				SELECT	c.ApprovalRole,
@@ -241,7 +241,8 @@ END
 	
 	--Development database
 	EXEC kenuser.Pr_GetDashboardStatistics 1
-	EXEC kenuser.Pr_GetDashboardStatistics 1, 10003633
+	EXEC kenuser.Pr_GetDashboardStatistics 1, 10003632
+	EXEC kenuser.Pr_GetDashboardStatistics 1, 10003632, 'RTYPEOT'
 
 	EXEC kenuser.Pr_GetDashboardStatistics 2, 10003632			--Approved
 	EXEC kenuser.Pr_GetDashboardStatistics 3, 10003632			--Rejected

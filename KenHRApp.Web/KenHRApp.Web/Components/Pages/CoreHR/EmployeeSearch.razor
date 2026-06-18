@@ -209,7 +209,7 @@
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.Upload" IconColor="Color.Dark" Label="Upload Employees" hidden />
                  </MudMenu>
             </MudAppBar>
-            <MudPaper Elevation="4" Square="true" Class="w-100">                
+            <MudPaper Elevation="4" Square="true" Class="w-100 pb-4">                
                  <MudDataGrid T="EmployeeMasterDTO" Items="@employeeList" Hover="true" Striped="true" Class="employee-master-grid"
                     Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                     QuickFilter="@_quickFilter" Hideable="true" PageSize="5"

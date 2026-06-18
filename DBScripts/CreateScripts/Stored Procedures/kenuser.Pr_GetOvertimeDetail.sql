@@ -6,7 +6,7 @@
 *
 *	Date			Author		Rev. #		Comments:
 *	22/03/2026		Ervin		1.0			Created
-*	
+*	19/06/2026		Ervin		1.1			Returned the current approver emp. no and name
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetOvertimeDetail
@@ -78,7 +78,9 @@ BEGIN
 			a.LastUpdatedDate,
 			a.LastUpdatedBy,
 			a.LastUpdatedUserID,
-			a.LastUpdatedEmail
+			a.LastUpdatedEmail,
+			wf.ApproverNo,		--Rev. #1.1
+			wf.ApproverName			--Rev. #1.1
 	FROM kenuser.OTRequestWF a WITH (NOLOCK)
 		INNER JOIN kenuser.DepartmentMaster dep WITH (NOLOCK) ON RTRIM(a.CostCenter) = RTRIM(dep.DepartmentCode)
 		OUTER APPLY
@@ -97,6 +99,18 @@ BEGIN
 		) c
 		LEFT JOIN kenuser.Employee d WITH (NOLOCK) ON a.CreatedBy = d.EmployeeNo
 		LEFT JOIN kenuser.UserDefinedCode stat WITH (NOLOCK) ON RTRIM(a.StatusCode) = RTRIM(stat.UDCCOde)
+		OUTER APPLY		--Rev. #1.1
+		(
+			SELECT	x.ApproverEmpNo AS ApproverNo, 
+					RTRIM(ISNULL(d.FirstName, '')) + ' ' + RTRIM(ISNULL(d.MiddleName, '')) + ' ' + RTRIM(ISNULL(d.LastName, '')) AS ApproverName
+			FROM kenuser.WorkflowStepInstances x
+				INNER JOIN kenuser.WorkflowInstances y WITH (NOLOCK) ON x.WorkflowInstanceId = y.WorkflowInstanceId
+				INNER JOIN kenuser.WorkflowDefinitions z WITH (NOLOCK) ON y.WorkflowDefinitionId = z.WorkflowDefinitionId
+				LEFT JOIN kenuser.Employee emp WITH (NOLOCK) ON x.ApproverEmpNo = emp.EmployeeNo
+			WHERE RTRIM(z.EntityName) = 'RTYPEOT'
+				AND RTRIM(x.[Status]) = 'Pending'
+				AND y.EntityId = a.ExtratimeId
+		) wf
 	WHERE 
 		(a.ExtratimeId = @requestNo OR @requestNo IS NULL)
 		AND (a.EmployeeNo = @empNo OR @empNo IS NULL) 
@@ -122,7 +136,7 @@ PARAMETERS:
 	@endDate		DATETIME = NULL
 
 	EXEC kenuser.Pr_GetOvertimeDetail
-	EXEC kenuser.Pr_GetOvertimeDetail 2
+	EXEC kenuser.Pr_GetOvertimeDetail 7
 	EXEC kenuser.Pr_GetOvertimeDetail 0, 10003632 
 	EXEC kenuser.Pr_GetOvertimeDetail 0, 0, '7600'
 	EXEC kenuser.Pr_GetOvertimeDetail 0, 0, '', 'BD'

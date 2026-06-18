@@ -326,7 +326,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             var result = await dialog.Result;
         }
 
-        public void OpenRequestDetail(ApprovalRequestResultDTO item)
+        public void OpenRequestDetail(ApprovalRequestResultDTO item, bool isApproval = false)
         {
             if (item.RequestTypeCode == WorkflowHelper.CONST_LEAVE_REQUEST)
                 Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
@@ -336,12 +336,17 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
             else if (item.RequestTypeCode == WorkflowHelper.CONST_EXTRA_TIME)
             {
-                #region Initialize DTO object to be passed to  the Extra Time page
-                // Pass via NavigationManager and a shared state service 
-                State.RequestItem = item;
-                #endregion
+                if (isApproval)
+                {
+                    #region Initialize DTO object to be passed to  the Extra Time page
+                    // Pass via NavigationManager and a shared state service 
+                    State.RequestItem = item;
+                    #endregion
 
-                Navigation.NavigateTo($"/TimeAttendance/ExtraTime?ActionType=Approval&RequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+                    Navigation.NavigateTo($"/TimeAttendance/ExtraTime?ActionType=Approval&RequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+                }
+                else
+                    Navigation.NavigateTo($"/TimeAttendance/ExtraTime?ActionType=View&RequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
             }
         }
 

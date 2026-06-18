@@ -60,6 +60,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private DateTime? _selectedDate;
         private Orientation _calOrientation = Orientation.Portrait;
         private string _pickerStyle = "width: 420px;";
+        private string _approverRemarks = string.Empty;
+        private bool _isApprover = false;
         #endregion
 
         #region Flags
@@ -743,36 +745,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 BeginRequestCancellation(_overtimeRequest);
             }
-        }
-
-        private async Task ConfirmReject()
-        {
-            var parameters = new DialogParameters
-            {
-                { "DialogTitle", "Confirm Reject"},
-                { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to reject Extra Time Request No. '{_overtimeRequest.ExtratimeId}'?" },
-                { "ConfirmText", "Ok" },
-                { "Color", Color.Error },
-                { "DialogIconColor", Color.Error }
-            };
-
-            var options = new DialogOptions
-            {
-                CloseButton = true,
-                MaxWidth = MaxWidth.Small,
-                Position = DialogPosition.TopCenter,
-                CloseOnEscapeKey = true,   // Prevent ESC from closing
-                BackdropClick = false       // Prevent clicking outside to close
-            };
-
-            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Reject Confirmation", parameters, options);
-            var result = await dialog.Result;
-            if (result != null && !result.Canceled)
-            {
-                //BeginRequestCancellation(_overtimeRequest);
-            }
-        }
+        }                
 
         private void OnBreakpointChanged(Breakpoint breakpoint)
         {
@@ -1263,6 +1236,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set the calendar's selected date
                 _selectedDate = _overtimeRequest.AttendanceDate;
 
+                // Set the approver flag
+                if (_overtimeRequest.ApproverNo == UserEmpNo)
+                    _isApprover = true;
+
                 // Display the requisition number in the page title
                 _pageTitle = $" Extra Time Request #{_overtimeRequest.ExtratimeId} (Created On: {_overtimeRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")} | Status: {_overtimeRequest.StatusSummary})";
 
@@ -1415,7 +1392,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                     StateHasChanged();
 
-                }, stepInstanceId, _requestItem.ApproverNo, UserName!, _requestItem.Remarks, _requestItem.RequestNo);
+                    // Go back to the previous page
+                    HandleBackButton();
+
+                }, stepInstanceId, _requestItem.ApproverNo, UserName!, _approverRemarks, _requestItem.RequestNo);
             }
             catch (Exception ex)
             {
@@ -1440,27 +1420,148 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Initialize the cancellation token
             _cts = new CancellationTokenSource();
 
-            bool isSuccess = false;
+            //bool isSuccess = false;
             string errorMsg = string.Empty;
 
             var repoResult = await WorkflowService.ApproveStepAsync(stepInstanceId, approverNo, userID, comments,
-                WorkflowHelper.CONST_LEAVE_REQUEST, requestNo, Environment.WebRootPath, _cts.Token);
+                WorkflowHelper.CONST_EXTRA_TIME, requestNo, Environment.WebRootPath, _cts.Token);
 
-            isSuccess = repoResult.Success;
-            if (!isSuccess)
-                errorMsg = repoResult.Error!;
+            //isSuccess = repoResult.Success;
+            //if (!isSuccess)
+            //    errorMsg = repoResult.Error!;
 
-            if (isSuccess)
+            if (repoResult.Success)
             {
                 // Show notification
                 ShowNotification("Extra Time request has been approved successfully!", NotificationType.Success);
             }
             else
             {
-                if (!string.IsNullOrEmpty(errorMsg))
+                if (!string.IsNullOrEmpty(repoResult.Error))
                 {
                     // Display error message
-                    _errorMessage.AppendLine(errorMsg);
+                    _errorMessage.AppendLine(repoResult.Error);
+                    ShowHideError(true);
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task ConfirmReject()
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Reject"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to reject Extra Time Request No. '{_overtimeRequest.ExtratimeId}'?" },
+                { "ConfirmText", "Ok" },
+                { "Color", Color.Error },
+                { "DialogIconColor", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Reject Confirmation", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {                
+                BeginRejectRequest(_requestItem);
+            }
+        }
+
+        private void BeginRejectRequest(ApprovalRequestResultDTO? requestItem)
+        {
+            try
+            {
+                if (requestItem == null)
+                {
+                    throw new Exception("The selected request workflow instance is not configured correctly!");
+                }
+                else
+                {
+                    if (requestItem.StepInstanceId == null)
+                        throw new Exception("The current workflow instance is not defined!");
+
+                    if (string.IsNullOrWhiteSpace(_approverRemarks))
+                        throw new Exception("Approval Remarks is required when rejecting the request!");
+                }
+
+                // Get the current WF activity instance id
+                int stepInstanceId = requestItem.StepInstanceId ?? 0;
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Rejecting request, please wait...";
+
+                _ = RejectWorkflowAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    StateHasChanged();
+
+                    // Go back to the previous page
+                    HandleBackButton();
+
+                }, stepInstanceId, requestItem.CreatedByEmpNo, requestItem.ApproverNo, UserName!,
+               _approverRemarks, requestItem.RequestNo);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task RejectWorkflowAsync(
+            Func<Task> callback,
+            int stepInstanceId,
+            int? creatorEmpNo,
+            int approverNo,
+            string? userID,
+            string comments,
+            long requestNo)
+        {
+
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            string errorMsg = string.Empty;
+
+            var repoResult = await WorkflowService.RejectStepAsync(stepInstanceId, creatorEmpNo, approverNo, userID, comments,
+                WorkflowHelper.CONST_EXTRA_TIME, requestNo, Environment.WebRootPath, _cts.Token);
+            if (repoResult.Success)
+            {
+                // Show notification
+                ShowNotification("The selected request has been rejected successfully!", NotificationType.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(repoResult.Error))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(repoResult.Error);
                     ShowHideError(true);
                 }
             }

@@ -43,6 +43,8 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public string? LastUpdatedUserID { get; set; } = null;
         public string? LastUpdatedEmail { get; set; } = null;
         public List<AttendanceSwipeLog>? SwipeLogList { get; set; }
+        public int? ApproverNo { get; set; }
+        public string? ApproverName { get; set; } = null;
         #endregion
     }
 }

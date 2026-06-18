@@ -1,12 +1,12 @@
 DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPEOT',
-		@requestNo			BIGINT = 3
+		@requestNo			BIGINT = 7
 
 	--Get request info
 	SELECT a.* 
-	FROM [kenuser].RegularRequestWFs a
-	WHERE a.RegularizationId = @requestNo
+	FROM [kenuser].OTRequestWF a
+	WHERE a.ExtratimeId = @requestNo
 
-	--Apprval history
+	--Approval history
 	SELECT * FROM [kenuser].[RequestApprovals] a WITH (NOLOCK)
 	WHERE a.RequisitionNo = @requestNo
 
@@ -42,6 +42,9 @@ DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPEOT',
 		INNER JOIN kenuser.WorkflowDefinitions c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
 	WHERE RTRIM(c.EntityName) = @workflowTypeCode
 		AND b.EntityId = @requestNo
+
+	SELECT * FROM kenuser.RequestApprovals a WITH (NOLOCK)
+	WHERE a.RequisitionNo = 7
 
 /*	Clear workflow
 

@@ -1764,6 +1764,8 @@ namespace KenHRApp.Infrastructure.Repositories
                     otRequest.LastUpdatedBy = model[0].LastUpdatedBy;
                     otRequest.LastUpdatedUserID = model[0].LastUpdatedUserID;
                     otRequest.LastUpdatedEmail = model[0].LastUpdatedEmail;
+                    otRequest.ApproverNo = model[0].ApproverNo;
+                    otRequest.ApproverName = model[0].ApproverName;
 
                     #region Get the swipe logs
                     List<AttendanceSwipeLog> swipeLogs = new List<AttendanceSwipeLog>();

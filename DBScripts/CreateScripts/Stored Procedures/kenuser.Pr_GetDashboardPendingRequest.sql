@@ -450,7 +450,7 @@ END
 	--Development database
 	EXEC kenuser.Pr_GetDashboardPendingRequest
 	EXEC kenuser.Pr_GetDashboardPendingRequest 10003632
-	EXEC kenuser.Pr_GetDashboardPendingRequest 10003632, 'RTYPELEAVE'
+	EXEC kenuser.Pr_GetDashboardPendingRequest 10003632, 'RTYPEOT'
 
 
 Parameters:

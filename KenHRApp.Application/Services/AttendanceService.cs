@@ -1462,8 +1462,10 @@ namespace KenHRApp.Application.Services
                         LastUpdatedDate = model.LastUpdatedDate,
                         LastUpdatedBy = model.LastUpdatedBy,
                         LastUpdatedUserID = model.LastUpdatedUserID,
-                        LastUpdatedEmail = model.LastUpdatedEmail,                                                
-                    };
+                        LastUpdatedEmail = model.LastUpdatedEmail,
+                        ApproverNo = model.ApproverNo,
+                        ApproverName = model.ApproverName
+                };
 
                     if (model.SwipeLogList != null && model.SwipeLogList.Any())
                     {
