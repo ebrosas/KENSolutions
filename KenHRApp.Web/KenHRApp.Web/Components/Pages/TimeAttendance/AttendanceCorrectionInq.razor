@@ -285,20 +285,12 @@
                                     @row.Item.CurrentStatus
                                 </MudChip>
                             </CellTemplate>
-                        </PropertyColumn>
-                        @* <TemplateColumn Class="flex-column" Title="Action">
-                            <CellTemplate Context="row">
-                                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Spacing="0">
-                                    <MudIconButton title="View request details"
-                                               Class="show-btn fa-icon-btn"
-                                               Color="Color.Surface"
-                                               Size="Size.Small"
-                                               Icon="fas fa-eye-slash"
-                                               OnClick="@(()=>OpenRequestDetail(row.Item))">
-                                    </MudIconButton>
-                                </MudStack>                                
+                        </PropertyColumn>  
+                        <PropertyColumn Property="x => x.CurrentApprover" Title="Currently Assigned To" Class="col-RequesterName" Editable="false">
+                            <CellTemplate>
+                                @context.Item.CurrentApprover
                             </CellTemplate>
-                        </TemplateColumn> *@
+                        </PropertyColumn>
                         <TemplateColumn CellClass="text-center align-middle" Title="Action">
                              <CellTemplate Context="row">
                                  <MudIconButton title="View details"
@@ -306,7 +298,7 @@
                                                 Color="Color.Surface"
                                                 OnClick="@(()=>OpenRequestDetail(row.Item))">
                                      <ChildContent>
-                                         <i class="fas fa-eye-slash fa-1x"></i>
+                                        <i class="fas fa-eye fa-1x"></i>
                                      </ChildContent>
                                  </MudIconButton>
                              </CellTemplate>

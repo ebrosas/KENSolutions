@@ -7,7 +7,8 @@
 *	Date			Author		Rev. #		Comments:
 *	25/04/2026		Ervin		1.0			Created
 *	06/05/2026		Ervin		1.1			Added "Remarks" field in the returned dataset
-*	18/06/2026		Ervin		1.2			Fixed bud that cause duplicate records based on request type code
+*	18/06/2026		Ervin		1.2			Fixed bug that cause duplicate records based on request type code
+*	20/06/2026		Ervin		1.3			Fixed bug that causes duplicate records in the Approved list
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetDashboardStatistics
@@ -95,13 +96,18 @@ BEGIN
 				req.RequestDetail AS Detail,
 				req.CreatedByEmpNo,
 				wf.ApprovalRole,
-				--wf.CurrentStatus,
-				'Approved' AS CurrentStatus,
-				wf.ApproverNo,
-				wf.ApproverName,
+								
+				--'Approved' AS CurrentStatus,				
+				--wf.ApproverNo,
+				--wf.ApproverName,
+
+				CASE WHEN wf.CurrentStatus = 'Pending' AND RTRIM(req.StatusHandlingCode) <> 'Open' THEN req.StatusHandlingCode ELSE wf.CurrentStatus END AS CurrentStatus,
+				ISNULL(req.CurrentlyAssignedEmpNo, 0) AS ApproverNo,
+				ISNULL(req.CurrentlyAssignedEmpName, '') AS ApproverName,
+
 				wf.PendingDays,
 				wf.StepInstanceId,
-				app.Remarks				--Rev. #1.1
+				ISNULL(app.Remarks, '') AS Remarks				--Rev. #1.1
 		FROM kenuser.RequestApprovals app WITH (NOLOCK)
 			CROSS APPLY
 			(
@@ -120,10 +126,13 @@ BEGIN
 						DATEDIFF(DAY, b.ActionDate, GETDATE()) AS PendingDays,
 						b.StepInstanceId
 				FROM kenuser.WorkflowInstances a WITH (NOLOCK) 
-					INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId AND RTRIM(b.[Status]) = 'Approved'
+					--INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId AND RTRIM(b.[Status]) = 'Approved' 
+					INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId AND RTRIM(b.[Status]) = 'Pending' 
 					INNER JOIN kenuser.WorkflowStepDefinitions c WITH (NOLOCK) ON b.StepDefinitionId = c.StepDefinitionId
+					INNER JOIN kenuser.WorkflowDefinitions d WITH (NOLOCK) ON a.WorkflowDefinitionId = d.WorkflowDefinitionId	--Rev. #1.3
 					LEFT JOIN kenuser.Employee emp WITH (NOLOCK) ON b.ApproverEmpNo = emp.EmployeeNo
 				WHERE a.EntityId = app.RequisitionNo 
+					AND RTRIM(d.EntityName) = RTRIM(app.RequestTypeCode)		--Rev. #1.3
 			) wf
 		WHERE app.IsApproved = 1
 			AND (app.AssignedEmpNo = @empNo OR @empNo IS NULL)
@@ -143,10 +152,15 @@ BEGIN
 				req.RequestDetail AS Detail,
 				req.CreatedByEmpNo,
 				wf.ApprovalRole,
-				--wf.CurrentStatus,
-				'Rejected' AS CurrentStatus,
-				wf.ApproverNo,
-				wf.ApproverName,
+				
+				--'Rejected' AS CurrentStatus,				
+				--wf.ApproverNo,
+				--wf.ApproverName,
+
+				CASE WHEN wf.CurrentStatus = 'Pending' AND RTRIM(req.StatusHandlingCode) <> 'Open' THEN req.StatusHandlingCode ELSE wf.CurrentStatus END AS CurrentStatus,
+				ISNULL(req.CurrentlyAssignedEmpNo, 0) AS ApproverNo,
+				ISNULL(req.CurrentlyAssignedEmpName, '') AS ApproverName,
+
 				wf.PendingDays,
 				wf.StepInstanceId,
 				app.Remarks				--Rev. #1.1
@@ -168,10 +182,13 @@ BEGIN
 						DATEDIFF(DAY, b.ActionDate, GETDATE()) AS PendingDays,
 						b.StepInstanceId
 				FROM kenuser.WorkflowInstances a WITH (NOLOCK) 
-					INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId AND RTRIM(b.[Status]) = 'Rejected'
+					--INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId AND RTRIM(b.[Status]) = 'Rejected'
+					INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId AND RTRIM(b.[Status]) = 'Pending' 
 					INNER JOIN kenuser.WorkflowStepDefinitions c WITH (NOLOCK) ON b.StepDefinitionId = c.StepDefinitionId
+					INNER JOIN kenuser.WorkflowDefinitions d WITH (NOLOCK) ON a.WorkflowDefinitionId = d.WorkflowDefinitionId	--Rev. #1.3
 					LEFT JOIN kenuser.Employee emp WITH (NOLOCK) ON b.ApproverEmpNo = emp.EmployeeNo
 				WHERE a.EntityId = app.RequisitionNo 
+					AND RTRIM(d.EntityName) = RTRIM(app.RequestTypeCode)	--Rev. #1.3
 			) wf
 		WHERE ISNULL(app.IsApproved, 0) = 0
 			AND (app.AssignedEmpNo = @empNo OR @empNo IS NULL)
@@ -191,10 +208,15 @@ BEGIN
 				req.RequestDetail AS Detail,
 				req.CreatedByEmpNo,
 				wf.ApprovalRole,
-				--wf.CurrentStatus,
-				'On-hold' AS CurrentStatus,
-				wf.ApproverNo,
-				wf.ApproverName,
+				
+				--'On-hold' AS CurrentStatus,				
+				--wf.ApproverNo,
+				--wf.ApproverName,
+
+				CASE WHEN wf.CurrentStatus = 'Pending' AND RTRIM(req.StatusHandlingCode) <> 'Open' THEN req.StatusHandlingCode ELSE wf.CurrentStatus END AS CurrentStatus,
+				ISNULL(req.CurrentlyAssignedEmpNo, 0) AS ApproverNo,
+				ISNULL(req.CurrentlyAssignedEmpName, '') AS ApproverName,
+
 				wf.PendingDays,
 				wf.StepInstanceId,
 				app.Remarks					--Rev. #1.1
@@ -216,10 +238,13 @@ BEGIN
 						DATEDIFF(DAY, b.ActionDate, GETDATE()) AS PendingDays,
 						b.StepInstanceId
 				FROM kenuser.WorkflowInstances a WITH (NOLOCK) 
-					INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId AND RTRIM(b.[Status]) = 'OnHold'
+					--INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId AND RTRIM(b.[Status]) = 'OnHold'
+					INNER JOIN kenuser.WorkflowStepInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId AND RTRIM(b.[Status]) = 'Pending' 
 					INNER JOIN kenuser.WorkflowStepDefinitions c WITH (NOLOCK) ON b.StepDefinitionId = c.StepDefinitionId
+					INNER JOIN kenuser.WorkflowDefinitions d WITH (NOLOCK) ON a.WorkflowDefinitionId = d.WorkflowDefinitionId	--Rev. #1.3
 					LEFT JOIN kenuser.Employee emp WITH (NOLOCK) ON b.ApproverEmpNo = emp.EmployeeNo
 				WHERE a.EntityId = app.RequisitionNo 
+					AND RTRIM(d.EntityName) = RTRIM(app.RequestTypeCode)	--Rev. #1.3
 			) wf
 		WHERE app.IsHold = 1
 			AND (app.AssignedEmpNo = @empNo OR @empNo IS NULL)
@@ -245,6 +270,7 @@ END
 	EXEC kenuser.Pr_GetDashboardStatistics 1, 10003632, 'RTYPEOT'
 
 	EXEC kenuser.Pr_GetDashboardStatistics 2, 10003632			--Approved
+	EXEC kenuser.Pr_GetDashboardStatistics 2, 10003632, 'RTYPEREGULAR'			--Approved
 	EXEC kenuser.Pr_GetDashboardStatistics 3, 10003632			--Rejected
 	EXEC kenuser.Pr_GetDashboardStatistics 4, 10003632			--Hold
 

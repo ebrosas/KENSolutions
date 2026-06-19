@@ -18,7 +18,7 @@ namespace KenHRApp.Application.DTOs
         public string? Detail { get; set; } = null;
         public string? ApprovalRole { get; set; } = null;
         public string CurrentStatus { get; set; } = null!;
-        public int ApproverNo { get; set; }
+        public int? ApproverNo { get; set; }
         public string? ApproverName { get; set; } = null;
         public int? PendingDays { get; set; }
         public int? StepInstanceId { get; set; }
@@ -39,7 +39,10 @@ namespace KenHRApp.Application.DTOs
         {
             get
             {
-                return $"{ApproverName} (Emp. #: {ApproverNo})";
+                if (CurrentStatus == "Pending")
+                    return $"{ApproverName} (Emp. #: {ApproverNo})";
+                else
+                    return string.Empty;
             }
         }
 

@@ -8,6 +8,7 @@
 *	04/05/2026		Ervin		1.0			Created
 *	30/05/2026		Ervin		1.1			Populated return dataset for Regularization Request
 *	09/06/2026		Ervin		1.2			Populated return dataset for Extra Time Request
+*	19/06/2026		Ervin		1.3			Added the following fields in the returned dataset: CurrentlyAssignedEmpNo, CurrentlyAssignedEmpName
 ******************************************************************************************************************************************************************************/
 
 ALTER VIEW kenuser.Vw_RequestDetail
@@ -31,7 +32,9 @@ AS
 				'Leave Start Date: ' + FORMAT(a.LeaveStartDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) +
 				'Leave Resume Date: ' + FORMAT(a.LeaveResumeDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) AS RequestDetail,
 			a.LeaveCreatedBy AS CreatedByEmpNo,		--Rev. #1.2
-			a.StatusHandlingCode			
+			a.StatusHandlingCode,
+			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverNo ELSE NULL END AS CurrentlyAssignedEmpNo,			--Rev. #1.3
+			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverName ELSE NULL END AS CurrentlyAssignedEmpName		--Rev. #1.3
 	FROM kenuser.LeaveRequisitionWF a WITH (NOLOCK) 
 		INNER JOIN kenuser.Employee b WITh (NOLOCK) ON a.LeaveCreatedBy = b.EmployeeNo
 		LEFT JOIN kenuser.DepartmentMaster dep WITH (NOLOCK) ON RTRIM(a.LeaveEmpCostCenter) = RTRIM(dep.DepartmentCode)
@@ -41,6 +44,18 @@ AS
 			WHERE GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'LEAVETYPES')
 				AND RTRIM(UDCCode) = RTRIM(a.LeaveType)
 		) udc 
+		OUTER APPLY		--Rev. #1.3
+		(
+			SELECT	x.ApproverEmpNo AS ApproverNo, 
+					RTRIM(ISNULL(emp.FirstName, '')) + ' ' + RTRIM(ISNULL(emp.MiddleName, '')) + ' ' + RTRIM(ISNULL(emp.LastName, '')) AS ApproverName
+			FROM kenuser.WorkflowStepInstances x
+				INNER JOIN kenuser.WorkflowInstances y WITH (NOLOCK) ON x.WorkflowInstanceId = y.WorkflowInstanceId
+				INNER JOIN kenuser.WorkflowDefinitions z WITH (NOLOCK) ON y.WorkflowDefinitionId = z.WorkflowDefinitionId
+				LEFT JOIN kenuser.Employee emp WITH (NOLOCK) ON x.ApproverEmpNo = emp.EmployeeNo
+			WHERE RTRIM(z.EntityName) = 'RTYPELEAVE'
+				AND RTRIM(x.[Status]) = 'Pending'
+				AND y.EntityId = a.LeaveRequestId
+		) wf
 
 	UNION
 
@@ -64,8 +79,10 @@ AS
 				'Deficit Hours: ' + ISNULL(dur.NPHText, '') + CHAR(13) + CHAR(10) +
 				'Regularized Time In: ' + FORMAT(CAST(a.RegularizedTimeIn AS DATETIME), 'hh:mm tt') + CHAR(13) + CHAR(10) +
 				'Regularized Time Out: ' + FORMAT(CAST(a.RegularizedTimeOut AS DATETIME), 'hh:mm tt')  + CHAR(13) + CHAR(10) AS RequestDetail,
-		a.CreatedBy AS CreatedByEmpNo,
-		a.StatusHandlingCode
+			a.CreatedBy AS CreatedByEmpNo,
+			a.StatusHandlingCode,
+			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverNo ELSE NULL END AS CurrentlyAssignedEmpNo,			--Rev. #1.3
+			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverName ELSE NULL END AS CurrentlyAssignedEmpName		--Rev. #1.3
 	FROM kenuser.RegularRequestWFs a WITH (NOLOCK) 
 		INNER JOIN kenuser.Employee b WITh (NOLOCK) ON a.CreatedBy = b.EmployeeNo
 		LEFT JOIN kenuser.DepartmentMaster dep WITH (NOLOCK) ON RTRIM(a.CostCenter) = RTRIM(dep.DepartmentCode)
@@ -85,6 +102,18 @@ AS
 			FROM kenuser.RegularRequestWFs x WITH (NOLOCK)
 			WHERE x.RegularizationId = a.RegularizationId
 		) dur
+		OUTER APPLY		--Rev. #1.3
+		(
+			SELECT	x.ApproverEmpNo AS ApproverNo, 
+					RTRIM(ISNULL(emp.FirstName, '')) + ' ' + RTRIM(ISNULL(emp.MiddleName, '')) + ' ' + RTRIM(ISNULL(emp.LastName, '')) AS ApproverName
+			FROM kenuser.WorkflowStepInstances x
+				INNER JOIN kenuser.WorkflowInstances y WITH (NOLOCK) ON x.WorkflowInstanceId = y.WorkflowInstanceId
+				INNER JOIN kenuser.WorkflowDefinitions z WITH (NOLOCK) ON y.WorkflowDefinitionId = z.WorkflowDefinitionId
+				LEFT JOIN kenuser.Employee emp WITH (NOLOCK) ON x.ApproverEmpNo = emp.EmployeeNo
+			WHERE RTRIM(z.EntityName) = 'RTYPEREGULAR'
+				AND RTRIM(x.[Status]) = 'Pending'
+				AND y.EntityId = a.RegularizationId
+		) wf
 
 	UNION
 
@@ -108,8 +137,10 @@ AS
 				'Overtime Hours: ' + ISNULL(dur.OTDurationText, '') + CHAR(13) + CHAR(10) +
 				'OT Start Time: ' + FORMAT(CAST(a.OTStartTime AS DATETIME), 'hh:mm tt') + CHAR(13) + CHAR(10) +
 				'OT End Time: ' + FORMAT(CAST(a.OTEndTime AS DATETIME), 'hh:mm tt')  + CHAR(13) + CHAR(10) AS RequestDetail,
-		a.CreatedBy AS CreatedByEmpNo,
-		a.StatusHandlingCode
+			a.CreatedBy AS CreatedByEmpNo,
+			a.StatusHandlingCode,
+			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverNo ELSE NULL END AS CurrentlyAssignedEmpNo,			--Rev. #1.3
+			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverName ELSE NULL END AS CurrentlyAssignedEmpName		--Rev. #1.3
 	FROM kenuser.OTRequestWF a WITH (NOLOCK) 
 		INNER JOIN kenuser.Employee b WITh (NOLOCK) ON a.CreatedBy = b.EmployeeNo
 		LEFT JOIN kenuser.DepartmentMaster dep WITH (NOLOCK) ON RTRIM(a.CostCenter) = RTRIM(dep.DepartmentCode)
@@ -129,6 +160,18 @@ AS
 			FROM kenuser.OTRequestWF x WITH (NOLOCK)
 			WHERE x.ExtratimeId = a.ExtratimeId
 		) dur
+		OUTER APPLY		--Rev. #1.3
+		(
+			SELECT	x.ApproverEmpNo AS ApproverNo, 
+					RTRIM(ISNULL(emp.FirstName, '')) + ' ' + RTRIM(ISNULL(emp.MiddleName, '')) + ' ' + RTRIM(ISNULL(emp.LastName, '')) AS ApproverName
+			FROM kenuser.WorkflowStepInstances x
+				INNER JOIN kenuser.WorkflowInstances y WITH (NOLOCK) ON x.WorkflowInstanceId = y.WorkflowInstanceId
+				INNER JOIN kenuser.WorkflowDefinitions z WITH (NOLOCK) ON y.WorkflowDefinitionId = z.WorkflowDefinitionId
+				LEFT JOIN kenuser.Employee emp WITH (NOLOCK) ON x.ApproverEmpNo = emp.EmployeeNo
+			WHERE RTRIM(z.EntityName) = 'RTYPEOT'
+				AND RTRIM(x.[Status]) = 'Pending'
+				AND y.EntityId = a.ExtratimeId
+		) wf
 
 GO 
 
@@ -137,5 +180,9 @@ GO
 	SELECT * FROM kenuser.Vw_RequestDetail a
 	WHERE RTRIM(a.RequestTypeCode) = 'RTYPEOT'
 	ORDER BY a.RequestTypeCode, a.RequestNo
+
+	SELECT * FROM kenuser.Vw_RequestDetail a
+	WHERE RTRIM(a.RequestTypeCode) = 'RTYPEREGULAR'
+		AND a.RequestNo = 6
 
 */

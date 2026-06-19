@@ -249,6 +249,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     UserEmail = UserSession.CurrentUser!.EmailAddress;
                     UserCostCenter = UserSession.CurrentUser!.CostCenter;
 
+                    // Get the request item from the application state
                     _requestItem = State.RequestItem!;
 
                     // Initialize the request object
@@ -1372,6 +1373,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 {
                     if (_requestItem.StepInstanceId == null)
                         throw new Exception("The current workflow instance is not defined!");
+
+                    if (_requestItem.ApproverNo == null)
+                        throw new Exception("The current approver is not defined!");
                 }
 
                 // Get the current WF activity instance id
@@ -1395,7 +1399,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     // Go back to the previous page
                     HandleBackButton();
 
-                }, stepInstanceId, _requestItem.ApproverNo, UserName!, _approverRemarks, _requestItem.RequestNo);
+                }, stepInstanceId, Convert.ToInt32(_requestItem.ApproverNo), UserName!, _approverRemarks, _requestItem.RequestNo);
             }
             catch (Exception ex)
             {
@@ -1496,6 +1500,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                     if (string.IsNullOrWhiteSpace(_approverRemarks))
                         throw new Exception("Approval Remarks is required when rejecting the request!");
+
+                    if (_requestItem.ApproverNo == null)
+                        throw new Exception("The current approver is not defined!");
                 }
 
                 // Get the current WF activity instance id
@@ -1519,7 +1526,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     // Go back to the previous page
                     HandleBackButton();
 
-                }, stepInstanceId, requestItem.CreatedByEmpNo, requestItem.ApproverNo, UserName!,
+                }, stepInstanceId, requestItem.CreatedByEmpNo, Convert.ToInt32(requestItem.ApproverNo), UserName!,
                _approverRemarks, requestItem.RequestNo);
             }
             catch (Exception ex)

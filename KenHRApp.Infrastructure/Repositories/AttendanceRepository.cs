@@ -1314,6 +1314,8 @@ namespace KenHRApp.Infrastructure.Repositories
                     regularRequest.LastUpdatedBy = model[0].LastUpdatedBy;
                     regularRequest.LastUpdatedUserID = model[0].LastUpdatedUserID;
                     regularRequest.LastUpdatedEmail = model[0].LastUpdatedEmail;
+                    regularRequest.ApproverNo = model[0].ApproverNo;
+                    regularRequest.ApproverName = model[0].ApproverName;
 
                     #region Get the file attachments
                     List<LeaveAttachment> attachments = new();
@@ -1867,7 +1869,9 @@ namespace KenHRApp.Infrastructure.Repositories
                         LastUpdatedDate = e.LastUpdatedDate,
                         LastUpdatedBy = e.LastUpdatedBy,
                         LastUpdatedUserID = e.LastUpdatedUserID,
-                        LastUpdatedEmail = e.LastUpdatedEmail
+                        LastUpdatedEmail = e.LastUpdatedEmail,
+                        ApproverNo = e.ApproverNo,
+                        ApproverName = e.ApproverName
                     }).ToList();
                 }
 
@@ -1930,8 +1934,9 @@ namespace KenHRApp.Infrastructure.Repositories
                         RequestedByNo = e.RequestedByNo,
                         RequestedByName = e.RequestedByName,
                         RequestDetail = e.RequestDetail,
-                        //CreatedByEmpNo = e.CreatedByEmpNo,
-                        CurrentStatus = e.CurrentStatus
+                        CurrentStatus = e.CurrentStatus,
+                        CurrentlyAssignedEmpNo = e.CurrentlyAssignedEmpNo,
+                        CurrentlyAssignedEmpName = e.CurrentlyAssignedEmpName
                     }).ToList();
                 }
 

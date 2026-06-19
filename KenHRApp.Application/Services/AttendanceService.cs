@@ -1113,18 +1113,20 @@ namespace KenHRApp.Application.Services
                         LastUpdatedBy = model.LastUpdatedBy,
                         LastUpdatedUserID = model.LastUpdatedUserID,
                         LastUpdatedEmail = model.LastUpdatedEmail,
+                        ApproverNo = model.ApproverNo,
+                        ApproverName = model.ApproverName,
 
                         Files = model.AttachmentList!.Select(e => new FileAttachmentDTO
-                        {
-                            Id = e.Id,
-                            RequestType = e.RequestType,
-                            AttachmentId = e.AttachmentId,
-                            FileName = e.FileName,
-                            StoredFileName = e.StoredFileName,
-                            ContentType = e.ContentType,
-                            FileSize = e.FileSize
-                        }).ToList(),
-                    };
+                            {
+                                Id = e.Id,
+                                RequestType = e.RequestType,
+                                AttachmentId = e.AttachmentId,
+                                FileName = e.FileName,
+                                StoredFileName = e.StoredFileName,
+                                ContentType = e.ContentType,
+                                FileSize = e.FileSize
+                            }).ToList(),
+                        };
 
                     if (model.SwipeLogList != null && model.SwipeLogList.Any())
                     {
@@ -1592,8 +1594,9 @@ namespace KenHRApp.Application.Services
                         RequestedByNo = e.RequestedByNo,
                         RequestedByName = e.RequestedByName,
                         RequestDetail = e.RequestDetail,
-                        //CreatedByEmpNo = e.CreatedByEmpNo,
-                        CurrentStatus = e.CurrentStatus
+                        CurrentStatus = e.CurrentStatus,
+                        CurrentlyAssignedEmpNo = e.CurrentlyAssignedEmpNo,
+                        CurrentlyAssignedEmpName = e.CurrentlyAssignedEmpName
                     }).ToList();
                 }
 

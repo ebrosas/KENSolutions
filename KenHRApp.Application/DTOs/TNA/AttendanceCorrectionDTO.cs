@@ -21,8 +21,9 @@ namespace KenHRApp.Application.DTOs.TNA
         public int? RequestedByNo { get; set; }
         public string? RequestedByName { get; set; } = null;
         public string? RequestDetail { get; set; } = null;
-        //public int? CreatedByEmpNo { get; set; }
         public string CurrentStatus { get; set; } = null!;
+        public int? CurrentlyAssignedEmpNo { get; set; }
+        public string? CurrentlyAssignedEmpName { get; set; } = null;
         #endregion
 
         #region Extended Properties
@@ -31,6 +32,20 @@ namespace KenHRApp.Application.DTOs.TNA
             get
             {
                 return $"{RequestedByName} (Emp.#: {RequestedByNo})";
+            }
+        }
+
+        public string CurrentApprover
+        {
+            get
+            {
+                if (CurrentlyAssignedEmpNo > 0 &&
+                    !string.IsNullOrWhiteSpace(CurrentlyAssignedEmpName))
+                {
+                    return $"{RequestedByName} (Emp.#: {RequestedByNo})";
+                }
+                else
+                    return string.Empty;
             }
         }
         #endregion

@@ -60,7 +60,9 @@ BEGIN
 			a.RequestedByNo,
 			a.RequestedByName,
 			a.RequestDetail,
-			a.StatusHandlingCode AS CurrentStatus
+			a.StatusHandlingCode AS CurrentStatus,
+			a.CurrentlyAssignedEmpNo,
+			a.CurrentlyAssignedEmpName
 	FROM kenuser.Vw_RequestDetail a
 		CROSS APPLY
 		(

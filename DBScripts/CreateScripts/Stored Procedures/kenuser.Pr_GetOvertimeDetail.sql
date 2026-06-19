@@ -79,7 +79,7 @@ BEGIN
 			a.LastUpdatedBy,
 			a.LastUpdatedUserID,
 			a.LastUpdatedEmail,
-			wf.ApproverNo,		--Rev. #1.1
+			wf.ApproverNo,			--Rev. #1.1
 			wf.ApproverName			--Rev. #1.1
 	FROM kenuser.OTRequestWF a WITH (NOLOCK)
 		INNER JOIN kenuser.DepartmentMaster dep WITH (NOLOCK) ON RTRIM(a.CostCenter) = RTRIM(dep.DepartmentCode)
@@ -102,7 +102,7 @@ BEGIN
 		OUTER APPLY		--Rev. #1.1
 		(
 			SELECT	x.ApproverEmpNo AS ApproverNo, 
-					RTRIM(ISNULL(d.FirstName, '')) + ' ' + RTRIM(ISNULL(d.MiddleName, '')) + ' ' + RTRIM(ISNULL(d.LastName, '')) AS ApproverName
+					RTRIM(ISNULL(emp.FirstName, '')) + ' ' + RTRIM(ISNULL(emp.MiddleName, '')) + ' ' + RTRIM(ISNULL(emp.LastName, '')) AS ApproverName
 			FROM kenuser.WorkflowStepInstances x
 				INNER JOIN kenuser.WorkflowInstances y WITH (NOLOCK) ON x.WorkflowInstanceId = y.WorkflowInstanceId
 				INNER JOIN kenuser.WorkflowDefinitions z WITH (NOLOCK) ON y.WorkflowDefinitionId = z.WorkflowDefinitionId

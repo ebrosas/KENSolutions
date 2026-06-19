@@ -473,7 +473,8 @@
                                 </ChildContent>
                             </MudExpansionPanel>
 
-                            @if (ActionType == ActionTypes.Approval.ToString())
+                            @if (ActionType == ActionTypes.Approval.ToString() &&
+                                _overtimeRequest.StatusHandlingCode == "Open")
                             {
                                 <MudExpansionPanel Class="p-0" Dense Gutters Expanded="true">
                                      <TitleContent>
@@ -496,7 +497,7 @@
                             }
 
                             @if (ActionType == ActionTypes.View.ToString() ||
-                            ActionType == ActionTypes.Approval.ToString())
+                                ActionType == ActionTypes.Approval.ToString())
                             {
                                 <MudExpansionPanel Class="p-0" Dense Gutters>
                                      <TitleContent>

@@ -332,7 +332,19 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
 
             else if (item.RequestTypeCode == WorkflowHelper.CONST_REGULARIZATION)
-                Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=View&RequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+            {
+                if (isApproval)
+                {
+                    #region Initialize DTO object to be passed to  the Regularization page
+                    // Pass via NavigationManager and a shared state service 
+                    State.RequestItem = item;
+                    #endregion
+
+                    Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=Approval&RequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+                }
+                else
+                    Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=View&RequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+            }
 
             else if (item.RequestTypeCode == WorkflowHelper.CONST_EXTRA_TIME)
             {
@@ -501,6 +513,9 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 {
                     if (requestItem.StepInstanceId == null)
                         throw new Exception("The current workflow instance is not defined!");
+
+                    else if (requestItem.ApproverNo == null)
+                        throw new Exception("The current approver is not defined!");
                 }
 
                 // Get the current WF activity instance id
@@ -524,7 +539,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
                     StateHasChanged();
 
-                }, stepInstanceId, requestItem.ApproverNo, UserName!,
+                }, stepInstanceId, Convert.ToInt32(requestItem.ApproverNo), UserName!,
                 requestItem.Remarks, requestItem.RequestNo);
             }
             catch (Exception ex)
@@ -576,6 +591,9 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
                     if (string.IsNullOrWhiteSpace(requestItem.Remarks))
                         throw new Exception("Remarks is required when rejecting the request!");
+
+                    if (requestItem.ApproverNo == null)
+                        throw new Exception("The current approver is not defined!");
                 }
 
                 // Get the current WF activity instance id
@@ -606,7 +624,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
 
                     StateHasChanged();
 
-                }, stepInstanceId, requestItem.CreatedByEmpNo, requestItem.ApproverNo, UserName!,
+                }, stepInstanceId, requestItem.CreatedByEmpNo, Convert.ToInt32(requestItem.ApproverNo), UserName!,
                 requestItem.Remarks, requestItem.RequestNo);
             }
             catch (Exception ex)

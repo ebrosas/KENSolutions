@@ -64,6 +64,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private DateTime? _selectedDate; 
         private Orientation _calOrientation = Orientation.Portrait;
         private string _pickerStyle = "width: 420px;";
+        private string _approverRemarks = string.Empty;
         #endregion
 
         #region Flags
@@ -87,6 +88,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Objects and Collections       
+        private ApprovalRequestResultDTO? _requestItem;
         private RegularRequestDTO _regularRequest = new();
         private IReadOnlyList<IBrowserFile> _files = Array.Empty<IBrowserFile>();
 
@@ -128,7 +130,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             View,
             Edit,
             Add,
-            Delete
+            Delete,
+            Approval
         }
 
         private enum NotificationType
@@ -249,6 +252,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     UserEmail = UserSession.CurrentUser!.EmailAddress;
                     UserCostCenter = UserSession.CurrentUser!.CostCenter;
 
+                    // Get the request item from the application state
+                    _requestItem = State.RequestItem!;
+
                     // Initialize the Leave Request object
                     _regularRequest.CreatedBy = UserEmpNo;
                     _regularRequest.CreatedEmail = UserEmail;
@@ -256,7 +262,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _regularRequest.ActionDescription = CONST_REGULARIZATION;
 
                     if (ActionType == ActionTypes.Edit.ToString() ||
-                        ActionType == ActionTypes.View.ToString())
+                        ActionType == ActionTypes.View.ToString() ||
+                        ActionType == ActionTypes.Approval.ToString())
                     {
                         if (RequestNo > 0)
                         {
@@ -1393,6 +1400,223 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 // Set the error message
                 _errorMessage.AppendLine(errorMsg);
                 ShowHideError(true);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+        #endregion
+
+        #region Workflow Methods
+        private void BeginApproveRequest()
+        {
+            try
+            {
+                if (_requestItem == null)
+                {
+                    throw new Exception("The selected request workflow instance is not configured correctly!");
+                }
+                else
+                {
+                    if (_requestItem.StepInstanceId == null)
+                        throw new Exception("The current workflow instance is not defined!");
+
+                    else if (_requestItem.ApproverNo == null)
+                        throw new Exception("The current approver is not defined!");
+                }
+
+                // Get the current WF activity instance id
+                int stepInstanceId = _requestItem.StepInstanceId ?? 0;
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Approving request, please wait...";
+
+                _ = ApproveWorkflowAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    StateHasChanged();
+
+                    // Go back to the previous page
+                    HandleBackButton();
+
+                }, stepInstanceId, Convert.ToInt32(_requestItem.ApproverNo), UserName!, _approverRemarks, _requestItem.RequestNo);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task ApproveWorkflowAsync(
+           Func<Task> callback,
+           int stepInstanceId,
+           int approverNo,
+           string userID,
+           string? comments,
+           long requestNo)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            //bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            var repoResult = await WorkflowService.ApproveStepAsync(stepInstanceId, approverNo, userID, comments,
+                WorkflowHelper.CONST_EXTRA_TIME, requestNo, Environment.WebRootPath, _cts.Token);
+
+            if (repoResult.Success)
+            {
+                // Show notification
+                ShowNotification("Extra Time request has been approved successfully!", NotificationType.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(repoResult.Error))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(repoResult.Error);
+                    ShowHideError(true);
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task ConfirmReject()
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Reject"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to reject Extra Time Request No. '{_regularRequest.RegularizationId}'?" },
+                { "ConfirmText", "Ok" },
+                { "Color", Color.Error },
+                { "DialogIconColor", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Reject Confirmation", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                BeginRejectRequest(_requestItem);
+            }
+        }
+
+        private void BeginRejectRequest(ApprovalRequestResultDTO? requestItem)
+        {
+            try
+            {
+                if (requestItem == null)
+                {
+                    throw new Exception("The selected request workflow instance is not configured correctly!");
+                }
+                else
+                {
+                    if (requestItem.StepInstanceId == null)
+                        throw new Exception("The current workflow instance is not defined!");
+
+                    if (string.IsNullOrWhiteSpace(_approverRemarks))
+                        throw new Exception("Approval Remarks is required when rejecting the request!");
+
+                    if (_requestItem.ApproverNo == null)
+                        throw new Exception("The current approver is not defined!");
+                }
+
+                // Get the current WF activity instance id
+                int stepInstanceId = requestItem.StepInstanceId ?? 0;
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Rejecting request, please wait...";
+
+                _ = RejectWorkflowAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    StateHasChanged();
+
+                    // Go back to the previous page
+                    HandleBackButton();
+
+                }, stepInstanceId, requestItem.CreatedByEmpNo, Convert.ToInt32(requestItem.ApproverNo), UserName!,
+               _approverRemarks, requestItem.RequestNo);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task RejectWorkflowAsync(
+            Func<Task> callback,
+            int stepInstanceId,
+            int? creatorEmpNo,
+            int approverNo,
+            string? userID,
+            string comments,
+            long requestNo)
+        {
+
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            string errorMsg = string.Empty;
+
+            var repoResult = await WorkflowService.RejectStepAsync(stepInstanceId, creatorEmpNo, approverNo, userID, comments,
+                WorkflowHelper.CONST_EXTRA_TIME, requestNo, Environment.WebRootPath, _cts.Token);
+            if (repoResult.Success)
+            {
+                // Show notification
+                ShowNotification("The selected request has been rejected successfully!", NotificationType.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(repoResult.Error))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(repoResult.Error);
+                    ShowHideError(true);
+                }
             }
 
             if (callback != null)

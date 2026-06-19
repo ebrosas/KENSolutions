@@ -92,6 +92,9 @@ namespace KenHRApp.Application.DTOs
         public int? LastUpdatedBy { get; set; }
         public string? LastUpdatedUserID { get; set; } = null;
         public string? LastUpdatedEmail { get; set; } = null;
+        public int? ApproverNo { get; set; }
+        public string? ApproverName { get; set; } = null;
+
         public List<FileAttachmentDTO> Files { get; set; } = new();
         public List<AttendanceSwipeDTO>? SwipeLogList { get; set; } = new();
         #endregion
@@ -177,6 +180,22 @@ namespace KenHRApp.Application.DTOs
                 else
                     return StatusDesc!;
             }
+        }
+
+        [Display(Name = "Current Approver")]
+        public string CurrentApprover
+        {
+            get
+            {
+                if (ApproverNo > 0 &&
+                    !string.IsNullOrWhiteSpace(ApproverName))
+                {
+                    return $"{ApproverNo} - {ApproverName}";
+                }
+                else
+                    return "";
+            }
+            set { }
         }
         #endregion
     }

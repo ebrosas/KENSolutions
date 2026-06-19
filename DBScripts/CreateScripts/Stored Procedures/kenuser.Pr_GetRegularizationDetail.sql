@@ -7,6 +7,7 @@
 *	Date			Author		Rev. #		Comments:
 *	22/03/2026		Ervin		1.0			Created
 *	07/06/2026		Ervin		1.1			Refactored the logic in fetching the ROA description and Action description
+*	19/06/2026		Ervin		1.2			Returned the current approver emp. no and name
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetRegularizationDetail
@@ -78,7 +79,9 @@ BEGIN
 			a.LastUpdatedDate,
 			a.LastUpdatedBy,
 			a.LastUpdatedUserID,
-			a.LastUpdatedEmail
+			a.LastUpdatedEmail,
+			wf.ApproverNo,			--Rev. #1.2
+			wf.ApproverName			--Rev. #1.2
 	FROM kenuser.RegularRequestWFs a WITH (NOLOCK)
 		INNER JOIN kenuser.DepartmentMaster dep WITH (NOLOCK) ON RTRIM(a.CostCenter) = RTRIM(dep.DepartmentCode)
 		OUTER APPLY		--Rev. #1.1
@@ -97,6 +100,18 @@ BEGIN
 		) c
 		LEFT JOIN kenuser.Employee d WITH (NOLOCK) ON a.CreatedBy = d.EmployeeNo
 		LEFT JOIN kenuser.UserDefinedCode stat WITH (NOLOCK) ON RTRIM(a.StatusCode) = RTRIM(stat.UDCCOde)
+		OUTER APPLY		--Rev. #1.2
+		(
+			SELECT	x.ApproverEmpNo AS ApproverNo, 
+					RTRIM(ISNULL(emp.FirstName, '')) + ' ' + RTRIM(ISNULL(emp.MiddleName, '')) + ' ' + RTRIM(ISNULL(emp.LastName, '')) AS ApproverName
+			FROM kenuser.WorkflowStepInstances x
+				INNER JOIN kenuser.WorkflowInstances y WITH (NOLOCK) ON x.WorkflowInstanceId = y.WorkflowInstanceId
+				INNER JOIN kenuser.WorkflowDefinitions z WITH (NOLOCK) ON y.WorkflowDefinitionId = z.WorkflowDefinitionId
+				LEFT JOIN kenuser.Employee emp WITH (NOLOCK) ON x.ApproverEmpNo = emp.EmployeeNo
+			WHERE RTRIM(z.EntityName) = 'RTYPEREGULAR'
+				AND RTRIM(x.[Status]) = 'Pending'
+				AND y.EntityId = a.RegularizationId
+		) wf
 	WHERE 
 		(a.RegularizationId = @requestNo OR @requestNo IS NULL)
 		AND (a.EmployeeNo = @empNo OR @empNo IS NULL) 

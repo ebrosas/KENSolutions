@@ -172,7 +172,15 @@ namespace KenHRApp.Application.DTOs.TNA
             get
             {
                 if (StatusHandlingCode == "Open")
-                    return $"{StatusHandlingCode} - {StatusDesc}";
+                {
+                    if (ApproverNo > 0 &&
+                        !string.IsNullOrWhiteSpace(ApproverName))
+                    {
+                        return $"{StatusDesc} with {ApproverName}";
+                    }
+                    else
+                        return $"{StatusHandlingCode} - {StatusDesc}";
+                }
                 else
                     return StatusDesc!;
             }

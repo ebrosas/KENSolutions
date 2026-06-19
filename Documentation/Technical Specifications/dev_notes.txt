@@ -78,7 +78,13 @@ Approval Dashboard:
 1. When opening the assigned request, the Cancel Request button should be disabled since only the creator can cancel request.
 
 Extra Time page:
-1. Implement the Approve and Reject buttons
+1. Implement the Approve and Reject buttons	-Done
+
+Leave Request page:
+1. Implement the Approve and Reject buttons	
+
+Approval Dashboard
+1. Fix the bug that shows the Approve and Reject button even if the request is not assigned to the current user.
 
 
 

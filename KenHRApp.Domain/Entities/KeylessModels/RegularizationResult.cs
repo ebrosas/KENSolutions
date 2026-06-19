@@ -44,6 +44,8 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public string? LastUpdatedEmail { get; set; } = null;
         public List<FileAttachment> AttachmentList { get; set; } = new();
         public List<AttendanceSwipeLog>? SwipeLogList { get; set; } = new();
+        public int? ApproverNo { get; set; }
+        public string? ApproverName { get; set; } = null;
         #endregion
     }
 }

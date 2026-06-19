@@ -201,8 +201,14 @@
                                                 </MudChip>
                                             </CellTemplate>
                                         </PropertyColumn>
-                                        <PropertyColumn Property="x => x.ApproverFullName" Title="Currently Assigned To" 
+                                        @* <PropertyColumn Property="x => x.ApproverFullName" Title="Currently Assigned To" 
                                             Hidden="@(!_isPendingClicked)"
+                                            Class="col-ApproverFullName" Editable="false">
+                                            <CellTemplate>
+                                                @context.Item.ApproverFullName
+                                            </CellTemplate>
+                                        </PropertyColumn> *@
+                                        <PropertyColumn Property="x => x.ApproverFullName" Title="Currently Assigned To" 
                                             Class="col-ApproverFullName" Editable="false">
                                             <CellTemplate>
                                                 @context.Item.ApproverFullName
@@ -242,7 +248,7 @@
                                                         title="View request details"
                                                         Class="show-btn fa-icon-btn"
                                                         Size="Size.Small"
-                                                        Icon="fas fa-eye-slash"
+                                                        Icon="fas fa-eye"
                                                         OnClick="@(() => OpenRequestDetail(row.Item, true))">
                                                      </MudIconButton>
                                                 </MudStack>                                                                                          

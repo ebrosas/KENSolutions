@@ -79,7 +79,31 @@
                         </MudButton>
                     }
 
-                    @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
+                    @if (ActionType == ActionTypes.Approval.ToString())
+                    {
+                        @if (_regularRequest.StatusHandlingCode == "Open")
+                        {
+                            <MudButton Variant="Variant.Filled"
+                                       StartIcon="fas fa-thumbs-up"
+                                       Size="Size.Small"
+                                       Color="Color.Success"
+                                       Disabled="@(_isEditMode)"
+                                       OnClick="BeginApproveRequest">
+                                Approve
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled"
+                                       StartIcon="fas fa-thumbs-down"
+                                       Size="Size.Small"
+                                       Color="Color.Error"
+                                       Disabled="@(_isEditMode)"
+                                       OnClick="ConfirmReject">
+                                Reject
+                            </MudButton>
+                        }
+                    }
+
+                    @if (ActionType == ActionTypes.Edit.ToString() || 
+                        ActionType == ActionTypes.View.ToString())
                     {
                         @if (_regularRequest.StatusHandlingCode == "Open")
                         {
@@ -91,16 +115,7 @@
                                        OnClick="ConfirmCancel">
                                 Cancel Request
                             </MudButton>
-                        }
-
-                        <MudButton Variant="Variant.Text"
-                                   StartIcon="@Icons.Material.Filled.ArrowBackIos"
-                                   Size="Size.Small"
-                                   Color="Color.Surface"
-                                   Disabled="@(_isEditMode)"
-                                   OnClick="HandleBackButton">
-                            Go back
-                        </MudButton>
+                        }                                                
 
                         <MudButton Variant="Variant.Filled" hidden
                                    StartIcon="@Icons.Material.Filled.Edit"
@@ -126,6 +141,20 @@
                                    Disabled="@_isEditMode"
                                    OnClick="ShowDeleteDialog">
                             Delete
+                        </MudButton>
+                    }
+
+                    @if (ActionType == ActionTypes.Edit.ToString() || 
+                        ActionType == ActionTypes.View.ToString() ||
+                        ActionType == ActionTypes.Approval.ToString())
+                    {
+                        <MudButton Variant="Variant.Text"
+                                   StartIcon="@Icons.Material.Filled.ArrowBackIos"
+                                   Size="Size.Small"
+                                   Color="Color.Surface"
+                                   Disabled="@(_isEditMode)"
+                                   OnClick="HandleBackButton">
+                            Go back
                         </MudButton>
                     }
                 </MudStack>
@@ -369,7 +398,7 @@
                                             Class="required-field"
                                             @bind-Value="_regularRequest.RegularizedDescription" 
                                             For="@(() => _regularRequest.RegularizedDescription)"
-                                            Variant="Variant.Filled" MaxLength="500" Lines="4"
+                                                      Variant="Variant.Outlined" MaxLength="500" Lines="4"
                                             Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                     </MudPaper>
                                 </MudItem>
@@ -455,7 +484,31 @@
                                 </ChildContent>
                             </MudExpansionPanel>
 
-                            @if (ActionType == ActionTypes.View.ToString())
+                            @if (ActionType == ActionTypes.Approval.ToString() &&
+                                _regularRequest.StatusHandlingCode == "Open")
+                            {
+                                <MudExpansionPanel Class="p-0" Dense Gutters Expanded="true">
+                                     <TitleContent>
+                                         <div class="d-flex">
+                                             <MudIcon Icon="fas fa-user-check" Style="color: #004165;" class="mr-3 mt-1" Size=Size.Small></MudIcon>
+                                             <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Approval Remarks</strong></MudText>
+                                         </div>
+                                     </TitleContent>
+                                     <ChildContent>
+                                        <MudPaper Elevation="0" Square="true" Class="w-100 mt-0 mb-1">
+                                         <MudTextField Label="Remarks"
+                                                @bind-Value="_approverRemarks"
+                                                Variant="Variant.Outlined"
+                                                MaxLength="500" Lines="4"
+                                                Clearable="@_isClearable" Disabled="false" Immediate="true"
+                                                Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                        </MudPaper>
+                                    </ChildContent>
+                                </MudExpansionPanel>
+                            }
+
+                            @if (ActionType == ActionTypes.View.ToString() ||
+                                ActionType == ActionTypes.Approval.ToString())
                             {
                                 <MudExpansionPanel Class="p-0" Dense Gutters>
                                  <TitleContent>

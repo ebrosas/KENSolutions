@@ -18,7 +18,7 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public string? Detail { get; set; } = null;
         public string? ApprovalRole { get; set; } = null;
         public string CurrentStatus { get; set; } = null!;
-        public int ApproverNo { get; set; }
+        public int? ApproverNo { get; set; }
         public string? ApproverName { get; set; } = null;
         public int? PendingDays { get; set; }
         public int? StepInstanceId { get; set; }
