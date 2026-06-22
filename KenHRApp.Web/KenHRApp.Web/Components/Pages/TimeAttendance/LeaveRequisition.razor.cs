@@ -13,6 +13,7 @@ using KenHRApp.Application.DTOs.TNA;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using KenHRApp.Web.Components.Common.Helpers;
+using Azure.Core;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
@@ -60,6 +61,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private decimal _leaveDuration = 0;
         private string _pageTitle = "Apply Leave";
         private int _currentWFIndex = 0;
+        private string _approverRemarks = string.Empty;
+        private bool _isCurrentApprover = false;
+        private bool _isCreator = false;
         #endregion
 
         #region Flags
@@ -82,7 +86,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private readonly string _iconWarning = "fas fa-exclamation-circle";
         #endregion
 
-        #region Objects and Collections       
+        #region Objects and Collections   
+        private ApprovalRequestResultDTO? _requestItem;
         private LeaveRequisitionDTO _leaveRequest = new();
         private IReadOnlyList<IBrowserFile> _files = Array.Empty<IBrowserFile>();
         private MudSelect<string> _endDayMode = new();
@@ -109,7 +114,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         #region Constants
 
-        #region Leave Daye Mode
+        #region Leave Day Mode
         private const string CONST_LEAVE_FULL_DAY = "LEAVEFD";
         private const string CONST_LEAVE_FIRST_HALF = "LEAVEFH";
         private const string CONST_LEAVE_SECOND_HALF = "LEAVESH";
@@ -140,7 +145,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             View,
             Edit,
             Add,
-            Delete
+            Delete,
+            Approval
         }
 
         private enum NotificationType
@@ -264,12 +270,158 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     UserEmail = UserSession.CurrentUser!.EmailAddress;
                     UserCostCenter = UserSession.CurrentUser!.CostCenter;
 
+                    // Get the request item from the application state
+                    _requestItem = State.RequestItem!;
+
                     // Initialize the Leave Request object
                     _leaveRequest.LeaveCreatedBy = UserEmpNo;
                     _leaveRequest.LeaveCreatedEmail = UserEmail;
-                    _leaveRequest.LeaveCreatedUserID = UserName;                                        
+                    _leaveRequest.LeaveCreatedUserID = UserName;
 
-                    BeginLoadComboboxTask();
+                    //BeginLoadComboboxTask();
+
+                    if (ActionType == ActionTypes.Edit.ToString() ||
+                        ActionType == ActionTypes.View.ToString() ||
+                        ActionType == ActionTypes.Approval.ToString())
+                    {
+                        if (LeaveRequestNo > 0)
+                        {
+                            #region Load request details and workflow
+
+                            #region Get employee list
+                            var repoResult = await LookupCache.GetEmployeeAsync();
+                            if (repoResult.Success)
+                            {
+                                _employeeList = repoResult.Value!;
+                            }
+                            else
+                            {
+                                // Set the error message
+                                _errorMessage.AppendLine(repoResult.Error);
+                            }
+
+                            if (_employeeList != null)
+                            {
+                                _employeeArray = _employeeList.Select(d => d.EmployeeNameWithCostCenter).OrderBy(d => d).ToArray();
+                            }
+                            #endregion
+
+                            #region Get UDCs
+
+                            #region Get all UDC group codes
+                            List<UserDefinedCodeGroupDTO>? udcGroupList = new();
+                            int groupID = 0;
+
+                            var resultUDC = await EmployeeService.GetUserDefinedCodeGroupAsync();
+                            if (resultUDC.Success)
+                            {
+                                udcGroupList = resultUDC!.Value;
+                            }
+                            else
+                                _errorMessage.Append(resultUDC.Error);
+                            #endregion
+
+                            // Get UDC dataset
+                            var result = await EmployeeService.GetUserDefinedCodeAllAsync();
+                            if (result.Success)
+                            {
+                                var udcData = result.Value;
+                                if (udcData!.Any() && udcGroupList!.Any())
+                                {
+                                    #region Get Leave Types
+                                    try
+                                    {
+                                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.LEAVETYPES.ToString()).FirstOrDefault()!.UDCGroupId;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _errorMessage.Append($"Error getting Leave Types group id: {ex.Message}");
+                                    }
+
+                                    if (groupID > 0)
+                                    {
+                                        _leaveTypeList = udcData!.Where(a => a.GroupID == groupID && a.IsActive == true).ToList();
+                                        if (_leaveTypeList != null)
+                                            _leaveTypeArray = _leaveTypeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                                    }
+                                    #endregion
+
+                                    #region Leave Day Portions
+                                    try
+                                    {
+                                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.LEAVEAPORTION.ToString()).FirstOrDefault()!.UDCGroupId;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _errorMessage.Append($"Error getting Leave Mode group id: {ex.Message}");
+                                    }
+
+                                    if (groupID > 0)
+                                    {
+                                        _leaveModeList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                                        if (_leaveModeList != null)
+                                            _leaveModeArray = _leaveModeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                                    }
+                                    #endregion
+
+                                    #region Leave Statuses
+                                    try
+                                    {
+                                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.STATUS.ToString()).FirstOrDefault()!.UDCGroupId;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _errorMessage.Append($"Error getting Leave Status group id: {ex.Message}");
+                                    }
+
+                                    if (groupID > 0)
+                                    {
+                                        _leaveStatusList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                                    }
+                                    #endregion
+                                }
+                            }
+                            #endregion
+
+                            // Load regularization details
+                            await GetLeaveRequestDetail(LeaveRequestNo);
+
+                            #region Get the workflow data
+                            var wfRepo = await WorkflowService.GetWorkflowStatusAsync(WorkflowHelper.CONST_LEAVE_REQUEST, LeaveRequestNo);
+                            if (wfRepo.Success)
+                            {
+                                _workflowList = wfRepo.Value!;
+
+                                if (_workflowList.Any())
+                                {
+                                    #region Find the current pending activity
+                                    WorkflowDetailResultDTO currentAct = _workflowList.Where(w => w.IsCurrent == true).FirstOrDefault()!;
+                                    if (currentAct != null)
+                                    {
+                                        _currentWFIndex = _workflowList.IndexOf(currentAct);
+                                    }
+                                    #endregion
+                                }
+                            }
+                            else
+                            {
+                                // Set the error message
+                                _errorMessage.Append(result.Error);
+
+                                ShowHideError(true);
+                            }
+                            #endregion
+
+                            #endregion
+
+                            _isDisabled = true;
+
+                            // Refresh the page
+                            StateHasChanged();
+                        }
+                    }
+                    else
+                        BeginLoadComboboxTask();
                 }
                 else
                     GoToLogin();
@@ -1376,56 +1528,90 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private void BeginLoadLeaveRequest(long leaveRequestNo)
+        //private void BeginLoadLeaveRequest(long leaveRequestNo)
+        //{
+        //    _isRunning = true;
+
+        //    // Set the overlay message
+        //    overlayMessage = "Loading leave request, please wait...";
+
+        //    _ = GetLeaveRequestDetail(async () =>
+        //    {
+        //        _isRunning = false;
+
+        //        // Shows the spinner overlay
+        //        await InvokeAsync(StateHasChanged);
+
+        //        #region Get the workflow data
+        //        var result = await WorkflowService.GetWorkflowStatusAsync(WorkflowHelper.CONST_LEAVE_REQUEST, leaveRequestNo);
+        //        if (result.Success)
+        //        {
+        //            _workflowList = result.Value!;
+
+        //            if (_workflowList.Any())
+        //            {
+        //                #region Find the current pending activity
+        //                WorkflowDetailResultDTO currentAct = _workflowList.Where(w => w.IsCurrent == true).FirstOrDefault()!;   
+        //                if (currentAct != null)
+        //                {
+        //                    _currentWFIndex = _workflowList.IndexOf(currentAct);
+        //                }
+        //                #endregion
+        //            }
+        //        }
+        //        else
+        //        {
+        //            // Set the error message
+        //            _errorMessage.Append(result.Error);
+
+        //            ShowHideError(true);
+        //        }
+        //        #endregion
+
+        //    }, leaveRequestNo);
+        //}
+
+        private async void BeginLoadLeaveRequest(long requestNo)
         {
-            _isRunning = true;
+            // Load regularization details
+            await GetLeaveRequestDetail(requestNo);
 
-            // Set the overlay message
-            overlayMessage = "Loading leave request, please wait...";
-
-            _ = GetLeaveRequestDetail(async () =>
+            #region Get the workflow data
+            var result = await WorkflowService.GetWorkflowStatusAsync(WorkflowHelper.CONST_LEAVE_REQUEST, requestNo);
+            if (result.Success)
             {
-                _isRunning = false;
+                _workflowList = result.Value!;
 
-                // Shows the spinner overlay
-                await InvokeAsync(StateHasChanged);
-
-                #region Get the workflow data
-                var result = await WorkflowService.GetWorkflowStatusAsync(WorkflowHelper.CONST_LEAVE_REQUEST, leaveRequestNo);
-                if (result.Success)
+                if (_workflowList.Any())
                 {
-                    _workflowList = result.Value!;
-
-                    if (_workflowList.Any())
+                    #region Find the current pending activity
+                    WorkflowDetailResultDTO currentAct = _workflowList.Where(w => w.IsCurrent == true).FirstOrDefault()!;
+                    if (currentAct != null)
                     {
-                        #region Find the current pending activity
-                        WorkflowDetailResultDTO currentAct = _workflowList.Where(w => w.IsCurrent == true).FirstOrDefault()!;   
-                        if (currentAct != null)
-                        {
-                            _currentWFIndex = _workflowList.IndexOf(currentAct);
-                        }
-                        #endregion
+                        _currentWFIndex = _workflowList.IndexOf(currentAct);
                     }
+                    #endregion
                 }
-                else
-                {
-                    // Set the error message
-                    _errorMessage.Append(result.Error);
+            }
+            else
+            {
+                // Set the error message
+                _errorMessage.Append(result.Error);
 
-                    ShowHideError(true);
-                }
-                #endregion
-
-            }, leaveRequestNo);
+                ShowHideError(true);
+            }
+            #endregion
         }
 
-        private async Task GetLeaveRequestDetail(Func<Task> callback, long leaveRequestNo)
+        private async Task GetLeaveRequestDetail(long leaveRequestNo)
         {
             // Wait for 1 second then gives control back to the runtime
-            await Task.Delay(500);
+            //await Task.Delay(500);
 
-            // Reset error messages
+            // Reset error messages and flags
             _errorMessage.Clear();
+            _isCurrentApprover = false;
+            _isCreator = false;
 
             // Clear attachment list
             _files = Array.Empty<IBrowserFile>();
@@ -1434,6 +1620,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (result.Success)
             {
                 _leaveRequest = result.Value!;
+
+                // Set the approver flag
+                if (_leaveRequest.ApproverNo == UserEmpNo)
+                    _isCurrentApprover = true;
+
+                if (_leaveRequest.LeaveCreatedBy == UserEmpNo ||
+                    _leaveRequest.LeaveEmpNo == UserEmpNo)
+                    _isCreator = true;
 
                 // Recreate the EditContext with the loaded _leaveRequest
                 _editContext = new EditContext(_leaveRequest);
@@ -1444,6 +1638,223 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _errorMessage.Append(result.Error);
 
                 ShowHideError(true);
+            }
+
+            //if (callback != null)
+            //{
+            //    // Hide the spinner overlay
+            //    await callback.Invoke();
+            //}
+        }
+        #endregion
+
+        #region Workflow Methods
+        private void BeginApproveRequest()
+        {
+            try
+            {
+                if (_requestItem == null)
+                {
+                    throw new Exception("The selected request workflow instance is not configured correctly!");
+                }
+                else
+                {
+                    if (_requestItem.StepInstanceId == null)
+                        throw new Exception("The current workflow instance is not defined!");
+
+                    if (_requestItem.ApproverNo == null)
+                        throw new Exception("The current approver is not defined!");
+                }
+
+                // Get the current WF activity instance id
+                int stepInstanceId = _requestItem.StepInstanceId ?? 0;
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Approving request, please wait...";
+
+                _ = ApproveWorkflowAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    StateHasChanged();
+
+                    // Go back to the previous page
+                    HandleBackButton();
+
+                }, stepInstanceId, Convert.ToInt32(_requestItem.ApproverNo), UserName!, _approverRemarks, _requestItem.RequestNo);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task ApproveWorkflowAsync(
+           Func<Task> callback,
+           int stepInstanceId,
+           int approverNo,
+           string userID,
+           string? comments,
+           long requestNo)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            //bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            var repoResult = await WorkflowService.ApproveStepAsync(stepInstanceId, approverNo, userID, comments,
+                WorkflowHelper.CONST_LEAVE_REQUEST, requestNo, Environment.WebRootPath, _cts.Token);
+
+            if (repoResult.Success)
+            {
+                // Show notification
+                ShowNotification("Leave request has been approved successfully!", NotificationType.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(repoResult.Error))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(repoResult.Error);
+                    ShowHideError(true);
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task ConfirmReject()
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Reject"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to reject Leave Request No. '{_leaveRequest.LeaveRequestId}'?" },
+                { "ConfirmText", "Ok" },
+                { "Color", Color.Error },
+                { "DialogIconColor", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Reject Confirmation", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                BeginRejectRequest(_requestItem);
+            }
+        }
+
+        private void BeginRejectRequest(ApprovalRequestResultDTO? requestItem)
+        {
+            try
+            {
+                if (requestItem == null)
+                {
+                    throw new Exception("The selected request workflow instance is not configured correctly!");
+                }
+                else
+                {
+                    if (requestItem.StepInstanceId == null)
+                        throw new Exception("The current workflow instance is not defined!");
+
+                    if (string.IsNullOrWhiteSpace(_approverRemarks))
+                        throw new Exception("Approval Remarks is required when rejecting the request!");
+
+                    if (_requestItem.ApproverNo == null)
+                        throw new Exception("The current approver is not defined!");
+                }
+
+                // Get the current WF activity instance id
+                int stepInstanceId = requestItem.StepInstanceId ?? 0;
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Rejecting request, please wait...";
+
+                _ = RejectWorkflowAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    StateHasChanged();
+
+                    // Go back to the previous page
+                    HandleBackButton();
+
+                }, stepInstanceId, requestItem.CreatedByEmpNo, Convert.ToInt32(requestItem.ApproverNo), UserName!,
+               _approverRemarks, requestItem.RequestNo);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task RejectWorkflowAsync(
+            Func<Task> callback,
+            int stepInstanceId,
+            int? creatorEmpNo,
+            int approverNo,
+            string? userID,
+            string comments,
+            long requestNo)
+        {
+
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            string errorMsg = string.Empty;
+
+            var repoResult = await WorkflowService.RejectStepAsync(stepInstanceId, creatorEmpNo, approverNo, userID, comments,
+                WorkflowHelper.CONST_LEAVE_REQUEST, requestNo, Environment.WebRootPath, _cts.Token);
+            if (repoResult.Success)
+            {
+                // Show notification
+                ShowNotification("The selected request has been rejected successfully!", NotificationType.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(repoResult.Error))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(repoResult.Error);
+                    ShowHideError(true);
+                }
             }
 
             if (callback != null)

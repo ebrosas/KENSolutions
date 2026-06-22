@@ -329,7 +329,19 @@ namespace KenHRApp.Web.Components.Pages.Workflow
         public void OpenRequestDetail(ApprovalRequestResultDTO item, bool isApproval = false)
         {
             if (item.RequestTypeCode == WorkflowHelper.CONST_LEAVE_REQUEST)
-                Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+            {
+                if (isApproval)
+                {
+                    #region Initialize DTO object to be passed to  the Regularization page
+                    // Pass via NavigationManager and a shared state service 
+                    State.RequestItem = item;
+                    #endregion
+
+                    Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=Approval&LeaveRequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+                }
+                else
+                    Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+            }
 
             else if (item.RequestTypeCode == WorkflowHelper.CONST_REGULARIZATION)
             {

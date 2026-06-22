@@ -61,7 +61,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private Orientation _calOrientation = Orientation.Portrait;
         private string _pickerStyle = "width: 420px;";
         private string _approverRemarks = string.Empty;
-        private bool _isApprover = false;
+        private bool _isCurrentApprover = false;
+        private bool _isCreator = false;
         #endregion
 
         #region Flags
@@ -372,8 +373,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             #endregion
 
                             #endregion
-
-                            //BeginLoadOvertimeRequest(RequestNo);
 
                             _isDisabled = true;
 
@@ -1218,8 +1217,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private async Task GetExtraTimeDetail(long requestNo)
         {
-            // Reset error messages
+            // Reset error messages and flags
             _errorMessage.Clear();
+            _isCurrentApprover = false;
+            _isCreator = false;
 
             // Clear attachment list
             _files = Array.Empty<IBrowserFile>();
@@ -1239,7 +1240,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 // Set the approver flag
                 if (_overtimeRequest.ApproverNo == UserEmpNo)
-                    _isApprover = true;
+                    _isCurrentApprover = true;
+
+                if (_overtimeRequest.CreatedBy == UserEmpNo ||
+                    _overtimeRequest.EmployeeNo == UserEmpNo)
+                    _isCreator = true;
 
                 // Display the requisition number in the page title
                 _pageTitle = $" Extra Time Request #{_overtimeRequest.ExtratimeId} (Created On: {_overtimeRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")} | Status: {_overtimeRequest.StatusSummary})";

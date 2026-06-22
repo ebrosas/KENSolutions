@@ -55,6 +55,8 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public string? CreatedByName { get; set; } = null;
         public string? DepartmentCode { get; set; } = null;
         public string? DepartmentName { get; set; } = null;
+        public int? ApproverNo { get; set; }
+        public string? ApproverName { get; set; } = null;
         public List<LeaveAttachment> AttachmentList { get; set; } = new();
         #endregion
     }

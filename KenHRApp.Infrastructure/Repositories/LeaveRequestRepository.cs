@@ -402,6 +402,8 @@ namespace KenHRApp.Infrastructure.Repositories
                     leaveRequest.StatusDesc = model[0].StatusDesc;
                     leaveRequest.ApprovalFlagDesc = model[0].ApprovalFlagDesc;
                     leaveRequest.CreatedByName = model[0].CreatedByName;
+                    leaveRequest.ApproverNo = model[0].ApproverNo;
+                    leaveRequest.ApproverName = model[0].ApproverName;
 
                     #region Get the file attachments
                     List<LeaveAttachment> attachments = new();

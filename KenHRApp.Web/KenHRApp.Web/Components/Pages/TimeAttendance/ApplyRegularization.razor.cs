@@ -65,6 +65,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private Orientation _calOrientation = Orientation.Portrait;
         private string _pickerStyle = "width: 420px;";
         private string _approverRemarks = string.Empty;
+        private bool _isCurrentApprover = false;
+        private bool _isCreator = false;
         #endregion
 
         #region Flags
@@ -1274,6 +1276,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             // Reset error messages
             _errorMessage.Clear();
+            _isCurrentApprover = false;
+            _isCreator = false;
 
             // Clear attachment list
             _files = Array.Empty<IBrowserFile>();
@@ -1290,6 +1294,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 // Set the calendar's selected date
                 _selectedDate = _regularRequest.AttendanceDate;
+
+                // Set the approver flag
+                if (_regularRequest.ApproverNo == UserEmpNo)
+                    _isCurrentApprover = true;
+
+                if (_regularRequest.CreatedBy == UserEmpNo ||
+                    _regularRequest.EmployeeNo == UserEmpNo)
+                    _isCreator = true;
 
                 // Display the requisition number in the page title
                 _pageTitle = $" Regularization Request #{_regularRequest.RegularizationId} (Created On: {_regularRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")} | Status: {_regularRequest.StatusSummary})";

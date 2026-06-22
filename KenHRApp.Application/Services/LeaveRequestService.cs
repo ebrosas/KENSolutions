@@ -470,8 +470,10 @@ namespace KenHRApp.Application.Services
                         StatusDesc = model.StatusDesc,
                         ApprovalFlagDesc = model.ApprovalFlagDesc,
                         CreatedByName = model.CreatedByName,
+                        ApproverNo = model.ApproverNo,
+                        ApproverName = model.ApproverName,
 
-                        Files = model.AttachmentList!.Select(e => new LeaveAttachmentDTO
+                    Files = model.AttachmentList!.Select(e => new LeaveAttachmentDTO
                         {
                             Id = e.Id,
                             LeaveAttachmentId = e.LeaveAttachmentId,

@@ -155,7 +155,29 @@ namespace KenHRApp.Application.DTOs
         public string? ApprovalFlagDesc { get; set; } = null;
         public string? CreatedByName { get; set; } = null;
 
+        public int? ApproverNo { get; set; }
+        public string? ApproverName { get; set; } = null;
+
         public List<LeaveAttachmentDTO> Files { get; set; } = new();
+        #endregion
+
+        #region Extended Properties
+
+        [Display(Name = "Current Approver")]
+        public string CurrentApprover
+        {
+            get
+            {
+                if (ApproverNo > 0 &&
+                    !string.IsNullOrWhiteSpace(ApproverName))
+                {
+                    return $"{ApproverNo} - {ApproverName}";
+                }
+                else
+                    return "";
+            }
+            set { }
+        }
         #endregion
     }
 }

@@ -81,7 +81,8 @@
 
                     @if (ActionType == ActionTypes.Approval.ToString())
                     {
-                        @if (_regularRequest.StatusHandlingCode == "Open")
+                        @if (_regularRequest.StatusHandlingCode == "Open"
+                            && _isCurrentApprover)
                         {
                             <MudButton Variant="Variant.Filled"
                                        StartIcon="fas fa-thumbs-up"
@@ -105,7 +106,8 @@
                     @if (ActionType == ActionTypes.Edit.ToString() || 
                         ActionType == ActionTypes.View.ToString())
                     {
-                        @if (_regularRequest.StatusHandlingCode == "Open")
+                        @if (_regularRequest.StatusHandlingCode == "Open"
+                       && _isCreator)
                         {
                             <MudButton Variant="Variant.Filled"
                                        StartIcon="@Icons.Material.Filled.Cancel"

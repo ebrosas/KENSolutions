@@ -6,7 +6,7 @@
 *
 *	Date			Author		Rev. #		Comments:
 *	22/03/2026		Ervin		1.0			Created
-*	
+*	22/06/2026		Ervin		1.1			Returned the current approver emp. no and name
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetLeaveRequestDetail
@@ -88,16 +88,37 @@ BEGIN
 			sdm.StartDayModeDesc,
 			a.EndDayMode,
 			edm.EndDayModeDesc,
-			RTRIM(b.UDCDesc1) as StatusDesc,
-			RTRIM(c.UDCDesc1) as ApprovalFlagDesc,
+			--RTRIM(b.UDCDesc1) as StatusDesc,
+			--RTRIM(c.UDCDesc1) as ApprovalFlagDesc,
+			b.StatusDesc,
+			c.ApprovalFlagDesc,
 			RTRIM(d.FirstName) + ' ' + RTRIM(d.MiddleName) + ' ' + RTRIM(d.LastName) AS CreatedByName,
 			emp.DepartmentCode,
-			dep.DepartmentName
+			dep.DepartmentName,
+			wf.ApproverNo,			--Rev. #1.1
+			wf.ApproverName			--Rev. #1.1
 	FROM kenuser.LeaveRequisitionWF a WITH (NOLOCK)
 		INNER JOIN kenuser.Employee emp WITH (NOLOCK) ON a.LeaveEmpNo = emp.EmployeeNo
 		INNER JOIN kenuser.DepartmentMaster dep WITH (NOLOCK) ON RTRIM(emp.DepartmentCode) = RTRIM(dep.DepartmentCode)
-		LEFT JOIN kenuser.UserDefinedCode b WITH (NOLOCK) ON RTRIM(a.LeaveStatusCode) = RTRIM(b.UDCCOde)
-		LEFT JOIN kenuser.UserDefinedCode c WITH (NOLOCK) ON RTRIM(a.LeaveApprovalFlag) = RTRIM(c.UDCCOde)
+		
+		--LEFT JOIN kenuser.UserDefinedCode b WITH (NOLOCK) ON RTRIM(a.LeaveStatusCode) = RTRIM(b.UDCCOde)
+		OUTER APPLY
+		(
+			SELECT RTRIM(x.UDCCode) as StatusCode, RTRIM(x.UDCDesc1) AS StatusDesc
+			FROM kenuser.UserDefinedCode x WITH (NOLOCK)
+			WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'STATUS')
+				AND RTRIM(x.UDCCode) = RTRIM(a.LeaveStatusCode)
+		) b
+		
+		--LEFT JOIN kenuser.UserDefinedCode c WITH (NOLOCK) ON RTRIM(a.LeaveApprovalFlag) = RTRIM(c.UDCCOde)
+		OUTER APPLY
+		(
+			SELECT RTRIM(x.UDCCode) as ApprovalFlagCode, RTRIM(x.UDCDesc1) AS ApprovalFlagDesc
+			FROM kenuser.UserDefinedCode x WITH (NOLOCK)
+			WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'LEAVEAPVFLAG')
+				AND RTRIM(x.UDCCode) = RTRIM(a.LeaveApprovalFlag)
+		) c
+
 		OUTER APPLY
 		(
 			SELECT RTRIM(x.UDCCode) as LeaveTypeCode, RTRIM(x.UDCDesc1) AS LeaveTypeDesc
@@ -120,6 +141,18 @@ BEGIN
 				AND RTRIM(x.UDCCode) = RTRIM(a.EndDayMode)
 		) edm
 		LEFT JOIN kenuser.Employee d WITH (NOLOCK) ON a.LeaveCreatedBy = d.EmployeeNo
+		OUTER APPLY		--Rev. #1.1
+		(
+			SELECT	x.ApproverEmpNo AS ApproverNo, 
+					RTRIM(ISNULL(emp.FirstName, '')) + ' ' + RTRIM(ISNULL(emp.MiddleName, '')) + ' ' + RTRIM(ISNULL(emp.LastName, '')) AS ApproverName
+			FROM kenuser.WorkflowStepInstances x WITH (NOLOCK)
+				INNER JOIN kenuser.WorkflowInstances y WITH (NOLOCK) ON x.WorkflowInstanceId = y.WorkflowInstanceId
+				INNER JOIN kenuser.WorkflowDefinitions z WITH (NOLOCK) ON y.WorkflowDefinitionId = z.WorkflowDefinitionId
+				LEFT JOIN kenuser.Employee emp WITH (NOLOCK) ON x.ApproverEmpNo = emp.EmployeeNo
+			WHERE RTRIM(z.EntityName) = 'RTYPELEAVE'
+				AND RTRIM(x.[Status]) = 'Pending'
+				AND y.EntityId = a.LeaveRequestId
+		) wf
 	WHERE 
 		(a.LeaveRequestId = @leaveNo OR @leaveNo IS NULL)
 		AND (a.LeaveEmpNo = @empNo OR @empNo IS NULL) 
@@ -149,7 +182,7 @@ PARAMETERS:
 	@endDate		DATETIME = NULL
 
 	EXEC kenuser.Pr_GetLeaveRequestDetail
-	EXEC kenuser.Pr_GetLeaveRequestDetail 11
+	EXEC kenuser.Pr_GetLeaveRequestDetail 20
 	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 10003632 
 	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '7600'
 	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '', 'AL'

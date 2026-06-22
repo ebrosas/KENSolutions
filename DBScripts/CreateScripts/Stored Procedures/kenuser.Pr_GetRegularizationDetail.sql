@@ -137,7 +137,7 @@ PARAMETERS:
 	@endDate		DATETIME = NULL
 
 	EXEC kenuser.Pr_GetRegularizationDetail
-	EXEC kenuser.Pr_GetRegularizationDetail 2
+	EXEC kenuser.Pr_GetRegularizationDetail 4
 	EXEC kenuser.Pr_GetRegularizationDetail 0, 10003632 
 	EXEC kenuser.Pr_GetRegularizationDetail 0, 0, '7600'
 	EXEC kenuser.Pr_GetRegularizationDetail 0, 0, '', 'XL'

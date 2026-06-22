@@ -78,26 +78,46 @@
                         </MudButton>
                     }
 
-                    @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
+                    @if (ActionType == ActionTypes.Approval.ToString())
                     {
-                        <MudButton Variant="Variant.Filled"
+                        @if (_leaveRequest.StatusHandlingCode == "Open"
+                            && _isCurrentApprover)
+                        {
+                            <MudButton Variant="Variant.Filled"
+                                       StartIcon="fas fa-thumbs-up"
+                                       Size="Size.Small"
+                                       Color="Color.Success"
+                                       Disabled="@(_isEditMode)"
+                                       OnClick="BeginApproveRequest">
+                                Approve
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled"
+                                       StartIcon="fas fa-thumbs-down"
+                                       Size="Size.Small"
+                                       Color="Color.Error"
+                                       Disabled="@(_isEditMode)"
+                                       OnClick="ConfirmReject">
+                                Reject
+                            </MudButton>
+                        }
+                    }
+
+                    @if (ActionType == ActionTypes.Edit.ToString() 
+                        || ActionType == ActionTypes.View.ToString())
+                    {
+                        @if (_leaveRequest.StatusHandlingCode == "Open" 
+                            && _isCreator)
+                        {
+                            <MudButton Variant="Variant.Filled"
                                    StartIcon="@Icons.Material.Filled.Cancel"
                                    Size="Size.Small"
                                    Color="Color.Error"
                                    Disabled="@(_isEditMode)"
                                    OnClick="ConfirmCancel">
-                            Cancel Leave
-                        </MudButton>
-
-                        <MudButton Variant="Variant.Text"
-                                   StartIcon="@Icons.Material.Filled.ArrowBackIos"
-                                   Size="Size.Small"
-                                   Color="Color.Surface"
-                                   Disabled="@(_isEditMode)"
-                                   OnClick="HandleBackButton">
-                            Go back
-                        </MudButton>
-
+                                Cancel Leave
+                            </MudButton>
+                        }                        
+                        
                         <MudButton Variant="Variant.Filled" hidden
                                    StartIcon="@Icons.Material.Filled.Edit"
                                    Size="Size.Small"
@@ -123,7 +143,21 @@
                                    OnClick="ShowDeleteDialog">
                             Delete
                         </MudButton>
-                    }                                        
+                    }   
+                    
+                    @if (ActionType == ActionTypes.Edit.ToString() || 
+                        ActionType == ActionTypes.View.ToString() ||
+                        ActionType == ActionTypes.Approval.ToString())
+                    {
+                        <MudButton Variant="Variant.Text"
+                                   StartIcon="@Icons.Material.Filled.ArrowBackIos"
+                                   Size="Size.Small"
+                                   Color="Color.Surface"
+                                   Disabled="@(_isEditMode)"
+                                   OnClick="HandleBackButton">
+                            Go back
+                        </MudButton>
+                    }
                 </MudStack>                
             </MudStack>
         </MudPaper>

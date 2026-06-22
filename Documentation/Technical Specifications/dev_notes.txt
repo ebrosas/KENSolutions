@@ -73,18 +73,16 @@ To-do Task:
 
 Extra Time Request page:
 1. When opening the request from the inquiry screen, the attendance date is not binding to the calendar control and the date text in the Apply Regularization page.  -Done
+2. Implement the Approve and Reject buttons	-Done
 
 Approval Dashboard:
-1. When opening the assigned request, the Cancel Request button should be disabled since only the creator can cancel request.
-
-Extra Time page:
-1. Implement the Approve and Reject buttons	-Done
+1. When opening the assigned request, the Cancel Request button should be disabled since only the creator can cancel request.	-Done
+2. Fix the bug that shows the Approve and Reject button even if the request is not assigned to the current user.	-Done
 
 Leave Request page:
-1. Implement the Approve and Reject buttons	
+1. Implement the Approve and Reject buttons	-Done
+2. Fix the navigation bug when opening the leave request from the Approval Dashboard page
 
-Approval Dashboard
-1. Fix the bug that shows the Approve and Reject button even if the request is not assigned to the current user.
 
 
 
