@@ -11,7 +11,7 @@
     <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserFullName</MudText>
 </MudStack>
 
-<MudContainer MaxWidth="MaxWidth.Medium" Class="px-4">
+<MudContainer MaxWidth="MaxWidth.Medium" Class="px-0">
     <EditForm EditContext="@_editContext" @ref="_editForm"
               OnValidSubmit="HandleValidSubmit"
               OnInvalidSubmit="HandleInvalidSubmit">
@@ -439,7 +439,7 @@
                                     For="@(() => _leaveRequest.LeaveRemarks)"
                                     Label="Leave Reason"
                                     HelperText="Max. text input is 500 chars."
-                                    Variant="Variant.Filled" HelperTextOnFocus="true" Counter="500" MaxLength="500" Lines="3"
+                                    Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="500" MaxLength="500" Lines="3"
                                     Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                         </MudPaper>
                     </MudItem>
@@ -468,7 +468,7 @@
                     </MudItem>
                 </MudGrid>
                                
-                <MudExpansionPanels Elevation="0" MultiExpansion="true" Class="p-0 m-0">
+                <MudExpansionPanels Elevation="0" MultiExpansion="true" Class="p-0 mb-4">
                     <MudExpansionPanel Class="p-0" Dense Gutters Expanded="true">
                         <TitleContent>
                             <div class="d-flex">
@@ -514,7 +514,8 @@
                                         </MudChipSet>
                                     }
                                 }
-                                else if (ActionType == ActionTypes.View.ToString())
+                                else if (ActionType == ActionTypes.View.ToString() ||
+                                ActionType == ActionTypes.Approval.ToString())
                                 {
                                     @if (_leaveRequest.Files.Any())
                                     {
@@ -540,46 +541,72 @@
                             </MudStack>
                         </ChildContent>
                     </MudExpansionPanel>
-                    @if (ActionType == ActionTypes.View.ToString())
+
+                    @if (ActionType == ActionTypes.Approval.ToString() 
+                        && _leaveRequest.StatusHandlingCode == "Open" 
+                        && _isCurrentApprover)
                     {
-                    <MudExpansionPanel Class="p-0" Dense Gutters>
-                        <TitleContent>
-                            <div class="d-flex">
-                                <MudIcon Icon="fas fa-user-check" Style="color: #004165;" class="mr-3 mt-1" Size=Size.Small></MudIcon>
-                                <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Approval Workflow</strong></MudText>
-                            </div>
-                        </TitleContent>
-                        <ChildContent>
-                            <MudPaper Elevation="0" Square="true" Class="w-100 mt-0 mb-1">
-                                @if (_workflowList.Any())
-                                {
-                                     <MudStepper NonLinear Ripple="true" Class="my-stepper" ShowResetButton="false" 
-                                        @bind-ActiveIndex="_currentWFIndex" 
-                                        CurrentStepColor="Color.Secondary" CompletedStepColor="Color.Success"
-                                        ErrorStepColor="Color.Error">
-                                            @foreach (var wf in _workflowList!)
-                                            {
-                                                <MudStep @bind-Title="wf.ActivityName" @bind-SecondaryText="wf.ApprovalSummary"
-                                                    @bind-Completed="wf.IsCompleted"  
-                                                    @bind-Disabled="wf.IsCompleted">
-                                                    <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
-                                                        <strong>
-                                                            @wf.ApprovalDetails
-                                                        </strong>
-                                                    </MudText>
-                                                </MudStep>
-                                            }
-                                    </MudStepper>
-                                }
-                                else
-                                {
-                                    <MudText Typo="Typo.body2" Color="Color.Surface">
-                                        No workflow transactions found!
-                                    </MudText>
-                                }
-                            </MudPaper>
-                        </ChildContent>
-                    </MudExpansionPanel>
+                        <MudExpansionPanel Class="p-0" Dense Gutters Expanded="true">
+                                <TitleContent>
+                                    <div class="d-flex">
+                                        <MudIcon Icon="fas fa-user-check" Style="color: #004165;" class="mr-3 mt-1" Size=Size.Small></MudIcon>
+                                        <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Approval Remarks</strong></MudText>
+                                    </div>
+                                </TitleContent>
+                                <ChildContent>
+                                <MudPaper Elevation="0" Square="true" Class="w-100 mt-0 mb-1">
+                                    <MudTextField Label="Remarks"
+                                        @bind-Value="_approverRemarks"
+                                        Variant="Variant.Outlined"
+                                        MaxLength="500" Lines="4"
+                                        Clearable="@_isClearable" Disabled="false" Immediate="true"
+                                        Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                </MudPaper>
+                            </ChildContent>
+                        </MudExpansionPanel>
+                    }
+
+                    @if (ActionType == ActionTypes.View.ToString()
+                        || ActionType == ActionTypes.Approval.ToString())
+                    {
+                        <MudExpansionPanel Class="p-0" Dense Gutters>
+                            <TitleContent>
+                                <div class="d-flex">
+                                    <MudIcon Icon="fas fa-user-check" Style="color: #004165;" class="mr-3 mt-1" Size=Size.Small></MudIcon>
+                                    <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Approval Workflow</strong></MudText>
+                                </div>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudPaper Elevation="0" Square="true" Class="w-100 mt-0 mb-1">
+                                    @if (_workflowList.Any())
+                                    {
+                                         <MudStepper NonLinear Ripple="true" Class="my-stepper" ShowResetButton="false" 
+                                            @bind-ActiveIndex="_currentWFIndex" 
+                                            CurrentStepColor="Color.Secondary" CompletedStepColor="Color.Success"
+                                            ErrorStepColor="Color.Error">
+                                                @foreach (var wf in _workflowList!)
+                                                {
+                                                    <MudStep @bind-Title="wf.ActivityName" @bind-SecondaryText="wf.ApprovalSummary"
+                                                        @bind-Completed="wf.IsCompleted"  
+                                                        @bind-Disabled="wf.IsCompleted">
+                                                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
+                                                            <strong>
+                                                                @wf.ApprovalDetails
+                                                            </strong>
+                                                        </MudText>
+                                                    </MudStep>
+                                                }
+                                        </MudStepper>
+                                    }
+                                    else
+                                    {
+                                        <MudText Typo="Typo.body2" Color="Color.Surface">
+                                            No workflow transactions found!
+                                        </MudText>
+                                    }
+                                </MudPaper>
+                            </ChildContent>
+                        </MudExpansionPanel>
                     }
                 </MudExpansionPanels>
             </MudPaper>

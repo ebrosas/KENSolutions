@@ -81,7 +81,10 @@ Approval Dashboard:
 
 Leave Request page:
 1. Implement the Approve and Reject buttons	-Done
-2. Fix the navigation bug when opening the leave request from the Approval Dashboard page
+2. Fix the navigation bug when opening the leave request from the Approval Dashboard page	-Done
+
+Workflow Service:
+1. Once the workflow status is set to "Rejected", implement logic to reject the request status in the underlying requisition table.
 
 
 

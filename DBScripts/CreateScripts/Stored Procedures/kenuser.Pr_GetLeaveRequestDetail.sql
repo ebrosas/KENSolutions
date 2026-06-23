@@ -182,7 +182,7 @@ PARAMETERS:
 	@endDate		DATETIME = NULL
 
 	EXEC kenuser.Pr_GetLeaveRequestDetail
-	EXEC kenuser.Pr_GetLeaveRequestDetail 20
+	EXEC kenuser.Pr_GetLeaveRequestDetail 21
 	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 10003632 
 	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '7600'
 	EXEC kenuser.Pr_GetLeaveRequestDetail 0, 0, '', 'AL'

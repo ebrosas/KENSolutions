@@ -1,4 +1,4 @@
-DECLARE @leaveNo	BIGINT = 9
+DECLARE @leaveNo	BIGINT = 21
 
 	SELECT a.LeaveApprovalFlag, * 
 	FROM kenuser.LeaveRequisitionWF a
