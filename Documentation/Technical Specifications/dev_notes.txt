@@ -82,6 +82,9 @@ Approval Dashboard:
 Leave Request page:
 1. Implement the Approve and Reject buttons	-Done
 2. Fix the navigation bug when opening the leave request from the Approval Dashboard page	-Done
+3. After approval, the leave request page should be closed and redirected to the calling form.
+4. In the Leave Inquiry page, add new field called "Currently Assigned To".	-Done
+5. Set the alignment of MudScrollToTop button to right.	-Done
 
 Workflow Service:
 1. Once the workflow status is set to "Rejected", implement logic to reject the request status in the underlying requisition table.

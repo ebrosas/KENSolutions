@@ -1299,10 +1299,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _leaveRequest.LeaveCreatedDate = DateTime.Now;
                 _leaveRequest.LeaveApprovalFlag = CONST_WAITING_APPROVAL;
                 _leaveRequest.LeaveEndDate = _leaveRequest.LeaveResumeDate!.Value.AddDays(-1);
-                _leaveRequest.LeaveApprovalFlag = CONST_WAITING_APPROVAL;
 
                 #region Set leave status to "Request Sent" 
-                if (_leaveStatusList != null && _leaveStatusList.Any())
+                if (_leaveStatusList != null 
+                    && _leaveStatusList.Any())
                 {
                     UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_REQUEST_SENT).FirstOrDefault();
                     if (statusFlag != null)

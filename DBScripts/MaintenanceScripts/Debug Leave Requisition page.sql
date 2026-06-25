@@ -1,6 +1,6 @@
-DECLARE @leaveNo	BIGINT = 21
+DECLARE @leaveNo	BIGINT = 22
 
-	SELECT a.LeaveApprovalFlag, * 
+	SELECT a.LeaveApprovalFlag, a.LeaveStatusCode, a.LeaveStatusID, a.StatusHandlingCode, * 
 	FROM kenuser.LeaveRequisitionWF a
 	WHERE a.LeaveRequestId = @leaveNo
 
@@ -12,10 +12,21 @@ DECLARE @leaveNo	BIGINT = 21
 		WHERE x.LeaveRequestId = @leaveNo
 	)
 
-	SELECT a.LeaveApprovalFlag, a.LeaveDuration, a.HalfDayLeaveFlag, * 
+	SELECT a.LeaveApprovalFlag, a.LeaveStatusCode, a.LeaveStatusID, a.StatusHandlingCode, a.LeaveDuration, a.HalfDayLeaveFlag, * 
 	FROM kenuser.LeaveRequisitionWF a
 	WHERE a.LeaveEmpNo = 10003632
 	ORDER BY a.LeaveVisaRequired
+
+	-- SELECT a.* 
+	-- FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	-- WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'STATUS')
+	-- ORDER BY a.UDCCode
+
+	SELECT b.* 
+	FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		INNER JOIN kenuser.UserDefinedCode b WITH (NOLOCK) ON a.UDCGroupId = b.GroupID
+	where a.UDCGCode = 'STATUS'
+	ORDER BY b.UDCCode
 
 	SELECT SUM(x.LeaveDuration) AS TotalLeave 
 	FROM kenuser.LeaveRequisitionWF x WITH (NOLOCK)

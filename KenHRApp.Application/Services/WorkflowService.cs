@@ -312,7 +312,13 @@ namespace KenHRApp.Application.Services
                     #endregion
                 }
 
-                var repoResult = await _repository.ApproveStepAsync(stepInstanceId, approverEmpNo, approverUserID, comments);
+                var repoResult = await _repository.ApproveStepAsync(
+                    stepInstanceId, 
+                    approverEmpNo, 
+                    approverUserID, 
+                    comments,
+                    entityId,
+                    entityName);
                 if (!repoResult.Success)
                 {
                     return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");
@@ -401,7 +407,13 @@ namespace KenHRApp.Application.Services
                     #endregion
                 }
 
-                var repoResult = await _repository.RejectStepAsync(stepInstanceId, approverEmpNo, approverUserID, rejectionReason);
+                var repoResult = await _repository.RejectStepAsync(
+                    stepInstanceId, 
+                    approverEmpNo, 
+                    approverUserID, 
+                    rejectionReason,
+                    entityId,
+                    entityName);
                 if (!repoResult.Success)
                 {
                     return Result<bool>.Failure(repoResult.Error ?? "Unknown repository error");

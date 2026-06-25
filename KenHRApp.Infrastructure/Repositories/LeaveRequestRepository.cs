@@ -512,7 +512,9 @@ namespace KenHRApp.Infrastructure.Repositories
                         ApprovalFlagDesc = e.ApprovalFlagDesc,
                         CreatedByName = e.CreatedByName,
                         DepartmentCode = e.DepartmentCode,
-                        DepartmentName = e.DepartmentName
+                        DepartmentName = e.DepartmentName,
+                        ApproverNo = e.ApproverNo,
+                        ApproverName = e.ApproverName
                     }).ToList();
 
                     if (leaveRequestList.Any())

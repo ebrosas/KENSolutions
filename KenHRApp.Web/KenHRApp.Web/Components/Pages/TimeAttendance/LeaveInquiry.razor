@@ -323,6 +323,11 @@
                                 </MudChip>
                             </CellTemplate>
                         </PropertyColumn>
+                        <PropertyColumn Property="x => x.CurrentApprover" Title="Currently Assigned To" Class="col-RequesterName" Editable="false">
+                            <CellTemplate>
+                                @context.Item.CurrentApprover
+                            </CellTemplate>
+                        </PropertyColumn>
                        @*  <TemplateColumn Class="flex-column" Title="Action">
                              <CellTemplate Context="row">
                                  <MudIconButton title="View leave details"

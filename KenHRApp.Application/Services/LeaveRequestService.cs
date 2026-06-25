@@ -563,6 +563,8 @@ namespace KenHRApp.Application.Services
                         CreatedByName = e.CreatedByName,
                         DepartmentCode = e.DepartmentCode,
                         DepartmentName = e.DepartmentName,
+                        ApproverNo = e.ApproverNo,
+                        ApproverName = e.ApproverName,
                         AttachmentList = e.AttachmentList
                     }).ToList();
                 }

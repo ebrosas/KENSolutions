@@ -14,8 +14,22 @@ namespace KenHRApp.Infrastructure.Repositories
     {
         #region Workflow Abstract Methods
         Task<Result<List<int>>> StartWorkflowAsync(string entityName, long entityId);
-        Task<Result<List<int>?>> ApproveStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string? comments);
-        Task<Result<bool>> RejectStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string comments);
+
+        Task<Result<List<int>?>> ApproveStepAsync(
+            int stepInstanceId, 
+            int approverEmpNo, 
+            string? approverUserID, 
+            string? comments,
+            long entityId,
+            string entityName);
+
+        Task<Result<bool>> RejectStepAsync(
+            int stepInstanceId, 
+            int approverEmpNo, 
+            string? approverUserID, 
+            string comments,
+            long entityId,
+            string entityName);
         #endregion
 
         #region Database Access Abstract Methods

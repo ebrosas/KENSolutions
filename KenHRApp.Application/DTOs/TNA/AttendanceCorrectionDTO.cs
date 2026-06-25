@@ -42,7 +42,7 @@ namespace KenHRApp.Application.DTOs.TNA
                 if (CurrentlyAssignedEmpNo > 0 &&
                     !string.IsNullOrWhiteSpace(CurrentlyAssignedEmpName))
                 {
-                    return $"{RequestedByName} (Emp.#: {RequestedByNo})";
+                    return $"{CurrentlyAssignedEmpName} (Emp.#: {CurrentlyAssignedEmpNo})";
                 }
                 else
                     return string.Empty;

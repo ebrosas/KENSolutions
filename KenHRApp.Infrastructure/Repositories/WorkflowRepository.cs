@@ -24,7 +24,7 @@ namespace KenHRApp.Infrastructure.Repositories
         #endregion                
 
         #region Enumerations
-        private enum WorkflowStatus
+        public enum WorkflowStatus
         {
             Running,
             Pending,
@@ -178,6 +178,9 @@ namespace KenHRApp.Infrastructure.Repositories
                     {
                         // Set the request entity
                         requestEntity = entity;
+
+                        // Update request status
+                        await UpdateLeaveRequestStatus(entityId, WorkflowStatus.Pending);
                     }
                 }
                 else if (requestType == WorkflowRequestType.Regularization)
@@ -218,7 +221,9 @@ namespace KenHRApp.Infrastructure.Repositories
             int stepInstanceId, 
             int approverEmpNo, 
             string? approverUserID, 
-            string? comments)
+            string? comments,
+            long entityId,
+            string entityName)
         {
             try
             {
@@ -243,12 +248,33 @@ namespace KenHRApp.Infrastructure.Repositories
 
                 // Save to database
                 await _db.SaveChangesAsync();
-
+                                
                 // Insert approval history
                 await InsertApprovalHistoryAsync(step.StepInstanceId, step.ApproverEmpNo, step.ApproverUserID!, isApproved: true, isHold: false, approverRemarks: comments ?? string.Empty);
 
                 // Set the next approver(s) to the list before advancing the workflow
                 List<int> approverList = await AdvanceWorkflow(step.WorkflowInstance);
+
+                #region Update request status 
+                switch (entityName)
+                {
+                    case "RTYPELEAVE":
+                        if (approverList.Any())
+                            await UpdateLeaveRequestStatus(entityId, WorkflowStatus.Approved);
+                        else
+                            await UpdateLeaveRequestStatus(entityId, WorkflowStatus.Completed);
+                        break;
+
+                    case "RTYPEREGULAR":
+                        //this.RequestType = WorkflowRequestType.Regularization;
+                        break;
+
+                    case "RTYPEOT":
+                        //this.RequestType = WorkflowRequestType.OvertimeRequest;
+                        break;
+                }
+                #endregion
+
                 if (approverList.Any())
                     return Result<List<int>?>.SuccessResult(approverList);
                 else
@@ -261,7 +287,13 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
 
-        public async Task<Result<bool>> RejectStepAsync(int stepInstanceId, int approverEmpNo, string? approverUserID, string comments)
+        public async Task<Result<bool>> RejectStepAsync(
+            int stepInstanceId, 
+            int approverEmpNo, 
+            string? approverUserID, 
+            string comments,
+            long entityId,
+            string entityName)
         {
             try
             {
@@ -286,7 +318,22 @@ namespace KenHRApp.Infrastructure.Repositories
                 step.WorkflowInstance.Status = WorkflowStatus.Rejected.ToString();
                 await _db.SaveChangesAsync();
 
-                //await _notify.SendRejectionAsync(step.WorkflowInstance.EntityId);
+                #region Update request status 
+                switch (entityName)
+                {
+                    case "RTYPELEAVE":
+                        await UpdateLeaveRequestStatus(entityId, WorkflowStatus.Rejected);
+                        break;
+
+                    case "RTYPEREGULAR":
+                        //this.RequestType = WorkflowRequestType.Regularization;
+                        break;
+
+                    case "RTYPEOT":
+                        //this.RequestType = WorkflowRequestType.OvertimeRequest;
+                        break;
+                }
+                #endregion
 
                 return Result<bool>.SuccessResult(true);
             }
@@ -1391,7 +1438,112 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 return Result<List<ApprovalRequestResult>>.Failure($"Database error: {ex.Message}");
             }
-        }                
+        }
+
+        public async Task<int> UpdateLeaveRequestStatus(
+            long requestNo,
+            WorkflowStatus reqStatus)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                var existing = await _db.LeaveRequisitionWFs
+                    .FirstOrDefaultAsync(e =>
+                        e.LeaveRequestId == requestNo);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find leave request with the specified request no.");
+
+                UserDefinedCode? statusUDC = null;
+
+                if (reqStatus == WorkflowStatus.Pending)
+                {
+                    #region Set request status to "Waiting for Approval" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "05"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+
+                    // Set the leave approval flag to "Waiting for Approval"
+                    existing.LeaveApprovalFlag = 'W';
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Approved)
+                {
+                    #region Set request status to "Assigned to Next Approver" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "121"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+
+                    // Set the leave approval flag to "Waiting for Approval"
+                    existing.LeaveApprovalFlag = 'W';
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Rejected)
+                {
+                    #region Set request status to "Rejected By Approver" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "110"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+
+                    // Set the leave approval flag to "Rejected"
+                    existing.LeaveApprovalFlag = 'R';
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Cancelled)
+                {
+                    #region Set request status to "Cancelled by User" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "101"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+
+                    // Set the leave approval flag to "Cancelled"
+                    existing.LeaveApprovalFlag = 'C';
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Completed)
+                {
+                    #region Set request status to "Closed by Approver" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "123"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+
+                    // Set the leave approval flag to "Approved / Not Paid"
+                    existing.LeaveApprovalFlag = 'N';
+                    #endregion
+                }
+
+                if (statusUDC != null)
+                {
+                    existing.LeaveStatusCode = statusUDC.UDCCode;
+                    existing.LeaveStatusID = statusUDC.UDCId;
+                    existing.StatusDesc = statusUDC.UDCDesc1;
+                    existing.StatusHandlingCode = statusUDC.UDCSpecialHandlingCode;
+                }
+
+                rowsUpdated = await _db.SaveChangesAsync();
+                return rowsUpdated;
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
         #endregion
     }
 }

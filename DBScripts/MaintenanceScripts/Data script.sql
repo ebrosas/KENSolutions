@@ -10,6 +10,18 @@
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'PAYGRADE')
 
+	--Request statuses
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'STATUS')
+	ORDER BY a.UDCCode
+
+	--Leave Approval Flags
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'LEAVEAPVFLAG')
+	ORDER BY a.SequenceNo
+	
 	--OT Reasons
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
@@ -40,21 +52,14 @@
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'LEAVETYPES')
 
-	--Leave Approval Flags
-	SELECT a.* 
-	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
-	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'LEAVEAPVFLAG')
+	
 
 	--Leave Day Portions
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'LEAVEAPORTION')
 
-	--Request statuses
-	SELECT a.* 
-	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
-	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'STATUS')
-
+	
 	--Attendance Legends
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
