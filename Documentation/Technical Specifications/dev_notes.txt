@@ -61,7 +61,7 @@ To-do List (As of 15-Apr-2026):
 1. Refactor the code in SendPendingApprovalAsync() method in "WorkflowService" class.
 2. Refactor the code in SendAsync() method in "WorkflowEmailService" class
 
-Regularization Request Page:
+
 
 To-do Task:
 1. After successfull submission of the regularization request, change the page title to display the requisition number. -done
@@ -82,14 +82,24 @@ Approval Dashboard:
 Leave Request page:
 1. Implement the Approve and Reject buttons	-Done
 2. Fix the navigation bug when opening the leave request from the Approval Dashboard page	-Done
-3. After approval, the leave request page should be closed and redirected to the calling form.
+3. After approval, the leave request page should be closed and redirected to the calling form.	-Done
 4. In the Leave Inquiry page, add new field called "Currently Assigned To".	-Done
 5. Set the alignment of MudScrollToTop button to right.	-Done
+
+Regularization Request Page:
+1. Test the approval and rejection effect on the status of the request.
 
 Workflow Service:
 1. Once the workflow status is set to "Rejected", implement logic to reject the request status in the underlying requisition table.
 
+10003637 - Naga
+02/02/2010
+ervin_brosas@yahoo.com
 
+10003633 - Tonet
+01/01/2020
+antonina.brosas@gmail.com
 
+Navigation.NavigateTo("/Workflow/ApprovalDashboard?RequestType=RTYPEREGULAR");
 
 

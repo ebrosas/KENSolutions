@@ -247,6 +247,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _isDisabled = false;
                 _saveBtnEnabled = true;
             }
+
+            if (CallerForm == "LeaveInquiry")
+                _forceLoad = true;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -400,6 +403,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                                     {
                                         _currentWFIndex = _workflowList.IndexOf(currentAct);
                                     }
+                                    else
+                                        _currentWFIndex = -1;
                                     #endregion
                                 }
                             }
@@ -493,8 +498,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     {
                         // Initiate the workflow
                         await InitializeWorkflowAsync(_leaveRequest.LeaveRequestId, _leaveRequest.LeaveEmpNo);
-
-                        BeginLoadLeaveRequest(_leaveRequest.LeaveRequestId);
+                        
+                        HandleBackButton();
+                        //BeginLoadLeaveRequest(_leaveRequest.LeaveRequestId);
                     }
                 });
             }
@@ -591,33 +597,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             #endregion
         }
 
-        //private void HandleCancelRequestButton()
-        //{
-        //    // Set flag to display the loading panel
-        //    _isRunning = true;
-
-        //    // Set the overlay message
-        //    overlayMessage = "Cancelling leave request, please wait...";
-
-        //    _ = CancelRequestAsync(async () =>
-        //    {
-        //        // Reset the flags
-        //        _isEditMode = false;
-        //        _isDisabled = false;
-        //        _isRunning = false;
-        //        _saveBtnEnabled = false;
-        //        _hasValidationError = false;
-        //        _validationMessages.Clear();
-
-        //        // Reset error messages
-        //        _errorMessage.Clear();
-        //        ShowHideError(false);
-
-        //        // Shows the spinner overlay
-        //        await InvokeAsync(StateHasChanged);
-        //    });
-        //}
-
         private void HandleBackButton()
         {
             switch(CallerForm)
@@ -627,15 +606,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     break;
 
                 case "LeaveInquiry":
-                    Navigation.NavigateTo("/TimeAttendance/leaveinquiry");
+                    Navigation.NavigateTo($"/TimeAttendance/leaveinquiry?ForceLoad={_forceLoad}");
                     break;
 
                 case "ApprovalDashboard":
-                    Navigation.NavigateTo("/Workflow/ApprovalDashboard");
+                    Navigation.NavigateTo("/Workflow/ApprovalDashboard?RequestType=RTYPEREGULAR");
                     break;
 
                 default:
-                    Navigation.NavigateTo("/home");
+                    Navigation.NavigateTo("/TimeAttendance/tnadashboard");
                     break;
             }
         }
@@ -1785,7 +1764,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     if (string.IsNullOrWhiteSpace(_approverRemarks))
                         throw new Exception("Approval Remarks is required when rejecting the request!");
 
-                    if (_requestItem.ApproverNo == null)
+                    if (_requestItem!.ApproverNo == null)
                         throw new Exception("The current approver is not defined!");
                 }
 

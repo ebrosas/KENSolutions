@@ -364,6 +364,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                                     {
                                         _currentWFIndex = _workflowList.IndexOf(currentAct);
                                     }
+                                    else
+                                        _currentWFIndex = -1;
                                     #endregion
                                 }
                             }
@@ -545,7 +547,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     break;
 
                 case "ApprovalDashboard":
-                    Navigation.NavigateTo("/Workflow/ApprovalDashboard");
+                    Navigation.NavigateTo("/Workflow/ApprovalDashboard?RequestType=RTYPEREGULAR");
                     break;
 
                 case "AttendanceCorrectInq":
@@ -553,7 +555,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     break;
 
                 default:
-                    Navigation.NavigateTo("/home");
+                    Navigation.NavigateTo("/TimeAttendance/tnadashboard");
                     break;
             }
         }

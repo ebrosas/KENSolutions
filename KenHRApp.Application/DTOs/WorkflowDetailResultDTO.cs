@@ -12,6 +12,7 @@ namespace KenHRApp.Application.DTOs
         private readonly string CONST_PENDING = "Pending";
         private readonly string CONST_APPROVED = "Approved";
         private readonly string CONST_REJECTED = "Rejected";
+        private readonly string CONST_COMPLETED = "Completed";
         #endregion
 
         #region Properties

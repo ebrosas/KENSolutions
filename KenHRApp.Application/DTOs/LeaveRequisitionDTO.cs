@@ -178,6 +178,22 @@ namespace KenHRApp.Application.DTOs
             }
             set { }
         }
+
+        [Display(Name = "Current Status")]
+        public string CurrentStatus
+        {
+            get
+            {
+                if (ApproverNo > 0 &&
+                    !string.IsNullOrWhiteSpace(ApproverName))
+                {
+                    return $"{StatusDesc} - {ApproverName}";
+                }
+                else
+                    return $"{StatusHandlingCode} - {StatusDesc}";
+            }
+            set { }
+        }
         #endregion
     }
 }

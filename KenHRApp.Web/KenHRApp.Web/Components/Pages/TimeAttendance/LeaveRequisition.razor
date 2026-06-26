@@ -166,7 +166,9 @@
             <MudPaper Elevation="0" Square="true" Class="w-100 px-2 mt-4">
                  <MudGrid Spacing="5">
                     <MudItem xs="12" sm="6">
-                        @if (ActionType == ActionTypes.Edit.ToString() || ActionType == ActionTypes.View.ToString())
+                        @if (ActionType == ActionTypes.Edit.ToString() || 
+                            ActionType == ActionTypes.View.ToString() ||
+                            ActionType == ActionTypes.Approval.ToString())
                         {
                             <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Spacing="0">
                                 <!-- Leave Requisition No. -->
@@ -180,13 +182,13 @@
                                 </MudText>
 
                                 <!-- Employee Name and Number -->
-                                <MudText Typo="Typo.body2" Color="Color.Surface">
+                                <MudText Typo="Typo.subtitle2" Color="Color.Surface">
                                     Created By: @_leaveRequest.CreatedByName
                                 </MudText>
 
                                 <!-- Current Status -->
-                                <MudText Typo="Typo.body2" Color="@(_leaveRequest.StatusHandlingCode == "Cancelled" ? Color.Error : _leaveRequest.StatusHandlingCode == "Approved" || _leaveRequest.StatusHandlingCode == "Closed" ? Color.Success : Color.Info)" Class="fw-semibold">
-                                    @($"Status: {_leaveRequest.StatusHandlingCode} - {_leaveRequest.StatusDesc}")
+                                <MudText Typo="Typo.subtitle2" Color="@(_leaveRequest.StatusHandlingCode == "Cancelled" ? Color.Error : _leaveRequest.StatusHandlingCode == "Approved" || _leaveRequest.StatusHandlingCode == "Closed" ? Color.Success : Color.Info)">
+                                    Status: @_leaveRequest.CurrentStatus
                                 </MudText>
                             </MudStack>
                         }
@@ -443,7 +445,6 @@
                                     Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                         </MudPaper>
                     </MudItem>
-
                     <MudItem xs="6">
                         <MudPaper Elevation="0">
                             <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Spacing="3" Breakpoint="Breakpoint.Xs">

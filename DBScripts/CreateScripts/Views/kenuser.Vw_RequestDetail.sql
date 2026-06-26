@@ -9,6 +9,7 @@
 *	30/05/2026		Ervin		1.1			Populated return dataset for Regularization Request
 *	09/06/2026		Ervin		1.2			Populated return dataset for Extra Time Request
 *	19/06/2026		Ervin		1.3			Added the following fields in the returned dataset: CurrentlyAssignedEmpNo, CurrentlyAssignedEmpName
+*	26/06/2026		Ervin		1.4			Added "StatusCode" and "StatusDesc" fields		
 ******************************************************************************************************************************************************************************/
 
 ALTER VIEW kenuser.Vw_RequestDetail
@@ -32,6 +33,8 @@ AS
 				'Leave Start Date: ' + FORMAT(a.LeaveStartDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) +
 				'Leave Resume Date: ' + FORMAT(a.LeaveResumeDate, 'dd-MMM-yyyy') + CHAR(13) + CHAR(10) AS RequestDetail,
 			a.LeaveCreatedBy AS CreatedByEmpNo,		--Rev. #1.2
+			a.LeaveStatusCode AS StatusCode,		--Rev. #1.4
+			stat.UDCDesc1 as StatusDesc, 			--Rev. #1.4
 			a.StatusHandlingCode,
 			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverNo ELSE NULL END AS CurrentlyAssignedEmpNo,			--Rev. #1.3
 			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverName ELSE NULL END AS CurrentlyAssignedEmpName		--Rev. #1.3
@@ -56,6 +59,14 @@ AS
 				AND RTRIM(x.[Status]) = 'Pending'
 				AND y.EntityId = a.LeaveRequestId
 		) wf
+		OUTER APPLY
+		(
+			SELECT y.* 
+			FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK)
+				INNER JOIN kenuser.UserDefinedCode y WITH (NOLOCK) ON x.UDCGroupId = y.GroupID
+			where x.UDCGCode = 'STATUS'
+				AND y.UDCCode = a.LeaveStatusCode
+		) stat
 
 	UNION
 
@@ -80,6 +91,8 @@ AS
 				'Regularized Time In: ' + FORMAT(CAST(a.RegularizedTimeIn AS DATETIME), 'hh:mm tt') + CHAR(13) + CHAR(10) +
 				'Regularized Time Out: ' + FORMAT(CAST(a.RegularizedTimeOut AS DATETIME), 'hh:mm tt')  + CHAR(13) + CHAR(10) AS RequestDetail,
 			a.CreatedBy AS CreatedByEmpNo,
+			a.StatusCode,					--Rev. #1.4
+			stat.UDCDesc1 as StatusDesc, 	--Rev. #1.4
 			a.StatusHandlingCode,
 			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverNo ELSE NULL END AS CurrentlyAssignedEmpNo,			--Rev. #1.3
 			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverName ELSE NULL END AS CurrentlyAssignedEmpName		--Rev. #1.3
@@ -114,6 +127,14 @@ AS
 				AND RTRIM(x.[Status]) = 'Pending'
 				AND y.EntityId = a.RegularizationId
 		) wf
+		OUTER APPLY
+		(
+			SELECT y.* 
+			FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK)
+				INNER JOIN kenuser.UserDefinedCode y WITH (NOLOCK) ON x.UDCGroupId = y.GroupID
+			where x.UDCGCode = 'STATUS'
+				AND y.UDCCode = a.[StatusCode]
+		) stat
 
 	UNION
 
@@ -138,6 +159,8 @@ AS
 				'OT Start Time: ' + FORMAT(CAST(a.OTStartTime AS DATETIME), 'hh:mm tt') + CHAR(13) + CHAR(10) +
 				'OT End Time: ' + FORMAT(CAST(a.OTEndTime AS DATETIME), 'hh:mm tt')  + CHAR(13) + CHAR(10) AS RequestDetail,
 			a.CreatedBy AS CreatedByEmpNo,
+			a.StatusCode,					--Rev. #1.4
+			stat.UDCDesc1 as StatusDesc, 	--Rev. #1.4
 			a.StatusHandlingCode,
 			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverNo ELSE NULL END AS CurrentlyAssignedEmpNo,			--Rev. #1.3
 			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverName ELSE NULL END AS CurrentlyAssignedEmpName		--Rev. #1.3
@@ -172,13 +195,21 @@ AS
 				AND RTRIM(x.[Status]) = 'Pending'
 				AND y.EntityId = a.ExtratimeId
 		) wf
+		OUTER APPLY
+		(
+			SELECT y.* 
+			FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK)
+				INNER JOIN kenuser.UserDefinedCode y WITH (NOLOCK) ON x.UDCGroupId = y.GroupID
+			where x.UDCGCode = 'STATUS'
+				AND y.UDCCode = a.[StatusCode]
+		) stat
 
 GO 
 
 /*	Debug:
 
 	SELECT * FROM kenuser.Vw_RequestDetail a
-	WHERE RTRIM(a.RequestTypeCode) = 'RTYPEOT'
+	-- WHERE RTRIM(a.RequestTypeCode) = 'RTYPEOT'
 	ORDER BY a.RequestTypeCode, a.RequestNo
 
 	SELECT * FROM kenuser.Vw_RequestDetail a

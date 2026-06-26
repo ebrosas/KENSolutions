@@ -52,6 +52,6 @@ END
 
 /*	Test:
 
-	EXEC kenuser.Pr_GetWorkflowStatus 'RTYPELEAVE', 15
+	EXEC kenuser.Pr_GetWorkflowStatus 'RTYPELEAVE', 23
 
 */

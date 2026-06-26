@@ -1,6 +1,18 @@
 
-	SELECT a.EmployeeNo, a.CostCenter, a.TS_AutoId, a.AttendanceDate, a.OTReasonCode, * 
+	SELECT 
+		a.StatusCode, a.StatusID, b.UDCDesc1 as StatusDesc, a.[StatusHandlingCode],
+		a.EmployeeNo, a.CostCenter, a.TS_AutoId, a.AttendanceDate, a.OTReasonCode, 
+		a.* 
 	FROM kenuser.[OTRequestWF] a
+		CROSS APPLY
+		(
+			SELECT y.* 
+			FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK)
+				INNER JOIN kenuser.UserDefinedCode y WITH (NOLOCK) ON x.UDCGroupId = y.GroupID
+			where x.UDCGCode = 'STATUS'
+				AND y.UDCCode = a.StatusCode
+		) b
+	where a.ExtratimeId = 7
 
 	EXEC kenuser.Pr_GetOvertimeDetail 3
 

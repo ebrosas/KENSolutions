@@ -23,6 +23,8 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public string? RequestDetail { get; set; } = null;
         //public int? CreatedByEmpNo { get; set; }
         public string CurrentStatus { get; set; } = null!;
+        public string? StatusCode { get; set; } = null;
+        public string? StatusDesc { get; set; } = null;
         public int? CurrentlyAssignedEmpNo { get; set; }
         public string? CurrentlyAssignedEmpName { get; set; } = null;
         #endregion

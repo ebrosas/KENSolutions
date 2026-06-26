@@ -1594,6 +1594,8 @@ namespace KenHRApp.Application.Services
                         RequestedByNo = e.RequestedByNo,
                         RequestedByName = e.RequestedByName,
                         RequestDetail = e.RequestDetail,
+                        StatusCode = e.StatusCode,
+                        StatusDesc = e.StatusDesc,
                         CurrentStatus = e.CurrentStatus,
                         CurrentlyAssignedEmpNo = e.CurrentlyAssignedEmpNo,
                         CurrentlyAssignedEmpName = e.CurrentlyAssignedEmpName

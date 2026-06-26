@@ -1,7 +1,17 @@
-DECLARE @leaveNo	BIGINT = 22
+DECLARE @leaveNo BIGINT = 23
 
-	SELECT a.LeaveApprovalFlag, a.LeaveStatusCode, a.LeaveStatusID, a.StatusHandlingCode, * 
+	SELECT a.LeaveApprovalFlag, a.LeaveStatusCode, b.UDCDesc1 as StatusDesc, 
+		a.LeaveStatusID, a.StatusHandlingCode, a.* 
 	FROM kenuser.LeaveRequisitionWF a
+		CROSS APPLY
+		(
+			SELECT y.* 
+			FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK)
+				INNER JOIN kenuser.UserDefinedCode y WITH (NOLOCK) ON x.UDCGroupId = y.GroupID
+			where x.UDCGCode = 'STATUS'
+				AND y.UDCCode = a.LeaveStatusCode
+		) b
+
 	WHERE a.LeaveRequestId = @leaveNo
 
 	SELECT * FROM [kenuser].[LeaveAttachments] a

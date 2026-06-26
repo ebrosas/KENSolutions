@@ -43,7 +43,7 @@
                             FullWidth="false"
                             Size="Size.Small"
                             StartIcon="@Icons.Material.Filled.PersonSearch"
-                            OnClick="@(() => BeginSearchLeaveTask(true))"
+                            OnClick="BeginSearchLeaveTask"
                             Disabled="@_isRunning">
                         @if (_isRunning)
                     {
@@ -314,12 +314,12 @@
                             <CellTemplate Context="row">
                                 <MudChip T="string" Size=Size.Small Variant="Variant.Outlined" 
                                     Color="@(row.Item.StatusHandlingCode == "Open" ? Color.Info
-                                     : row.Item.StatusHandlingCode == "Closed" ? Color.Surface 
+                                     : row.Item.StatusHandlingCode == "Closed" ? Color.Tertiary 
                                      : row.Item.StatusHandlingCode == "Rejected" ? Color.Error
                                      : row.Item.StatusHandlingCode == "Cancelled" ? Color.Warning
                                      : row.Item.StatusHandlingCode == "Approved" ? Color.Success
                                      : Color.Dark)">
-                                    @row.Item.StatusDesc
+                                    @row.Item.StatusSummary
                                 </MudChip>
                             </CellTemplate>
                         </PropertyColumn>

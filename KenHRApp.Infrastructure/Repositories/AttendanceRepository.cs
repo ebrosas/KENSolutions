@@ -1934,7 +1934,9 @@ namespace KenHRApp.Infrastructure.Repositories
                         RequestedByNo = e.RequestedByNo,
                         RequestedByName = e.RequestedByName,
                         RequestDetail = e.RequestDetail,
-                        CurrentStatus = e.CurrentStatus,
+                        StatusCode = e.StatusCode,
+                        StatusDesc = e.StatusDesc,
+                        CurrentStatus = e.CurrentStatus,                        
                         CurrentlyAssignedEmpNo = e.CurrentlyAssignedEmpNo,
                         CurrentlyAssignedEmpName = e.CurrentlyAssignedEmpName
                     }).ToList();

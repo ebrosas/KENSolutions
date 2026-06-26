@@ -552,7 +552,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                     StateHasChanged();
 
                 }, stepInstanceId, Convert.ToInt32(requestItem.ApproverNo), UserName!,
-                requestItem.Remarks, requestItem.RequestNo);
+                requestItem.Remarks, requestItem.RequestNo, requestItem.RequestTypeCode);
             }
             catch (Exception ex)
             {
@@ -637,7 +637,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                     StateHasChanged();
 
                 }, stepInstanceId, requestItem.CreatedByEmpNo, Convert.ToInt32(requestItem.ApproverNo), UserName!,
-                requestItem.Remarks, requestItem.RequestNo);
+                requestItem.Remarks, requestItem.RequestNo, requestItem.RequestTypeCode);
             }
             catch (Exception ex)
             {
@@ -780,7 +780,8 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             int approverNo, 
             string userID, 
             string? comments,
-            long requestNo)
+            long requestNo,
+            string requestType)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(500);
@@ -795,7 +796,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             string errorMsg = string.Empty;
 
             var repoResult = await WorkflowService.ApproveStepAsync(stepInstanceId, approverNo, userID, comments,
-                WorkflowHelper.CONST_LEAVE_REQUEST, requestNo, Environment.WebRootPath, _cts.Token);
+                requestType, requestNo, Environment.WebRootPath, _cts.Token);
 
             isSuccess = repoResult.Success;
             if (!isSuccess)
@@ -830,7 +831,8 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             int approverNo, 
             string? userID, 
             string comments,
-            long requestNo)
+            long requestNo,
+            string requestType)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(500);
@@ -845,7 +847,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             string errorMsg = string.Empty;
 
             var repoResult = await WorkflowService.RejectStepAsync(stepInstanceId, creatorEmpNo, approverNo, userID, comments,
-                WorkflowHelper.CONST_LEAVE_REQUEST, requestNo, Environment.WebRootPath, _cts.Token);
+                requestType, requestNo, Environment.WebRootPath, _cts.Token);
 
             isSuccess = repoResult.Success;
             if (!isSuccess)

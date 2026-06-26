@@ -282,7 +282,7 @@
                                         : row.Item.CurrentStatus == RequestStatus.Approved.ToString() ? Color.Success
                                         : row.Item.CurrentStatus == RequestStatus.Draft.ToString() ? Color.Surface
                                         : Color.Dark)">
-                                    @row.Item.CurrentStatus
+                                    @row.Item.StatusSummary
                                 </MudChip>
                             </CellTemplate>
                         </PropertyColumn>  

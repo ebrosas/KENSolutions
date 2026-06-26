@@ -6,7 +6,7 @@
 *
 *	Date			Author		Rev. #		Comments:
 *	22/03/2026		Ervin		1.0			Created
-*
+*	26/06/2026		Ervin		1.1			Added "StatusCode" and "StatusDesc" fields	
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_SearchAttendanceCorrection
@@ -60,6 +60,8 @@ BEGIN
 			a.RequestedByNo,
 			a.RequestedByName,
 			a.RequestDetail,
+			a.StatusCode,			--Rev. #1.1
+			a.StatusDesc,			--Rev. #1.1
 			a.StatusHandlingCode AS CurrentStatus,
 			a.CurrentlyAssignedEmpNo,
 			a.CurrentlyAssignedEmpName

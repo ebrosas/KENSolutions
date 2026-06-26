@@ -62,7 +62,7 @@
                                                 </MudText>
 
                                                 <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexEnd">
-                                                    <MudChip T="string" Variant="Variant.Filled" @bind-Text="request.AssignedCountString" hidden="@(request.AssignedCount == 0 ? true : false)" Color="@(request.AssignedCount > 0 ? Color.Info : Color.Transparent)" Size="Size.Small" />
+                                                    <MudChip T="string" Variant="Variant.Filled" @bind-Text="request.AssignedCountString" hidden="@(request.AssignedCount == 0 ? true : false)" Color="@(request.AssignedCount > 0 ? Color.Secondary : Color.Transparent)" Size="Size.Small" />
                                                 </MudStack>
                                             </MudStack>
                                         </MudListItem>

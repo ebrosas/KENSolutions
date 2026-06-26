@@ -192,6 +192,9 @@ namespace KenHRApp.Infrastructure.Repositories
                     {
                         // Set the request entity
                         requestEntity = entity;
+
+                        // Update request status
+                        await UpdateRegularizationStatus(entityId, WorkflowStatus.Pending);
                     }
                 }
                 else if (requestType == WorkflowRequestType.OvertimeRequest)
@@ -203,6 +206,9 @@ namespace KenHRApp.Infrastructure.Repositories
                     {
                         // Set the request entity
                         requestEntity = entity;
+
+                        // Update request status
+                        await UpdateExtraTimeStatus(entityId, WorkflowStatus.Pending);
                     }
                 }
                 #endregion
@@ -266,11 +272,17 @@ namespace KenHRApp.Infrastructure.Repositories
                         break;
 
                     case "RTYPEREGULAR":
-                        //this.RequestType = WorkflowRequestType.Regularization;
+                        if (approverList.Any())
+                            await UpdateRegularizationStatus(entityId, WorkflowStatus.Approved);
+                        else
+                            await UpdateRegularizationStatus(entityId, WorkflowStatus.Completed);
                         break;
 
                     case "RTYPEOT":
-                        //this.RequestType = WorkflowRequestType.OvertimeRequest;
+                        if (approverList.Any())
+                            await UpdateExtraTimeStatus(entityId, WorkflowStatus.Approved);
+                        else
+                            await UpdateExtraTimeStatus(entityId, WorkflowStatus.Completed);
                         break;
                 }
                 #endregion
@@ -326,11 +338,11 @@ namespace KenHRApp.Infrastructure.Repositories
                         break;
 
                     case "RTYPEREGULAR":
-                        //this.RequestType = WorkflowRequestType.Regularization;
+                        await UpdateRegularizationStatus(entityId, WorkflowStatus.Rejected);
                         break;
 
                     case "RTYPEOT":
-                        //this.RequestType = WorkflowRequestType.OvertimeRequest;
+                        await UpdateExtraTimeStatus(entityId, WorkflowStatus.Rejected);
                         break;
                 }
                 #endregion
@@ -1529,6 +1541,184 @@ namespace KenHRApp.Infrastructure.Repositories
                     existing.LeaveStatusCode = statusUDC.UDCCode;
                     existing.LeaveStatusID = statusUDC.UDCId;
                     existing.StatusDesc = statusUDC.UDCDesc1;
+                    existing.StatusHandlingCode = statusUDC.UDCSpecialHandlingCode;
+                }
+
+                rowsUpdated = await _db.SaveChangesAsync();
+                return rowsUpdated;
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> UpdateExtraTimeStatus(
+            long requestNo,
+            WorkflowStatus reqStatus)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                var existing = await _db.OTRequestWF
+                    .FirstOrDefaultAsync(e =>
+                        e.ExtratimeId == requestNo);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find Extra Time request with the specified requisition no.");
+
+                UserDefinedCode? statusUDC = null;
+
+                if (reqStatus == WorkflowStatus.Pending)
+                {
+                    #region Set request status to "Waiting for Approval" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "05"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Approved)
+                {
+                    #region Set request status to "Assigned to Next Approver" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "121"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Rejected)
+                {
+                    #region Set request status to "Rejected By Approver" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "110"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Cancelled)
+                {
+                    #region Set request status to "Cancelled by User" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "101"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Completed)
+                {
+                    #region Set request status to "Closed by Approver" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "123"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+
+                if (statusUDC != null)
+                {
+                    existing.StatusCode = statusUDC.UDCCode;
+                    existing.StatusID = statusUDC.UDCId;
+                    existing.StatusHandlingCode = statusUDC.UDCSpecialHandlingCode;
+                }
+
+                rowsUpdated = await _db.SaveChangesAsync();
+                return rowsUpdated;
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> UpdateRegularizationStatus(
+            long requestNo,
+            WorkflowStatus reqStatus)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                var existing = await _db.RegularRequestWFs
+                    .FirstOrDefaultAsync(e =>
+                        e.RegularizationId == requestNo);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find Regularization request with the specified requisition no.");
+
+                UserDefinedCode? statusUDC = null;
+
+                if (reqStatus == WorkflowStatus.Pending)
+                {
+                    #region Set request status to "Waiting for Approval" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "05"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Approved)
+                {
+                    #region Set request status to "Assigned to Next Approver" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "121"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Rejected)
+                {
+                    #region Set request status to "Rejected By Approver" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "110"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Cancelled)
+                {
+                    #region Set request status to "Cancelled by User" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "101"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Completed)
+                {
+                    #region Set request status to "Closed by Approver" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "123"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+
+                if (statusUDC != null)
+                {
+                    existing.StatusCode = statusUDC.UDCCode;
+                    existing.StatusID = statusUDC.UDCId;
                     existing.StatusHandlingCode = statusUDC.UDCSpecialHandlingCode;
                 }
 

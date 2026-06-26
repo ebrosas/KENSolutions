@@ -21,6 +21,8 @@ namespace KenHRApp.Application.DTOs.TNA
         public int? RequestedByNo { get; set; }
         public string? RequestedByName { get; set; } = null;
         public string? RequestDetail { get; set; } = null;
+        public string? StatusCode { get; set; } = null;
+        public string? StatusDesc { get; set; } = null;
         public string CurrentStatus { get; set; } = null!;
         public int? CurrentlyAssignedEmpNo { get; set; }
         public string? CurrentlyAssignedEmpName { get; set; } = null;
@@ -43,6 +45,20 @@ namespace KenHRApp.Application.DTOs.TNA
                     !string.IsNullOrWhiteSpace(CurrentlyAssignedEmpName))
                 {
                     return $"{CurrentlyAssignedEmpName} (Emp.#: {CurrentlyAssignedEmpNo})";
+                }
+                else
+                    return string.Empty;
+            }
+        }
+
+        public string StatusSummary
+        {
+            get
+            {
+                if (!string.IsNullOrWhiteSpace(CurrentStatus) &&
+                    !string.IsNullOrWhiteSpace(StatusDesc))
+                {
+                    return $"{CurrentStatus} - {StatusDesc}";
                 }
                 else
                     return string.Empty;

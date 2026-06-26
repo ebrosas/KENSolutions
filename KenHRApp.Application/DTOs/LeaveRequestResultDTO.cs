@@ -91,6 +91,20 @@ namespace KenHRApp.Application.DTOs
                     return string.Empty;
             }
         }
+
+        public string StatusSummary
+        {
+            get
+            {
+                if (!string.IsNullOrWhiteSpace(StatusHandlingCode) &&
+                    !string.IsNullOrWhiteSpace(StatusDesc))
+                {
+                    return $"{StatusHandlingCode} - {StatusDesc}";
+                }
+                else
+                    return string.Empty;
+            }
+        }
         #endregion
     }
 }

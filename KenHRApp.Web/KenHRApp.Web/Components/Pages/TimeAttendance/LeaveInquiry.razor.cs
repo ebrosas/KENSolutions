@@ -436,7 +436,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 if (ForceLoad)
                 {
-                    BeginSearchLeaveTask(ForceLoad);
+                    BeginSearchLeaveTask();
                 }
             });
         }
@@ -463,7 +463,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _validationMessages.Clear();
         }
 
-        private void BeginSearchLeaveTask(bool forceLoad = false)
+        private void BeginSearchLeaveTask()
         {
             // Reset validation errors
             _hasValidationError = false;
@@ -498,7 +498,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
-            }, forceLoad);
+            });
         }
         #endregion
 
@@ -598,7 +598,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task SearchLeaveRequestAsync(Func<Task> callback, bool forceLoad = false)
+        private async Task SearchLeaveRequestAsync(Func<Task> callback)
         {
             await Task.Delay(500);
 
