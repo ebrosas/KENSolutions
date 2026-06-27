@@ -1,4 +1,4 @@
-﻿@page "/TimeAttendance/leaverequest"
+﻿@page "/TimeAttendance/ApplyOutdoor"
 
 <style>
     .my-stepper .mud-stepper-actions {
@@ -80,7 +80,7 @@
 
                     @if (ActionType == ActionTypes.Approval.ToString())
                     {
-                        @if (_leaveRequest.StatusHandlingCode == "Open"
+                        @if (_outdoorRequest.StatusHandlingCode == "Open"
                             && _isCurrentApprover)
                         {
                             <MudButton Variant="Variant.Filled"
@@ -105,7 +105,7 @@
                     @if (ActionType == ActionTypes.Edit.ToString() 
                         || ActionType == ActionTypes.View.ToString())
                     {
-                        @if (_leaveRequest.StatusHandlingCode == "Open" 
+                        @if (_outdoorRequest.StatusHandlingCode == "Open" 
                             && _isCreator)
                         {
                             <MudButton Variant="Variant.Filled"
@@ -164,85 +164,14 @@
 
         <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
             <MudPaper Elevation="0" Square="true" Class="w-100 px-2 mt-4">
-                 <MudGrid Spacing="5">
-                    <MudItem xs="12" sm="6">
-                        @if (ActionType == ActionTypes.Edit.ToString() || 
-                            ActionType == ActionTypes.View.ToString() ||
-                            ActionType == ActionTypes.Approval.ToString())
-                        {
-                            <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Spacing="0">
-                                <!-- Leave Requisition No. -->
-                                <MudText Typo="Typo.h6" Color="Color.Surface" Class="fw-bold">
-                                    Leave Requisition No. @_leaveRequest.LeaveRequestId
-                                </MudText>
-
-                                <!-- Created Date and Time -->
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                    Created On: @_leaveRequest.LeaveCreatedDate?.ToString("MMM dd, yyyy hh:mm tt")
-                                </MudText>
-
-                                <!-- Employee Name and Number -->
-                                <MudText Typo="Typo.subtitle2" Color="Color.Surface">
-                                    Created By: @_leaveRequest.CreatedByName
-                                </MudText>
-
-                                <!-- Current Status -->
-                                <MudText Typo="Typo.subtitle2" Color="@(_leaveRequest.StatusHandlingCode == "Cancelled" ? Color.Error : _leaveRequest.StatusHandlingCode == "Approved" || _leaveRequest.StatusHandlingCode == "Closed" ? Color.Success : Color.Info)">
-                                    Status: @_leaveRequest.CurrentStatus
-                                </MudText>
-                            </MudStack>
-                        }
-                    </MudItem>
-                    <MudItem xs="12" sm="6">
-                        <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Spacing="4">
-                             <MudStack Justify="Justify.FlexStart" Spacing="0">
-                                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
-                                     <MudAvatar Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
-                                         <MudIcon Icon="@Icons.Material.Filled.Balance" />
-                                     </MudAvatar>
-                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Info">@_leaveRequest.LeaveBalance.ToString("F1") days</MudText>
-                                </MudStack>
-                                <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Info">Leave Balance</MudText>
-                            </MudStack>
-                             <MudStack Justify="Justify.FlexStart" Spacing="0">
-                                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
-                                     <MudAvatar Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
-                                         <MudIcon Icon="@Icons.Material.Filled.TimeToLeave" />
-                                     </MudAvatar>
-                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.LeaveDuration!.Value.ToString("F1") days</MudText>
-                                 </MudStack>
-                                <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Success">Duration</MudText>
-                             </MudStack>
-                             <MudStack Justify="Justify.FlexStart" Spacing="0">
-                                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
-                                     <MudAvatar Size="Size.Small" Color="Color.Surface" Variant="Variant.Filled">
-                                         <MudIcon Icon="@Icons.Material.Filled.Weekend" />
-                                     </MudAvatar>
-                                    <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Surface">@_leaveRequest.NoOfWeekends!.Value.ToString() days</MudText>
-                                 </MudStack>
-                                 <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Surface">Weekends</MudText>
-                             </MudStack>
-                             <MudStack Justify="Justify.FlexStart" Spacing="0">
-                                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
-                                     <MudAvatar Size="Size.Small" Color="Color.Surface" Variant="Variant.Filled">
-                                         <MudIcon Icon="@Icons.Material.Filled.HolidayVillage" />
-                                     </MudAvatar>
-                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Surface">@_leaveRequest.NoOfHolidays!.Value.ToString() days</MudText>
-                                 </MudStack>
-                                <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Surface">Holidays</MudText>
-                             </MudStack>
-                         </MudStack>
-                    </MudItem>
-                </MudGrid>
-
                 <MudGrid Spacing="5" Class="mt-0">
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="w-100">
-                            <MudAutocomplete @bind-Value="_leaveRequest.LeaveTypeDesc"
-                                For="@(() => _leaveRequest.LeaveTypeDesc)"
+                            <MudAutocomplete @bind-Value="_outdoorRequest.ROADesc"
+                                For="@(() => _outdoorRequest.ROADesc)"
                                 Class="required-field"
-                                Label="Leave Type"
-                                SearchFunc="SearchLeaveTypes!"
+                                Label="Outdoor Type"
+                                SearchFunc="SearchReasonOfAbsence!"
                                 Variant="Variant.Text"
                                 Margin="Margin.Dense"
                                 Dense="true"
@@ -252,36 +181,14 @@
                                 Clearable="true"
                                 Typo="Typo.subtitle2"
                                 Disabled="@_isDisabled"
-                                MaxItems="@(_leaveTypeList != null ? _leaveTypeList.Count : 10)"
+                                MaxItems="@(_roaList != null ? _roaList.Count : 10)"
                                 Modal="true" />
-
-                            @* <MudSelect T="string"
-                                       Value="_leaveRequest.LeaveType"
-                                       ValueChanged="@((v) => OnLeaveTypeChanged(v))"
-                                       Disabled="@_isDisabled"
-                                       Label="Leave Type"
-                                       Class="required-field"
-                                       Variant="Variant.Text"
-                                       Margin="Margin.Dense"
-                                       Placeholder="Please Select"
-                                       AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
-                                       AdornmentColor="Color.Default"
-                                       HelperText="Type a key to search for value"
-                                       HelperTextOnFocus="true"
-                                       Immediate="true"
-                                       FullWidth="true"
-                                       Typo="Typo.subtitle2">
-                                @foreach (var leave in _leaveTypeList!)
-                                {
-                                    <MudSelectItem Value="leave.UDCCode">@leave.UDCDesc1</MudSelectItem>
-                                }
-                            </MudSelect> *@
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudSelect T="int"
-                                       Value="_leaveRequest.LeaveEmpNo"
+                                       Value="_outdoorRequest.EmpNo"
                                        ValueChanged="@((v) => OnEmployeeChanged(v))"
                                        Disabled="@_isDisabled"
                                        Label="Select Employee"
@@ -308,62 +215,33 @@
                         <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
                             <MudDatePicker Label="Start Date" Editable="true" AutoClose="true"
                                     Class="required-field"
-                                    For="@(() => _leaveRequest.LeaveStartDate)"
+                                    @bind-Date="_outdoorRequest.StartDate"
+                                    For="@(() => _outdoorRequest.StartDate)"
                                     Margin="Margin.Dense" 
                                     HelperText="Specify start period of leave" HelperTextOnFocus="true" 
                                     Clearable="false" Disabled="@_isDisabled" 
                                     Color="Color.Surface"
-                                    Date="_leaveRequest.LeaveStartDate"
-                                    DateChanged="OnStartDateChanged"
                                     Mask="@(new DateMask("dd/MM/yyyy"))" 
                                     DateFormat="dd/MM/yyyy" 
                                     Placeholder="dd/MM/yyyy" 
                                     Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
-                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = DateTime.Today))">Today</MudButton>
-                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = null))">Clear</MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _outdoorRequest.StartDate = DateTime.Today))">Today</MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _outdoorRequest.StartDate = null))">Clear</MudButton>
                                 </PickerActions>
                             </MudDatePicker>
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="6">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                            @* <MudAutocomplete @bind-Value="_leaveRequest.StartDayModeDesc"
-                                             For="@(() => _leaveRequest.StartDayModeDesc)"
-                                             SearchFunc="SearchLeaveMode!"
-                                             Variant="Variant.Text"
-                                             Label="Start Day Mode"
-                                             Margin="Margin.Dense"
-                                             Dense="true"
-                                             Placeholder="Please Select"
-                                             HelperText="Type a key to search for value"
-                                             HelperTextOnFocus="true"
-                                             Clearable="true"
-                                             Typo="Typo.subtitle2"
-                                             Disabled="@_isDisabled" 
-                                             MaxItems="@(_leaveModeList != null ? _leaveModeList.Count : 10)"
-                                             Modal="true" /> *@
-
-                            <MudSelect T="string"
-                                       @ref="_startDayMode"
-                                       Value="_leaveRequest.StartDayMode"
-                                       ValueChanged="@((v) => OnStartDayModeChanged(v))"
-                                       Disabled="@_isDisabled"
-                                       Label="Start Day Mode"
-                                       Variant="Variant.Text"
-                                       Margin="Margin.Dense"
-                                       Placeholder="Please Select"
-                                       AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
-                                       AdornmentColor="Color.Default"
-                                       HelperText="Type a key to search for value"
-                                       HelperTextOnFocus="true"
-                                       Immediate="true"
-                                       Typo="Typo.subtitle2">
-                                @foreach (var mode in _leaveModeList!)
-                                {
-                                    <MudSelectItem Value="mode.UDCCode">@mode.UDCDesc1</MudSelectItem>
-                                }
-                            </MudSelect>
+                        <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
+                            <MudTimePicker Color="Color.Dark" AmPm="true" TimeFormat="h:mm tt"
+                                    Label="Start Time"
+                                    Class="required-field"
+                                    @bind-Time="_outdoorRequest.StartTime"
+                                    For="@(() => _outdoorRequest.StartTime)"
+                                    Variant="Variant.Text"
+                                    Margin="Margin.Dense"
+                                    Disabled="@_isDisabled" />
                         </MudPaper>
                     </MudItem>
                 </MudGrid>
@@ -371,11 +249,10 @@
                 <MudGrid Spacing="5">
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
-                            <MudDatePicker Label="Resume Date" Editable="true" AutoClose="true"
+                            <MudDatePicker Label="End Date" Editable="true" AutoClose="true"
                                     Class="required-field"
-                                    Date="_leaveRequest.LeaveResumeDate"
-                                    DateChanged="OnResumeDateChanged"
-                                    For="@(() => _leaveRequest.LeaveResumeDate)"
+                                    @bind-Date="_outdoorRequest.EndDate"
+                                    For="@(() => _outdoorRequest.EndDate)"
                                     Margin="Margin.Dense"
                                     HelperText="Specify resume date of work" HelperTextOnFocus="true"
                                     Clearable="false" 
@@ -386,50 +263,22 @@
                                     Placeholder="dd/MM/yyyy" 
                                     Variant="Variant.Text">
                                 <PickerActions Context="dateContext">
-                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveResumeDate = DateTime.Today))">Today</MudButton>
-                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveResumeDate = null))">Clear</MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _outdoorRequest.EndDate = DateTime.Today))">Today</MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _outdoorRequest.EndDate = null))">Clear</MudButton>
                                 </PickerActions>
                             </MudDatePicker>
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="6">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                            @* <MudAutocomplete @bind-Value="_leaveRequest.EndDayModeDesc"
-                                             For="@(() => _leaveRequest.EndDayModeDesc)"
-                                             SearchFunc="SearchLeaveMode!"
-                                             Variant="Variant.Text"
-                                             Label="End Day Mode"
-                                             Margin="Margin.Dense"
-                                             Dense="true" 
-                                             Placeholder="Please Select"
-                                             HelperText="Type a key to search for value"
-                                             HelperTextOnFocus="true"
-                                             Clearable="true"
-                                             Typo="Typo.subtitle2"
-                                             Disabled="@_isDisabled"
-                                             MaxItems="@(_leaveModeList != null ? _leaveModeList.Count : 10)"
-                                             Modal="true" /> *@
-
-                            <MudSelect T="string"
-                                       @ref="_endDayMode"
-                                       Value="_leaveRequest.EndDayMode"
-                                       ValueChanged="@((v) => OnResumeDayModeChanged(v))"
-                                       Disabled="@_isDisabled"
-                                       Label="End Day Mode"
-                                       Variant="Variant.Text"
-                                       Margin="Margin.Dense"
-                                       Placeholder="Please Select"
-                                       AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
-                                       AdornmentColor="Color.Default"
-                                       HelperText="Type a key to search for value"
-                                       HelperTextOnFocus="true"
-                                       Immediate="true"
-                                       Typo="Typo.subtitle2">
-                                @foreach (var mode in _leaveModeList!)
-                                {
-                                    <MudSelectItem Value="mode.UDCCode">@mode.UDCDesc1</MudSelectItem>
-                                }
-                            </MudSelect>
+                        <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
+                            <MudTimePicker Color="Color.Dark" AmPm="true" TimeFormat="h:mm tt"
+                                           Label="End Time"
+                                           Class="required-field"
+                                           @bind-Time="_outdoorRequest.EndTime"
+                                           For="@(() => _outdoorRequest.EndTime)"
+                                           Variant="Variant.Text"
+                                           Margin="Margin.Dense"
+                                           Disabled="@_isDisabled" />
                         </MudPaper>
                     </MudItem>                    
                 </MudGrid>                                 
@@ -437,34 +286,32 @@
                 <MudGrid Spacing="5">
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudTextField @bind-Value="_leaveRequest.LeaveRemarks" 
-                                    For="@(() => _leaveRequest.LeaveRemarks)"
-                                    Label="Leave Reason"
+                            <MudTextField @bind-Value="_outdoorRequest.Description" 
+                                    For="@(() => _outdoorRequest.Description)"
+                                    Label="Description"
                                     HelperText="Max. text input is 500 chars."
                                     Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="500" MaxLength="500" Lines="3"
                                     Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="6">
-                        <MudPaper Elevation="0">
-                            <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Spacing="3" Breakpoint="Breakpoint.Xs">
-                                 <MudPaper Elevation="0">
-                                     <MudText Typo="Typo.caption" Align="Align.Start" Style="color: #004165;">Require Visa?</MudText>
-                                     <MudPaper Elevation="0" Class="p-0 w-100 d-flex justify-content-start">
-                                         <MudSwitch @bind-Value="_leaveRequest.LeaveVisaRequired" Color="Color.Success" UncheckedColor="Color.Default"
-                                                    Disabled="@_isDisabled"
-                                                    LabelPlacement="Placement.Start">No/Yes</MudSwitch>
-                                     </MudPaper>
-                                 </MudPaper>
-                                 <MudPaper Elevation="0">
-                                     <MudText Typo="Typo.caption" Align="Align.Start" Style="color: #004165;">Require Adv. Payment?</MudText>
-                                     <MudPaper Elevation="0" Class="p-0 w-100 d-flex justify-content-start">
-                                         <MudSwitch @bind-Value="_leaveRequest.LeavePayAdv" Color="Color.Success" UncheckedColor="Color.Default"
-                                                    Disabled="@_isDisabled"
-                                                    LabelPlacement="Placement.Start">No/Yes</MudSwitch>
-                                     </MudPaper>
-                                 </MudPaper>
-                            </MudStack>                            
+                        <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
+                            <MudAutocomplete @bind-Value="_outdoorRequest.DOWDesc"
+                                             For="@(() => _outdoorRequest.DOWDesc)"
+                                             Class="required-field"
+                                             Label="Day of Week"
+                                             SearchFunc="SearchDOW!"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for value"
+                                             HelperTextOnFocus="true"
+                                             Clearable="true"
+                                             Typo="Typo.subtitle2"
+                                             Disabled="@_isDisabled"
+                                             MaxItems="@(_dowList != null ? _dowList.Count : 10)"
+                                             Modal="true" />
                         </MudPaper>
                     </MudItem>
                 </MudGrid>
@@ -518,10 +365,10 @@
                                 else if (ActionType == ActionTypes.View.ToString() ||
                                 ActionType == ActionTypes.Approval.ToString())
                                 {
-                                    @if (_leaveRequest.Files.Any())
+                                    @if (_outdoorRequest.Files.Any())
                                     {
                                         <MudChipSet T="LeaveAttachmentDTO" Class="mt-2">
-                                            @foreach (var file in _leaveRequest.Files)
+                                            @foreach (var file in _outdoorRequest.Files)
                                             {
                                                 <MudChip T="LeaveAttachmentDTO"
                                                          Color="Color.Info"
@@ -544,7 +391,7 @@
                     </MudExpansionPanel>
 
                     @if (ActionType == ActionTypes.Approval.ToString() 
-                        && _leaveRequest.StatusHandlingCode == "Open" 
+                        && _outdoorRequest.StatusHandlingCode == "Open" 
                         && _isCurrentApprover)
                     {
                         <MudExpansionPanel Class="p-0" Dense Gutters Expanded="true">

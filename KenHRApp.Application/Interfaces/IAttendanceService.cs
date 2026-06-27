@@ -98,6 +98,21 @@ namespace KenHRApp.Application.Interfaces
             string? status,
             DateTime? startDate,
             DateTime? endDate);
+
+        Task<Result<OutdoorRequestDTO?>> GetOutdoorRequestAsync(long requestNo);
+        Task<Result<long>> AddOutdoorRequestAsync(
+            OutdoorRequestDTO dto,
+            List<FileUploadDTO> files,
+            string webRootPath,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<int>> UpdateOutdoorRequestAsync(
+           OutdoorRequestDTO dto,
+           CancellationToken cancellationToken = default);
+
+        Task<Result<int>> CancelOutdoorRequestAsync(
+            OutdoorRequestDTO dto,
+            CancellationToken cancellationToken = default);
         #endregion
     }
 }

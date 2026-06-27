@@ -2530,6 +2530,14 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@SequenceNo					= 6,
 				@IsActive					= 1,
 				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'RTYPEOUTDOOR',
+				@UDCDesc1					= 'Outdoor',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 7,
+				@IsActive					= 1,
+				@Amount						= NULL 
 	*/
 
 	/*	Populate Workflow Statuses

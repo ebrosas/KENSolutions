@@ -513,7 +513,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             //    // Shows the spinner overlay
             //    await InvokeAsync(StateHasChanged);
-            //}, _shiftPattern.RegularizationId);
+            //}, _shiftPattern.OutdoorId);
         }
 
         private void HandleRefreshButton()
@@ -523,6 +523,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _regularRequest.CreatedBy = UserEmpNo;
             _regularRequest.CreatedEmail = UserEmail;
             _regularRequest.CreatedUserID = UserName;
+
+            // Reset the flags
+            _isRunning = false;
+            _hasValidationError = false;
+            _validationMessages.Clear();
+
+            // Reset error messages
+            _errorMessage.Clear();
+            ShowHideError(false);
 
             #region Reset file attachments
             _files = Array.Empty<IBrowserFile>();
@@ -764,7 +773,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Cancel"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to cancel Regularization Request No. '{_regularRequest.RegularizationId}'?" },
+                { "ContentText", $"Are you sure you want to cancel Regularization Request #'{_regularRequest.RegularizationId}'?" },
                 { "ConfirmText", "Proceed" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -1261,6 +1270,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     {
                         _currentWFIndex = _workflowList.IndexOf(currentAct);
                     }
+                    else
+                        _currentWFIndex = -1;
                     #endregion
                 }
             }

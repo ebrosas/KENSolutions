@@ -87,6 +87,7 @@
         <MudNavLink Icon="far fa-calendar-plus" Class="navMenu navlink-icon-sm" OnClick="OpenExtraTime">Extra Time Request</MudNavLink>
         <MudNavLink Href="/DigitalID" Icon="fas fa-address-card" Class="navMenu navlink-icon-sm" hidden>Digital ID</MudNavLink>        
         <MudNavLink Href="/SelfService" Icon="fas fa-user-edit" Class="navMenu navlink-icon-sm" hidden>Self Service</MudNavLink>
+        <MudNavLink Icon="far fa-calendar-check" Class="navMenu navlink-icon-sm" OnClick="OpenOutdoor">Outdoor Request</MudNavLink>
         <MudNavLink Icon="far fa-calendar-check" Class="navMenu navlink-icon-sm" OnClick="OpenRegularization">Regularization Request</MudNavLink>
         <MudNavLink Icon="fas fa-people-carry" Class="navMenu navlink-icon-sm" OnClick="ShowShiftRoster">Shift Roster</MudNavLink>
         <MudNavLink Href="/security" Icon="fas fa-tasks" Class="navMenu navlink-icon-sm" hidden>Manual Attendance</MudNavLink>
@@ -256,6 +257,12 @@
     {        
         // NavigationManager.NavigateTo("/TimeAttendance/regularinquiry");
         NavigationManager.NavigateTo("/TimeAttendance/regularization?ActionType=Add&CallerForm=TNADashboard");
+        Actions.InvokeShowHideDrawer();
+    }
+
+    private void OpenOutdoor()
+    {
+        NavigationManager.NavigateTo("/TimeAttendance/ApplyOutdoor?ActionType=Add&CallerForm=TNADashboard");
         Actions.InvokeShowHideDrawer();
     }
 

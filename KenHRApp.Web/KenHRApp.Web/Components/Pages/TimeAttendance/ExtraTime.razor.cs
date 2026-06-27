@@ -517,6 +517,15 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _overtimeRequest.CreatedEmail = UserEmail;
             _overtimeRequest.CreatedUserID = UserName;
 
+            // Reset the flags
+            _isRunning = false;
+            _hasValidationError = false;
+            _validationMessages.Clear();
+
+            // Reset error messages
+            _errorMessage.Clear();
+            ShowHideError(false);
+
             #region Reset file attachments
             _files = Array.Empty<IBrowserFile>();
 

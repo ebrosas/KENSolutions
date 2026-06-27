@@ -1609,6 +1609,273 @@ namespace KenHRApp.Application.Services
                 return Result<List<AttendanceCorrectionDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while searching for attendance correction requests from the database.");
             }
         }
+
+        public async Task<Result<OutdoorRequestDTO?>> GetOutdoorRequestAsync(long requestNo)
+        {
+            OutdoorRequestDTO? request = null;
+
+            try
+            {
+                //var repoResult = await _repository.GetRegularRequestAsync(requestNo);
+                //if (!repoResult.Success)
+                //{
+                //    return Result<OutdoorRequestDTO?>.Failure(repoResult.Error ?? "Unknown repository error");
+                //}
+
+                //var model = repoResult.Value;
+                //if (model != null)
+                //{
+                //    request = new OutdoorRequestDTO
+                //    {
+                //        RegularizationId = model.RegularizationId,
+                //        AttachmentId = model.AttachmentId,
+                //        WorkflowId = model.WorkflowId,
+                //        EmployeeNo = model.EmployeeNo,
+                //        EmployeeName = model.EmployeeName,
+                //        CostCenter = model.CostCenter,
+                //        CostCenterName = model.CostCenter,
+                //        AttendanceDate = model.AttendanceDate,
+                //        ROACode = model.ROACode,
+                //        ROADescription = model.ROADesc,
+                //        ActionCode = model.ActionCode,
+                //        ActionDescription = model.ActionDesc,
+                //        RegularizedTimeIn = model.RegularizedTimeIn,
+                //        RegularizedTimeOut = model.RegularizedTimeOut,
+                //        ShiftPattern = model.ShiftPattern,
+                //        ShiftTiming = model.ShiftTiming,
+                //        WorkDuration = model.WorkDuration,
+                //        NoPayHours = model.NoPayHours,
+                //        RegularizedDescription = model.RegularizedDescription,
+                //        StatusID = model.StatusID,
+                //        StatusCode = model.StatusCode,
+                //        StatusDesc = model.StatusDesc,
+                //        StatusHandlingCode = model.StatusHandlingCode,
+                //        CreatedDate = model.CreatedDate,
+                //        CreatedBy = model.CreatedBy,
+                //        CreatedUserID = model.CreatedUserID,
+                //        CreatedEmail = model.CreatedEmail,
+                //        CreatedByName = model.CreatedByName,
+                //        LastUpdatedDate = model.LastUpdatedDate,
+                //        LastUpdatedBy = model.LastUpdatedBy,
+                //        LastUpdatedUserID = model.LastUpdatedUserID,
+                //        LastUpdatedEmail = model.LastUpdatedEmail,
+                //        ApproverNo = model.ApproverNo,
+                //        ApproverName = model.ApproverName,
+
+                //        Files = model.AttachmentList!.Select(e => new FileAttachmentDTO
+                //        {
+                //            Id = e.Id,
+                //            RequestType = e.RequestType,
+                //            AttachmentId = e.AttachmentId,
+                //            FileName = e.FileName,
+                //            StoredFileName = e.StoredFileName,
+                //            ContentType = e.ContentType,
+                //            FileSize = e.FileSize
+                //        }).ToList(),
+                //    };
+                //}
+
+                return Result<OutdoorRequestDTO?>.SuccessResult(request);
+            }
+            catch (Exception ex)
+            {
+                return Result<OutdoorRequestDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching leave request record from the database.");
+            }
+        }
+
+        public async Task<Result<long>> AddOutdoorRequestAsync(
+            OutdoorRequestDTO dto,
+            List<FileUploadDTO> files,
+            string webRootPath,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Create "RegularRequestWF" entity from DTO
+                //RegularRequestWF regularRequest = new RegularRequestWF
+                //{
+                //    EmployeeNo = dto.EmpNo,
+                //    EmployeeName = dto.EmpName,
+                //    CostCenter = dto.CostCenter,
+                //    AttendanceDate = Convert.ToDateTime(dto.AttendanceDate),
+                //    ROACode = dto!.ROACode,
+                //    ActionCode = dto!.ActionCode,
+                //    RegularizedTimeIn = dto.RegularizedTimeIn!.Value,
+                //    RegularizedTimeOut = dto.RegularizedTimeOut!.Value,
+                //    ShiftPattern = dto.ShiftPattern,
+                //    RegularizedDescription = dto.RegularizedDescription,
+                //    StatusCode = dto.StatusCode,
+                //    StatusID = dto.StatusID,
+                //    StatusHandlingCode = dto.StatusHandlingCode,
+                //    CreatedDate = dto.CreatedDate,
+                //    CreatedBy = dto.CreatedBy,
+                //    CreatedUserID = dto.CreatedUserID,
+                //    CreatedEmail = dto.CreatedEmail,
+                //    LastUpdatedDate = dto.LastUpdatedDate,
+                //    LastUpdatedBy = dto.LastUpdatedBy,
+                //    LastUpdatedUserID = dto.LastUpdatedUserID,
+                //    LastUpdatedEmail = dto.LastUpdatedEmail
+                //};
+                #endregion
+
+                #region Initialize the file upload path
+                string uploadPath = Path.Combine(
+                    webRootPath,
+                    "uploads",
+                    "attachments");
+
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
+                #endregion
+
+                #region Initialize file attachments
+                if (files is not null && files.Any())
+                {
+                    foreach (var file in files)
+                    {
+                        if (file.Size > MaxFileSize)
+                            throw new InvalidOperationException(
+                                $"File {file.FileName} exceeds 10MB limit.");
+
+                        if (file.Content is null)
+                            throw new InvalidOperationException(
+                                $"File stream for {file.FileName} is null.");
+
+                        string storedFileName =
+                            $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+
+                        string fullPath =
+                            Path.Combine(uploadPath, storedFileName);
+
+                        try
+                        {
+                            await using (var fileStream = new FileStream(
+                               fullPath,
+                               FileMode.Create,
+                               FileAccess.Write,
+                               FileShare.None,
+                               81920,
+                               useAsync: true))
+                            {
+                                await file.Content.CopyToAsync(fileStream);
+                            }
+                        }
+                        catch (Exception attachErr)
+                        {
+                        }
+
+                        //var attachment = new FileAttachment(
+                        //    regularRequest.AttachmentId,
+                        //    ServiceHelper.CONST_OUTDOOR,
+                        //    file.FileName,
+                        //    file.ContentType,
+                        //    storedFileName,
+                        //    file.Size);
+
+                        //regularRequest.AddAttachment(attachment);
+                    }
+                }
+                #endregion
+
+                //var result = await _repository.AddRegularRequestAsync(regularRequest, cancellationToken);
+                //if (!result.Success)
+                //{
+                //    if (!string.IsNullOrEmpty(result.Error))
+                //        throw new Exception(result.Error);
+                //    else
+                //        throw new Exception("Unable to save leave request due to error. Please check the data entry then try to save again!");
+                //}
+
+                return null; //Result<long>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<long>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<int>> UpdateOutdoorRequestAsync(
+           OutdoorRequestDTO dto,
+           CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Create "RegularRequestWF" entity from DTO
+                //RegularRequestWF regularRequest = new RegularRequestWF
+                //{
+                //    RegularizationId = dto.RegularizationId,
+                //    EmployeeNo = dto.EmployeeNo,
+                //    AttendanceDate = Convert.ToDateTime(dto.AttendanceDate),
+                //    ROACode = dto!.ROACode,
+                //    RegularizedTimeIn = dto.RegularizedTimeIn!.Value,
+                //    RegularizedTimeOut = dto.RegularizedTimeOut!.Value,
+                //    RegularizedDescription = dto.RegularizedDescription,
+                //    StatusCode = dto.StatusCode,
+                //    StatusID = dto.StatusID,
+                //    StatusHandlingCode = dto.StatusHandlingCode,
+                //    LastUpdatedDate = dto.LastUpdatedDate,
+                //    LastUpdatedBy = dto.LastUpdatedBy,
+                //    LastUpdatedUserID = dto.LastUpdatedUserID,
+                //    LastUpdatedEmail = dto.LastUpdatedEmail
+                //};
+                #endregion
+
+                //var result = await _repository.UpdateRegularRequestAsync(regularRequest, cancellationToken);
+                //if (!result.Success)
+                //{
+                //    if (!string.IsNullOrEmpty(result.Error))
+                //        throw new Exception(result.Error);
+                //    else
+                //        throw new Exception("Unable to save shift roster changes due to error. Please check the data entry then try to save again!");
+                //}
+
+                //return Result<int>.SuccessResult(result.Value);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<int>> CancelOutdoorRequestAsync(
+            OutdoorRequestDTO dto,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Create "RegularRequestWF" entity from DTO
+                //RegularRequestWF regularRequest = new RegularRequestWF
+                //{
+                //    RegularizationId = dto.RegularizationId,
+                //    StatusCode = dto.StatusCode,
+                //    StatusID = dto.StatusID,
+                //    StatusHandlingCode = dto.StatusHandlingCode,
+                //    LastUpdatedDate = dto.LastUpdatedDate,
+                //    LastUpdatedBy = dto.LastUpdatedBy,
+                //    LastUpdatedUserID = dto.LastUpdatedUserID,
+                //    LastUpdatedEmail = dto.LastUpdatedEmail
+                //};
+                #endregion
+
+                //var result = await _repository.CancelRegularRequestAsync(regularRequest, cancellationToken);
+                //if (!result.Success)
+                //{
+                //    if (!string.IsNullOrEmpty(result.Error))
+                //        throw new Exception(result.Error);
+                //    else
+                //        throw new Exception("Unable to cancel leave request due to unhandled error. Please check the data entry then try again!");
+                //}
+
+                //return Result<int>.SuccessResult(result.Value);
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
         #endregion
     }
 }

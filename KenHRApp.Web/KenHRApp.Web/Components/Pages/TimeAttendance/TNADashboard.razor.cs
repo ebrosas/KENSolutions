@@ -169,7 +169,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 //if (State.AuthenticatedUser != null)
                 //{
                 //    UserName = State.AuthenticatedUser!.UserFullName;
-                //    UserEmpNo = State.AuthenticatedUser.EmployeeNo;
+                //    UserEmpNo = State.AuthenticatedUser.EmpNo;
                 //    UserID = State.AuthenticatedUser!.UserID;
                 //    UserEmail = State.AuthenticatedUser!.OfficialEmail;
                 //    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;

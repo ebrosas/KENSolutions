@@ -160,7 +160,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 //if (State.AuthenticatedUser != null)
                 //{
                 //    UserName = State.AuthenticatedUser!.EmployeeFullName;
-                //    UserEmpNo = State.AuthenticatedUser.EmployeeNo;
+                //    UserEmpNo = State.AuthenticatedUser.EmpNo;
                 //    UserID = State.AuthenticatedUser!.UserID;
                 //    UserEmail = State.AuthenticatedUser!.OfficialEmail;
                 //    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;

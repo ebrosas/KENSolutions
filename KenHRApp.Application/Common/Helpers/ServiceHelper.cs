@@ -12,6 +12,7 @@ namespace KenHRApp.Application.Common.Helpers
         #region Constants
         public static readonly string CONST_LEAVE_REQUEST = "RTYPELEAVE";
         public static readonly string CONST_REGULARIZATION = "RTYPEREGULAR";
+        public static readonly string CONST_OUTDOOR = "RTYPEOUTDOOR";
         #endregion   
 
         #region Public Methods
