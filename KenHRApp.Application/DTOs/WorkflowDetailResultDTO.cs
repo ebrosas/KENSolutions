@@ -54,9 +54,9 @@ namespace KenHRApp.Application.DTOs
                 else if (ActivityStatus == CONST_REJECTED)
                     return $"Rejected by {ApproverName} (Emp. #: {ApproverNo})";
                 else if (ActivityStatus == CONST_PENDING)
-                    return "In-progress";
+                    return WorkflowStatus == CONST_REJECTED ? "Bypassed" : "In-progress";
                 else
-                    return "Pending";
+                    return WorkflowStatus == CONST_REJECTED ? "Bypassed" : "Pending";
             }
             set { }
         }

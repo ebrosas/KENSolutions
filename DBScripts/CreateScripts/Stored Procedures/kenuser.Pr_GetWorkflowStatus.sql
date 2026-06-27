@@ -53,5 +53,6 @@ END
 /*	Test:
 
 	EXEC kenuser.Pr_GetWorkflowStatus 'RTYPELEAVE', 23
+	EXEC kenuser.Pr_GetWorkflowStatus 'RTYPEREGULAR', 9
 
 */

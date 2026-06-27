@@ -1492,12 +1492,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             string errorMsg = string.Empty;
 
             var repoResult = await WorkflowService.ApproveStepAsync(stepInstanceId, approverNo, userID, comments,
-                WorkflowHelper.CONST_EXTRA_TIME, requestNo, Environment.WebRootPath, _cts.Token);
+                WorkflowHelper.CONST_REGULARIZATION, requestNo, Environment.WebRootPath, _cts.Token);
 
             if (repoResult.Success)
             {
                 // Show notification
-                ShowNotification("Extra Time request has been approved successfully!", NotificationType.Success);
+                ShowNotification("Regularization request has been approved successfully!", NotificationType.Success);
             }
             else
             {
@@ -1522,7 +1522,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Reject"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to reject Extra Time Request No. '{_regularRequest.RegularizationId}'?" },
+                { "ContentText", $"Are you sure you want to reject Regularization Request #'{_regularRequest.RegularizationId}'?" },
                 { "ConfirmText", "Ok" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -1617,7 +1617,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             string errorMsg = string.Empty;
 
             var repoResult = await WorkflowService.RejectStepAsync(stepInstanceId, creatorEmpNo, approverNo, userID, comments,
-                WorkflowHelper.CONST_EXTRA_TIME, requestNo, Environment.WebRootPath, _cts.Token);
+                WorkflowHelper.CONST_REGULARIZATION, requestNo, Environment.WebRootPath, _cts.Token);
             if (repoResult.Success)
             {
                 // Show notification

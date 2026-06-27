@@ -87,10 +87,10 @@ Leave Request page:
 5. Set the alignment of MudScrollToTop button to right.	-Done
 
 Regularization Request Page:
-1. Test the approval and rejection effect on the status of the request.
+1. Test the approval and rejection effect on the status of the request.		-Done
 
 Workflow Service:
-1. Once the workflow status is set to "Rejected", implement logic to reject the request status in the underlying requisition table.
+1. Once the workflow status is set to "Rejected", implement logic to reject the request status in the underlying requisition table.	-Done
 
 10003637 - Naga
 02/02/2010

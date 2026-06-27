@@ -1469,7 +1469,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Reject"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to reject Extra Time Request No. '{_overtimeRequest.ExtratimeId}'?" },
+                { "ContentText", $"Are you sure you want to reject Extra Time Request #'{_overtimeRequest.ExtratimeId}'?" },
                 { "ConfirmText", "Ok" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
