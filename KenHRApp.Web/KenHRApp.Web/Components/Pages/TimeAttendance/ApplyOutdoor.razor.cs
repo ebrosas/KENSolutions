@@ -153,7 +153,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private enum UDCKeys
         {
             ROATYPE,            // ROA Types
-            DOWTYPE,            // Day of Weeks
+            DOWTYPES,           // Day of Weeks
             STATUS              // Request Status
         }
         #endregion
@@ -252,7 +252,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _outdoorRequest.CreatedBy = UserEmpNo;
                     _outdoorRequest.CreatedEmail = UserEmail;
                     _outdoorRequest.CreatedUserID = UserName;
-                    _outdoorRequest.ActionDescription = CONST_OUTDOOR;
+                    _outdoorRequest.ActionDesc = CONST_OUTDOOR;
 
                     if (ActionType == ActionTypes.Edit.ToString() ||
                         ActionType == ActionTypes.View.ToString() ||
@@ -413,7 +413,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                         // Initiate the workflow
                         await InitializeWorkflowAsync(_outdoorRequest.OutdoorId, _outdoorRequest.EmpNo);
 
-                        BeginLoadOutdoorRequest(_outdoorRequest.OutdoorId);
+                        //BeginLoadOutdoorRequest(_outdoorRequest.OutdoorId);
+                        HandleBackButton("AttendanceCorrectInq");
                     }
                 });
             }
@@ -511,28 +512,30 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             ShowHideError(false);
         }
 
-        private void HandleBackButton()
+        private void HandleBackButton(string callerForm = "")
         {
-            if (string.IsNullOrEmpty(CallerForm))
-                return;
-
-            switch (CallerForm)
+            if (!string.IsNullOrWhiteSpace(callerForm))
+                Navigation.NavigateTo($"/TimeAttendance/{callerForm}?ForceLoad=true");
+            else
             {
-                case "TNADashboard":
-                    Navigation.NavigateTo("/TimeAttendance/tnadashboard");
-                    break;
+                switch (CallerForm)
+                {
+                    case "TNADashboard":
+                        Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+                        break;
 
-                case "ApprovalDashboard":
-                    Navigation.NavigateTo("/Workflow/ApprovalDashboard?RequestType=RTYPEOUTDOOR");
-                    break;
+                    case "ApprovalDashboard":
+                        Navigation.NavigateTo("/Workflow/ApprovalDashboard?RequestType=RTYPEOUTDOOR");
+                        break;
 
-                case "AttendanceCorrectInq":
-                    Navigation.NavigateTo("/TimeAttendance/AttendanceCorrectInq?ForceLoad=true");
-                    break;
+                    case "AttendanceCorrectInq":
+                        Navigation.NavigateTo("/TimeAttendance/AttendanceCorrectInq?ForceLoad=true");
+                        break;
 
-                default:
-                    Navigation.NavigateTo("/TimeAttendance/tnadashboard");
-                    break;
+                    default:
+                        Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+                        break;
+                }
             }
         }
         #endregion
@@ -964,7 +967,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     #region Day of Week Types
                     try
                     {
-                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.DOWTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.DOWTYPES.ToString()).FirstOrDefault()!.UDCGroupId;
                     }
                     catch (Exception ex)
                     {
@@ -1053,14 +1056,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 _outdoorRequest = result.Value!;
 
-                #region Populate raw swipe chips
-                //if (_outdoorRequest.SwipeLogList != null && _outdoorRequest.SwipeLogList.Any())
-                //    _attendanceChips.AddRange(_outdoorRequest.SwipeLogList.ToList());
-                #endregion
-
-                // Set the calendar's selected date
-                //_selectedDate = _outdoorRequest.AttendanceDate;
-
                 // Set the approver flag
                 if (_outdoorRequest.ApproverNo == UserEmpNo)
                     _isCurrentApprover = true;
@@ -1128,13 +1123,24 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             #endregion
 
             #region Get the selected Action
-            if (!string.IsNullOrEmpty(_outdoorRequest.ActionDescription))
+            if (!string.IsNullOrEmpty(_outdoorRequest.ActionDesc))
             {
                 UserDefinedCodeDTO? selectedAction = _actionList
-                    .Where(a => a.UDCDesc1 == _outdoorRequest.ActionDescription)
+                    .Where(a => a.UDCDesc1 == _outdoorRequest.ActionDesc)
                     .FirstOrDefault();
                 if (selectedAction != null)
                     _outdoorRequest.ActionCode = selectedAction.UDCCode;
+            }
+            #endregion
+
+            #region Get the selected DOW
+            if (!string.IsNullOrEmpty(_outdoorRequest.DOWDesc))
+            {
+                UserDefinedCodeDTO? selectedDOW = _dowList
+                    .Where(a => a.UDCDesc1 == _outdoorRequest.DOWDesc)
+                    .FirstOrDefault();
+                if (selectedDOW != null)
+                    _outdoorRequest.DOWCode = selectedDOW.UDCCode;
             }
             #endregion
 

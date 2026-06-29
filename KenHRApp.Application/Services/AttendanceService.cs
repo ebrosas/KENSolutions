@@ -1616,64 +1616,63 @@ namespace KenHRApp.Application.Services
 
             try
             {
-                //var repoResult = await _repository.GetRegularRequestAsync(requestNo);
-                //if (!repoResult.Success)
-                //{
-                //    return Result<OutdoorRequestDTO?>.Failure(repoResult.Error ?? "Unknown repository error");
-                //}
+                var repoResult = await _repository.GetOutdoorRequestAsync(requestNo);
+                if (!repoResult.Success)
+                {
+                    return Result<OutdoorRequestDTO?>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
 
-                //var model = repoResult.Value;
-                //if (model != null)
-                //{
-                //    request = new OutdoorRequestDTO
-                //    {
-                //        RegularizationId = model.RegularizationId,
-                //        AttachmentId = model.AttachmentId,
-                //        WorkflowId = model.WorkflowId,
-                //        EmployeeNo = model.EmployeeNo,
-                //        EmployeeName = model.EmployeeName,
-                //        CostCenter = model.CostCenter,
-                //        CostCenterName = model.CostCenter,
-                //        AttendanceDate = model.AttendanceDate,
-                //        ROACode = model.ROACode,
-                //        ROADescription = model.ROADesc,
-                //        ActionCode = model.ActionCode,
-                //        ActionDescription = model.ActionDesc,
-                //        RegularizedTimeIn = model.RegularizedTimeIn,
-                //        RegularizedTimeOut = model.RegularizedTimeOut,
-                //        ShiftPattern = model.ShiftPattern,
-                //        ShiftTiming = model.ShiftTiming,
-                //        WorkDuration = model.WorkDuration,
-                //        NoPayHours = model.NoPayHours,
-                //        RegularizedDescription = model.RegularizedDescription,
-                //        StatusID = model.StatusID,
-                //        StatusCode = model.StatusCode,
-                //        StatusDesc = model.StatusDesc,
-                //        StatusHandlingCode = model.StatusHandlingCode,
-                //        CreatedDate = model.CreatedDate,
-                //        CreatedBy = model.CreatedBy,
-                //        CreatedUserID = model.CreatedUserID,
-                //        CreatedEmail = model.CreatedEmail,
-                //        CreatedByName = model.CreatedByName,
-                //        LastUpdatedDate = model.LastUpdatedDate,
-                //        LastUpdatedBy = model.LastUpdatedBy,
-                //        LastUpdatedUserID = model.LastUpdatedUserID,
-                //        LastUpdatedEmail = model.LastUpdatedEmail,
-                //        ApproverNo = model.ApproverNo,
-                //        ApproverName = model.ApproverName,
+                var model = repoResult.Value;
+                if (model != null)
+                {
+                    request = new OutdoorRequestDTO
+                    {
+                        OutdoorId = model.OutdoorId,
+                        AttachmentId = model.AttachmentId,
+                        WorkflowId = model.WorkflowId,
+                        EmpNo = model.EmpNo,
+                        EmpName = model.EmpName,
+                        CostCenter = model.CostCenter,
+                        CostCenterName = model.CostCenter,
+                        StartDate = model.StartDate,
+                        EndDate = model.EndDate,
+                        ROACode = model.ROACode,
+                        ROADesc = !string.IsNullOrWhiteSpace(model.ROADesc) ? model.ROADesc : string.Empty,
+                        ActionCode = model.ActionCode,
+                        ActionDesc = model.ActionDesc,
+                        DOWCode = model.DOWCode,
+                        DOWDesc = model.DOWDesc,
+                        StartTime = model.StartTime,
+                        EndTime = model.EndTime,
+                        Description = model.Description,
+                        StatusID = model.StatusID,
+                        StatusCode = model.StatusCode,
+                        StatusDesc = model.StatusDesc,
+                        StatusHandlingCode = model.StatusHandlingCode,
+                        CreatedDate = model.CreatedDate,
+                        CreatedBy = model.CreatedBy,
+                        CreatedUserID = model.CreatedUserID,
+                        CreatedEmail = model.CreatedEmail,
+                        CreatedByName = model.CreatedByName,
+                        LastUpdatedDate = model.LastUpdatedDate,
+                        LastUpdatedBy = model.LastUpdatedBy,
+                        LastUpdatedUserID = model.LastUpdatedUserID,
+                        LastUpdatedEmail = model.LastUpdatedEmail,
+                        ApproverNo = model.ApproverNo,
+                        ApproverName = model.ApproverName,
 
-                //        Files = model.AttachmentList!.Select(e => new FileAttachmentDTO
-                //        {
-                //            Id = e.Id,
-                //            RequestType = e.RequestType,
-                //            AttachmentId = e.AttachmentId,
-                //            FileName = e.FileName,
-                //            StoredFileName = e.StoredFileName,
-                //            ContentType = e.ContentType,
-                //            FileSize = e.FileSize
-                //        }).ToList(),
-                //    };
-                //}
+                        Files = model.AttachmentList!.Select(e => new FileAttachmentDTO
+                        {
+                            Id = e.Id,
+                            RequestType = e.RequestType,
+                            AttachmentId = e.AttachmentId,
+                            FileName = e.FileName,
+                            StoredFileName = e.StoredFileName,
+                            ContentType = e.ContentType,
+                            FileSize = e.FileSize
+                        }).ToList(),
+                    };
+                }
 
                 return Result<OutdoorRequestDTO?>.SuccessResult(request);
             }
@@ -1691,31 +1690,32 @@ namespace KenHRApp.Application.Services
         {
             try
             {
-                #region Create "RegularRequestWF" entity from DTO
-                //RegularRequestWF regularRequest = new RegularRequestWF
-                //{
-                //    EmployeeNo = dto.EmpNo,
-                //    EmployeeName = dto.EmpName,
-                //    CostCenter = dto.CostCenter,
-                //    AttendanceDate = Convert.ToDateTime(dto.AttendanceDate),
-                //    ROACode = dto!.ROACode,
-                //    ActionCode = dto!.ActionCode,
-                //    RegularizedTimeIn = dto.RegularizedTimeIn!.Value,
-                //    RegularizedTimeOut = dto.RegularizedTimeOut!.Value,
-                //    ShiftPattern = dto.ShiftPattern,
-                //    RegularizedDescription = dto.RegularizedDescription,
-                //    StatusCode = dto.StatusCode,
-                //    StatusID = dto.StatusID,
-                //    StatusHandlingCode = dto.StatusHandlingCode,
-                //    CreatedDate = dto.CreatedDate,
-                //    CreatedBy = dto.CreatedBy,
-                //    CreatedUserID = dto.CreatedUserID,
-                //    CreatedEmail = dto.CreatedEmail,
-                //    LastUpdatedDate = dto.LastUpdatedDate,
-                //    LastUpdatedBy = dto.LastUpdatedBy,
-                //    LastUpdatedUserID = dto.LastUpdatedUserID,
-                //    LastUpdatedEmail = dto.LastUpdatedEmail
-                //};
+                #region Create "OutdoorRequestWF" entity from DTO
+                OutdoorRequestWF outdoorRequest = new OutdoorRequestWF
+                {
+                    EmpNo = dto.EmpNo,
+                    EmpName = dto.EmpName,
+                    CostCenter = dto.CostCenter,
+                    StartDate = Convert.ToDateTime(dto.StartDate),
+                    EndDate = Convert.ToDateTime(dto.EndDate),
+                    ROACode = dto!.ROACode,
+                    ActionCode = dto!.ActionCode,
+                    DOWCode = dto!.DOWCode,
+                    StartTime = dto.StartTime!.Value,
+                    EndTime = dto.EndTime!.Value,
+                    Description = dto.Description,
+                    StatusID = dto.StatusID,
+                    StatusCode = dto.StatusCode,
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    CreatedDate = dto.CreatedDate,
+                    CreatedBy = dto.CreatedBy,
+                    CreatedUserID = dto.CreatedUserID,
+                    CreatedEmail = dto.CreatedEmail,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedEmail = dto.LastUpdatedEmail
+                };
                 #endregion
 
                 #region Initialize the file upload path
@@ -1764,29 +1764,29 @@ namespace KenHRApp.Application.Services
                         {
                         }
 
-                        //var attachment = new FileAttachment(
-                        //    regularRequest.AttachmentId,
-                        //    ServiceHelper.CONST_OUTDOOR,
-                        //    file.FileName,
-                        //    file.ContentType,
-                        //    storedFileName,
-                        //    file.Size);
+                        var attachment = new FileAttachment(
+                            outdoorRequest.AttachmentId,
+                            ServiceHelper.CONST_OUTDOOR,
+                            file.FileName,
+                            file.ContentType,
+                            storedFileName,
+                            file.Size);
 
-                        //regularRequest.AddAttachment(attachment);
+                        outdoorRequest.AddAttachment(attachment);
                     }
                 }
                 #endregion
 
-                //var result = await _repository.AddRegularRequestAsync(regularRequest, cancellationToken);
-                //if (!result.Success)
-                //{
-                //    if (!string.IsNullOrEmpty(result.Error))
-                //        throw new Exception(result.Error);
-                //    else
-                //        throw new Exception("Unable to save leave request due to error. Please check the data entry then try to save again!");
-                //}
+                var result = await _repository.AddOutdoorRequestAsync(outdoorRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to save outdoor request due to error. Please check the data entry then try to save again!");
+                }
 
-                return null; //Result<long>.SuccessResult(result.Value);
+                return Result<long>.SuccessResult(result.Value);
             }
             catch (Exception ex)
             {
@@ -1800,37 +1800,38 @@ namespace KenHRApp.Application.Services
         {
             try
             {
-                #region Create "RegularRequestWF" entity from DTO
-                //RegularRequestWF regularRequest = new RegularRequestWF
-                //{
-                //    RegularizationId = dto.RegularizationId,
-                //    EmployeeNo = dto.EmployeeNo,
-                //    AttendanceDate = Convert.ToDateTime(dto.AttendanceDate),
-                //    ROACode = dto!.ROACode,
-                //    RegularizedTimeIn = dto.RegularizedTimeIn!.Value,
-                //    RegularizedTimeOut = dto.RegularizedTimeOut!.Value,
-                //    RegularizedDescription = dto.RegularizedDescription,
-                //    StatusCode = dto.StatusCode,
-                //    StatusID = dto.StatusID,
-                //    StatusHandlingCode = dto.StatusHandlingCode,
-                //    LastUpdatedDate = dto.LastUpdatedDate,
-                //    LastUpdatedBy = dto.LastUpdatedBy,
-                //    LastUpdatedUserID = dto.LastUpdatedUserID,
-                //    LastUpdatedEmail = dto.LastUpdatedEmail
-                //};
+                #region Create "OutdoorRequestWF" entity from DTO
+                OutdoorRequestWF outdoorRequest = new OutdoorRequestWF
+                {
+                    OutdoorId = dto.OutdoorId,
+                    EmpNo = dto.EmpNo,
+                    StartDate = Convert.ToDateTime(dto.StartDate),
+                    EndDate = Convert.ToDateTime(dto.EndDate),
+                    ROACode = dto!.ROACode,
+                    DOWCode = dto.DOWCode,
+                    StartTime = dto.StartTime!.Value,
+                    EndTime = dto.EndTime!.Value,
+                    Description = dto.Description,
+                    StatusCode = dto.StatusCode,
+                    StatusID = dto.StatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedEmail = dto.LastUpdatedEmail
+                };
                 #endregion
 
-                //var result = await _repository.UpdateRegularRequestAsync(regularRequest, cancellationToken);
-                //if (!result.Success)
-                //{
-                //    if (!string.IsNullOrEmpty(result.Error))
-                //        throw new Exception(result.Error);
-                //    else
-                //        throw new Exception("Unable to save shift roster changes due to error. Please check the data entry then try to save again!");
-                //}
+                var result = await _repository.UpdateOutdoorRequestAsync(outdoorRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to save changes due to error. Please check the data entry then try to save again!");
+                }
 
-                //return Result<int>.SuccessResult(result.Value);
-                return null;
+                return Result<int>.SuccessResult(result.Value);
             }
             catch (Exception ex)
             {
@@ -1844,32 +1845,30 @@ namespace KenHRApp.Application.Services
         {
             try
             {
-                #region Create "RegularRequestWF" entity from DTO
-                //RegularRequestWF regularRequest = new RegularRequestWF
-                //{
-                //    RegularizationId = dto.RegularizationId,
-                //    StatusCode = dto.StatusCode,
-                //    StatusID = dto.StatusID,
-                //    StatusHandlingCode = dto.StatusHandlingCode,
-                //    LastUpdatedDate = dto.LastUpdatedDate,
-                //    LastUpdatedBy = dto.LastUpdatedBy,
-                //    LastUpdatedUserID = dto.LastUpdatedUserID,
-                //    LastUpdatedEmail = dto.LastUpdatedEmail
-                //};
+                #region Create "OutdoorRequestWF" entity from DTO
+                OutdoorRequestWF outdoorRequest = new OutdoorRequestWF
+                {
+                    OutdoorId = dto.OutdoorId,
+                    StatusCode = dto.StatusCode,
+                    StatusID = dto.StatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedEmail = dto.LastUpdatedEmail
+                };
                 #endregion
 
-                //var result = await _repository.CancelRegularRequestAsync(regularRequest, cancellationToken);
-                //if (!result.Success)
-                //{
-                //    if (!string.IsNullOrEmpty(result.Error))
-                //        throw new Exception(result.Error);
-                //    else
-                //        throw new Exception("Unable to cancel leave request due to unhandled error. Please check the data entry then try again!");
-                //}
+                var result = await _repository.CancelOutdoorRequestAsync(outdoorRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to cancel request due to unhandled error. Please check the data entry then try again!");
+                }
 
-                //return Result<int>.SuccessResult(result.Value);
-
-                return null;
+                return Result<int>.SuccessResult(result.Value);
             }
             catch (Exception ex)
             {

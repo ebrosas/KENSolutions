@@ -1,6 +1,6 @@
 DECLARE	@actionType				TINYINT = 0,		--(Notes: 0 = Check records, 1 = Create new workflow, 2 = Update record)
 		@isCommitTrans			BIT = 0,
-		@workflowTypeCode		VARCHAR(100) = 'RTYPEOT',
+		@workflowTypeCode		VARCHAR(100) = 'RTYPEOUTDOOR',
 		@stepName				VARCHAR(200),
 		@stepOrder				INT,
 		@approvalRole			VARCHAR(50),
@@ -90,6 +90,34 @@ DECLARE	@actionType				TINYINT = 0,		--(Notes: 0 = Check records, 1 = Create new
 */
 
 /*	Setup workflow for Overtime Request
+
+	--Add Direct Supervisor
+	SELECT	@stepName				= 'Approval by Direct Supervisor',
+			@stepOrder				= 1,
+			@approvalRole			= 'SUPERVISOR',
+			@isParallelGroup		= 0,
+			@requiresAllParallel	= 0,
+			@approvalStageDesc		= 'Direct Supervisor'
+
+	--Add Cost Center Manager
+	SELECT	@stepName				= 'Approval by Department Manager',
+			@stepOrder				= 2,
+			@approvalRole			= 'CCMANAGER',
+			@isParallelGroup		= 0,
+			@requiresAllParallel	= 0,
+			@approvalStageDesc		= 'Department Manager'
+
+	--Add Head of HR
+	SELECT	@stepName				= 'Final approval by Head of HR',
+			@stepOrder				= 3,
+			@approvalRole			= 'HRHEAD',
+			@isParallelGroup		= 0,
+			@requiresAllParallel	= 0,
+			@approvalStageDesc		= 'Head of HR'
+
+*/
+
+/*	Setup workflow for Outdoor Request
 
 	--Add Direct Supervisor
 	SELECT	@stepName				= 'Approval by Direct Supervisor',

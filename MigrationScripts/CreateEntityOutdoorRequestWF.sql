@@ -32,14 +32,28 @@ CREATE TABLE [kenuser].[OutdoorRequestWF] (
 );
 GO
 
+CREATE TABLE [kenuser].[OutdoorAttachment] (
+    [Id] uniqueidentifier NOT NULL,
+    [AttachmentId] uniqueidentifier NOT NULL,
+    [RequestType] varchar(20) NOT NULL,
+    [FileName] varchar(100) NOT NULL,
+    [StoredFileName] varchar(250) NOT NULL,
+    [ContentType] varchar(50) NOT NULL,
+    [FileSize] bigint NOT NULL,
+    [FileData] varbinary(max) NULL,
+    CONSTRAINT [PK_OutdoorAttachment_Id] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_OutdoorAttachment_OutdoorRequestWF_AttachmentId] FOREIGN KEY ([AttachmentId]) REFERENCES [kenuser].[OutdoorRequestWF] ([AttachmentId]) ON DELETE CASCADE
+);
+GO
+
+CREATE INDEX [IX_OutdoorAttachment_AttachmentId] ON [kenuser].[OutdoorAttachment] ([AttachmentId]);
+GO
+
 CREATE UNIQUE INDEX [IX_OutdoorRequestWF_CompoKeys] ON [kenuser].[OutdoorRequestWF] ([EmpNo], [StartDate], [EndDate], [ROACode], [ActionCode]);
 GO
 
-ALTER TABLE [kenuser].[FileAttachments] ADD CONSTRAINT [FK_FileAttachments_OutdoorRequestWF_AttachmentId] FOREIGN KEY ([AttachmentId]) REFERENCES [kenuser].[OutdoorRequestWF] ([AttachmentId]) ON DELETE CASCADE;
-GO
-
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20260628201627_CreateEntityOutdoorRequestWF', N'8.0.17');
+VALUES (N'20260629182527_CreateEntityOutdoorRequestWF', N'8.0.17');
 GO
 
 COMMIT;

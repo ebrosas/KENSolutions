@@ -84,7 +84,7 @@ namespace KenHRApp.Domain.Entities
         public string? DOWDesc { get; set; } = null;
 
         [NotMapped]
-        public string ActionDescription { get; set; } = null!;
+        public string ActionDesc { get; set; } = null!;
 
         [NotMapped]
         public string? StatusDesc { get; set; } = null;
@@ -105,12 +105,20 @@ namespace KenHRApp.Domain.Entities
         #region Public Methods
         public void AddAttachment(FileAttachment attachment)
         {
-            AttachmentList.Add(attachment);
+            var outdoorAttachment = new OutdoorAttachment(
+                            attachment.AttachmentId,
+                            attachment.RequestType,
+                            attachment.FileName,
+                            attachment.ContentType,
+                            attachment.StoredFileName,
+                            attachment.FileSize);
+
+            AttachmentList.Add(outdoorAttachment);
         }
         #endregion
 
         #region Reference Navigations
-        public List<FileAttachment> AttachmentList { get; set; } = new();
+        public List<OutdoorAttachment> AttachmentList { get; set; } = new();
         #endregion
     }
 }

@@ -27,7 +27,7 @@ namespace KenHRApp.Infrastructure.EntityConfiguration
                 .HasDatabaseName("IX_OutdoorRequestWF_CompoKeys")
                 .IsUnique();
 
-            // ✅ RELATIONSHIP: OutdoorRequestWF → FileAttachment
+            // ✅ RELATIONSHIP: OutdoorRequestWF → OutdoorAttachment
             builder.HasMany(x => x.AttachmentList)
                 .WithOne()
                 .HasPrincipalKey(e => e.AttachmentId)     // Map to AttachmentId alternate key of OutdoorRequestWF principal

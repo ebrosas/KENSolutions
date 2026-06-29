@@ -11,7 +11,7 @@
 
 	UPDATE kenuser.UserDefinedCode
 	SET UDCSpecialHandlingCode = 'ATTENDANCE'
-	WHERE RTRIM(UDCCode) IN ('RTYPEOT', 'RTYPEREGULAR')
+	WHERE RTRIM(UDCCode) IN ('RTYPEOT', 'RTYPEREGULAR', 'RTYPEOUTDOOR')
 
 	UPDATE kenuser.UserDefinedCode
 	SET UDCSpecialHandlingCode = NULL

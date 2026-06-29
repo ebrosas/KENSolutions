@@ -23,11 +23,18 @@ DECLARE	@actionType				TINYINT,		--(Notes: 0 = Check records, 1 = Create new wor
 	--		@isActive				= 1	
 
 	--Regularization Request Workflow
-	SELECT	@actionType				= 0,		
-			@isCommitTrans			= 0,
-			@workflowName			= 'Overtime Request',
-			@workflowTypeCode		= 'RTYPEOT',
-			@isActive				= 1	
+	--SELECT	@actionType				= 0,		
+	--		@isCommitTrans			= 0,
+	--		@workflowName			= 'Overtime Request',
+	--		@workflowTypeCode		= 'RTYPEOT',
+	--		@isActive				= 1	
+
+	--Outdoor Request Workflow
+	--SELECT	@actionType				= 0,		
+	--		@isCommitTrans			= 0,
+	--		@workflowName			= 'Outdoor Request',
+	--		@workflowTypeCode		= 'RTYPEOUTDOOR',
+	--		@isActive				= 1	
 
 	IF @actionType = 0
 	BEGIN

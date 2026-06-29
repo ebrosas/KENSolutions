@@ -1950,6 +1950,272 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<List<AttendanceCorrectionResult>>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Get Outdoor Request details
+        /// </summary>
+        /// <param name="requestNo"></param>
+        /// <returns></returns>
+        public async Task<Result<OutdoorRequestWF>> GetOutdoorRequestAsync(long requestNo)
+        {
+            OutdoorRequestWF outdoorRequest = new();
+
+            try
+            {
+                var model = await _db.Set<OutdoorRequestWF>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetOutdoorRequestDetail @requestNo = {0}",
+                    requestNo)
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    outdoorRequest.OutdoorId = model[0].OutdoorId;
+                    outdoorRequest.AttachmentId = model[0].AttachmentId;
+                    outdoorRequest.WorkflowId = model[0].WorkflowId;
+                    outdoorRequest.EmpNo = model[0].EmpNo;
+                    outdoorRequest.EmpName = model[0].EmpName;
+                    outdoorRequest.CostCenter = model[0].CostCenter;
+                    outdoorRequest.CostCenterName = model[0].CostCenter;
+                    outdoorRequest.StartDate = model[0].StartDate;
+                    outdoorRequest.EndDate = model[0].EndDate;
+                    outdoorRequest.ROACode = model[0].ROACode;
+                    outdoorRequest.ROADesc = model[0].ROADesc;
+                    outdoorRequest.ActionCode = model[0].ActionCode;
+                    outdoorRequest.ActionDesc = model[0].ActionDesc;
+                    outdoorRequest.DOWCode = model[0].DOWCode;
+                    outdoorRequest.DOWDesc = model[0].DOWDesc;
+                    outdoorRequest.StartTime = model[0].StartTime;
+                    outdoorRequest.EndTime = model[0].EndTime;
+                    outdoorRequest.Description = model[0].Description;
+                    outdoorRequest.StatusID = model[0].StatusID;
+                    outdoorRequest.StatusCode = model[0].StatusCode;
+                    outdoorRequest.StatusDesc = model[0].StatusDesc;
+                    outdoorRequest.StatusHandlingCode = model[0].StatusHandlingCode;
+                    outdoorRequest.CreatedDate = model[0].CreatedDate;
+                    outdoorRequest.CreatedBy = model[0].CreatedBy;
+                    outdoorRequest.CreatedUserID = model[0].CreatedUserID;
+                    outdoorRequest.CreatedEmail = model[0].CreatedEmail;
+                    outdoorRequest.CreatedByName = model[0].CreatedByName;
+                    outdoorRequest.LastUpdatedDate = model[0].LastUpdatedDate;
+                    outdoorRequest.LastUpdatedBy = model[0].LastUpdatedBy;
+                    outdoorRequest.LastUpdatedUserID = model[0].LastUpdatedUserID;
+                    outdoorRequest.LastUpdatedEmail = model[0].LastUpdatedEmail;
+                    outdoorRequest.ApproverNo = model[0].ApproverNo;
+                    outdoorRequest.ApproverName = model[0].ApproverName;
+
+                    #region Get the file attachments
+                    List<OutdoorAttachment> attachments = new();
+
+                    var attachModel = await (from attach in _db.OutdoorAttachment
+                                             where attach.AttachmentId == outdoorRequest.AttachmentId
+                                             select attach).ToListAsync();
+                    if (attachModel != null)
+                    {
+                        outdoorRequest.AttachmentList = attachModel.Select(e => new OutdoorAttachment
+                        {
+                            Id = e.Id,
+                            RequestType = e.RequestType,
+                            AttachmentId = e.AttachmentId,
+                            FileName = e.FileName,
+                            StoredFileName = e.StoredFileName,
+                            ContentType = e.ContentType,
+                            FileSize = e.FileSize
+                        }).ToList();
+                    }
+                    #endregion
+                }
+
+                return Result<OutdoorRequestWF>.SuccessResult(outdoorRequest);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<OutdoorRequestWF>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Add new outdoor request
+        /// </summary>
+        public async Task<Result<long>> AddOutdoorRequestAsync(
+            OutdoorRequestWF dto, 
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (dto is null)
+                    throw new ArgumentNullException(nameof(dto));
+
+                #region Initialize entity
+                var outdoorRequest = new OutdoorRequestWF
+                {
+                    EmpNo = dto.EmpNo,
+                    EmpName = dto.EmpName,
+                    CostCenter = dto.CostCenter,
+                    StartDate = dto.StartDate,
+                    EndDate = dto.EndDate,
+                    ROACode = dto.ROACode,
+                    DOWCode = dto.DOWCode,
+                    Description = dto.Description,
+                    ActionCode = dto.ActionCode,
+                    StartTime = dto.StartTime,
+                    EndTime = dto.EndTime,
+                    StatusID = dto.StatusID,
+                    StatusCode = dto.StatusCode,
+                    StatusHandlingCode = dto.StatusHandlingCode,
+                    CreatedDate = dto.CreatedDate,
+                    CreatedBy = dto.CreatedBy,
+                    CreatedUserID = dto.CreatedUserID,
+                    CreatedEmail = dto.CreatedEmail,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedEmail = dto.LastUpdatedEmail
+                };
+                #endregion
+
+                #region Initialize attachments
+                if (dto.AttachmentList != null && dto.AttachmentList.Any())
+                {
+                    outdoorRequest.AttachmentList = dto.AttachmentList.Select(e => new OutdoorAttachment
+                    {
+                        AttachmentId = e.AttachmentId,
+                        RequestType = e.RequestType,
+                        FileName = e.FileName,
+                        StoredFileName = e.StoredFileName,
+                        ContentType = e.ContentType,
+                        FileSize = e.FileSize
+                    }).ToList();
+                }
+                #endregion
+
+                // Save to database
+                await _db.OutdoorRequestWF.AddAsync(outdoorRequest);
+                await _db.SaveChangesAsync(cancellationToken);
+
+                // ✅ EF Core automatically populates identity after SaveChanges
+                long generatedId = outdoorRequest.OutdoorId;
+
+                return Result<long>.SuccessResult(generatedId);
+
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<long>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<long>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Update outdoor request
+        /// </summary>
+        public async Task<Result<int>> UpdateOutdoorRequestAsync(
+            OutdoorRequestWF outdoorRequest, 
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (outdoorRequest == null)
+                    throw new ArgumentNullException(nameof(outdoorRequest));
+
+                var existing = await _db.OutdoorRequestWF
+                    .FirstOrDefaultAsync(e =>
+                        e.OutdoorId == outdoorRequest.OutdoorId,
+                        cancellationToken);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find outdoor request with the specified no.");
+
+                #region Update request information
+                existing.ROACode = outdoorRequest.ROACode;
+                existing.StartDate = outdoorRequest.StartDate;
+                existing.EndDate = outdoorRequest.EndDate;
+                existing.DOWCode = outdoorRequest.DOWCode;
+                existing.StartTime = outdoorRequest.StartTime;
+                existing.EndTime = outdoorRequest.EndTime;
+                existing.Description = outdoorRequest.Description;
+                existing.StatusCode = outdoorRequest.StatusCode;
+                existing.StatusID = outdoorRequest.StatusID;
+                existing.StatusHandlingCode = outdoorRequest.StatusHandlingCode;
+                existing.LastUpdatedDate = outdoorRequest.LastUpdatedDate;
+                existing.LastUpdatedBy = outdoorRequest.LastUpdatedBy;
+                existing.LastUpdatedUserID = outdoorRequest.LastUpdatedUserID;
+                existing.LastUpdatedEmail = outdoorRequest.LastUpdatedEmail;
+                #endregion
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Cancel Outdoor Request
+        /// </summary>
+        public async Task<Result<int>> CancelOutdoorRequestAsync(
+            OutdoorRequestWF outdoorRequest,
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (outdoorRequest == null)
+                    throw new ArgumentNullException(nameof(outdoorRequest));
+
+                var existing = await _db.OutdoorRequestWF
+                    .FirstOrDefaultAsync(e =>
+                        e.OutdoorId == outdoorRequest.OutdoorId,
+                        cancellationToken);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find outdoor request with the specified request no.");
+
+                #region Update request status to "Cancelled" state
+                existing.StatusCode = outdoorRequest.StatusCode;
+                existing.StatusID = outdoorRequest.StatusID;
+                existing.StatusHandlingCode = outdoorRequest.StatusHandlingCode;
+                existing.LastUpdatedDate = outdoorRequest.LastUpdatedDate;
+                existing.LastUpdatedBy = outdoorRequest.LastUpdatedBy;
+                existing.LastUpdatedUserID = outdoorRequest.LastUpdatedUserID;
+                existing.LastUpdatedEmail = outdoorRequest.LastUpdatedEmail;
+                #endregion
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
         #endregion
     }
 }

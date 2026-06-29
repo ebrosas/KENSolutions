@@ -87,6 +87,20 @@ namespace KenHRApp.Infrastructure.Repositories
             string? status,
             DateTime? startDate,
             DateTime? endDate);
+
+        Task<Result<OutdoorRequestWF>> GetOutdoorRequestAsync(long requestNo);
+
+        Task<Result<long>> AddOutdoorRequestAsync(
+            OutdoorRequestWF dto,
+            CancellationToken cancellationToken);
+
+        Task<Result<int>> UpdateOutdoorRequestAsync(
+            OutdoorRequestWF outdoorRequest,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<int>> CancelOutdoorRequestAsync(
+            OutdoorRequestWF outdoorRequest,
+            CancellationToken cancellationToken = default);
         #endregion
     }
 }

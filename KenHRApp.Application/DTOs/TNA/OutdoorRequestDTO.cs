@@ -19,15 +19,18 @@ namespace KenHRApp.Application.DTOs.TNA
 
         [Display(Name = "Start Date")]
         [DataType(DataType.Date)]
+        [Required(ErrorMessage = "Start Date is required")]
         public DateTime? StartDate { get; set; }
 
         [Display(Name = "End Date")]
         [DataType(DataType.Date)]
+        [Required(ErrorMessage = "End Date is required")]
         public DateTime? EndDate { get; set; }
 
         public string? ROACode { get; set; } = null;
 
-        [Display(Name = "Reason of Absence")]
+        [Display(Name = "Outdoor Type")]
+        [Required(ErrorMessage = "Outdoor Type is required")]
         public string ROADesc { get; set; } = null!;
 
         public string? DOWCode { get; set; } = null;
@@ -36,14 +39,15 @@ namespace KenHRApp.Application.DTOs.TNA
         public string? DOWDesc { get; set; } = null;
 
         [Display(Name = "Description")]
-        [Required(ErrorMessage = "Regularization Reason is required")]
+        [Required(ErrorMessage = "Description is required")]
         [StringLength(500, ErrorMessage = "Description can't be more than 500 characters.")]
         public string Description { get; set; } = null!;
 
         public string? ActionCode { get; set; } = null;
 
         [Display(Name = "Select Action")]
-        public string ActionDescription { get; set; } = null!;
+        [Required(ErrorMessage = "Action is required")]
+        public string ActionDesc { get; set; } = null!;
 
         [Display(Name = "Start Time")]
         [OutdoorTimeValidation("EndTime")] // ✅ custom validation

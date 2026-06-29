@@ -60,6 +60,7 @@ namespace KenHRApp.Infrastructure.Data
         public DbSet<FileAttachment> FileAttachments => Set<FileAttachment>();
         public DbSet<OTRequestWF> OTRequestWF => Set<OTRequestWF>();
         public DbSet<OutdoorRequestWF> OutdoorRequestWF => Set<OutdoorRequestWF>();
+        public DbSet<OutdoorAttachment> OutdoorAttachment => Set<OutdoorAttachment>();
         #endregion
 
         #region Initialize Entities for mapping to Views/SP results 
@@ -90,6 +91,7 @@ namespace KenHRApp.Infrastructure.Data
             new FileAttachmentConfig().Configure(modelBuilder.Entity<FileAttachment>());
             new OTRequestWFConfig().Configure(modelBuilder.Entity<OTRequestWF>());
             new OutdoorRequestWFConfig().Configure(modelBuilder.Entity<OutdoorRequestWF>());
+            new OutdoorAttachmentConfig().Configure(modelBuilder.Entity<OutdoorAttachment>());
             #endregion
 
             #region Configure keyless models that are mapped to views or stored procedures

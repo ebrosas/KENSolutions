@@ -293,6 +293,12 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	--		@UDCGDesc2					= NULL,
 	--		@UDCGSpecialHandlingCode	= NULL
 
+	--Add Overtime Reasons
+	-- SELECT	@UDCGCode					= 'DOWTYPES',
+	-- 		@UDCGDesc1					= 'Day of Week Types',
+	-- 		@UDCGDesc2					= NULL,
+	-- 		@UDCGSpecialHandlingCode	= NULL
+
 	IF @actionType = 0
 	BEGIN
 

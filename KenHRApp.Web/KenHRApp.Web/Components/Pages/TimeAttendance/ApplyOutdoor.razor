@@ -154,7 +154,7 @@
                                    Size="Size.Small"
                                    Color="Color.Surface"
                                    Disabled="@(_isEditMode)"
-                                   OnClick="HandleBackButton">
+                                   OnClick="@(() => HandleBackButton(""))">
                             Go back
                         </MudButton>
                     }
@@ -236,7 +236,6 @@
                         <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
                             <MudTimePicker Color="Color.Dark" AmPm="true" TimeFormat="h:mm tt"
                                     Label="Start Time"
-                                    Class="required-field"
                                     @bind-Time="_outdoorRequest.StartTime"
                                     For="@(() => _outdoorRequest.StartTime)"
                                     Variant="Variant.Text"
@@ -273,7 +272,6 @@
                         <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
                             <MudTimePicker Color="Color.Dark" AmPm="true" TimeFormat="h:mm tt"
                                            Label="End Time"
-                                           Class="required-field"
                                            @bind-Time="_outdoorRequest.EndTime"
                                            For="@(() => _outdoorRequest.EndTime)"
                                            Variant="Variant.Text"
@@ -298,10 +296,9 @@
                         <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
                             <MudAutocomplete @bind-Value="_outdoorRequest.DOWDesc"
                                              For="@(() => _outdoorRequest.DOWDesc)"
-                                             Class="required-field"
                                              Label="Day of Week"
                                              SearchFunc="SearchDOW!"
-                                             Variant="Variant.Outlined"
+                                             Variant="Variant.Text"
                                              Margin="Margin.Dense"
                                              Dense="true"
                                              Placeholder="Please Select"

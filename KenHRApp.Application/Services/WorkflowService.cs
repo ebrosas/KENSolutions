@@ -44,7 +44,8 @@ namespace KenHRApp.Application.Services
             Regularization,
             TravelRequest,
             ExpenseClaim,
-            RecruitmentOffer
+            RecruitmentOffer,
+            Outdoor
         }
         #endregion
 
@@ -218,6 +219,10 @@ namespace KenHRApp.Application.Services
                         case "RTYPEOT":
                             this.RequestType = WorkflowRequestType.OvertimeRequest;
                             break;
+
+                        case "RTYPEOUTDOOR":
+                            this.RequestType = WorkflowRequestType.Outdoor;
+                            break;
                     }
                     #endregion
                 }
@@ -240,13 +245,19 @@ namespace KenHRApp.Application.Services
                     {
                         subject = "Regularization Request for Approval";
                         requestTypeDesc = "Regularization Request";
-                        requestLink = $"{baseUrl}/TimeAttendance/regularization?ActionType=View&RequestNo={entityId}&CallerForm=LeaveInquiry";
+                        requestLink = $"{baseUrl}/TimeAttendance/regularization?ActionType=View&RequestNo={entityId}&CallerForm=AttendanceCorrectInq";
                     }
                     else if (this.RequestType == WorkflowRequestType.OvertimeRequest)
                     {
                         subject = "Extra Time Request for Approval";
                         requestTypeDesc = "Extra Time Request";
-                        requestLink = $"{baseUrl}/TimeAttendance/ExtraTime?ActionType=View&RequestNo={entityId}&CallerForm=OvertimeInquiry";
+                        requestLink = $"{baseUrl}/TimeAttendance/ExtraTime?ActionType=View&RequestNo={entityId}&CallerForm=AttendanceCorrectInq";
+                    }
+                    else if (this.RequestType == WorkflowRequestType.Outdoor)
+                    {
+                        subject = "Outdoor Request for Approval";
+                        requestTypeDesc = "Outdoor Request";
+                        requestLink = $"{baseUrl}/TimeAttendance/ApplyOutdoor?ActionType=View&RequestNo={entityId}&CallerForm=AttendanceCorrectInq";
                     }
                     #endregion
 
@@ -308,6 +319,10 @@ namespace KenHRApp.Application.Services
                         case "RTYPEOT":
                             this.RequestType = WorkflowRequestType.OvertimeRequest;
                             break;
+
+                        case "RTYPEOUTDOOR":
+                            this.RequestType = WorkflowRequestType.Outdoor;
+                            break;
                     }
                     #endregion
                 }
@@ -349,6 +364,14 @@ namespace KenHRApp.Application.Services
                             subject = "Extra Time Request for Approval";
                             requestTypeDesc = "Extra Time Request";
                             requestLink = $"{baseUrl}/TimeAttendance/ExtraTime?ActionType=View&RequestNo={entityId}&CallerForm=ApprovalDashboard";
+                            #endregion
+                        }
+                        else if (this.RequestType == WorkflowRequestType.Outdoor)
+                        {
+                            #region Build email parameters for Outdoor Request
+                            subject = "Outdoor Request for Approval";
+                            requestTypeDesc = "Outdoor Request";
+                            requestLink = $"{baseUrl}/TimeAttendance/ApplyOutdoor?ActionType=View&RequestNo={entityId}&CallerForm=ApprovalDashboard";
                             #endregion
                         }
 
@@ -403,6 +426,10 @@ namespace KenHRApp.Application.Services
                         case "RTYPEOT":
                             this.RequestType = WorkflowRequestType.OvertimeRequest;
                             break;
+
+                        case "RTYPEOUTDOOR":
+                            this.RequestType = WorkflowRequestType.Outdoor;
+                            break;
                     }
                     #endregion
                 }
@@ -447,6 +474,14 @@ namespace KenHRApp.Application.Services
                                 subject = "Rejected Extra Time Request";
                                 requestTypeDesc = "Extra Time Request";
                                 requestLink = $"{baseUrl}/TimeAttendance/ExtraTime?ActionType=View&RequestNo={entityId}&CallerForm=ApprovalDashboard";
+                                #endregion
+                            }
+                            else if (this.RequestType == WorkflowRequestType.Outdoor)
+                            {
+                                #region Build email parameters for Outdoor Request
+                                subject = "Rejected Outdoor Request";
+                                requestTypeDesc = "Outdoor Request";
+                                requestLink = $"{baseUrl}/TimeAttendance/ApplyOutdoor?ActionType=View&RequestNo={entityId}&CallerForm=ApprovalDashboard";
                                 #endregion
                             }
 

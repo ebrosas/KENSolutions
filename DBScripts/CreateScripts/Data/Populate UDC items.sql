@@ -2938,6 +2938,70 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 
 	*/
 
+	/*	Populate DOW Types
+	
+		SELECT @GroupID = a.UDCGroupId 
+		FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
+		WHERE RTRIM(a.UDCGCode) = 'DOWTYPES'
+
+		SELECT	@UDCCode					= 'DOWSUN',
+				@UDCDesc1					= 'Sunday',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 1,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'DOWMON',
+				@UDCDesc1					= 'Monday',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 2,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'DOWTUE',
+				@UDCDesc1					= 'Tuesday',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 3,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'DOWWED',
+				@UDCDesc1					= 'Wednesday',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 4,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'DOWTHU',
+				@UDCDesc1					= 'Thursday',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 5,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'DOWFRI',
+				@UDCDesc1					= 'Friday',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 6,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+		SELECT	@UDCCode					= 'DOWSAT',
+				@UDCDesc1					= 'Saturday',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 7,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
+	*/
+
 	IF @actionType = 0
 	BEGIN
 
