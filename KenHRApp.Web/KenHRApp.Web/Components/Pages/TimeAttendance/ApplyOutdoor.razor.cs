@@ -154,6 +154,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             ROATYPE,            // ROA Types
             DOWTYPES,           // Day of Weeks
+            ATTENDACT,          // Action Types
             STATUS              // Request Status
         }
         #endregion
@@ -946,7 +947,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 var udcData = result.Value;
                 if (udcData!.Any() && udcGroupList!.Any())
                 {
-                    #region Get ROA Types
+                    #region Get Outdoor Types
                     try
                     {
                         groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ROATYPE.ToString()).FirstOrDefault()!.UDCGroupId;
@@ -979,6 +980,24 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                         _dowList = udcData!.Where(a => a.GroupID == groupID).ToList();
                         if (_dowList != null)
                             _dowArray = _dowList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                    }
+                    #endregion
+
+                    #region Attendance Action Types
+                    try
+                    {
+                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ATTENDACT.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Action Types group id: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _actionList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                        if (_actionList != null)
+                            _actionArray = _actionList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
                     }
                     #endregion
 

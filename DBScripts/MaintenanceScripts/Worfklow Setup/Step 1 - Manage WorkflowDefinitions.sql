@@ -1,4 +1,4 @@
-DECLARE	@actionType				TINYINT,		--(Notes: 0 = Check records, 1 = Create new workflow, 2 = Update record, 3 = Delete record)
+DECLARE	@actionType				TINYINT = 0,		--(Notes: 0 = Check records, 1 = Create new workflow, 2 = Update record, 3 = Delete record)
 		@isCommitTrans			BIT,
 		@workflowDefinitionId	INT,
 		@workflowName			VARCHAR(150),
