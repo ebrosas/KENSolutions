@@ -366,6 +366,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             else if (item.RequestTypeCode == WorkflowHelper.CONST_REGULARIZATION)
                 Navigation.NavigateTo($"/TimeAttendance/regularization?ActionType=View&RequestNo={item.RequestNo}&CallerForm=AttendanceCorrectInq");
+
+            else if (item.RequestTypeCode == WorkflowHelper.CONST_OUTDOOR)
+                Navigation.NavigateTo($"/TimeAttendance/ApplyOutdoor?ActionType=View&RequestNo={item.RequestNo}&CallerForm=AttendanceCorrectInq");
         }
 
         private async Task<IEnumerable<string>> SearchRequestType(string value, CancellationToken token)
@@ -488,7 +491,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (!UserSession.IsAuthenticated())
                 overlayMessage = "Authentication required. Redirecting to login page...";
             else
-                overlayMessage = "Loading extra time requests, please wait...";
+                overlayMessage = "Loading data, please wait...";
 
             _ = SearchAttendanceCorrectionAsync(async () =>
             {

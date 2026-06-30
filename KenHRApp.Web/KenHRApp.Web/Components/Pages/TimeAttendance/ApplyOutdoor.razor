@@ -47,33 +47,33 @@
 
                 <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="3" Class="mud-primary-text" />
 
-                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexEnd" Spacing="2">
+                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexEnd" Spacing="2" Class="mt-2">
                     @if (ActionType == ActionTypes.Add.ToString())
                     {
                         <MudButton Variant="Variant.Filled"
-                                   StartIcon="@Icons.Material.Filled.Save"
-                                   ButtonType="ButtonType.Submit"
-                                   Size="Size.Small"
-                                   Color="Color.Success"
-                                   Style="background-color:#004165;"
-                                   Disabled="@(!_saveBtnEnabled)">
+                                    StartIcon="@Icons.Material.Filled.Save"
+                                    ButtonType="ButtonType.Submit"
+                                    Size="Size.Small"
+                                    Color="Color.Success"
+                                    Style="background-color:#004165;"
+                                    Disabled="@(!_saveBtnEnabled)">
                             Submit
                         </MudButton>
 
-                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh"
-                                   ButtonType="ButtonType.Reset"
-                                   Size="Size.Small"
-                                   Color="Color.Warning"
-                                   Style="background-color:#004165;"
-                                   Disabled="@(_isEditMode)"
-                                   OnClick="HandleRefreshButton">
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh"
+                                    ButtonType="ButtonType.Reset"
+                                    Size="Size.Small"
+                                    Color="Color.Warning"
+                                    Style="background-color:#004165;"
+                                    Disabled="@(_isEditMode)"
+                                    OnClick="HandleRefreshButton">
                             Reset
                         </MudButton>
 
                         <MudButton Variant="Variant.Filled"                                   
-                                   OnClick="ShowCancelDialog"
-                                   Size="Size.Small"
-                                   Color="Color.Surface">
+                                    OnClick="ShowCancelDialog"
+                                    Size="Size.Small"
+                                    Color="Color.Surface">
                             Cancel
                         </MudButton>
                     }
@@ -84,19 +84,19 @@
                             && _isCurrentApprover)
                         {
                             <MudButton Variant="Variant.Filled"
-                                       StartIcon="fas fa-thumbs-up"
-                                       Size="Size.Small"
-                                       Color="Color.Success"
-                                       Disabled="@(_isEditMode)"
-                                       OnClick="BeginApproveRequest">
+                                        StartIcon="fas fa-thumbs-up"
+                                        Size="Size.Small"
+                                        Color="Color.Success"
+                                        Disabled="@(_isEditMode)"
+                                        OnClick="BeginApproveRequest">
                                 Approve
                             </MudButton>
                             <MudButton Variant="Variant.Filled"
-                                       StartIcon="fas fa-thumbs-down"
-                                       Size="Size.Small"
-                                       Color="Color.Error"
-                                       Disabled="@(_isEditMode)"
-                                       OnClick="ConfirmReject">
+                                        StartIcon="fas fa-thumbs-down"
+                                        Size="Size.Small"
+                                        Color="Color.Error"
+                                        Disabled="@(_isEditMode)"
+                                        OnClick="ConfirmReject">
                                 Reject
                             </MudButton>
                         }
@@ -109,38 +109,38 @@
                             && _isCreator)
                         {
                             <MudButton Variant="Variant.Filled"
-                                   StartIcon="@Icons.Material.Filled.Cancel"
-                                   Size="Size.Small"
-                                   Color="Color.Error"
-                                   Disabled="@(_isEditMode)"
-                                   OnClick="ConfirmCancel">
+                                    StartIcon="@Icons.Material.Filled.Cancel"
+                                    Size="Size.Small"
+                                    Color="Color.Error"
+                                    Disabled="@(_isEditMode)"
+                                    OnClick="ConfirmCancel">
                                 Cancel Leave
                             </MudButton>
                         }                        
                         
                         <MudButton Variant="Variant.Filled" hidden
-                                   StartIcon="@Icons.Material.Filled.Edit"
-                                   Size="Size.Small"
-                                   Color="Color.Primary"
-                                   Style="background-color:#004165;"
-                                   Disabled="@(_isEditMode)"
-                                   OnClick="HandleEditButton">
+                                    StartIcon="@Icons.Material.Filled.Edit"
+                                    Size="Size.Small"
+                                    Color="Color.Primary"
+                                    Style="background-color:#004165;"
+                                    Disabled="@(_isEditMode)"
+                                    OnClick="HandleEditButton">
                             Edit
                         </MudButton>
 
                         <MudButton Variant="Variant.Filled" hidden
-                                   StartIcon="@Icons.Material.Filled.Undo"
-                                   Size="Size.Small" Color="Color.Warning"
-                                   Disabled="@(!_isEditMode)"
-                                   OnClick="HandleUndoButton">
+                                    StartIcon="@Icons.Material.Filled.Undo"
+                                    Size="Size.Small" Color="Color.Warning"
+                                    Disabled="@(!_isEditMode)"
+                                    OnClick="HandleUndoButton">
                             Undo
                         </MudButton>
 
                         <MudButton Variant="Variant.Filled" hidden
-                                   StartIcon="@Icons.Material.Filled.Delete"
-                                   Size="Size.Small" Color="Color.Error"
-                                   Disabled="@_isEditMode"
-                                   OnClick="ShowDeleteDialog">
+                                    StartIcon="@Icons.Material.Filled.Delete"
+                                    Size="Size.Small" Color="Color.Error"
+                                    Disabled="@_isEditMode"
+                                    OnClick="ShowDeleteDialog">
                             Delete
                         </MudButton>
                     }   
@@ -150,11 +150,11 @@
                         ActionType == ActionTypes.Approval.ToString())
                     {
                         <MudButton Variant="Variant.Text"
-                                   StartIcon="@Icons.Material.Filled.ArrowBackIos"
-                                   Size="Size.Small"
-                                   Color="Color.Surface"
-                                   Disabled="@(_isEditMode)"
-                                   OnClick="@(() => HandleBackButton(""))">
+                                    StartIcon="@Icons.Material.Filled.ArrowBackIos"
+                                    Size="Size.Small"
+                                    Color="Color.Surface"
+                                    Disabled="@(_isEditMode)"
+                                    OnClick="@(() => HandleBackButton(""))">
                             Go back
                         </MudButton>
                     }
@@ -162,7 +162,7 @@
             </MudStack>
         </MudPaper>
 
-        <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
+        <div id="mainPanel" class="ma-0 full-height mt-2" style="overflow-y: scroll; scrollbar-width: none;">
             <MudPaper Elevation="0" Square="true" Class="w-100 px-2 mt-4">
                 <MudGrid Spacing="5" Class="mt-0">
                     <MudItem xs="6">
@@ -284,12 +284,19 @@
                 <MudGrid Spacing="5">
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudTextField @bind-Value="_outdoorRequest.Description" 
-                                    For="@(() => _outdoorRequest.Description)"
-                                    Label="Description"
-                                    HelperText="Max. text input is 500 chars."
-                                    Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="500" MaxLength="500" Lines="3"
-                                    Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                            <MudAutocomplete @bind-Value="_outdoorRequest.ActionDesc"
+                                                SearchFunc="SearchAction!"
+                                                Variant="Variant.Text"
+                                                Label="Select Action"
+                                                Margin="Margin.Normal"
+                                                Dense="true"
+                                                Placeholder="Please Select"
+                                                HelperText="Type a key to search for action"
+                                                HelperTextOnFocus="true"
+                                                Clearable="true" Typo="Typo.subtitle2"
+                                                MaxItems="@(_actionList != null ? _actionList.Count : 10)"
+                                                Disabled="true"
+                                                Modal="true" />
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="6">
@@ -309,6 +316,19 @@
                                              Disabled="@_isDisabled"
                                              MaxItems="@(_dowList != null ? _dowList.Count : 10)"
                                              Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+
+                <MudGrid Spacing="0" Class="m-0 p-0">
+                    <MudItem xs="12">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="_outdoorRequest.Description"
+                                          For="@(() => _outdoorRequest.Description)"
+                                          Label="Description"
+                                          HelperText="Max. text input is 500 chars."
+                                          Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="500" MaxLength="500" Lines="4"
+                                          Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                         </MudPaper>
                     </MudItem>
                 </MudGrid>

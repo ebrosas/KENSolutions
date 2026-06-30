@@ -94,7 +94,8 @@ Outdoor Request Page:
 
 Workflow Service:
 1. Once the workflow status is set to "Rejected", implement logic to reject the request status in the underlying requisition table.	-Done
-2. Implement workflow code for Outdoor Request in the "WorkflowRepository" class.
+2. Implement workflow code for Outdoor Request in the "WorkflowRepository" class.	-Done
+3. Test the workflow of Outdoor request upon submission.
 
 10003637 - Naga
 02/02/2010

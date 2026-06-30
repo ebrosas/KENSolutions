@@ -21,6 +21,7 @@ namespace KenHRApp.Infrastructure.Repositories
         public static readonly string CONST_LEAVE_REQUEST = "RTYPELEAVE";
         public static readonly string CONST_REGULARIZATION = "RTYPEREGULAR";
         public static readonly string CONST_EXTRA_TIME = "RTYPEOT";
+        public static readonly string CONST_OUTDOOR = "RTYPEOUTDOOR";
         #endregion                
 
         #region Enumerations
@@ -44,7 +45,8 @@ namespace KenHRApp.Infrastructure.Repositories
             Regularization,
             TravelRequest,
             ExpenseClaim,
-            RecruitmentOffer
+            RecruitmentOffer,
+            Outdoor
         }
         #endregion
 
@@ -166,6 +168,10 @@ namespace KenHRApp.Infrastructure.Repositories
                         case "RTYPEOT":
                             requestType = WorkflowRequestType.OvertimeRequest;
                             break;
+
+                        case "RTYPEOUTDOOR":
+                            requestType = WorkflowRequestType.Outdoor;
+                            break;
                     }
                 }
 
@@ -209,6 +215,20 @@ namespace KenHRApp.Infrastructure.Repositories
 
                         // Update request status
                         await UpdateExtraTimeStatus(entityId, WorkflowStatus.Pending);
+                    }
+                }
+                else if (requestType == WorkflowRequestType.Outdoor)
+                {
+                    var entity = await _db.OutdoorRequestWF
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(x => x.OutdoorId == instance.EntityId);
+                    if (entity != null)
+                    {
+                        // Set the request entity
+                        requestEntity = entity;
+
+                        // Update request status
+                        await UpdateOutdoorStatus(entityId, WorkflowStatus.Pending);
                     }
                 }
                 #endregion
@@ -284,6 +304,13 @@ namespace KenHRApp.Infrastructure.Repositories
                         else
                             await UpdateExtraTimeStatus(entityId, WorkflowStatus.Completed);
                         break;
+
+                    case "RTYPEOUTDOOR":
+                        if (approverList.Any())
+                            await UpdateOutdoorStatus(entityId, WorkflowStatus.Approved);
+                        else
+                            await UpdateOutdoorStatus(entityId, WorkflowStatus.Completed);
+                        break;
                 }
                 #endregion
 
@@ -344,6 +371,10 @@ namespace KenHRApp.Infrastructure.Repositories
                     case "RTYPEOT":
                         await UpdateExtraTimeStatus(entityId, WorkflowStatus.Rejected);
                         break;
+
+                    case "RTYPEOUTDOOR":
+                        await UpdateOutdoorStatus(entityId, WorkflowStatus.Rejected);
+                        break;
                 }
                 #endregion
 
@@ -398,6 +429,14 @@ namespace KenHRApp.Infrastructure.Repositories
                             assigneeEmpNo = Convert.ToInt32(employeeInfo.ReportingManagerCode);
                         }
                     }
+                    else if (entity is OutdoorRequestWF outdoor)
+                    {
+                        var employeeInfo = await _db.Employees.FirstAsync(x => x.EmployeeNo == outdoor.EmpNo);
+                        if (employeeInfo != null && employeeInfo.ReportingManagerCode.HasValue)
+                        {
+                            assigneeEmpNo = Convert.ToInt32(employeeInfo.ReportingManagerCode);
+                        }
+                    }
                     #endregion
                 }
                 else if (approver.GroupType == 2)
@@ -427,6 +466,14 @@ namespace KenHRApp.Infrastructure.Repositories
                             assigneeEmpNo = Convert.ToInt32(departmentInfo.SuperintendentEmpNo);
                         }
                     }
+                    else if (entity is OutdoorRequestWF outdoor)
+                    {
+                        var departmentInfo = await _db.DepartmentMasters.FirstAsync(x => x.DepartmentCode == outdoor.CostCenter);
+                        if (departmentInfo != null && departmentInfo.SuperintendentEmpNo.HasValue)
+                        {
+                            assigneeEmpNo = Convert.ToInt32(departmentInfo.SuperintendentEmpNo);
+                        }
+                    }
                     #endregion
                 }
                 else if (approver.GroupType == 3)
@@ -451,6 +498,14 @@ namespace KenHRApp.Infrastructure.Repositories
                     else if (entity is OTRequestWF overtime)
                     {
                         var departmentInfo = await _db.DepartmentMasters.FirstAsync(x => x.DepartmentCode == overtime.CostCenter);
+                        if (departmentInfo != null && departmentInfo.ManagerEmpNo.HasValue)
+                        {
+                            assigneeEmpNo = Convert.ToInt32(departmentInfo.ManagerEmpNo);
+                        }
+                    }
+                    else if (entity is OutdoorRequestWF outdoor)
+                    {
+                        var departmentInfo = await _db.DepartmentMasters.FirstAsync(x => x.DepartmentCode == outdoor.CostCenter);
                         if (departmentInfo != null && departmentInfo.ManagerEmpNo.HasValue)
                         {
                             assigneeEmpNo = Convert.ToInt32(departmentInfo.ManagerEmpNo);
@@ -725,6 +780,10 @@ namespace KenHRApp.Infrastructure.Repositories
                         case "RTYPEOT":
                             requestType = WorkflowRequestType.OvertimeRequest;
                             break;
+
+                        case "RTYPEOUTDOOR":
+                            requestType = WorkflowRequestType.Outdoor;
+                            break;
                     }
                 }
 
@@ -755,6 +814,17 @@ namespace KenHRApp.Infrastructure.Repositories
                     var entity = await _db.OTRequestWF
                                 .AsNoTracking()
                                 .FirstOrDefaultAsync(x => x.ExtratimeId == dbInstance.EntityId);
+                    if (entity != null)
+                    {
+                        // Set the request entity
+                        requestEntity = entity;
+                    }
+                }
+                else if (requestType == WorkflowRequestType.Outdoor)
+                {
+                    var entity = await _db.OutdoorRequestWF
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(x => x.OutdoorId == dbInstance.EntityId);
                     if (entity != null)
                     {
                         // Set the request entity
@@ -1213,6 +1283,13 @@ namespace KenHRApp.Infrastructure.Repositories
                         return queryable.Any(normalized);
                     }
 
+                    else if (entity is OutdoorRequestWF outdoor)
+                    {
+                        var queryable = new List<OutdoorRequestWF> { outdoor }.AsQueryable();
+
+                        return queryable.Any(normalized);
+                    }
+
                     //throw new InvalidOperationException("Unsupported entity type.");
 
                     //// Convert single object → IQueryable
@@ -1661,6 +1738,95 @@ namespace KenHRApp.Infrastructure.Repositories
                 if (existing == null)
                     throw new KeyNotFoundException(
                         "Could not find Regularization request with the specified requisition no.");
+
+                UserDefinedCode? statusUDC = null;
+
+                if (reqStatus == WorkflowStatus.Pending)
+                {
+                    #region Set request status to "Waiting for Approval" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "05"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Approved)
+                {
+                    #region Set request status to "Assigned to Next Approver" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "121"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Rejected)
+                {
+                    #region Set request status to "Rejected By Approver" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "110"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Cancelled)
+                {
+                    #region Set request status to "Cancelled by User" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "101"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+                else if (reqStatus == WorkflowStatus.Completed)
+                {
+                    #region Set request status to "Closed by Approver" 
+                    statusUDC = await (from grp in _db.UserDefinedCodeGroups
+                                       join udc in _db.UserDefinedCodes on grp.UDCGroupId equals udc.GroupID
+                                       where grp.UDCGCode == "STATUS" && udc.UDCCode == "123"
+                                       select udc)
+                                       .FirstOrDefaultAsync();
+                    #endregion
+                }
+
+                if (statusUDC != null)
+                {
+                    existing.StatusCode = statusUDC.UDCCode;
+                    existing.StatusID = statusUDC.UDCId;
+                    existing.StatusHandlingCode = statusUDC.UDCSpecialHandlingCode;
+                }
+
+                rowsUpdated = await _db.SaveChangesAsync();
+                return rowsUpdated;
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        private async Task<int> UpdateOutdoorStatus(
+            long requestNo,
+            WorkflowStatus reqStatus)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                var existing = await _db.OutdoorRequestWF
+                    .FirstOrDefaultAsync(e =>
+                        e.OutdoorId == requestNo);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find outdoor request with the specified requisition no.");
 
                 UserDefinedCode? statusUDC = null;
 

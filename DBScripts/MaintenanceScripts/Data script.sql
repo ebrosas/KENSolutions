@@ -10,6 +10,12 @@
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'PAYGRADE')
 
+	--Request Types
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'REQTYPE')
+	ORDER BY a.SequenceNo
+
 	--Request statuses
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
@@ -32,12 +38,7 @@
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'OTREASON')
-
-	--Request Types
-	SELECT a.* 
-	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
-	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'REQTYPE')
-	ORDER BY a.SequenceNo
+	
 	
 	--ROA Types
 	SELECT a.* 
@@ -48,7 +49,8 @@
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'ATTENDACT')
-
+	ORDER BY a.SequenceNo
+	
 	--Workflow Statuses
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)

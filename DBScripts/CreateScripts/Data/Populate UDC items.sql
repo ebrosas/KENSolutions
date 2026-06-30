@@ -2936,6 +2936,14 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@IsActive					= 1,
 				@Amount						= NULL 
 
+		SELECT	@UDCCode					= 'OUTDOORREQ',
+				@UDCDesc1					= 'Outdoor',
+				@UDCDesc2					= NULL,
+				@UDCSpecialHandlingCode		= NULL,
+				@SequenceNo					= 3,
+				@IsActive					= 1,
+				@Amount						= NULL 
+
 	*/
 
 	/*	Populate DOW Types

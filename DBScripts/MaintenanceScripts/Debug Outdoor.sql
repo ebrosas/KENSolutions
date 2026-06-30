@@ -1,9 +1,9 @@
 
 	SELECT 
 		a.StatusCode, a.StatusID, b.UDCDesc1 as StatusDesc, a.[StatusHandlingCode],
-		a.EmployeeNo, a.CostCenter, a.TS_AutoId, a.AttendanceDate, a.OTReasonCode, 
+		a.EmpNo, a.CostCenter, 
 		a.* 
-	FROM kenuser.[OTRequestWF] a
+	FROM kenuser.OutdoorRequestWF a
 		CROSS APPLY
 		(
 			SELECT y.* 
@@ -12,24 +12,10 @@
 			where x.UDCGCode = 'STATUS'
 				AND y.UDCCode = a.StatusCode
 		) b
-	where a.ExtratimeId = 7
+	where a.OutdoorId = 3
 
-	EXEC kenuser.Pr_GetOvertimeDetail 3
+	EXEC kenuser.Pr_GetOutdoorRequestDetail 3
 
-	--Get attendance records
-	SELECT 
-		a.EmpNo, a.AttendanceDate,
-		a.ShiftPatCode, a.SchedShiftCode, a.DurationRequired, 
-		a.DurationWorked, a.DurationWorkedCumulative, 
-		a.TimeIn, a.TimeOut,
-		a.* 
-	FROM kenuser.AttendanceTimesheet a WITH (NOLOCK) 
-	WHERE a.EmpNo = 10003633
-		AND (a.TimeIn is not null and a.[TimeOut] IS NOT NULL)
-		--AND a.AttendanceDate = '05/22/2026'
-	ORDER By a.AttendanceDate Desc
-
-	SELECT * FROM [kenuser].[PayrollPeriod] a
 
 /*	Debug:
 

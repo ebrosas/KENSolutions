@@ -10,6 +10,7 @@
 *	09/06/2026		Ervin		1.2			Populated return dataset for Extra Time Request
 *	19/06/2026		Ervin		1.3			Added the following fields in the returned dataset: CurrentlyAssignedEmpNo, CurrentlyAssignedEmpName
 *	26/06/2026		Ervin		1.4			Added "StatusCode" and "StatusDesc" fields		
+*	30/06/2026		Ervin		1.5			Populated return dataset for Outdoor Request
 ******************************************************************************************************************************************************************************/
 
 ALTER VIEW kenuser.Vw_RequestDetail
@@ -194,6 +195,70 @@ AS
 			WHERE RTRIM(z.EntityName) = 'RTYPEOT'
 				AND RTRIM(x.[Status]) = 'Pending'
 				AND y.EntityId = a.ExtratimeId
+		) wf
+		OUTER APPLY
+		(
+			SELECT y.* 
+			FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK)
+				INNER JOIN kenuser.UserDefinedCode y WITH (NOLOCK) ON x.UDCGroupId = y.GroupID
+			where x.UDCGCode = 'STATUS'
+				AND y.UDCCode = a.[StatusCode]
+		) stat
+
+	UNION
+
+	--Outdoor Request (Rev. #1.5)
+	SELECT	DISTINCT
+			'RTYPEOUTDOOR' AS RequestTypeCode,
+			'Outdoor' AS RequestTypeDesc,
+			a.OutdoorId AS RequestNo,
+			a.StartDate AS RequestDate,
+			a.EmpNo AS OrigEmpNo,
+			a.EmpName AS OrigEmpName,
+			a.CostCenter,
+			RTRIM(dep.DepartmentName) AS CostCenterName,
+			a.CreatedDate AS AppliedDate,
+			a.CreatedBy AS RequestedByNo,	
+			RTRIM(ISNULL(b.FirstName, '')) + ' ' + RTRIM(ISNULL(b.MiddleName, '')) + ' ' + RTRIM(ISNULL(b.LastName, '')) AS RequestedByName,			
+			'Outdoor Type: ' + RTRIM(udc.UDCDesc1) + CHAR(13) + CHAR(10) +
+				'Employee: ' + a.EmpName + CHAR(13) + CHAR(10) +
+				'Start Date: ' + CASE WHEN a.StartDate IS NOT NULL THEN FORMAT(a.StartDate, 'dd-MMM-yyyy') ELSE '' END + CHAR(13) + CHAR(10) +
+				'End Date: ' + CASE WHEN a.EndDate IS NOT NULL THEN FORMAT(a.EndDate, 'dd-MMM-yyyy') ELSE '' END + CHAR(13) + CHAR(10) +
+				'Day of Week: ' + RTRIM(ISNULL(dow.UDCDesc1, '')) + CHAR(13) + CHAR(10) +
+				'Start Time: ' + CASE WHEN a.StartTime IS NOT NULL THEN FORMAT(CAST(a.StartTime AS DATETIME), 'hh:mm tt') ELSE '' END + CHAR(13) + CHAR(10) +
+				'End Time: ' + CASE WHEN a.EndTime IS NOT NULL THEN FORMAT(CAST(a.EndTime AS DATETIME), 'hh:mm tt') ELSE '' END + CHAR(13) + CHAR(10) AS RequestDetail,
+			a.CreatedBy AS CreatedByEmpNo,
+			a.StatusCode,					
+			stat.UDCDesc1 as StatusDesc, 	
+			a.StatusHandlingCode,
+			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverNo ELSE NULL END AS CurrentlyAssignedEmpNo,			
+			CASE WHEN RTRIM(a.StatusHandlingCode) = 'Open' THEN wf.ApproverName ELSE NULL END AS CurrentlyAssignedEmpName		
+	FROM kenuser.OutdoorRequestWF a WITH (NOLOCK) 
+		INNER JOIN kenuser.Employee b WITh (NOLOCK) ON a.CreatedBy = b.EmployeeNo
+		LEFT JOIN kenuser.DepartmentMaster dep WITH (NOLOCK) ON RTRIM(a.CostCenter) = RTRIM(dep.DepartmentCode)
+		CROSS APPLY
+		(
+			SELECT * FROM kenuser.UserDefinedCode WITH (NOLOCK)
+			WHERE GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'ROATYPE')
+				AND RTRIM(UDCCode) = RTRIM(a.ROACode)
+		) udc 
+		OUTER APPLY
+		(
+			SELECT * FROM kenuser.UserDefinedCode WITH (NOLOCK)
+			WHERE GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'DOWTYPES')
+				AND RTRIM(UDCCode) = RTRIM(a.DOWCode)
+		) dow
+		OUTER APPLY		
+		(
+			SELECT	x.ApproverEmpNo AS ApproverNo, 
+					RTRIM(ISNULL(emp.FirstName, '')) + ' ' + RTRIM(ISNULL(emp.MiddleName, '')) + ' ' + RTRIM(ISNULL(emp.LastName, '')) AS ApproverName
+			FROM kenuser.WorkflowStepInstances x
+				INNER JOIN kenuser.WorkflowInstances y WITH (NOLOCK) ON x.WorkflowInstanceId = y.WorkflowInstanceId
+				INNER JOIN kenuser.WorkflowDefinitions z WITH (NOLOCK) ON y.WorkflowDefinitionId = z.WorkflowDefinitionId
+				LEFT JOIN kenuser.Employee emp WITH (NOLOCK) ON x.ApproverEmpNo = emp.EmployeeNo
+			WHERE RTRIM(z.EntityName) = 'RTYPEOUTDOOR'
+				AND RTRIM(x.[Status]) = 'Pending'
+				AND y.EntityId = a.OutdoorId
 		) wf
 		OUTER APPLY
 		(
