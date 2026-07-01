@@ -248,8 +248,14 @@
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.RequestTypeDesc" Title="Request Type" Class="col-RequestTypeDesc" Editable="false">
-                                <CellTemplate>
-                                    @context.Item.RequestTypeDesc
+                            <CellTemplate Context="row">
+                                <MudChip T="string" Size=Size.Small Variant="Variant.Text" Class="fw-bold" Style="font-size: 14px;"
+                                         Color="@(row.Item.RequestTypeCode == RequestTypeCodes.RTYPEOT.ToString() ? Color.Info
+                                        : row.Item.RequestTypeCode == RequestTypeCodes.RTYPEREGULAR.ToString() ? Color.Primary
+                                        : row.Item.RequestTypeCode == RequestTypeCodes.RTYPEOUTDOOR.ToString() ? Color.Tertiary
+                                        : Color.Dark)">
+                                    @row.Item.RequestTypeDesc
+                                </MudChip>
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.AppliedDate" Title="Applied Date" Class="col-AppliedDate" Editable="false">
@@ -293,14 +299,21 @@
                         </PropertyColumn>
                         <TemplateColumn CellClass="text-center align-middle" Title="Action">
                              <CellTemplate Context="row">
-                                 <MudIconButton title="View details"
+                                 @* <MudIconButton title="View details"
                                                 Class="show-btn fa-icon-btn"
                                                 Color="Color.Surface"
                                                 OnClick="@(()=>OpenRequestDetail(row.Item))">
                                      <ChildContent>
                                         <i class="fas fa-eye fa-1x"></i>
                                      </ChildContent>
-                                 </MudIconButton>
+                                 </MudIconButton> *@
+                                <MudIconButton Color="Color.Surface"
+                                               title="View request details"
+                                               Class="show-btn fa-icon-btn"
+                                               Size="Size.Small"
+                                               Icon="fas fa-eye"
+                                               OnClick="@(()=>OpenRequestDetail(row.Item))">
+                                </MudIconButton>
                              </CellTemplate>
                          </TemplateColumn>
                     </Columns>

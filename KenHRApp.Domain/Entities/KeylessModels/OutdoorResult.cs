@@ -7,28 +7,27 @@ using System.Threading.Tasks;
 
 namespace KenHRApp.Domain.Entities.KeylessModels
 {
-    public class RegularizationResult
+    public class OutdoorResult
     {
         #region Properties
-        public long RegularizationId { get; set; }       // Identity column  
+        public long OutdoorId { get; set; }       // Identity column  
         public Guid AttachmentId { get; set; } = Guid.NewGuid();
         public Guid WorkflowId { get; set; } = Guid.NewGuid();
-        public int EmployeeNo { get; set; }
-        public string EmployeeName { get; set; } = null!;
-        public string CostCenter { get; set; } = null!;
+        public int EmpNo { get; set; }
+        public string EmpName { get; set; } = null!;
+        public string? CostCenter { get; set; } = null;
         public string? CostCenterName { get; set; } = null;
-        public DateTime AttendanceDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public string ROACode { get; set; } = null!;
-        public string ROADesc { get; set; } = null!;
+        public string? ROADesc { get; set; } = null;
         public string ActionCode { get; set; } = null!;
-        public string ActionDesc { get; set; } = null!;
-        public TimeSpan RegularizedTimeIn { get; set; }
-        public TimeSpan RegularizedTimeOut { get; set; }
-        public string? ShiftPattern { get; set; } = null;
-        public string? ShiftTiming { get; set; } = null;
-        public int? WorkDuration { get; set; } = null;
-        public int? NoPayHours { get; set; } = null;
-        public string RegularizedDescription { get; set; } = null!;
+        public string? ActionDesc { get; set; } = null;
+        public string? DOWCode { get; set; } = null;
+        public string? DOWDesc { get; set; } = null;        
+        public TimeSpan? StartTime { get; set; }
+        public TimeSpan? EndTime { get; set; }
+        public string Description { get; set; } = null!;
         public int? StatusID { get; set; }
         public string StatusCode { get; set; } = null!;
         public string? StatusDesc { get; set; } = null;
@@ -42,10 +41,9 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public int? LastUpdatedBy { get; set; }
         public string? LastUpdatedUserID { get; set; } = null;
         public string? LastUpdatedEmail { get; set; } = null;
-        public List<FileAttachment> AttachmentList { get; set; } = new();
-        public List<AttendanceSwipeLog>? SwipeLogList { get; set; } = new();
         public int? ApproverNo { get; set; }
         public string? ApproverName { get; set; } = null;
+        public List<OutdoorAttachment> AttachmentList { get; set; } = new();
         #endregion
     }
 }

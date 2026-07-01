@@ -6,7 +6,7 @@
 *
 *	Date			Author		Rev. #		Comments:
 *	07/04/2026		Ervin		1.0			Created
-*	
+*	01/07/2026		Ervin		1.1			Set icon name for Outdoor request  		
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetPendingRequest
@@ -58,6 +58,7 @@ BEGIN
 					WHEN RTRIM(a.UDCCode) = 'RTYPEOT' THEN 'fas fa-user-clock'					--Overtime
 					WHEN RTRIM(a.UDCCode) = 'RTYPEREGULAR' THEN 'far fa-calendar-check'			--Regularization
 					WHEN RTRIM(a.UDCCode) = 'RTYPERECRUIT' THEN 'fas fa-users'					--Recruitment Offer
+					WHEN RTRIM(a.UDCCode) = 'RTYPEOUTDOOR' THEN 'fas fa-car'					--Outdoor Request   (Rev. #1.1)
 					ELSE ''
 				END AS IconName,
 				kenuser.fnGetAssignedRequestCount(RTRIM(a.UDCCode), @empNo, @startDate, @endDate) AS AssignedCount

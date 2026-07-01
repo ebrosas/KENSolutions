@@ -1956,13 +1956,13 @@ namespace KenHRApp.Infrastructure.Repositories
         /// </summary>
         /// <param name="requestNo"></param>
         /// <returns></returns>
-        public async Task<Result<OutdoorRequestWF>> GetOutdoorRequestAsync(long requestNo)
+        public async Task<Result<OutdoorResult>> GetOutdoorRequestAsync(long requestNo)
         {
-            OutdoorRequestWF outdoorRequest = new();
+            OutdoorResult outdoorRequest = new();
 
             try
             {
-                var model = await _db.Set<OutdoorRequestWF>()
+                var model = await _db.Set<OutdoorResult>()
                     .FromSqlRaw("EXEC kenuser.Pr_GetOutdoorRequestDetail @requestNo = {0}",
                     requestNo)
                     .ToListAsync();
@@ -2024,12 +2024,12 @@ namespace KenHRApp.Infrastructure.Repositories
                     #endregion
                 }
 
-                return Result<OutdoorRequestWF>.SuccessResult(outdoorRequest);
+                return Result<OutdoorResult>.SuccessResult(outdoorRequest);
             }
             catch (Exception ex)
             {
                 // Log error here if needed (Serilog, NLog, etc.)
-                return Result<OutdoorRequestWF>.Failure($"Database error: {ex.Message}");
+                return Result<OutdoorResult>.Failure($"Database error: {ex.Message}");
             }
         }
 

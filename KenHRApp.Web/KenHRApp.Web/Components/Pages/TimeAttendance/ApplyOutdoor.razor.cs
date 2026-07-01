@@ -95,7 +95,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
             new("Attendance Corrections", href: "/TimeAttendance/AttendanceCorrectInq?ForceLoad=true", icon: Icons.Material.Filled.ManageSearch),
-            new("Apply Outdoor", href: null, disabled: true, @Icons.Material.Filled.CardTravel)
+            new("Apply Outdoor", href: null, disabled: true, @Icons.Material.Filled.CameraOutdoor)
         ];
 
         private List<UserDefinedCodeDTO> _actionList = new List<UserDefinedCodeDTO>();
@@ -284,7 +284,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                                 var udcData = result.Value;
                                 if (udcData!.Any() && udcGroupList!.Any())
                                 {
-                                    #region Get ROA Types
+                                    #region Get Outdoor Types
                                     try
                                     {
                                         groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ROATYPE.ToString()).FirstOrDefault()!.UDCGroupId;
@@ -299,6 +299,42 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                                         _roaList = udcData!.Where(a => a.GroupID == groupID && a.IsActive == true).ToList();
                                         if (_roaList != null)
                                             _roaArray = _roaList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                                    }
+                                    #endregion
+
+                                    #region Day of Week Types
+                                    try
+                                    {
+                                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.DOWTYPES.ToString()).FirstOrDefault()!.UDCGroupId;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _errorMessage.Append($"Error getting DOW group id: {ex.Message}");
+                                    }
+
+                                    if (groupID > 0)
+                                    {
+                                        _dowList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                                        if (_dowList != null)
+                                            _dowArray = _dowList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
+                                    }
+                                    #endregion
+
+                                    #region Attendance Action Types
+                                    try
+                                    {
+                                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.ATTENDACT.ToString()).FirstOrDefault()!.UDCGroupId;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _errorMessage.Append($"Error getting Action Types group id: {ex.Message}");
+                                    }
+
+                                    if (groupID > 0)
+                                    {
+                                        _actionList = udcData!.Where(a => a.GroupID == groupID).ToList();
+                                        if (_actionList != null)
+                                            _actionArray = _actionList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
                                     }
                                     #endregion
 
@@ -886,8 +922,21 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _ = LoadComboboxAsync(async () =>
             {
                 // Set the default employee to the current logged in user
-                _outdoorRequest.EmpNo = UserEmpNo;
-                _outdoorRequest.EmpName = UserFullName;
+                //_outdoorRequest.EmpNo = UserEmpNo;
+                //_outdoorRequest.EmpName = UserFullName;
+
+                #region Set the default employee to the current logged in user
+                if (_employeeList.Any())
+                {
+                    EmployeeResultDTO? employee = _employeeList.Where(e => e.EmployeeNo == UserEmpNo).FirstOrDefault();
+                    if (employee != null)
+                    {
+                        _outdoorRequest.EmpNo = employee.EmployeeNo;
+                        _outdoorRequest.CostCenter = employee!.DepartmentCode;
+                        _outdoorRequest.EmpName = employee.EmployeeFullName;
+                    }
+                }
+                #endregion
 
                 _isRunning = false;
 

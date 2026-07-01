@@ -1639,7 +1639,7 @@ namespace KenHRApp.Application.Services
                         ROACode = model.ROACode,
                         ROADesc = !string.IsNullOrWhiteSpace(model.ROADesc) ? model.ROADesc : string.Empty,
                         ActionCode = model.ActionCode,
-                        ActionDesc = model.ActionDesc,
+                        ActionDesc = model.ActionDesc!,
                         DOWCode = model.DOWCode,
                         DOWDesc = model.DOWDesc,
                         StartTime = model.StartTime,

@@ -88,7 +88,7 @@ namespace KenHRApp.Infrastructure.Repositories
             DateTime? startDate,
             DateTime? endDate);
 
-        Task<Result<OutdoorRequestWF>> GetOutdoorRequestAsync(long requestNo);
+        Task<Result<OutdoorResult>> GetOutdoorRequestAsync(long requestNo);
 
         Task<Result<long>> AddOutdoorRequestAsync(
             OutdoorRequestWF dto,

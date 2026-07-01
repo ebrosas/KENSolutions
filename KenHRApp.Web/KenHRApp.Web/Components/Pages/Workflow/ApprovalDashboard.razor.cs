@@ -332,7 +332,7 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             {
                 if (isApproval)
                 {
-                    #region Initialize DTO object to be passed to  the Regularization page
+                    #region Initialize DTO object to be passed to the Leave Request page
                     // Pass via NavigationManager and a shared state service 
                     State.RequestItem = item;
                     #endregion
@@ -371,6 +371,21 @@ namespace KenHRApp.Web.Components.Pages.Workflow
                 }
                 else
                     Navigation.NavigateTo($"/TimeAttendance/ExtraTime?ActionType=View&RequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+            }
+
+            else if (item.RequestTypeCode == WorkflowHelper.CONST_OUTDOOR)
+            {
+                if (isApproval)
+                {
+                    #region Initialize DTO object to be passed to the Outdoor Request page
+                    // Pass via NavigationManager and a shared state service 
+                    State.RequestItem = item;
+                    #endregion
+
+                    Navigation.NavigateTo($"/TimeAttendance/ApplyOutdoor?ActionType=Approval&RequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
+                }
+                else
+                    Navigation.NavigateTo($"/TimeAttendance/ApplyOutdoor?ActionType=View&RequestNo={item.RequestNo}&CallerForm=ApprovalDashboard");
             }
         }
 

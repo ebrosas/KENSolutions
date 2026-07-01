@@ -144,6 +144,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             Rejected,
             Cancelled
         }
+
+        private enum RequestTypeCodes
+        {
+            RTYPEREGULAR,
+            RTYPEOT,
+            RTYPEOUTDOOR
+        }
         #endregion
 
         #region IPageAuthorization Implementation

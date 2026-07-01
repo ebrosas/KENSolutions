@@ -283,12 +283,12 @@
 
                 <MudGrid Spacing="5">
                     <MudItem xs="6">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
+                        <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
                             <MudAutocomplete @bind-Value="_outdoorRequest.ActionDesc"
                                                 SearchFunc="SearchAction!"
                                                 Variant="Variant.Text"
                                                 Label="Select Action"
-                                                Margin="Margin.Normal"
+                                                Margin="Margin.Dense"
                                                 Dense="true"
                                                 Placeholder="Please Select"
                                                 HelperText="Type a key to search for action"
