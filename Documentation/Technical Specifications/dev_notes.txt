@@ -88,6 +88,7 @@ Leave Request page:
 
 Regularization Request Page:
 1. Test the approval and rejection effect on the status of the request.		-Done
+2. Refactor the HandleBackButton() method to implement same function done in Outdoor Request page.
 
 Outdoor Request Page:
 1. Add code to open the Apply Outdoor page when the "Outdoor" button in clicked in the Employee Attendance Dashboard page.

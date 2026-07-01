@@ -322,7 +322,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             #endregion
 
                             // Load regularization details
-                            //await GetOutdoorDetail(RequestNo);
+                            await GetOutdoorDetail(RequestNo);
 
                             #region Get the workflow data
                             var wfRepo = await WorkflowService.GetWorkflowStatusAsync(WorkflowHelper.CONST_OUTDOOR, RequestNo);
@@ -516,7 +516,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private void HandleBackButton(string callerForm = "")
         {
             if (!string.IsNullOrWhiteSpace(callerForm))
-                Navigation.NavigateTo($"/TimeAttendance/{callerForm}?ForceLoad=true");
+                Navigation.NavigateTo($"/TimeAttendance/{callerForm}?ForceLoad=true&RequestType=RTYPEOUTDOOR");
             else
             {
                 switch (CallerForm)
@@ -530,7 +530,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                         break;
 
                     case "AttendanceCorrectInq":
-                        Navigation.NavigateTo("/TimeAttendance/AttendanceCorrectInq?ForceLoad=true");
+                        Navigation.NavigateTo("/TimeAttendance/AttendanceCorrectInq?ForceLoad=true&RequestType=RTYPEOUTDOOR");
                         break;
 
                     default:

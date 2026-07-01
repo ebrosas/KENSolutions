@@ -442,7 +442,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                         // Initiate the workflow
                         await InitializeWorkflowAsync(_regularRequest.RegularizationId, _regularRequest.EmployeeNo);
 
-                        BeginLoadRegularRequest(_regularRequest.RegularizationId);
+                        //BeginLoadRegularRequest(_regularRequest.RegularizationId);
+                        HandleBackButton("AttendanceCorrectInq");
                     }
                 });
             }
@@ -540,32 +541,34 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             #endregion
         }
         
-        private void HandleBackButton()
+        private void HandleBackButton(string callerForm = "")
         {
-            if (string.IsNullOrEmpty(CallerForm))
-                return;
-
-            switch (CallerForm)
+            if (!string.IsNullOrWhiteSpace(callerForm))
+                Navigation.NavigateTo($"/TimeAttendance/{callerForm}?ForceLoad=true&RequestType=RTYPEREGULAR");
+            else
             {
-                case "TNADashboard":
-                    Navigation.NavigateTo("/TimeAttendance/tnadashboard");
-                    break;
+                switch (CallerForm)
+                {
+                    case "TNADashboard":
+                        Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+                        break;
 
-                case "RegularInquiry":
-                    Navigation.NavigateTo("/TimeAttendance/regularinquiry?ForceLoad=true");
-                    break;
+                    case "RegularInquiry":
+                        Navigation.NavigateTo("/TimeAttendance/regularinquiry?ForceLoad=true");
+                        break;
 
-                case "ApprovalDashboard":
-                    Navigation.NavigateTo("/Workflow/ApprovalDashboard?RequestType=RTYPEREGULAR");
-                    break;
+                    case "ApprovalDashboard":
+                        Navigation.NavigateTo("/Workflow/ApprovalDashboard?RequestType=RTYPEREGULAR");
+                        break;
 
-                case "AttendanceCorrectInq":
-                    Navigation.NavigateTo("/TimeAttendance/AttendanceCorrectInq?ForceLoad=true");
-                    break;
+                    case "AttendanceCorrectInq":
+                        Navigation.NavigateTo("/TimeAttendance/AttendanceCorrectInq?ForceLoad=true&RequestType=RTYPEREGULAR");
+                        break;
 
-                default:
-                    Navigation.NavigateTo("/TimeAttendance/tnadashboard");
-                    break;
+                    default:
+                        Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+                        break;
+                }
             }
         }
         #endregion

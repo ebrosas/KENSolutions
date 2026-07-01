@@ -155,7 +155,7 @@
                                    Size="Size.Small"
                                    Color="Color.Surface"
                                    Disabled="@(_isEditMode)"
-                                   OnClick="HandleBackButton">
+                                   OnClick="@(() => HandleBackButton(""))">
                             Go back
                         </MudButton>
                     }

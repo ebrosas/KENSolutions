@@ -37,6 +37,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         [Parameter]
         [SupplyParameterFromQuery]
         public DateTime? SearchEndDate { get; set; } = null;
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string? RequestType { get; set; } = null;
         #endregion
 
         #region Fields
@@ -159,6 +163,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Page Events
         protected override void OnInitialized()
         {
+            #region Process query string values
             if (SearchEmpNo.HasValue && SearchEmpNo > 0)
                 _empNo = SearchEmpNo;
 
@@ -166,7 +171,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _selectedStartDate = SearchStartDate;
 
             if (SearchEndDate.HasValue)
-                _selectedEndDate = SearchEndDate;
+                _selectedEndDate = SearchEndDate;                       
+            #endregion
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -436,6 +442,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 // Shows the spinner overlay
                 await InvokeAsync(StateHasChanged);
+
+                // Get the selected request type
+                if (!string.IsNullOrEmpty(RequestType))
+                {
+                    UserDefinedCodeDTO? requestTypeUDC = _requestTypeList.Where(d => d.UDCCode == RequestType).FirstOrDefault();
+                    if (requestTypeUDC != null)
+                        _selectedRequestType = requestTypeUDC.UDCDesc1;
+                }
 
                 if (ForceLoad)
                 {

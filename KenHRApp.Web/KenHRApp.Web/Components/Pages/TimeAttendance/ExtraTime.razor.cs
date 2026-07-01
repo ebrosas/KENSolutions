@@ -435,7 +435,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                         // Initiate the workflow
                         await InitializeWorkflowAsync(_overtimeRequest.ExtratimeId, _overtimeRequest.EmployeeNo);
 
-                        BeginLoadOvertimeRequest(_overtimeRequest.ExtratimeId);
+                        //BeginLoadOvertimeRequest(_overtimeRequest.ExtratimeId);
+                        HandleBackButton("AttendanceCorrectInq");
                     }
                 });
             }
@@ -533,32 +534,34 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             #endregion
         }
 
-        private void HandleBackButton()
+        private void HandleBackButton(string callerForm = "")
         {
-            //if (string.IsNullOrEmpty(CallerForm))
-            //    return;
-
-            switch (CallerForm)
+            if (!string.IsNullOrWhiteSpace(callerForm))
+                Navigation.NavigateTo($"/TimeAttendance/{callerForm}?ForceLoad=true&RequestType=RTYPEOT");
+            else
             {
-                case "TNADashboard":
-                    Navigation.NavigateTo("/TimeAttendance/tnadashboard");
-                    break;
+                switch (CallerForm)
+                {
+                    case "TNADashboard":
+                        Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+                        break;
 
-                case "ApprovalDashboard":
-                    Navigation.NavigateTo("/Workflow/ApprovalDashboard?RequestType=RTYPEOT");
-                    break;
+                    case "ApprovalDashboard":
+                        Navigation.NavigateTo("/Workflow/ApprovalDashboard?RequestType=RTYPEOT");
+                        break;
 
-                case "ExtraTimeInq":
-                    Navigation.NavigateTo("/TimeAttendance/ExtraTimeInq?ForceLoad=true");
-                    break;
+                    case "ExtraTimeInq":
+                        Navigation.NavigateTo("/TimeAttendance/ExtraTimeInq?ForceLoad=true");
+                        break;
 
-                case "AttendanceCorrectInq":
-                    Navigation.NavigateTo("/TimeAttendance/AttendanceCorrectInq?ForceLoad=true");
-                    break;
+                    case "AttendanceCorrectInq":
+                        Navigation.NavigateTo("/TimeAttendance/AttendanceCorrectInq?ForceLoad=true&RequestType=RTYPEOT");
+                        break;
 
-                default:
-                    Navigation.NavigateTo("/TimeAttendance/tnadashboard"); 
-                    break;
+                    default:
+                        Navigation.NavigateTo("/TimeAttendance/tnadashboard");
+                        break;
+                }
             }
         }
         #endregion
