@@ -464,6 +464,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             Navigation.NavigateTo($"/TimeAttendance/ExtraTime?ActionType=Add&AttendanceDate={formattedDate}&CallerForm=TNADashboard");
         }
 
+        public void ApplyOutdoor()
+        {
+            string formattedDate = _selectedDate?.ToString("yyyy-MM-dd") ?? string.Empty;
+            Navigation.NavigateTo($"/TimeAttendance/ApplyOutdoor?ActionType=Add&AttendanceDate={formattedDate}&CallerForm=TNADashboard");
+        }
+
         public void OpenLeaveInquiry()
         {
             Navigation.NavigateTo($"/TimeAttendance/leaveinquiry?ForceLoad=true&LeaveEmpNo={UserEmpNo}&LeaveStartDate={_payrollStartDate}&LeaveEndDate={_payrollEndDate}&CallerForm=TNADashboard");

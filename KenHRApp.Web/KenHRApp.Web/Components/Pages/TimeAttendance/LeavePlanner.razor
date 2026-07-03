@@ -1,7 +1,538 @@
 ﻿@page "/TimeAttendance/LeavePlanner"
 
-<PageTitle>Leave Planner</PageTitle>
+<style>
+    .my-stepper .mud-stepper-actions {
+        display: none !important;
+    }
+</style>
 
-<h3>Leave Planner</h3>
+<MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
+     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">@_pageTitle</MudText>
+    <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserFullName</MudText>
+</MudStack>
 
-Under construction...
+<MudContainer MaxWidth="MaxWidth.Medium" Class="px-0">
+    <EditForm EditContext="@_editContext" @ref="_editForm"
+              OnValidSubmit="HandleValidSubmit"
+              OnInvalidSubmit="HandleInvalidSubmit">
+
+        <DataAnnotationsValidator />
+
+        @if (_hasValidationError && _validationMessages.Any())
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
+                <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
+                <ul style="margin:0; padding-left:20px;">
+                    @foreach (var msg in _validationMessages)
+                    {
+                        <li>
+                            <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
+                            </li>
+                    }
+                </ul>
+            </MudAlert>
+        }
+
+        @if (_showErrorAlert)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
+                      ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
+                @_errorMessage
+            </MudAlert>
+        }
+
+        <MudPaper class="paper-header w-100 px-2" Elevation="0">   
+            <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Class="mud-width-full"
+                StretchItems="StretchItems.End" Breakpoint="Breakpoint.Xs">
+
+                <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight" MaxItems="3" Class="mud-primary-text" />
+
+                <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexEnd" Spacing="2">
+                    @if (ActionType == ActionTypes.Add.ToString())
+                    {
+                        <MudButton Variant="Variant.Filled"
+                                   StartIcon="@Icons.Material.Filled.Save"
+                                   ButtonType="ButtonType.Submit"
+                                   Size="Size.Small"
+                                   Color="Color.Success"
+                                   Style="background-color:#004165;"
+                                   Disabled="@(!_saveBtnEnabled)">
+                            Submit
+                        </MudButton>
+
+                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh"
+                                   ButtonType="ButtonType.Reset"
+                                   Size="Size.Small"
+                                   Color="Color.Warning"
+                                   Style="background-color:#004165;"
+                                   Disabled="@(_isEditMode)"
+                                   OnClick="HandleRefreshButton">
+                            Reset
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Filled"                                   
+                                   OnClick="ShowCancelDialog"
+                                   Size="Size.Small"
+                                   Color="Color.Surface">
+                            Cancel
+                        </MudButton>
+                    }
+
+                    @* @if (ActionType == ActionTypes.Approval.ToString())
+                    {
+                        @if (_leaveRequest.StatusHandlingCode == "Open"
+                            && _isCurrentApprover)
+                        {
+                            <MudButton Variant="Variant.Filled"
+                                       StartIcon="fas fa-thumbs-up"
+                                       Size="Size.Small"
+                                       Color="Color.Success"
+                                       Disabled="@(_isEditMode)"
+                                       OnClick="BeginApproveRequest">
+                                Approve
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled"
+                                       StartIcon="fas fa-thumbs-down"
+                                       Size="Size.Small"
+                                       Color="Color.Error"
+                                       Disabled="@(_isEditMode)"
+                                       OnClick="ConfirmReject">
+                                Reject
+                            </MudButton>
+                        }
+                    } *@
+
+                    @if (ActionType == ActionTypes.Edit.ToString() 
+                        || ActionType == ActionTypes.View.ToString())
+                    {
+                        @if (_leaveRequest.StatusHandlingCode == "Open" 
+                            && _isCreator)
+                        {
+                            <MudButton Variant="Variant.Filled"
+                                   StartIcon="@Icons.Material.Filled.Cancel"
+                                   Size="Size.Small"
+                                   Color="Color.Error"
+                                   Disabled="@(_isEditMode)"
+                                   OnClick="ConfirmCancel">
+                                Cancel Leave
+                            </MudButton>
+                        }                        
+                        
+                        <MudButton Variant="Variant.Filled" hidden
+                                   StartIcon="@Icons.Material.Filled.Edit"
+                                   Size="Size.Small"
+                                   Color="Color.Primary"
+                                   Style="background-color:#004165;"
+                                   Disabled="@(_isEditMode)"
+                                   OnClick="HandleEditButton">
+                            Edit
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Filled" hidden
+                                   StartIcon="@Icons.Material.Filled.Undo"
+                                   Size="Size.Small" Color="Color.Warning"
+                                   Disabled="@(!_isEditMode)"
+                                   OnClick="HandleUndoButton">
+                            Undo
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Filled" hidden
+                                   StartIcon="@Icons.Material.Filled.Delete"
+                                   Size="Size.Small" Color="Color.Error"
+                                   Disabled="@_isEditMode"
+                                   OnClick="ShowDeleteDialog">
+                            Delete
+                        </MudButton>
+                    }   
+                    
+                    @if (ActionType == ActionTypes.Edit.ToString() || 
+                        ActionType == ActionTypes.View.ToString() ||
+                        ActionType == ActionTypes.Approval.ToString())
+                    {
+                        <MudButton Variant="Variant.Text"
+                                   StartIcon="@Icons.Material.Filled.ArrowBackIos"
+                                   Size="Size.Small"
+                                   Color="Color.Surface"
+                                   Disabled="@(_isEditMode)"
+                                   OnClick="HandleBackButton">
+                            Go back
+                        </MudButton>
+                    }
+                </MudStack>                
+            </MudStack>
+        </MudPaper>
+
+        <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
+            <MudPaper Elevation="0" Square="true" Class="w-100 px-2 mt-4">
+                 <MudGrid Spacing="5">
+                    <MudItem xs="12" sm="6">
+                        @if (ActionType == ActionTypes.Edit.ToString() || 
+                            ActionType == ActionTypes.View.ToString() ||
+                            ActionType == ActionTypes.Approval.ToString())
+                        {
+                            <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Spacing="0">
+                                <!-- Leave Requisition No. -->
+                                <MudText Typo="Typo.h6" Color="Color.Surface" Class="fw-bold">
+                                    Leave Requisition No. @_leaveRequest.LeaveRequestId
+                                </MudText>
+
+                                <!-- Created Date and Time -->
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    Created On: @_leaveRequest.LeaveCreatedDate?.ToString("MMM dd, yyyy hh:mm tt")
+                                </MudText>
+
+                                <!-- Employee Name and Number -->
+                                <MudText Typo="Typo.subtitle2" Color="Color.Surface">
+                                    Created By: @_leaveRequest.CreatedByName
+                                </MudText>
+
+                                <!-- Current Status -->
+                                <MudText Typo="Typo.subtitle2" Color="@(_leaveRequest.StatusHandlingCode == "Cancelled" ? Color.Error : _leaveRequest.StatusHandlingCode == "Approved" || _leaveRequest.StatusHandlingCode == "Closed" ? Color.Success : Color.Info)">
+                                    Status: @_leaveRequest.CurrentStatus
+                                </MudText>
+                            </MudStack>
+                        }
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Spacing="4">
+                             <MudStack Justify="Justify.FlexStart" Spacing="0" hidden>
+                                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
+                                     <MudAvatar Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
+                                         <MudIcon Icon="@Icons.Material.Filled.Balance" />
+                                     </MudAvatar>
+                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Info">@_leaveRequest.LeaveBalance.ToString("F1") days</MudText>
+                                </MudStack>
+                                <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Info">Leave Balance</MudText>
+                            </MudStack>
+                             <MudStack Justify="Justify.FlexStart" Spacing="0">
+                                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
+                                     <MudAvatar Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
+                                         <MudIcon Icon="@Icons.Material.Filled.TimeToLeave" />
+                                     </MudAvatar>
+                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Success">@_leaveRequest.LeaveDuration!.Value.ToString("F1") days</MudText>
+                                 </MudStack>
+                                <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Success">Duration</MudText>
+                             </MudStack>
+                             <MudStack Justify="Justify.FlexStart" Spacing="0">
+                                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
+                                     <MudAvatar Size="Size.Small" Color="Color.Surface" Variant="Variant.Filled">
+                                         <MudIcon Icon="@Icons.Material.Filled.Weekend" />
+                                     </MudAvatar>
+                                    <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Surface">@_leaveRequest.NoOfWeekends!.Value.ToString() days</MudText>
+                                 </MudStack>
+                                 <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Surface">Weekends</MudText>
+                             </MudStack>
+                             <MudStack Justify="Justify.FlexStart" Spacing="0">
+                                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
+                                     <MudAvatar Size="Size.Small" Color="Color.Surface" Variant="Variant.Filled">
+                                         <MudIcon Icon="@Icons.Material.Filled.HolidayVillage" />
+                                     </MudAvatar>
+                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Surface">@_leaveRequest.NoOfHolidays!.Value.ToString() days</MudText>
+                                 </MudStack>
+                                <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Surface">Holidays</MudText>
+                             </MudStack>
+                         </MudStack>
+                    </MudItem>
+                </MudGrid>
+
+                <MudGrid Spacing="5" Class="mt-0">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudSelect T="int"
+                                       Value="_leaveRequest.LeaveEmpNo"
+                                       ValueChanged="@((v) => OnEmployeeChanged(v))"
+                                       Disabled="@_isDisabled"
+                                       Label="Select Employee"
+                                       Variant="Variant.Text"
+                                       Margin="Margin.Dense"
+                                       Placeholder="Please Select"
+                                       AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                       AdornmentColor="Color.Default"
+                                       HelperText="Type a key to search for value"
+                                       HelperTextOnFocus="true"
+                                       Immediate="true"
+                                       Typo="Typo.subtitle2">
+                                @foreach (var emp in _employeeList!)
+                                {
+                                    <MudSelectItem Value="emp.EmployeeNo">@emp.EmployeeNameWithCode</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        
+                    </MudItem>
+                </MudGrid>
+
+                <MudGrid Spacing="5">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
+                            <MudDatePicker Label="Start Date" Editable="true" AutoClose="true"
+                                    Class="required-field"
+                                    For="@(() => _leaveRequest.LeaveStartDate)"
+                                    Margin="Margin.Dense" 
+                                    HelperText="Specify start period of leave" HelperTextOnFocus="true" 
+                                    Clearable="false" Disabled="@_isDisabled" 
+                                    Color="Color.Surface"
+                                    Date="_leaveRequest.LeaveStartDate"
+                                    DateChanged="OnStartDateChanged"
+                                    Mask="@(new DateMask("dd/MM/yyyy"))" 
+                                    DateFormat="dd/MM/yyyy" 
+                                    Placeholder="dd/MM/yyyy" 
+                                    Variant="Variant.Text">
+                                <PickerActions Context="dateContext">
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = DateTime.Today))">Today</MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = null))">Clear</MudButton>
+                                </PickerActions>
+                            </MudDatePicker>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudSelect T="string"
+                                       @ref="_startDayMode"
+                                       Value="_leaveRequest.StartDayMode"
+                                       ValueChanged="@((v) => OnStartDayModeChanged(v))"
+                                       Disabled="@_isDisabled"
+                                       Label="Start Day Mode"
+                                       Variant="Variant.Text"
+                                       Margin="Margin.Dense"
+                                       Placeholder="Please Select"
+                                       AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                       AdornmentColor="Color.Default"
+                                       HelperText="Type a key to search for value"
+                                       HelperTextOnFocus="true"
+                                       Immediate="true"
+                                       Typo="Typo.subtitle2">
+                                @foreach (var mode in _leaveModeList!)
+                                {
+                                    <MudSelectItem Value="mode.UDCCode">@mode.UDCDesc1</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+
+                <MudGrid Spacing="5">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0" Style="overflow:visible; width:200px;">
+                            <MudDatePicker Label="Resume Date" Editable="true" AutoClose="true"
+                                    Class="required-field"
+                                    Date="_leaveRequest.LeaveResumeDate"
+                                    DateChanged="OnResumeDateChanged"
+                                    For="@(() => _leaveRequest.LeaveResumeDate)"
+                                    Margin="Margin.Dense"
+                                    HelperText="Specify resume date of work" HelperTextOnFocus="true"
+                                    Clearable="false" 
+                                    Disabled="@_isDisabled" 
+                                    Color="Color.Surface"
+                                    Mask="@(new DateMask("dd/MM/yyyy"))" 
+                                    DateFormat="dd/MM/yyyy" 
+                                    Placeholder="dd/MM/yyyy" 
+                                    Variant="Variant.Text">
+                                <PickerActions Context="dateContext">
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveResumeDate = DateTime.Today))">Today</MudButton>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveResumeDate = null))">Clear</MudButton>
+                                </PickerActions>
+                            </MudDatePicker>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudSelect T="string"
+                                       @ref="_endDayMode"
+                                       Value="_leaveRequest.EndDayMode"
+                                       ValueChanged="@((v) => OnResumeDayModeChanged(v))"
+                                       Disabled="@_isDisabled"
+                                       Label="End Day Mode"
+                                       Variant="Variant.Text"
+                                       Margin="Margin.Dense"
+                                       Placeholder="Please Select"
+                                       AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                       AdornmentColor="Color.Default"
+                                       HelperText="Type a key to search for value"
+                                       HelperTextOnFocus="true"
+                                       Immediate="true"
+                                       Typo="Typo.subtitle2">
+                                @foreach (var mode in _leaveModeList!)
+                                {
+                                    <MudSelectItem Value="mode.UDCCode">@mode.UDCDesc1</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudPaper>
+                    </MudItem>                    
+                </MudGrid>                                 
+
+                <MudGrid Spacing="5">
+                    <MudItem xs="12">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="_leaveRequest.LeaveRemarks" 
+                                    For="@(() => _leaveRequest.LeaveRemarks)"
+                                    Label="Leave Reason"
+                                    HelperText="Max. text input is 500 chars."
+                                    Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="500" MaxLength="500" Lines="4"
+                                    Clearable="@_isClearable" Disabled="@_isDisabled" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                               
+                <MudExpansionPanels Elevation="0" MultiExpansion="true" Class="p-0 mb-4" hidden>
+                    <MudExpansionPanel Class="p-0" Dense Gutters Expanded="true">
+                        <TitleContent>
+                            <div class="d-flex">
+                                <MudIcon Icon="fas fa-briefcase" Style="color: #004165;" class="mr-3 mt-1" Size=Size.Small></MudIcon>
+                                <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>File Attachments</strong></MudText>
+                            </div>
+                        </TitleContent>
+                        <ChildContent>
+                            <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Class="mud-width-full">
+                                @if (ActionType == ActionTypes.Add.ToString())
+                                {
+                                    <MudFileUpload 
+                                        @bind-Files="_files"
+                                        Class="mt-1"
+                                        Accept=".doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.pdf,.png,.jpg"
+                                        MaxFileSize="10485760"
+                                                   Disabled="@(_btnProcessing || _isDisabled)">
+
+                                        <ActivatorContent>
+                                            <MudButton Variant="Variant.Filled"
+                                                EndIcon="@Icons.Material.Filled.AttachFile"
+                                                Size="Size.Small"
+                                                       Color="Color.Info">
+                                                Upload Files
+                                            </MudButton>
+                                        </ActivatorContent>
+                                    </MudFileUpload>
+
+                                    @if (_files?.Any() == true)
+                                    {
+                                        <MudChipSet T="IBrowserFile" Class="mt-2">
+                                            @foreach (var file in _files)
+                                            {
+                                                <MudChip T="IBrowserFile"
+                                                Color="Color.Info"
+                                                Variant="Variant.Outlined"
+                                                Closeable="true"
+                                                Disabled="@(_btnProcessing || _isDisabled)"
+                                                OnClose="@(() => RemoveFile(file))">
+                                                    @file.Name (@(file.Size / 1024) KB)
+                                                </MudChip>
+                                            }
+                                        </MudChipSet>
+                                    }
+                                }
+                                else if (ActionType == ActionTypes.View.ToString() ||
+                                ActionType == ActionTypes.Approval.ToString())
+                                {
+                                    @if (_leaveRequest.Files.Any())
+                                    {
+                                        <MudChipSet T="LeaveAttachmentDTO" Class="mt-2">
+                                            @foreach (var file in _leaveRequest.Files)
+                                            {
+                                                <MudChip T="LeaveAttachmentDTO"
+                                                         Color="Color.Info"
+                                                         Variant="Variant.Outlined"
+                                                         Disabled="false">
+                                                    @file.FileName (@(file.FileSize / 1024) KB)
+                                                </MudChip>
+                                            }
+                                        </MudChipSet>
+                                    }
+                                    else
+                                    {
+                                        <MudText Typo="Typo.body2" Color="Color.Surface">
+                                            No file attachments found!
+                                        </MudText>
+                                    }
+                                }
+                            </MudStack>
+                        </ChildContent>
+                    </MudExpansionPanel>
+
+                    @* @if (ActionType == ActionTypes.Approval.ToString() 
+                        && _leaveRequest.StatusHandlingCode == "Open" 
+                        && _isCurrentApprover)
+                    {
+                        <MudExpansionPanel Class="p-0" Dense Gutters Expanded="true">
+                                <TitleContent>
+                                    <div class="d-flex">
+                                        <MudIcon Icon="fas fa-user-check" Style="color: #004165;" class="mr-3 mt-1" Size=Size.Small></MudIcon>
+                                        <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Approval Remarks</strong></MudText>
+                                    </div>
+                                </TitleContent>
+                                <ChildContent>
+                                <MudPaper Elevation="0" Square="true" Class="w-100 mt-0 mb-1">
+                                    <MudTextField Label="Remarks"
+                                        @bind-Value="_approverRemarks"
+                                        Variant="Variant.Outlined"
+                                        MaxLength="500" Lines="4"
+                                        Clearable="@_isClearable" Disabled="false" Immediate="true"
+                                        Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                </MudPaper>
+                            </ChildContent>
+                        </MudExpansionPanel>
+                    } *@
+                    
+                    @* @if (ActionType == ActionTypes.View.ToString()
+                        || ActionType == ActionTypes.Approval.ToString())
+                    {
+                        <MudExpansionPanel Class="p-0" Dense Gutters>
+                            <TitleContent>
+                                <div class="d-flex">
+                                    <MudIcon Icon="fas fa-user-check" Style="color: #004165;" class="mr-3 mt-1" Size=Size.Small></MudIcon>
+                                    <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Approval Workflow</strong></MudText>
+                                </div>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudPaper Elevation="0" Square="true" Class="w-100 mt-0 mb-1">
+                                    @if (_workflowList.Any())
+                                    {
+                                         <MudStepper NonLinear Ripple="true" Class="my-stepper" ShowResetButton="false" 
+                                            @bind-ActiveIndex="_currentWFIndex" 
+                                            CurrentStepColor="Color.Secondary" CompletedStepColor="Color.Success"
+                                            ErrorStepColor="Color.Error">
+                                                @foreach (var wf in _workflowList!)
+                                                {
+                                                    <MudStep @bind-Title="wf.ActivityName" @bind-SecondaryText="wf.ApprovalSummary"
+                                                        @bind-Completed="wf.IsCompleted"  
+                                                        @bind-Disabled="wf.IsCompleted">
+                                                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
+                                                            <strong>
+                                                                @wf.ApprovalDetails
+                                                            </strong>
+                                                        </MudText>
+                                                    </MudStep>
+                                                }
+                                        </MudStepper>
+                                    }
+                                    else
+                                    {
+                                        <MudText Typo="Typo.body2" Color="Color.Surface">
+                                            No workflow transactions found!
+                                        </MudText>
+                                    }
+                                </MudPaper>
+                            </ChildContent>
+                        </MudExpansionPanel>
+                    } *@
+                </MudExpansionPanels>
+            </MudPaper>
+            <MudScrollToTop TopOffset="100"
+                            Selector="#mainPanel"
+                            VisibleCssClass="visible absolute"
+                            HiddenCssClass="hidden absolute">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+            </MudScrollToTop>
+        </div>
+    </EditForm>
+</MudContainer>
+
+<!-- Full-screen overlay -->
+@if (_isRunning)
+{
+    <div class="fullscreen-overlay">
+        <MudProgressCircular Indeterminate="true" Size="Size.Medium" Color="Color.Info" />
+        <MudText Typo="Typo.h6" Class="mt-2 text-white">@overlayMessage</MudText>
+        </div>
+}
