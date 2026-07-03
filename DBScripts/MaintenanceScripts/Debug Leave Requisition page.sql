@@ -1,4 +1,4 @@
-DECLARE @leaveNo BIGINT = 23
+DECLARE @leaveNo BIGINT = 18
 
 	SELECT a.LeaveApprovalFlag, a.LeaveStatusCode, b.UDCDesc1 as StatusDesc, 
 		a.LeaveStatusID, a.StatusHandlingCode, a.* 

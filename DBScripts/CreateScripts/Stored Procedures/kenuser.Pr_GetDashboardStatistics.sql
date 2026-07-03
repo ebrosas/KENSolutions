@@ -9,6 +9,7 @@
 *	06/05/2026		Ervin		1.1			Added "Remarks" field in the returned dataset
 *	18/06/2026		Ervin		1.2			Fixed bug that cause duplicate records based on request type code
 *	20/06/2026		Ervin		1.3			Fixed bug that causes duplicate records in the Approved list
+*	03/07/2026		Ervin		1.4			Fixed duplicated records in the dataset for Pending Requests
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetDashboardStatistics
@@ -64,7 +65,7 @@ BEGIN
 			--	WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'REQTYPE')
 			--		AND RTRIM(x.UDCCode) = RTRIM(b.EntityName)
 			--) udc 
-			INNER JOIN kenuser.Vw_RequestDetail req WITH (NOLOCK) ON req.RequestNo = c.EntityId
+			INNER JOIN kenuser.Vw_RequestDetail req WITH (NOLOCK) ON req.RequestNo = c.EntityId AND RTRIM(b.EntityName) = RTRIM(req.RequestTypeCode)	--Rev. #1.4
 			OUTER APPLY
 			(
 				SELECT	x.[Status] as ActivityStatus,
@@ -75,7 +76,7 @@ BEGIN
 				FROM kenuser.WorkflowStepInstances x WITH (NOLOCK)
 					LEFT JOIN kenuser.Employee y WITH (NOLOCK) ON x.ApproverEmpNo = y.EmployeeNo
 				WHERE x.WorkflowInstanceId = c.WorkflowInstanceId
-					and x.StepDefinitionId = a.StepDefinitionId
+					AND x.StepDefinitionId = a.StepDefinitionId
 			) d
 		WHERE RTRIM(d.ActivityStatus) = 'Pending'
 			AND RTRIM(req.StatusHandlingCode) = 'Open'
@@ -267,7 +268,7 @@ END
 	--Development database
 	EXEC kenuser.Pr_GetDashboardStatistics 1
 	EXEC kenuser.Pr_GetDashboardStatistics 1, 10003632
-	EXEC kenuser.Pr_GetDashboardStatistics 1, 10003632, 'RTYPEOT'
+	EXEC kenuser.Pr_GetDashboardStatistics 1, 10003632, 'RTYPEREGULAR'
 
 	EXEC kenuser.Pr_GetDashboardStatistics 2, 10003632			--Approved
 	EXEC kenuser.Pr_GetDashboardStatistics 2, 10003632, 'RTYPEREGULAR'			--Approved

@@ -28,17 +28,7 @@ BEGIN
 		SET @startDate = NULL
 
 	IF ISNULL(@endDate, '') = '' OR CAST(@endDate AS DATETIME) = CAST('' AS DATETIME)
-		SET @endDate = NULL
-
-	--SELECT @assignedCount = COUNT(a.ApprovalId)
-	--FROM kenuser.RequestApprovals a WITH (NOLOCK)
-	--WHERE a.AssignedEmpNo = @empNo
-	--	AND RTRIM(a.RequestTypeCode) = @requestTypeCode
-	--	AND 
-	--	(
-	--		(a.CreatedDate BETWEEN @startDate AND @endDate AND @startDate IS NOT NULL AND @endDate IS NOT NULL)
-	--		OR (@startDate IS NULL AND @endDate IS NULL)
-	--	)
+		SET @endDate = NULL	
 
 	--Start of Rev. #1.1
 	SELECT @assignedCount = COUNT(c.EntityId) 
@@ -52,6 +42,7 @@ BEGIN
 			WHERE x.GroupID = (SELECT UDCGroupId FROM kenuser.UserDefinedCodeGroup WITH (NOLOCK) WHERE RTRIM(UDCGCode) = 'REQTYPE')
 				AND RTRIM(x.UDCCode) = RTRIM(b.EntityName)
 		) udc 
+		-- INNER JOIN kenuser.Vw_RequestDetail req ON c.EntityId = req.RequestNo
 		OUTER APPLY
 		(
 			SELECT	x.[Status] as ActivityStatus,
@@ -65,6 +56,7 @@ BEGIN
 				and x.StepDefinitionId = a.StepDefinitionId
 		) d
 	WHERE RTRIM(d.ActivityStatus) = 'Pending'
+		-- AND RTRIM(req.StatusHandlingCode) = 'Open'
 		AND d.ApproverNo = @empNo
 		AND RTRIM(b.EntityName) = @requestTypeCode
 		AND 
@@ -87,7 +79,7 @@ PARAMETERS:
     @startDate			DATETIME,
     @endDate			DATETIME
 
-	SELECT  kenuser.fnGetAssignedRequestCount('RTYPELEAVE', 10003635, '', '')
+	SELECT  kenuser.fnGetAssignedRequestCount('RTYPELEAVE', 10003633, '', '')
 	SELECT  kenuser.fnGetAssignedRequestCount('RTYPERECRUIT', 10003632, '', '')
 	SELECT  kenuser.fnGetAssignedRequestCount(10003632, '02/01/2026', '02/28/2026', NULL)
 

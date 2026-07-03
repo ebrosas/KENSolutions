@@ -1,5 +1,5 @@
 DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPEOT',
-		@requestNo			BIGINT = 7
+		@requestNo			BIGINT = 5
 
 	--Get request info
 	SELECT a.* 
@@ -36,15 +36,15 @@ DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPEOT',
 	WHERE RTRIM(b.EntityName) = @workflowTypeCode
 		AND a.EntityId = @requestNo
 
-	SELECT a.* 
+	SELECT a.StepInstanceId, a.* 
 	FROM kenuser.WorkflowStepInstances a
 		INNER JOIN kenuser.WorkflowInstances b WITH (NOLOCK) ON a.WorkflowInstanceId = b.WorkflowInstanceId
 		INNER JOIN kenuser.WorkflowDefinitions c WITH (NOLOCK) ON b.WorkflowDefinitionId = c.WorkflowDefinitionId
 	WHERE RTRIM(c.EntityName) = @workflowTypeCode
 		AND b.EntityId = @requestNo
 
-	SELECT * FROM kenuser.RequestApprovals a WITH (NOLOCK)
-	WHERE a.RequisitionNo = 7
+	--SELECT * FROM kenuser.RequestApprovals a WITH (NOLOCK)
+	--WHERE a.RequisitionNo = 7
 
 /*	Clear workflow
 

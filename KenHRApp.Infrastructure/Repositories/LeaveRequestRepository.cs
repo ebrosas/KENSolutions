@@ -222,7 +222,9 @@ namespace KenHRApp.Infrastructure.Repositories
         /// <summary>
         /// Cancel leave request
         /// </summary>
-        public async Task<Result<int>> CancelLeaveRequestAsync(LeaveRequisitionWF leaveRequest, CancellationToken cancellationToken = default)
+        public async Task<Result<int>> CancelLeaveRequestAsync(
+            LeaveRequisitionWF leaveRequest, 
+            CancellationToken cancellationToken = default)
         {
             int rowsUpdated = 0;
 
@@ -252,6 +254,29 @@ namespace KenHRApp.Infrastructure.Repositories
                 #endregion
 
                 rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                if (rowsUpdated > 0)
+                {
+                    #region Cancel the associated workflow step instance
+                    var wfInstance = await (from wd in _db.WorkflowDefinitions
+                                            join wi in _db.WorkflowInstances on wd.WorkflowDefinitionId equals wi.WorkflowDefinitionId
+                                            join wsi in _db.WorkflowStepInstances on wi.WorkflowInstanceId equals wsi.WorkflowInstanceId
+                                            where wd.EntityName == "RTYPELEAVE"
+                                                && wi.EntityId == leaveRequest.LeaveRequestId
+                                                && wsi.Status == "Pending"
+                                            select wsi).ToListAsync();
+                    if (wfInstance != null && wfInstance.Any())
+                    {
+                        foreach (var item in wfInstance)
+                        {
+                            item.Status = "Cancelled";
+                        }
+
+                        int wfRowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                    }
+                    #endregion
+                }
+
                 return Result<int>.SuccessResult(rowsUpdated);
             }
             catch (InvalidOperationException invEx)

@@ -1,5 +1,5 @@
 DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPEOUTDOOR',
-		@requestNo			BIGINT = 3
+		@requestNo			BIGINT = 4
 
 	--Get request info
 	SELECT a.* 

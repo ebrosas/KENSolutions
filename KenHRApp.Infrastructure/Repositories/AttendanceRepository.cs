@@ -1250,6 +1250,29 @@ namespace KenHRApp.Infrastructure.Repositories
                 #endregion
 
                 rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                if (rowsUpdated > 0)
+                {
+                    #region Cancel the associated workflow step instance
+                    var wfInstance = await (from wd in _db.WorkflowDefinitions
+                                            join wi in _db.WorkflowInstances on wd.WorkflowDefinitionId equals wi.WorkflowDefinitionId
+                                            join wsi in _db.WorkflowStepInstances on wi.WorkflowInstanceId equals wsi.WorkflowInstanceId
+                                            where wd.EntityName == "RTYPEREGULAR"
+                                                && wi.EntityId == regularRequest.RegularizationId
+                                                && wsi.Status == "Pending"
+                                            select wsi).ToListAsync();
+                    if (wfInstance != null && wfInstance.Any())
+                    {
+                        foreach (var item in wfInstance)
+                        {
+                            item.Status = "Cancelled";
+                        }
+
+                        int wfRowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                    }
+                    #endregion
+                }
+
                 return Result<int>.SuccessResult(rowsUpdated);
             }
             catch (InvalidOperationException invEx)
@@ -1702,6 +1725,29 @@ namespace KenHRApp.Infrastructure.Repositories
                 #endregion
 
                 rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                if (rowsUpdated > 0)
+                {
+                    #region Cancel the associated workflow step instance
+                    var wfInstance = await (from wd in _db.WorkflowDefinitions
+                                            join wi in _db.WorkflowInstances on wd.WorkflowDefinitionId equals wi.WorkflowDefinitionId
+                                            join wsi in _db.WorkflowStepInstances on wi.WorkflowInstanceId equals wsi.WorkflowInstanceId
+                                            where wd.EntityName == "RTYPEOT"
+                                                && wi.EntityId == otRequest.ExtratimeId
+                                                && wsi.Status == "Pending"
+                                            select wsi).ToListAsync();
+                    if (wfInstance != null && wfInstance.Any())
+                    {
+                        foreach (var item in wfInstance)
+                        {
+                            item.Status = "Cancelled";
+                        }
+
+                        int wfRowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                    }
+                    #endregion
+                }
+
                 return Result<int>.SuccessResult(rowsUpdated);
             }
             catch (InvalidOperationException invEx)
@@ -2201,6 +2247,28 @@ namespace KenHRApp.Infrastructure.Repositories
                 #endregion
 
                 rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                if (rowsUpdated > 0)
+                {
+                    #region Cancel the associated workflow step instance
+                    var wfInstance = await (from wd in _db.WorkflowDefinitions
+                                            join wi in _db.WorkflowInstances on wd.WorkflowDefinitionId equals wi.WorkflowDefinitionId
+                                            join wsi in _db.WorkflowStepInstances on wi.WorkflowInstanceId equals wsi.WorkflowInstanceId
+                                            where wd.EntityName == "RTYPEOUTDOOR"
+                                                && wi.EntityId == outdoorRequest.OutdoorId
+                                                && wsi.Status == "Pending"
+                                            select wsi).ToListAsync();
+                    if (wfInstance != null && wfInstance.Any())
+                    {
+                        foreach (var item in wfInstance)
+                        {
+                            item.Status = "Cancelled";
+                        }
+
+                        int wfRowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                    }
+                    #endregion
+                }
                 return Result<int>.SuccessResult(rowsUpdated);
             }
             catch (InvalidOperationException invEx)

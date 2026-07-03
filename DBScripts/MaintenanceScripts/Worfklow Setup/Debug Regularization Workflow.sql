@@ -1,11 +1,11 @@
 DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPEREGULAR',
-		@requestNo			BIGINT = 4
+		@requestNo			BIGINT = 10
 
 	--Get request info
 	SELECT a.* 
 	FROM [kenuser].RegularRequestWFs a
 	WHERE a.RegularizationId = @requestNo
-
+	
 	--Apprval history
 	SELECT * FROM [kenuser].[RequestApprovals] a WITH (NOLOCK)
 	WHERE a.RequisitionNo = @requestNo

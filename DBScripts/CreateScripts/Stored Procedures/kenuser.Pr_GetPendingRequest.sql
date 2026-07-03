@@ -81,6 +81,7 @@ PARAMETERS:
 	@endDate			DATETIME = NULL
 
 	EXEC kenuser.Pr_GetPendingRequest 10003632
+	EXEC kenuser.Pr_GetPendingRequest 10003633, 'RTYPELEAVE'
 	EXEC kenuser.Pr_GetPendingRequest 0, 'RTYPELEAVE', '', '03/01/2026', '03/31/2026'
 
 */

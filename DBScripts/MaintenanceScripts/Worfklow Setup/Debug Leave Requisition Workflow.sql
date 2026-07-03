@@ -1,5 +1,5 @@
 DECLARE @workflowTypeCode	VARCHAR(100) = 'RTYPELEAVE',
-		@requestNo			BIGINT = 23
+		@requestNo			BIGINT = 10
 
 	--Get request info
 	SELECT a.LeaveType, a.LeaveDuration, a.LeaveEmpCostCenter,
