@@ -132,6 +132,7 @@ namespace KenHRApp.Application.DTOs
         public DateTime? LeaveUpdatedDate { get; set; }
 
         public int? LeaveUpdatedBy { get; set; }
+        public string? LeaveUpdatedName { get; set; } = null;
 
         public string? LeaveUpdatedUserID { get; set; } = null;
 

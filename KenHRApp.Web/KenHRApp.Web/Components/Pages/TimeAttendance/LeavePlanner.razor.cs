@@ -242,6 +242,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _leaveRequest.LeaveCreatedBy = UserEmpNo;
                     _leaveRequest.LeaveCreatedEmail = UserEmail;
                     _leaveRequest.LeaveCreatedUserID = UserName;
+                    _leaveRequest.LeaveType = "AL";
+                    _leaveRequest.LeaveTypeDesc = "Annual Leave";
 
                     //BeginLoadComboboxTask();
 
@@ -413,7 +415,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     if (_leaveRequest.LeaveRequestId > 0)
                     {
                         HandleBackButton();
-                        //BeginLoadLeaveRequest(_outdoorRequest.LeaveRequestId);
+                        //BeginLoadLeaveRequest(_outdoorRequest.PlannedLeaveId);
                     }
                 });
             }
@@ -1103,7 +1105,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 // Set the user who update the record and the timestamp
                 _leaveRequest.LeaveUpdatedDate = DateTime.Now;
-                //_leaveRequest.LeaveApprovalFlag = CONST_WAITING_APPROVAL;
                 _leaveRequest.LeaveEndDate = _leaveRequest.LeaveResumeDate!.Value.AddDays(-1);
 
                 #region Set leave status to "Closed By User" 
@@ -1312,10 +1313,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (result.Success)
             {
                 _leaveRequest = result.Value!;
-
-                // Set the approver flag
-                //if (_leaveRequest.ApproverNo == UserEmpNo)
-                //    _isCurrentApprover = true;
 
                 if (_leaveRequest.LeaveCreatedBy == UserEmpNo ||
                     _leaveRequest.LeaveEmpNo == UserEmpNo)

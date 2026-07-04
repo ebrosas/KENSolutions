@@ -500,7 +500,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                         await InitializeWorkflowAsync(_leaveRequest.LeaveRequestId, _leaveRequest.LeaveEmpNo);
                         
                         HandleBackButton();
-                        //BeginLoadLeaveRequest(_outdoorRequest.LeaveRequestId);
+                        //BeginLoadLeaveRequest(_outdoorRequest.PlannedLeaveId);
                     }
                 });
             }
@@ -1447,7 +1447,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Reset error messages
             _errorMessage.Clear();
 
-            //bool isNewRequition = leaveRequest.LeaveRequestId == 0;
+            //bool isNewRequition = leaveRequest.PlannedLeaveId == 0;
 
             // Initialize the cancellation token
             _cts = new CancellationTokenSource();

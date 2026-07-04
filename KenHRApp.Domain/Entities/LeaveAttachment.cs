@@ -48,8 +48,8 @@ namespace KenHRApp.Domain.Entities
         #endregion
 
         #region Reference Navation to LeaveRequisitionWF
-        //[Comment("Foreign key that references primary key: LeaveRequisitionWF.LeaveRequestId")]
-        //public long LeaveRequestId { get; set; }
+        //[Comment("Foreign key that references primary key: LeaveRequisitionWF.PlannedLeaveId")]
+        //public long PlannedLeaveId { get; set; }
 
         //public LeaveRequisitionWF LeaveRequest { get; set; } = default!;
         #endregion

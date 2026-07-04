@@ -746,13 +746,12 @@ namespace KenHRApp.Application.Services
         {
             try
             {
-                #region Create "LeaveRequisitionWF" entity from DTO
-                LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
+                #region Create "PlannedLeaveRequest" entity from DTO
+                PlannedLeaveRequest leaveRequest = new PlannedLeaveRequest()
                 {
-                    LeaveEmpNo = dto.LeaveEmpNo,
-                    LeaveEmpName = dto.LeaveEmpName,
-                    LeaveEmpEmail = dto.LeaveEmpEmail,
-                    LeaveEmpCostCenter = dto.LeaveEmpCostCenter,
+                    EmpNo = dto.LeaveEmpNo,
+                    EmpName = dto.LeaveEmpName,
+                    CostCenter = dto.LeaveEmpCostCenter,
                     LeaveStartDate = Convert.ToDateTime(dto.LeaveStartDate),
                     LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
                     LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
@@ -761,18 +760,19 @@ namespace KenHRApp.Application.Services
                     LeaveDuration = dto.LeaveDuration,
                     NoOfHolidays = dto.NoOfHolidays,
                     NoOfWeekends = dto.NoOfWeekends,
-                    LeaveRemarks = dto.LeaveRemarks,
-                    LeaveCreatedBy = dto.LeaveCreatedBy,
-                    LeaveCreatedEmail = dto.LeaveCreatedEmail,
-                    LeaveCreatedUserID = dto.LeaveCreatedUserID,
-                    LeaveCreatedDate = dto.LeaveCreatedDate,
-                    LeaveStatusCode = dto.LeaveStatusCode,
-                    LeaveStatusID = dto.LeaveStatusID,
+                    Remarks = dto.LeaveRemarks,
+                    CreatedBy = dto.LeaveCreatedBy,
+                    CreatedByName = dto.CreatedByName,
+                    CreatedEmail = dto.LeaveCreatedEmail,
+                    CreatedUserID = dto.LeaveCreatedUserID,
+                    CreatedDate = dto.LeaveCreatedDate,
+                    StatusID = dto.LeaveStatusID,
+                    StatusCode = dto.LeaveStatusCode,
                     StatusHandlingCode = dto.StatusHandlingCode
                 };
                 #endregion
 
-                var result = await _repository.AddLeaveRequestAsync(leaveRequest, cancellationToken);
+                var result = await _repository.AddPlannedLeaveRequestAsync(leaveRequest, cancellationToken);
                 if (!result.Success)
                 {
                     if (!string.IsNullOrEmpty(result.Error))
@@ -795,28 +795,29 @@ namespace KenHRApp.Application.Services
         {
             try
             {
-                #region Create "LeaveRequisitionWF" entity from DTO
-                LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
+                #region Create "PlannedLeaveRequest" entity from DTO
+                PlannedLeaveRequest leaveRequest = new PlannedLeaveRequest()
                 {
-                    LeaveRequestId = dto.LeaveRequestId,
+                    PlannedLeaveId = dto.LeaveRequestId,
                     LeaveStartDate = Convert.ToDateTime(dto.LeaveStartDate),
                     LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
                     LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
                     LeaveDuration = dto.LeaveDuration, 
                     NoOfHolidays = dto.NoOfHolidays,
                     NoOfWeekends = dto.NoOfWeekends,
-                    LeaveRemarks = dto.LeaveRemarks,
-                    LeaveUpdatedBy = dto.LeaveCreatedBy,
-                    LeaveUpdatedEmail = dto.LeaveUpdatedEmail,
-                    LeaveUpdatedUserID = dto.LeaveUpdatedUserID,
-                    LeaveUpdatedDate = dto.LeaveUpdatedDate,
-                    LeaveStatusCode = dto.LeaveStatusCode,
-                    LeaveStatusID = dto.LeaveStatusID,
+                    Remarks = dto.LeaveRemarks,
+                    LastUpdatedBy = dto.LeaveUpdatedBy,
+                    LastUpdatedName = dto.LeaveUpdatedName,
+                    LastUpdatedEmail = dto.LeaveUpdatedEmail,
+                    LastUpdatedUserID = dto.LeaveUpdatedUserID,
+                    LastUpdatedDate = dto.LeaveUpdatedDate,
+                    StatusCode = dto.LeaveStatusCode,
+                    StatusID = dto.LeaveStatusID,
                     StatusHandlingCode = dto.StatusHandlingCode
                 };
                 #endregion
 
-                var result = await _repository.UpdateLeaveRequestAsync(leaveRequest, cancellationToken);
+                var result = await _repository.UpdatePlannedLeaveRequestAsync(leaveRequest, cancellationToken);
                 if (!result.Success)
                 {
                     if (!string.IsNullOrEmpty(result.Error))
@@ -839,21 +840,22 @@ namespace KenHRApp.Application.Services
         {
             try
             {
-                #region Create "LeaveRequisitionWF" entity from DTO
-                LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
+                #region Create "PlannedLeaveRequest" entity from DTO
+                PlannedLeaveRequest leaveRequest = new PlannedLeaveRequest()
                 {
-                    LeaveRequestId = dto.LeaveRequestId,
-                    LeaveUpdatedBy = dto.LeaveCreatedBy,
-                    LeaveUpdatedEmail = dto.LeaveUpdatedEmail,
-                    LeaveUpdatedUserID = dto.LeaveUpdatedUserID,
-                    LeaveUpdatedDate = dto.LeaveUpdatedDate,
-                    LeaveStatusCode = dto.LeaveStatusCode,
-                    LeaveStatusID = dto.LeaveStatusID,
+                    PlannedLeaveId = dto.LeaveRequestId,
+                    LastUpdatedBy = dto.LeaveCreatedBy,
+                    LastUpdatedName = dto.LeaveUpdatedName,
+                    LastUpdatedEmail = dto.LeaveUpdatedEmail,
+                    LastUpdatedUserID = dto.LeaveUpdatedUserID,
+                    LastUpdatedDate = dto.LeaveUpdatedDate,
+                    StatusCode = dto.LeaveStatusCode,
+                    StatusID = dto.LeaveStatusID,
                     StatusHandlingCode = dto.StatusHandlingCode
                 };
                 #endregion
 
-                var result = await _repository.CancelLeaveRequestAsync(leaveRequest, cancellationToken);
+                var result = await _repository.CancelPlannedLeaveRequestAsync(leaveRequest, cancellationToken);
                 if (!result.Success)
                 {
                     if (!string.IsNullOrEmpty(result.Error))

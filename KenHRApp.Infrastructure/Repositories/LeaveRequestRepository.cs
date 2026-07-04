@@ -763,7 +763,171 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 return Result<bool>.Failure($"Database error: {ex.Message}");
             }
-        }                
+        }
+
+        /// <summary>
+        /// Add new planned leave request
+        /// </summary>
+        public async Task<Result<long>> AddPlannedLeaveRequestAsync(
+            PlannedLeaveRequest dto, 
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (dto is null)
+                    throw new ArgumentNullException(nameof(dto));
+
+                #region Initialize entity
+                var leaveRequest = new PlannedLeaveRequest
+                {
+                    EmpNo = dto.EmpNo,
+                    EmpName = dto.EmpName,
+                    CostCenter = dto.CostCenter,
+                    LeaveStartDate = Convert.ToDateTime(dto.LeaveStartDate),
+                    LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
+                    LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
+                    StartDayMode = dto.StartDayMode,
+                    EndDayMode = dto.EndDayMode,
+                    LeaveDuration = dto.LeaveDuration,
+                    NoOfHolidays = dto.NoOfHolidays,
+                    NoOfWeekends = dto.NoOfWeekends,
+                    Remarks = dto.Remarks,
+                    CreatedBy = dto.CreatedBy,
+                    CreatedByName = dto.CreatedByName,
+                    CreatedEmail = dto.CreatedEmail,
+                    CreatedUserID = dto.CreatedUserID,
+                    CreatedDate = dto.CreatedDate,
+                    StatusCode = dto.StatusCode,
+                    StatusID = dto.StatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode
+                };
+                #endregion
+
+                // Save to database
+                await _db.PlannedLeaveRequest.AddAsync(leaveRequest);
+                await _db.SaveChangesAsync(cancellationToken);
+
+                // ✅ EF Core automatically populates identity after SaveChanges
+                long generatedId = leaveRequest.PlannedLeaveId;
+
+                return Result<long>.SuccessResult(generatedId);
+
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<long>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<long>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Update planned leave request
+        /// </summary>
+        public async Task<Result<int>> UpdatePlannedLeaveRequestAsync(
+            PlannedLeaveRequest leaveRequest, 
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (leaveRequest == null)
+                    throw new ArgumentNullException(nameof(leaveRequest));
+
+                var existing = await _db.PlannedLeaveRequest
+                    .FirstOrDefaultAsync(e =>
+                        e.PlannedLeaveId == leaveRequest.PlannedLeaveId,
+                        cancellationToken);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find planned leave request with the specified request no.");
+
+                #region Update leave request information
+                existing.LeaveStartDate = leaveRequest.LeaveStartDate;
+                existing.LeaveEndDate = leaveRequest.LeaveEndDate;
+                existing.LeaveResumeDate = leaveRequest.LeaveResumeDate;
+                existing.StartDayMode = leaveRequest.StartDayMode;
+                existing.EndDayMode = leaveRequest.EndDayMode;
+                existing.Remarks = leaveRequest.Remarks;
+                existing.LastUpdatedBy = leaveRequest.LastUpdatedBy;
+                existing.LastUpdatedName = leaveRequest.LastUpdatedName;
+                existing.LastUpdatedUserID = leaveRequest.LastUpdatedUserID;
+                existing.LastUpdatedEmail = leaveRequest.LastUpdatedEmail;
+                existing.LastUpdatedDate = leaveRequest.LastUpdatedDate;
+                #endregion
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Cancel planned leave request
+        /// </summary>
+        public async Task<Result<int>> CancelPlannedLeaveRequestAsync(
+            PlannedLeaveRequest leaveRequest,
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                if (leaveRequest == null)
+                    throw new ArgumentNullException(nameof(leaveRequest));
+
+                var existing = await _db.PlannedLeaveRequest
+                    .FirstOrDefaultAsync(e =>
+                        e.PlannedLeaveId == leaveRequest.PlannedLeaveId,
+                        cancellationToken);
+
+                if (existing == null)
+                    throw new KeyNotFoundException(
+                        "Could not find planned leave request with the specified request no.");
+
+                #region Update leave information to cancel the request
+                existing.StatusCode = leaveRequest.StatusCode;
+                existing.StatusID = leaveRequest.StatusID;
+                existing.StatusHandlingCode = leaveRequest.StatusHandlingCode;
+                existing.LastUpdatedBy = leaveRequest.LastUpdatedBy;
+                existing.LastUpdatedName = leaveRequest.LastUpdatedName;
+                existing.LastUpdatedUserID = leaveRequest.LastUpdatedUserID;
+                existing.LastUpdatedEmail = leaveRequest.LastUpdatedEmail;
+                existing.LastUpdatedDate = leaveRequest.LastUpdatedDate;
+                #endregion
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

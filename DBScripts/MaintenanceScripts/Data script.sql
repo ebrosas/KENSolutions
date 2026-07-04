@@ -16,6 +16,12 @@
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'REQTYPE')
 	ORDER BY a.SequenceNo
 
+	--Leave Types
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'LEAVETYPES')
+	ORDER BY a.SequenceNo
+
 	--Request statuses
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
@@ -60,8 +66,6 @@
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'LEAVETYPES')
-
-	
 
 	--Leave Day Portions
 	SELECT a.* 
