@@ -738,7 +738,208 @@ namespace KenHRApp.Application.Services
             {
                 return Result<bool>.Failure(ex.Message.ToString());
             }
-        }                
+        }
+
+        public async Task<Result<long>> AddPlannedLeaveRequestAsync(
+            LeaveRequisitionDTO dto,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Create "LeaveRequisitionWF" entity from DTO
+                LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
+                {
+                    LeaveEmpNo = dto.LeaveEmpNo,
+                    LeaveEmpName = dto.LeaveEmpName,
+                    LeaveEmpEmail = dto.LeaveEmpEmail,
+                    LeaveEmpCostCenter = dto.LeaveEmpCostCenter,
+                    LeaveStartDate = Convert.ToDateTime(dto.LeaveStartDate),
+                    LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
+                    LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
+                    StartDayMode = dto.StartDayMode,
+                    EndDayMode = dto.EndDayMode,
+                    LeaveDuration = dto.LeaveDuration,
+                    NoOfHolidays = dto.NoOfHolidays,
+                    NoOfWeekends = dto.NoOfWeekends,
+                    LeaveRemarks = dto.LeaveRemarks,
+                    LeaveCreatedBy = dto.LeaveCreatedBy,
+                    LeaveCreatedEmail = dto.LeaveCreatedEmail,
+                    LeaveCreatedUserID = dto.LeaveCreatedUserID,
+                    LeaveCreatedDate = dto.LeaveCreatedDate,
+                    LeaveStatusCode = dto.LeaveStatusCode,
+                    LeaveStatusID = dto.LeaveStatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode
+                };
+                #endregion
+
+                var result = await _repository.AddLeaveRequestAsync(leaveRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to save leave request due to error. Please check the data entry then try to save again!");
+                }
+
+                return Result<long>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<long>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<int>> UpdatePlannedLeaveRequestAsync(
+            LeaveRequisitionDTO dto, 
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Create "LeaveRequisitionWF" entity from DTO
+                LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
+                {
+                    LeaveRequestId = dto.LeaveRequestId,
+                    LeaveStartDate = Convert.ToDateTime(dto.LeaveStartDate),
+                    LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
+                    LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
+                    LeaveDuration = dto.LeaveDuration, 
+                    NoOfHolidays = dto.NoOfHolidays,
+                    NoOfWeekends = dto.NoOfWeekends,
+                    LeaveRemarks = dto.LeaveRemarks,
+                    LeaveUpdatedBy = dto.LeaveCreatedBy,
+                    LeaveUpdatedEmail = dto.LeaveUpdatedEmail,
+                    LeaveUpdatedUserID = dto.LeaveUpdatedUserID,
+                    LeaveUpdatedDate = dto.LeaveUpdatedDate,
+                    LeaveStatusCode = dto.LeaveStatusCode,
+                    LeaveStatusID = dto.LeaveStatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode
+                };
+                #endregion
+
+                var result = await _repository.UpdateLeaveRequestAsync(leaveRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to save shift roster changes due to error. Please check the data entry then try to save again!");
+                }
+
+                return Result<int>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<int>> CancelPlannedLeaveRequestAsync(
+            LeaveRequisitionDTO dto, 
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                #region Create "LeaveRequisitionWF" entity from DTO
+                LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
+                {
+                    LeaveRequestId = dto.LeaveRequestId,
+                    LeaveUpdatedBy = dto.LeaveCreatedBy,
+                    LeaveUpdatedEmail = dto.LeaveUpdatedEmail,
+                    LeaveUpdatedUserID = dto.LeaveUpdatedUserID,
+                    LeaveUpdatedDate = dto.LeaveUpdatedDate,
+                    LeaveStatusCode = dto.LeaveStatusCode,
+                    LeaveStatusID = dto.LeaveStatusID,
+                    StatusHandlingCode = dto.StatusHandlingCode
+                };
+                #endregion
+
+                var result = await _repository.CancelLeaveRequestAsync(leaveRequest, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to cancel planned leave request due to unhandled error. Please check the data entry then try again!");
+                }
+
+                return Result<int>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<LeaveRequisitionDTO?>> GetPlannedLeaveRequestAsync(long leaveRequestNo)
+        {
+            LeaveRequisitionDTO? leaveRequest = null;
+
+            try
+            {
+                var repoResult = await _repository.GetLeaveRequestAsync(leaveRequestNo);
+                if (!repoResult.Success)
+                {
+                    return Result<LeaveRequisitionDTO?>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null)
+                {
+                    leaveRequest = new LeaveRequisitionDTO
+                    {
+                        LeaveRequestId = model.LeaveRequestId,
+                        //LeaveAttachmentId = model.LeaveAttachmentId,
+                        //WorkflowId = model.WorkflowId,
+                        //LeaveInstanceID = model.LeaveInstanceID,
+                        //LeaveType = model.LeaveType,
+                        LeaveEmpNo = model.LeaveEmpNo,
+                        LeaveEmpName = model.LeaveEmpName,
+                        LeaveEmpEmail = model.LeaveEmpEmail,
+                        LeaveStartDate = model.LeaveStartDate,
+                        LeaveEndDate = model.LeaveEndDate,
+                        LeaveResumeDate = model.LeaveResumeDate,
+                        LeaveEmpCostCenter = model.LeaveEmpCostCenter,
+                        LeaveRemarks = model.LeaveRemarks,
+                        //LeaveConstraints = model.LeaveConstraints,
+                        //LeaveStatusCode = model.LeaveStatusCode,
+                        //LeaveApprovalFlag = model.LeaveApprovalFlag,
+                        //LeaveVisaRequired = model.LeaveVisaRequired,
+                        //LeavePayAdv = model.LeavePayAdv,
+                        //LeaveIsFTMember = model.LeaveIsFTMember,
+                        //LeaveBalance = model.LeaveBalance,
+                        LeaveDuration = model.LeaveDuration,
+                        NoOfHolidays = model.NoOfHolidays,
+                        NoOfWeekends = model.NoOfWeekends,
+                        //PlannedLeave = model.PlannedLeave,
+                        //LeavePlannedNo = model.LeavePlannedNo,
+                        //HalfDayLeaveFlag = model.HalfDayLeaveFlag,
+                        LeaveCreatedDate = model.LeaveCreatedDate,
+                        LeaveCreatedBy = model.LeaveCreatedBy,
+                        LeaveCreatedUserID = model.LeaveCreatedUserID,
+                        LeaveCreatedEmail = model.LeaveCreatedEmail,
+                        LeaveUpdatedDate = model.LeaveUpdatedDate,
+                        LeaveUpdatedBy = model.LeaveUpdatedBy,
+                        LeaveUpdatedUserID = model.LeaveType,
+                        LeaveUpdatedEmail = model.LeaveUpdatedEmail,
+                        LeaveStatusID = model.LeaveStatusID,
+                        StatusHandlingCode = model.StatusHandlingCode,
+                        StartDayMode = model.StartDayMode,
+                        EndDayMode = model.EndDayMode,
+                        StatusDesc = model.StatusDesc,
+                        //ApprovalFlagDesc = model.ApprovalFlagDesc,
+                        CreatedByName = model.CreatedByName
+                        //ApproverNo = model.ApproverNo,
+                        //ApproverName = model.ApproverName,
+                    };
+                }
+
+                return Result<LeaveRequisitionDTO?>.SuccessResult(leaveRequest);
+            }
+            catch (Exception ex)
+            {
+                return Result<LeaveRequisitionDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching leave request record from the database.");
+            }
+        }
         #endregion
     }
 }

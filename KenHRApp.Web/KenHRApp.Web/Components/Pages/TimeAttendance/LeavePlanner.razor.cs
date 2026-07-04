@@ -125,9 +125,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Leave Request Statuses
-        private readonly string CONST_CANCELLED_BY_USER = "101";         // Cancelled by User
+        private readonly string CONST_CANCELLED_BY_USER = "101";        // Cancelled by User
         private readonly string CONST_REQUEST_SENT = "02";              // Request Sent
         private readonly string CONST_WAITING_FOR_APPROVAL = "05";      // Waiting for Approval
+        private readonly string CONST_CLOSED_BY_USER = "99";            // Closed by User
         #endregion
 
         #endregion
@@ -379,14 +380,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 #endregion
 
                 #region Check if leave period exist
-                bool isLeaveExist = LeaveService.CheckIfLeavePeriodExistAsync(
-                    _leaveRequest.LeaveEmpNo,
-                    _leaveRequest.LeaveResumeDate!.Value).Result;
-                if (isLeaveExist)
-                {
-                    _hasValidationError = true;
-                    _validationMessages.Add("The specified date period overlaps with an existing leave request.");
-                }
+                //bool isLeaveExist = LeaveService.CheckIfLeavePeriodExistAsync(
+                //    _leaveRequest.LeaveEmpNo,
+                //    _leaveRequest.LeaveResumeDate!.Value).Result;
+                //if (isLeaveExist)
+                //{
+                //    _hasValidationError = true;
+                //    _validationMessages.Add("The specified date period overlaps with an existing leave request.");
+                //}
                 #endregion
 
                 if (_hasValidationError && _validationMessages.Any())
@@ -864,7 +865,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Cancel"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to cancel leave requsition no. '{_leaveRequest.LeaveRequestId}'?" },
+                { "ContentText", $"Are you sure you want to cancel request no. '{_leaveRequest.LeaveRequestId}'?" },
                 { "ConfirmText", "Proceed" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -879,7 +880,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 BackdropClick = false       // Prevent clicking outside to close
             };
 
-            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Cancel Leave Confirmation", parameters, options);
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Cancel Planned Leave Confirmation", parameters, options);
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
@@ -903,7 +904,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 _isRunning = true;
 
                 // Set the overlay message
-                overlayMessage = "Cancelling leave request, please wait...";
+                overlayMessage = "Cancelling planeed leave request, please wait...";
 
                 _ = CancelLeaveRequestAsync(async () =>
                 {
@@ -1058,35 +1059,18 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             bool isSuccess = true;
             string errorMsg = string.Empty;
 
-            #region Initialize DTO
-            var fileDtos = new List<FileUploadDTO>();
-
-            foreach (var file in _files)
-            {
-                var stream = file.OpenReadStream(10 * 1024 * 1024);
-
-                fileDtos.Add(new FileUploadDTO
-                {
-                    FileName = file.Name,
-                    ContentType = file.ContentType,
-                    Size = file.Size,
-                    Content = stream
-                });
-            }
-            #endregion
-
             if (isNewRequition)
             {
                 // Set leave request information and flags 
                 _leaveRequest.LeaveCreatedDate = DateTime.Now;
-                _leaveRequest.LeaveApprovalFlag = CONST_WAITING_APPROVAL;
+                //_leaveRequest.LeaveApprovalFlag = CONST_WAITING_APPROVAL;
                 _leaveRequest.LeaveEndDate = _leaveRequest.LeaveResumeDate!.Value.AddDays(-1);
 
-                #region Set leave status to "Request Sent" 
+                #region Set request status to "Closed By User" 
                 if (_leaveStatusList != null
                     && _leaveStatusList.Any())
                 {
-                    UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_REQUEST_SENT).FirstOrDefault();
+                    UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_CLOSED_BY_USER).FirstOrDefault();
                     if (statusFlag != null)
                     {
                         _leaveRequest.LeaveStatusCode = statusFlag.UDCCode;
@@ -1096,7 +1080,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 }
                 #endregion
 
-                var addResult = await LeaveService.AddLeaveRequestAsync(_leaveRequest, fileDtos, Environment.WebRootPath, _cts.Token);
+                var addResult = await LeaveService.AddPlannedLeaveRequestAsync(_leaveRequest, _cts.Token);
                 isSuccess = addResult.Success;
                 if (!isSuccess)
                     errorMsg = addResult.Error!;
@@ -1119,13 +1103,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 // Set the user who update the record and the timestamp
                 _leaveRequest.LeaveUpdatedDate = DateTime.Now;
-                _leaveRequest.LeaveApprovalFlag = CONST_WAITING_APPROVAL;
+                //_leaveRequest.LeaveApprovalFlag = CONST_WAITING_APPROVAL;
                 _leaveRequest.LeaveEndDate = _leaveRequest.LeaveResumeDate!.Value.AddDays(-1);
 
-                #region Set leave status to "Request Sent" 
+                #region Set leave status to "Closed By User" 
                 if (_leaveStatusList != null && _leaveStatusList.Any())
                 {
-                    UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_REQUEST_SENT).FirstOrDefault();
+                    UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_CLOSED_BY_USER).FirstOrDefault();
                     if (statusFlag != null)
                     {
                         _leaveRequest.LeaveStatusCode = statusFlag.UDCCode;
@@ -1135,7 +1119,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 }
                 #endregion
 
-                var saveResult = await LeaveService.UpdateLeaveRequestAsync(_leaveRequest, _cts.Token);
+                var saveResult = await LeaveService.UpdatePlannedLeaveRequestAsync(_leaveRequest, _cts.Token);
                 isSuccess = saveResult.Success;
                 if (!isSuccess)
                     errorMsg = saveResult.Error!;
@@ -1153,9 +1137,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 // Show notification
                 if (isNewRequition)
-                    ShowNotification("Leave request has been submitted successfully!", NotificationType.Success);
+                    ShowNotification("Planned leave request has been submitted successfully!", NotificationType.Success);
                 else
-                    ShowNotification("Leave request has been updated successfully!", NotificationType.Success);
+                    ShowNotification("Planned leave request has been updated successfully!", NotificationType.Success);
 
                 // Go back to T&A dashboard
                 //Navigation.NavigateTo("/TimeAttendance/tnadashboard");
@@ -1258,7 +1242,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
             // Set the user who update the record and the timestamp
             leaveRequest.LeaveUpdatedDate = DateTime.Now;
-            leaveRequest.LeaveApprovalFlag = CONST_CANCELLED;
+            //leaveRequest.LeaveApprovalFlag = CONST_CANCELLED;
 
             #region Set workflow status to "101 - Cancelled by User" 
             if (_leaveStatusList != null && _leaveStatusList.Any())
@@ -1273,7 +1257,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
             #endregion
 
-            var saveResult = await LeaveService.CancelLeaveRequestAsync(leaveRequest, _cts.Token);
+            var saveResult = await LeaveService.CancelPlannedLeaveRequestAsync(leaveRequest, _cts.Token);
             isSuccess = saveResult.Success;
             if (!isSuccess)
                 errorMsg = saveResult.Error!;
@@ -1316,9 +1300,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private async Task GetLeaveRequestDetail(long leaveRequestNo)
         {
-            // Wait for 1 second then gives control back to the runtime
-            //await Task.Delay(500);
-
             // Reset error messages and flags
             _errorMessage.Clear();
             _isCurrentApprover = false;
@@ -1327,20 +1308,20 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Clear attachment list
             _files = Array.Empty<IBrowserFile>();
 
-            var result = await LeaveService.GetLeaveRequestAsync(leaveRequestNo);
+            var result = await LeaveService.GetPlannedLeaveRequestAsync(leaveRequestNo);
             if (result.Success)
             {
                 _leaveRequest = result.Value!;
 
                 // Set the approver flag
-                if (_leaveRequest.ApproverNo == UserEmpNo)
-                    _isCurrentApprover = true;
+                //if (_leaveRequest.ApproverNo == UserEmpNo)
+                //    _isCurrentApprover = true;
 
                 if (_leaveRequest.LeaveCreatedBy == UserEmpNo ||
                     _leaveRequest.LeaveEmpNo == UserEmpNo)
                     _isCreator = true;
 
-                // Recreate the EditContext with the loaded _outdoorRequest
+                // Recreate the EditContext with the loaded request item
                 _editContext = new EditContext(_leaveRequest);
             }
             else
@@ -1350,12 +1331,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 ShowHideError(true);
             }
-
-            //if (callback != null)
-            //{
-            //    // Hide the spinner overlay
-            //    await callback.Invoke();
-            //}
         }
         #endregion
     }
