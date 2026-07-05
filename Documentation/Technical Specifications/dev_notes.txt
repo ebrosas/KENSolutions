@@ -92,7 +92,7 @@ Regularization Request Page:
 2. Refactor the HandleBackButton() method to implement same function done in Outdoor Request page.	-Done
 
 Outdoor Request Page:
-1. Add code to open the Apply Outdoor page when the "Outdoor" button in clicked in the Employee Attendance Dashboard page.
+1. Add code to open the Apply Outdoor page when the "Outdoor" button in clicked in the Employee Attendance Dashboard page.	-Done
 
 Workflow Service:
 1. Once the workflow status is set to "Rejected", implement logic to reject the request status in the underlying requisition table.	-Done

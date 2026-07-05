@@ -183,12 +183,12 @@
                             <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start" Spacing="0">
                                 <!-- Leave Requisition No. -->
                                 <MudText Typo="Typo.h6" Color="Color.Surface" Class="fw-bold">
-                                    Leave Requisition No. @_leaveRequest.LeaveRequestId
+                                    Leave Requisition No. @_leaveRequest.PlannedLeaveId
                                 </MudText>
 
                                 <!-- Created Date and Time -->
                                 <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                    Created On: @_leaveRequest.LeaveCreatedDate?.ToString("MMM dd, yyyy hh:mm tt")
+                                    Created On: @_leaveRequest.CreatedDate?.ToString("MMM dd, yyyy hh:mm tt")
                                 </MudText>
 
                                 <!-- Employee Name and Number -->
@@ -198,22 +198,13 @@
 
                                 <!-- Current Status -->
                                 <MudText Typo="Typo.subtitle2" Color="@(_leaveRequest.StatusHandlingCode == "Cancelled" ? Color.Error : _leaveRequest.StatusHandlingCode == "Approved" || _leaveRequest.StatusHandlingCode == "Closed" ? Color.Success : Color.Info)">
-                                    Status: @_leaveRequest.CurrentStatus
+                                    Status: @_leaveRequest.StatusDesc
                                 </MudText>
                             </MudStack>
                         }
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Spacing="4">
-                             <MudStack Justify="Justify.FlexStart" Spacing="0" hidden>
-                                 <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
-                                     <MudAvatar Size="Size.Small" Color="Color.Info" Variant="Variant.Filled">
-                                         <MudIcon Icon="@Icons.Material.Filled.Balance" />
-                                     </MudAvatar>
-                                     <MudText Typo="Typo.subtitle1" Class="fw-bold" Color="Color.Info">@_leaveRequest.LeaveBalance.ToString("F1") days</MudText>
-                                </MudStack>
-                                <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Info">Leave Balance</MudText>
-                            </MudStack>
                              <MudStack Justify="Justify.FlexStart" Spacing="0">
                                  <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceEvenly" Spacing="1">
                                      <MudAvatar Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
@@ -249,7 +240,7 @@
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudSelect T="int"
-                                       Value="_leaveRequest.LeaveEmpNo"
+                                       Value="_leaveRequest.EmpNo"
                                        ValueChanged="@((v) => OnEmployeeChanged(v))"
                                        Disabled="@_isDisabled"
                                        Label="Select Employee"
@@ -376,8 +367,8 @@
                 <MudGrid Spacing="5">
                     <MudItem xs="12">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudTextField @bind-Value="_leaveRequest.LeaveRemarks" 
-                                    For="@(() => _leaveRequest.LeaveRemarks)"
+                            <MudTextField @bind-Value="_leaveRequest.Remarks" 
+                                    For="@(() => _leaveRequest.Remarks)"
                                     Label="Leave Reason"
                                     HelperText="Max. text input is 500 chars."
                                     Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="500" MaxLength="500" Lines="4"
@@ -430,30 +421,6 @@
                                                 </MudChip>
                                             }
                                         </MudChipSet>
-                                    }
-                                }
-                                else if (ActionType == ActionTypes.View.ToString() ||
-                                ActionType == ActionTypes.Approval.ToString())
-                                {
-                                    @if (_leaveRequest.Files.Any())
-                                    {
-                                        <MudChipSet T="LeaveAttachmentDTO" Class="mt-2">
-                                            @foreach (var file in _leaveRequest.Files)
-                                            {
-                                                <MudChip T="LeaveAttachmentDTO"
-                                                         Color="Color.Info"
-                                                         Variant="Variant.Outlined"
-                                                         Disabled="false">
-                                                    @file.FileName (@(file.FileSize / 1024) KB)
-                                                </MudChip>
-                                            }
-                                        </MudChipSet>
-                                    }
-                                    else
-                                    {
-                                        <MudText Typo="Typo.body2" Color="Color.Surface">
-                                            No file attachments found!
-                                        </MudText>
                                     }
                                 }
                             </MudStack>

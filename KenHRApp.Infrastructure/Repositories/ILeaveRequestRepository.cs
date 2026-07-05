@@ -56,6 +56,17 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<int>> CancelPlannedLeaveRequestAsync(
             PlannedLeaveRequest leaveRequest,
             CancellationToken cancellationToken = default);
+
+        Task<Result<PlannedLeaveResult>> GetPlannedLeaveAsync(long leaveRequestNo);
+
+        Task<Result<List<PlannedLeaveResult>>> SearchPlannedLeaveAsync(
+            long? leaveRequestNo,
+            int? empNo,
+            string? costCenter,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate,
+            bool? usedLeave);
         #endregion
     }
 }

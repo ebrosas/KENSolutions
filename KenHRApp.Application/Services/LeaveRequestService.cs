@@ -246,7 +246,7 @@ namespace KenHRApp.Application.Services
                     LeavePayAdv = dto.LeavePayAdv,
                     LeaveVisaRequired = dto.LeaveVisaRequired,
                     LeaveRemarks = dto.LeaveRemarks,
-                    LeaveUpdatedBy = dto.LeaveCreatedBy,
+                    LeaveUpdatedBy = dto.LeaveUpdatedBy,
                     LeaveUpdatedEmail = dto.LeaveUpdatedEmail,
                     LeaveUpdatedUserID = dto.LeaveUpdatedUserID,
                     LeaveUpdatedDate = dto.LeaveUpdatedDate,
@@ -740,8 +740,8 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<Result<long>> AddPlannedLeaveRequestAsync(
-            LeaveRequisitionDTO dto,
+        public async Task<Result<long>> AddPlannedLeaveAsync(
+            PlannedLeaveResultDTO dto,
             CancellationToken cancellationToken = default)
         {
             try
@@ -749,9 +749,9 @@ namespace KenHRApp.Application.Services
                 #region Create "PlannedLeaveRequest" entity from DTO
                 PlannedLeaveRequest leaveRequest = new PlannedLeaveRequest()
                 {
-                    EmpNo = dto.LeaveEmpNo,
-                    EmpName = dto.LeaveEmpName,
-                    CostCenter = dto.LeaveEmpCostCenter,
+                    EmpNo = dto.EmpNo,
+                    EmpName = dto.EmpName,
+                    CostCenter = dto.CostCenter,
                     LeaveStartDate = Convert.ToDateTime(dto.LeaveStartDate),
                     LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
                     LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
@@ -760,14 +760,14 @@ namespace KenHRApp.Application.Services
                     LeaveDuration = dto.LeaveDuration,
                     NoOfHolidays = dto.NoOfHolidays,
                     NoOfWeekends = dto.NoOfWeekends,
-                    Remarks = dto.LeaveRemarks,
-                    CreatedBy = dto.LeaveCreatedBy,
+                    Remarks = dto.Remarks,
+                    CreatedBy = dto.CreatedBy,
                     CreatedByName = dto.CreatedByName,
-                    CreatedEmail = dto.LeaveCreatedEmail,
-                    CreatedUserID = dto.LeaveCreatedUserID,
-                    CreatedDate = dto.LeaveCreatedDate,
-                    StatusID = dto.LeaveStatusID,
-                    StatusCode = dto.LeaveStatusCode,
+                    CreatedEmail = dto.CreatedEmail,
+                    CreatedUserID = dto.CreatedUserID,
+                    CreatedDate = dto.CreatedDate,
+                    StatusID = dto.StatusID,
+                    StatusCode = dto.StatusCode,
                     StatusHandlingCode = dto.StatusHandlingCode
                 };
                 #endregion
@@ -789,8 +789,8 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<Result<int>> UpdatePlannedLeaveRequestAsync(
-            LeaveRequisitionDTO dto, 
+        public async Task<Result<int>> UpdatePlannedLeaveAsync(
+            PlannedLeaveResultDTO dto, 
             CancellationToken cancellationToken = default)
         {
             try
@@ -798,21 +798,21 @@ namespace KenHRApp.Application.Services
                 #region Create "PlannedLeaveRequest" entity from DTO
                 PlannedLeaveRequest leaveRequest = new PlannedLeaveRequest()
                 {
-                    PlannedLeaveId = dto.LeaveRequestId,
+                    PlannedLeaveId = dto.PlannedLeaveId,
                     LeaveStartDate = Convert.ToDateTime(dto.LeaveStartDate),
                     LeaveEndDate = Convert.ToDateTime(dto.LeaveEndDate),
                     LeaveResumeDate = Convert.ToDateTime(dto.LeaveResumeDate),
                     LeaveDuration = dto.LeaveDuration, 
                     NoOfHolidays = dto.NoOfHolidays,
                     NoOfWeekends = dto.NoOfWeekends,
-                    Remarks = dto.LeaveRemarks,
-                    LastUpdatedBy = dto.LeaveUpdatedBy,
-                    LastUpdatedName = dto.LeaveUpdatedName,
-                    LastUpdatedEmail = dto.LeaveUpdatedEmail,
-                    LastUpdatedUserID = dto.LeaveUpdatedUserID,
-                    LastUpdatedDate = dto.LeaveUpdatedDate,
-                    StatusCode = dto.LeaveStatusCode,
-                    StatusID = dto.LeaveStatusID,
+                    Remarks = dto.Remarks,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedName = dto.LastUpdatedName,
+                    LastUpdatedEmail = dto.LastUpdatedEmail,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    StatusCode = dto.StatusCode,
+                    StatusID = dto.StatusID,
                     StatusHandlingCode = dto.StatusHandlingCode
                 };
                 #endregion
@@ -834,8 +834,8 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<Result<int>> CancelPlannedLeaveRequestAsync(
-            LeaveRequisitionDTO dto, 
+        public async Task<Result<int>> CancelPlannedLeaveAsync(
+            PlannedLeaveResultDTO dto, 
             CancellationToken cancellationToken = default)
         {
             try
@@ -843,14 +843,14 @@ namespace KenHRApp.Application.Services
                 #region Create "PlannedLeaveRequest" entity from DTO
                 PlannedLeaveRequest leaveRequest = new PlannedLeaveRequest()
                 {
-                    PlannedLeaveId = dto.LeaveRequestId,
-                    LastUpdatedBy = dto.LeaveCreatedBy,
-                    LastUpdatedName = dto.LeaveUpdatedName,
-                    LastUpdatedEmail = dto.LeaveUpdatedEmail,
-                    LastUpdatedUserID = dto.LeaveUpdatedUserID,
-                    LastUpdatedDate = dto.LeaveUpdatedDate,
-                    StatusCode = dto.LeaveStatusCode,
-                    StatusID = dto.LeaveStatusID,
+                    PlannedLeaveId = dto.PlannedLeaveId,
+                    LastUpdatedBy = dto.LastUpdatedBy,
+                    LastUpdatedName = dto.LastUpdatedName,
+                    LastUpdatedEmail = dto.LastUpdatedEmail,
+                    LastUpdatedUserID = dto.LastUpdatedUserID,
+                    LastUpdatedDate = dto.LastUpdatedDate,
+                    StatusCode = dto.StatusCode,
+                    StatusID = dto.StatusID,
                     StatusHandlingCode = dto.StatusHandlingCode
                 };
                 #endregion
@@ -872,74 +872,137 @@ namespace KenHRApp.Application.Services
             }
         }
 
-        public async Task<Result<LeaveRequisitionDTO?>> GetPlannedLeaveRequestAsync(long leaveRequestNo)
+        public async Task<Result<PlannedLeaveResultDTO?>> GetPlannedLeaveAsync(long leaveRequestNo)
         {
-            LeaveRequisitionDTO? leaveRequest = null;
+            PlannedLeaveResultDTO? leaveRequest = null;
 
             try
             {
-                var repoResult = await _repository.GetLeaveRequestAsync(leaveRequestNo);
+                var repoResult = await _repository.GetPlannedLeaveAsync(leaveRequestNo);
                 if (!repoResult.Success)
                 {
-                    return Result<LeaveRequisitionDTO?>.Failure(repoResult.Error ?? "Unknown repository error");
+                    return Result<PlannedLeaveResultDTO?>.Failure(repoResult.Error ?? "Unknown repository error");
                 }
 
                 var model = repoResult.Value;
                 if (model != null)
                 {
-                    leaveRequest = new LeaveRequisitionDTO
+                    leaveRequest = new PlannedLeaveResultDTO
                     {
-                        LeaveRequestId = model.LeaveRequestId,
-                        //LeaveAttachmentId = model.LeaveAttachmentId,
-                        //WorkflowId = model.WorkflowId,
-                        //LeaveInstanceID = model.LeaveInstanceID,
-                        //LeaveType = model.LeaveType,
-                        LeaveEmpNo = model.LeaveEmpNo,
-                        LeaveEmpName = model.LeaveEmpName,
-                        LeaveEmpEmail = model.LeaveEmpEmail,
+                        PlannedLeaveId = model.PlannedLeaveId,
+                        LeaveNo = model.LeaveNo,
+                        EmpNo = model.EmpNo,
+                        EmpName = model.EmpName,
                         LeaveStartDate = model.LeaveStartDate,
                         LeaveEndDate = model.LeaveEndDate,
                         LeaveResumeDate = model.LeaveResumeDate,
-                        LeaveEmpCostCenter = model.LeaveEmpCostCenter,
-                        LeaveRemarks = model.LeaveRemarks,
-                        //LeaveConstraints = model.LeaveConstraints,
-                        //LeaveStatusCode = model.LeaveStatusCode,
-                        //LeaveApprovalFlag = model.LeaveApprovalFlag,
-                        //LeaveVisaRequired = model.LeaveVisaRequired,
-                        //LeavePayAdv = model.LeavePayAdv,
-                        //LeaveIsFTMember = model.LeaveIsFTMember,
-                        //LeaveBalance = model.LeaveBalance,
+                        StartDayMode = model.StartDayMode,
+                        StartDayModeDesc = model.StartDayModeDesc,
+                        EndDayMode = model.EndDayMode,
+                        EndDayModeDesc = model.EndDayModeDesc,
+                        CostCenter = model.CostCenter,
+                        CostCenterName = model.CostCenterName,
+                        Remarks = model.Remarks,
                         LeaveDuration = model.LeaveDuration,
                         NoOfHolidays = model.NoOfHolidays,
                         NoOfWeekends = model.NoOfWeekends,
-                        //PlannedLeave = model.PlannedLeave,
-                        //LeavePlannedNo = model.LeavePlannedNo,
-                        //HalfDayLeaveFlag = model.HalfDayLeaveFlag,
-                        LeaveCreatedDate = model.LeaveCreatedDate,
-                        LeaveCreatedBy = model.LeaveCreatedBy,
-                        LeaveCreatedUserID = model.LeaveCreatedUserID,
-                        LeaveCreatedEmail = model.LeaveCreatedEmail,
-                        LeaveUpdatedDate = model.LeaveUpdatedDate,
-                        LeaveUpdatedBy = model.LeaveUpdatedBy,
-                        LeaveUpdatedUserID = model.LeaveType,
-                        LeaveUpdatedEmail = model.LeaveUpdatedEmail,
-                        LeaveStatusID = model.LeaveStatusID,
-                        StatusHandlingCode = model.StatusHandlingCode,
-                        StartDayMode = model.StartDayMode,
-                        EndDayMode = model.EndDayMode,
+                        HalfDayLeaveFlag = model.HalfDayLeaveFlag,
+                        StatusID = model.StatusID,
+                        StatusCode = model.StatusCode,
                         StatusDesc = model.StatusDesc,
-                        //ApprovalFlagDesc = model.ApprovalFlagDesc,
-                        CreatedByName = model.CreatedByName
-                        //ApproverNo = model.ApproverNo,
-                        //ApproverName = model.ApproverName,
+                        StatusHandlingCode = model.StatusHandlingCode,
+                        CreatedDate = model.CreatedDate,
+                        CreatedBy = model.CreatedBy,
+                        CreatedByName = model.CreatedByName,
+                        CreatedUserID = model.CreatedUserID,
+                        CreatedEmail = model.CreatedEmail,
+                        LastUpdatedDate = model.LastUpdatedDate,
+                        LastUpdatedBy = model.LastUpdatedBy,
+                        LastUpdatedName = model.LastUpdatedName,
+                        LastUpdatedUserID = model.LastUpdatedUserID,
+                        LastUpdatedEmail = model.LastUpdatedEmail
                     };
                 }
 
-                return Result<LeaveRequisitionDTO?>.SuccessResult(leaveRequest);
+                return Result<PlannedLeaveResultDTO?>.SuccessResult(leaveRequest);
             }
             catch (Exception ex)
             {
-                return Result<LeaveRequisitionDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching leave request record from the database.");
+                return Result<PlannedLeaveResultDTO?>.Failure(ex.Message.ToString() ?? "Unknown error while fetching leave request record from the database.");
+            }
+        }
+
+        public async Task<Result<List<PlannedLeaveResultDTO>>> SearchPlannedLeaveAsync(
+            long? leaveRequestNo,
+            int? empNo,
+            string? costCenter,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate,
+            bool? usedLeave)
+        {
+            List<PlannedLeaveResultDTO> leaveRequestList = new();
+
+            try
+            {
+                var repoResult = await _repository.SearchPlannedLeaveAsync(
+                    leaveRequestNo, 
+                    empNo, 
+                    costCenter, 
+                    status, 
+                    startDate, 
+                    endDate,
+                    usedLeave);
+                if (!repoResult.Success)
+                {
+                    return Result<List<PlannedLeaveResultDTO>>.Failure(repoResult.Error ?? "Unknown repository error");
+                }
+
+                var model = repoResult.Value;
+                if (model != null && model.Any())
+                {
+                    leaveRequestList = model.Select(e => new PlannedLeaveResultDTO
+                    {
+                        PlannedLeaveId = e.PlannedLeaveId,
+                        LeaveNo = e.LeaveNo,
+                        EmpNo = e.EmpNo,
+                        EmpName = e.EmpName,
+                        LeaveStartDate = e.LeaveStartDate,
+                        LeaveEndDate = e.LeaveEndDate,
+                        LeaveResumeDate = e.LeaveResumeDate,
+                        StartDayMode = e.StartDayMode,
+                        StartDayModeDesc = e.StartDayModeDesc,
+                        EndDayMode = e.EndDayMode,
+                        EndDayModeDesc = e.EndDayModeDesc,
+                        CostCenter = e.CostCenter,
+                        CostCenterName = e.CostCenterName,
+                        Remarks = e.Remarks,
+                        LeaveDuration = e.LeaveDuration.HasValue ? Convert.ToDouble(e.LeaveDuration) : 0,
+                        NoOfHolidays = e.NoOfHolidays.HasValue ? Convert.ToInt32(e.NoOfHolidays) : 0,
+                        NoOfWeekends = e.NoOfWeekends.HasValue ? Convert.ToInt32(e.NoOfWeekends) : 0,
+                        HalfDayLeaveFlag = e.HalfDayLeaveFlag,
+                        StatusID = e.StatusID,
+                        StatusCode = e.StatusCode,
+                        StatusDesc = e.StatusDesc,
+                        StatusHandlingCode = e.StatusHandlingCode,
+                        CreatedDate = e.CreatedDate,
+                        CreatedBy = e.CreatedBy,
+                        CreatedByName = e.CreatedByName,
+                        CreatedUserID = e.CreatedUserID,
+                        CreatedEmail = e.CreatedEmail,
+                        LastUpdatedDate = e.LastUpdatedDate,
+                        LastUpdatedBy = e.LastUpdatedBy,
+                        LastUpdatedName = e.LastUpdatedName,
+                        LastUpdatedUserID = e.LastUpdatedUserID,
+                        LastUpdatedEmail = e.LastUpdatedEmail
+                    }).ToList();
+                }
+
+                return Result<List<PlannedLeaveResultDTO>>.SuccessResult(leaveRequestList);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<PlannedLeaveResultDTO>>.Failure(ex.Message.ToString() ?? "Unknown error while fetching the leave requisition records from the database.");
             }
         }
         #endregion

@@ -58,19 +58,28 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<int>> UpdateLeaveEntitlementAsync(LeaveEntitlementDTO dto, CancellationToken cancellationToken = default);
         Task<Result<bool>> DeleteLeaveEntitlementAsync(int entitlementID, CancellationToken cancellationToken = default);
 
-        Task<Result<long>> AddPlannedLeaveRequestAsync(
-            LeaveRequisitionDTO dto,
+        Task<Result<long>> AddPlannedLeaveAsync(
+            PlannedLeaveResultDTO dto,
             CancellationToken cancellationToken = default);
 
-        Task<Result<int>> UpdatePlannedLeaveRequestAsync(
-            LeaveRequisitionDTO dto,
+        Task<Result<int>> UpdatePlannedLeaveAsync(
+            PlannedLeaveResultDTO dto,
             CancellationToken cancellationToken = default);
 
-        Task<Result<int>> CancelPlannedLeaveRequestAsync(
-            LeaveRequisitionDTO dto,
+        Task<Result<int>> CancelPlannedLeaveAsync(
+            PlannedLeaveResultDTO dto,
             CancellationToken cancellationToken = default);
 
-        Task<Result<LeaveRequisitionDTO?>> GetPlannedLeaveRequestAsync(long leaveRequestNo);
+        Task<Result<PlannedLeaveResultDTO?>> GetPlannedLeaveAsync(long leaveRequestNo);
+
+        Task<Result<List<PlannedLeaveResultDTO>>> SearchPlannedLeaveAsync(
+            long? leaveRequestNo,
+            int? empNo,
+            string? costCenter,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate,
+            bool? usedLeave);
         #endregion
     }
 }

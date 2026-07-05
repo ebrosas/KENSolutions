@@ -87,7 +87,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         #region Objects and Collections   
         private ApprovalRequestResultDTO? _requestItem;
-        private LeaveRequisitionDTO _leaveRequest = new();
+        private PlannedLeaveResultDTO _leaveRequest = new();
         private IReadOnlyList<IBrowserFile> _files = Array.Empty<IBrowserFile>();
         private MudSelect<string> _endDayMode = new();
         private MudSelect<string> _startDayMode = new();
@@ -239,11 +239,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _requestItem = State.RequestItem!;
 
                     // Initialize the Leave Request object
-                    _leaveRequest.LeaveCreatedBy = UserEmpNo;
-                    _leaveRequest.LeaveCreatedEmail = UserEmail;
-                    _leaveRequest.LeaveCreatedUserID = UserName;
-                    _leaveRequest.LeaveType = "AL";
-                    _leaveRequest.LeaveTypeDesc = "Annual Leave";
+                    _leaveRequest.CreatedBy = UserEmpNo;
+                    _leaveRequest.CreatedByName = UserFullName;
+                    _leaveRequest.CreatedEmail = UserEmail;
+                    _leaveRequest.CreatedUserID = UserName;
 
                     //BeginLoadComboboxTask();
 
@@ -383,7 +382,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 #region Check if leave period exist
                 //bool isLeaveExist = LeaveService.CheckIfLeavePeriodExistAsync(
-                //    _leaveRequest.LeaveEmpNo,
+                //    _leaveRequest.EmpNo,
                 //    _leaveRequest.LeaveResumeDate!.Value).Result;
                 //if (isLeaveExist)
                 //{
@@ -412,7 +411,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     // Shows the spinner overlay
                     await InvokeAsync(StateHasChanged);
 
-                    if (_leaveRequest.LeaveRequestId > 0)
+                    if (_leaveRequest.PlannedLeaveId > 0)
                     {
                         HandleBackButton();
                         //BeginLoadLeaveRequest(_outdoorRequest.PlannedLeaveId);
@@ -474,9 +473,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             // Reset Leave Request object
             _leaveRequest = new();
-            _leaveRequest.LeaveCreatedBy = UserEmpNo;
-            _leaveRequest.LeaveCreatedEmail = UserEmail;
-            _leaveRequest.LeaveCreatedUserID = UserName;
+            _leaveRequest.CreatedBy = UserEmpNo;
+            _leaveRequest.CreatedEmail = UserEmail;
+            _leaveRequest.CreatedUserID = UserName;
             _leaveRequest.StartDayMode = null;
             _leaveRequest.EndDayMode = null;
             _hasValidationError = false;
@@ -645,13 +644,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             //};
         }
 
-        private async Task ConfirmDelete(LeaveRequisitionDTO leaveRequest)
+        private async Task ConfirmDelete(PlannedLeaveResultDTO leaveRequest)
         {
             var parameters = new DialogParameters
             {
                 { "DialogTitle", "Confirm Delete"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to delete Leave Request No. '{leaveRequest.LeaveRequestId}'?" },
+                { "ContentText", $"Are you sure you want to delete Leave Request No. '{leaveRequest.PlannedLeaveId}'?" },
                 { "ConfirmText", "Delete" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -842,9 +841,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private void OnEmployeeChanged(int newValue)
         {
-            if (_leaveRequest.LeaveEmpNo != newValue)
+            if (_leaveRequest.EmpNo != newValue)
             {
-                _leaveRequest.LeaveEmpNo = newValue;
+                _leaveRequest.EmpNo = newValue;
 
                 // Get the employee details
                 if (_employeeList.Any())
@@ -852,10 +851,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     EmployeeResultDTO? employee = _employeeList.Where(e => e.EmployeeNo == newValue).FirstOrDefault();
                     if (employee != null)
                     {
-                        _leaveRequest.LeaveEmpName = employee.EmployeeFullName;
-                        _leaveRequest.LeaveEmpCostCenter = employee.DepartmentCode;
-                        _leaveRequest.LeaveEmpEmail = employee.EmpEmail;
-                        _leaveRequest.LeaveBalance = employee.LeaveBalance.HasValue ? Convert.ToDouble(employee.LeaveBalance) : 0;
+                        _leaveRequest.EmpName = employee.EmployeeFullName;
+                        _leaveRequest.CostCenter = employee.DepartmentCode;
                     }
                 }
             }
@@ -867,7 +864,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Cancel"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to cancel request no. '{_leaveRequest.LeaveRequestId}'?" },
+                { "ContentText", $"Are you sure you want to cancel request no. '{_leaveRequest.PlannedLeaveId}'?" },
                 { "ConfirmText", "Proceed" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -890,7 +887,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private void BeginLeaveCancellation(LeaveRequisitionDTO leaveRequest)
+        private void BeginLeaveCancellation(PlannedLeaveResultDTO leaveRequest)
         {
             try
             {
@@ -1053,7 +1050,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Reset error messages
             _errorMessage.Clear();
 
-            bool isNewRequition = _leaveRequest.LeaveRequestId == 0;
+            bool isNewRequition = _leaveRequest.PlannedLeaveId == 0;
 
             // Initialize the cancellation token
             _cts = new CancellationTokenSource();
@@ -1064,8 +1061,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (isNewRequition)
             {
                 // Set leave request information and flags 
-                _leaveRequest.LeaveCreatedDate = DateTime.Now;
-                //_leaveRequest.LeaveApprovalFlag = CONST_WAITING_APPROVAL;
+                _leaveRequest.CreatedDate = DateTime.Now;
                 _leaveRequest.LeaveEndDate = _leaveRequest.LeaveResumeDate!.Value.AddDays(-1);
 
                 #region Set request status to "Closed By User" 
@@ -1075,14 +1071,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_CLOSED_BY_USER).FirstOrDefault();
                     if (statusFlag != null)
                     {
-                        _leaveRequest.LeaveStatusCode = statusFlag.UDCCode;
-                        _leaveRequest.LeaveStatusID = statusFlag.UDCId;
+                        _leaveRequest.StatusCode = statusFlag.UDCCode;
+                        _leaveRequest.StatusID = statusFlag.UDCId;
                         _leaveRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
                     }
                 }
                 #endregion
 
-                var addResult = await LeaveService.AddPlannedLeaveRequestAsync(_leaveRequest, _cts.Token);
+                var addResult = await LeaveService.AddPlannedLeaveAsync(_leaveRequest, _cts.Token);
                 isSuccess = addResult.Success;
                 if (!isSuccess)
                     errorMsg = addResult.Error!;
@@ -1095,7 +1091,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     ActionType = ActionTypes.Edit.ToString();
 
                     // Get the new identity seed value
-                    _leaveRequest.LeaveRequestId = addResult.Value;
+                    _leaveRequest.PlannedLeaveId = addResult.Value;
 
                     // Display the requisition number in the page title
                     //_pageTitle = $" Submitted Leave Request No. {addResult.Value}";
@@ -1104,7 +1100,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             else
             {
                 // Set the user who update the record and the timestamp
-                _leaveRequest.LeaveUpdatedDate = DateTime.Now;
+                _leaveRequest.LastUpdatedDate = DateTime.Now;
+                _leaveRequest.LastUpdatedBy = UserEmpNo;
+                _leaveRequest.LastUpdatedName = UserFullName;
+                _leaveRequest.LastUpdatedEmail = UserEmail;
+                _leaveRequest.LastUpdatedUserID = UserName;
                 _leaveRequest.LeaveEndDate = _leaveRequest.LeaveResumeDate!.Value.AddDays(-1);
 
                 #region Set leave status to "Closed By User" 
@@ -1113,14 +1113,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_CLOSED_BY_USER).FirstOrDefault();
                     if (statusFlag != null)
                     {
-                        _leaveRequest.LeaveStatusCode = statusFlag.UDCCode;
-                        _leaveRequest.LeaveStatusID = statusFlag.UDCId;
+                        _leaveRequest.StatusCode = statusFlag.UDCCode;
+                        _leaveRequest.StatusID = statusFlag.UDCId;
                         _leaveRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
                     }
                 }
                 #endregion
 
-                var saveResult = await LeaveService.UpdatePlannedLeaveRequestAsync(_leaveRequest, _cts.Token);
+                var saveResult = await LeaveService.UpdatePlannedLeaveAsync(_leaveRequest, _cts.Token);
                 isSuccess = saveResult.Success;
                 if (!isSuccess)
                     errorMsg = saveResult.Error!;
@@ -1204,7 +1204,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     _leaveRequest.LeaveResumeDate.HasValue)
                 {
                     _leaveDuration = await LeaveService.CalculateAsync(
-                                    _leaveRequest.LeaveEmpNo,
+                                    _leaveRequest.EmpNo,
                                     Convert.ToDateTime(_leaveRequest.LeaveStartDate).Date,
                                     Convert.ToDateTime(_leaveRequest.LeaveResumeDate).Date,
                                     _leaveRequest.StartDayMode,
@@ -1227,7 +1227,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task CancelLeaveRequestAsync(Func<Task> callback, LeaveRequisitionDTO leaveRequest)
+        private async Task CancelLeaveRequestAsync(Func<Task> callback, PlannedLeaveResultDTO leaveRequest)
         {
             // Wait for 1 second then gives control back to the runtime
             await Task.Delay(500);
@@ -1242,8 +1242,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             string errorMsg = string.Empty;
 
             // Set the user who update the record and the timestamp
-            leaveRequest.LeaveUpdatedDate = DateTime.Now;
-            //leaveRequest.LeaveApprovalFlag = CONST_CANCELLED;
+            leaveRequest.LastUpdatedDate = DateTime.Now;
 
             #region Set workflow status to "101 - Cancelled by User" 
             if (_leaveStatusList != null && _leaveStatusList.Any())
@@ -1251,14 +1250,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 UserDefinedCodeDTO? statusFlag = _leaveStatusList.Where(s => s.UDCCode == CONST_CANCELLED_BY_USER).FirstOrDefault();
                 if (statusFlag != null)
                 {
-                    leaveRequest.LeaveStatusCode = statusFlag.UDCCode;
-                    leaveRequest.LeaveStatusID = statusFlag.UDCId;
+                    leaveRequest.StatusCode = statusFlag.UDCCode;
+                    leaveRequest.StatusID = statusFlag.UDCId;
                     leaveRequest.StatusHandlingCode = statusFlag.UDCSpecialHandlingCode;
                 }
             }
             #endregion
 
-            var saveResult = await LeaveService.CancelPlannedLeaveRequestAsync(leaveRequest, _cts.Token);
+            var saveResult = await LeaveService.CancelPlannedLeaveAsync(leaveRequest, _cts.Token);
             isSuccess = saveResult.Success;
             if (!isSuccess)
                 errorMsg = saveResult.Error!;
@@ -1309,13 +1308,13 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             // Clear attachment list
             _files = Array.Empty<IBrowserFile>();
 
-            var result = await LeaveService.GetPlannedLeaveRequestAsync(leaveRequestNo);
+            var result = await LeaveService.GetPlannedLeaveAsync(leaveRequestNo);
             if (result.Success)
             {
                 _leaveRequest = result.Value!;
 
-                if (_leaveRequest.LeaveCreatedBy == UserEmpNo ||
-                    _leaveRequest.LeaveEmpNo == UserEmpNo)
+                if (_leaveRequest.CreatedBy == UserEmpNo ||
+                    _leaveRequest.EmpNo == UserEmpNo)
                     _isCreator = true;
 
                 // Recreate the EditContext with the loaded request item

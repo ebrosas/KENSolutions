@@ -928,6 +928,148 @@ namespace KenHRApp.Infrastructure.Repositories
                     return Result<int>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Get leave request details
+        /// </summary>
+        /// <param name="leaveRequestNo"></param>
+        /// <returns></returns>
+        public async Task<Result<PlannedLeaveResult>> GetPlannedLeaveAsync(long leaveRequestNo)
+        {
+            PlannedLeaveResult leaveRequest = new();
+
+            try
+            {
+                var model = await _db.Set<PlannedLeaveResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetPlannedLeaveRequest @leaveNo = {0}",
+                    leaveRequestNo)
+                    .ToListAsync();
+                if (model != null && model.Any())
+                {
+                    leaveRequest.PlannedLeaveId = model[0].PlannedLeaveId;
+                    leaveRequest.LeaveNo = model[0].LeaveNo;
+                    leaveRequest.EmpNo = model[0].EmpNo;
+                    leaveRequest.EmpName = model[0].EmpName;
+                    leaveRequest.LeaveStartDate = model[0].LeaveStartDate;
+                    leaveRequest.LeaveEndDate = model[0].LeaveEndDate;
+                    leaveRequest.LeaveResumeDate = model[0].LeaveResumeDate;
+                    leaveRequest.StartDayMode = model[0].StartDayMode;
+                    leaveRequest.StartDayModeDesc = model[0].StartDayModeDesc;
+                    leaveRequest.EndDayMode = model[0].EndDayMode;
+                    leaveRequest.EndDayModeDesc = model[0].EndDayModeDesc;
+                    leaveRequest.CostCenter = model[0].CostCenter;
+                    leaveRequest.CostCenterName = model[0].CostCenterName;
+                    leaveRequest.Remarks = model[0].Remarks;
+                    leaveRequest.LeaveDuration = model[0].LeaveDuration;
+                    leaveRequest.NoOfHolidays = model[0].NoOfHolidays;
+                    leaveRequest.NoOfWeekends = model[0].NoOfWeekends;
+                    leaveRequest.HalfDayLeaveFlag = model[0].HalfDayLeaveFlag;
+                    leaveRequest.StatusID = model[0].StatusID;
+                    leaveRequest.StatusCode = model[0].StatusCode;
+                    leaveRequest.StatusDesc = model[0].StatusDesc;
+                    leaveRequest.StatusHandlingCode = model[0].StatusHandlingCode;
+                    leaveRequest.CreatedDate = model[0].CreatedDate;
+                    leaveRequest.CreatedBy = model[0].CreatedBy;
+                    leaveRequest.CreatedByName = model[0].CreatedByName;
+                    leaveRequest.CreatedUserID = model[0].CreatedUserID;
+                    leaveRequest.CreatedEmail = model[0].CreatedEmail;
+                    leaveRequest.LastUpdatedDate = model[0].LastUpdatedDate;
+                    leaveRequest.LastUpdatedBy = model[0].LastUpdatedBy;
+                    leaveRequest.LastUpdatedName = model[0].LastUpdatedName;
+                    leaveRequest.LastUpdatedUserID = model[0].LastUpdatedUserID;
+                    leaveRequest.LastUpdatedEmail = model[0].LastUpdatedEmail;
+                }
+
+                return Result<PlannedLeaveResult>.SuccessResult(leaveRequest);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<PlannedLeaveResult>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Get leave request details
+        /// </summary>
+        /// <param name="leaveRequestNo"></param>
+        /// <param name="empNo"></param>
+        /// <param name="costCenter"></param>
+        /// <param name="status"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <param name="usedLeave"></param>
+        /// <returns></returns>
+        public async Task<Result<List<PlannedLeaveResult>>> SearchPlannedLeaveAsync(
+            long? leaveRequestNo,
+            int? empNo,
+            string? costCenter,
+            string? status,
+            DateTime? startDate,
+            DateTime? endDate,
+            bool? usedLeave)
+        {
+            List<PlannedLeaveResult> leaveRequestList = new();
+
+            try
+            {
+                var model = (await _db.Set<PlannedLeaveResult>()
+                    .FromSqlRaw("EXEC kenuser.Pr_GetPlannedLeaveRequest @leaveNo = {0}, @empNo = {1}, @costCenter = {2}, @status = {3}, @startDate = {4}, @endDate = {5}, @usedLeave = {6}",
+                    leaveRequestNo!,
+                    empNo!,
+                    costCenter!,
+                    status!,
+                    startDate!,
+                    endDate!,
+                    usedLeave!)
+                    .ToListAsync()).AsEnumerable().OrderByDescending(a => a.PlannedLeaveId);
+                if (model != null && model.Any())
+                {
+                    leaveRequestList = model.Select(e => new PlannedLeaveResult
+                    {
+                        PlannedLeaveId = e.PlannedLeaveId,
+                        LeaveNo = e.LeaveNo,
+                        EmpNo = e.EmpNo,
+                        EmpName = e.EmpName,
+                        LeaveStartDate = e.LeaveStartDate,
+                        LeaveEndDate = e.LeaveEndDate,
+                        LeaveResumeDate = e.LeaveResumeDate,
+                        StartDayMode = e.StartDayMode,
+                        StartDayModeDesc = e.StartDayModeDesc,
+                        EndDayMode = e.EndDayMode,
+                        EndDayModeDesc = e.EndDayModeDesc,
+                        CostCenter = e.CostCenter,
+                        CostCenterName = e.CostCenterName,
+                        Remarks = e.Remarks,
+                        LeaveDuration = e.LeaveDuration,
+                        NoOfHolidays = e.NoOfHolidays,
+                        NoOfWeekends = e.NoOfWeekends,
+                        HalfDayLeaveFlag = e.HalfDayLeaveFlag,
+                        StatusID = e.StatusID,
+                        StatusCode = e.StatusCode,
+                        StatusDesc = e.StatusDesc,
+                        StatusHandlingCode = e.StatusHandlingCode,
+                        CreatedDate = e.CreatedDate,
+                        CreatedBy = e.CreatedBy,
+                        CreatedByName = e.CreatedByName,
+                        CreatedUserID = e.CreatedUserID,
+                        CreatedEmail = e.CreatedEmail,
+                        LastUpdatedDate = e.LastUpdatedDate,
+                        LastUpdatedBy = e.LastUpdatedBy,
+                        LastUpdatedName = e.LastUpdatedName,
+                        LastUpdatedUserID = e.LastUpdatedUserID,
+                        LastUpdatedEmail = e.LastUpdatedEmail
+                    }).ToList();
+                }
+
+                return Result<List<PlannedLeaveResult>>.SuccessResult(leaveRequestList);
+            }
+            catch (Exception ex)
+            {
+                // Log error here if needed (Serilog, NLog, etc.)
+                return Result<List<PlannedLeaveResult>>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }
