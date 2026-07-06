@@ -500,8 +500,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     Navigation.NavigateTo("/TimeAttendance/tnadashboard");
                     break;
 
-                case "LeavePlanner":
-                    Navigation.NavigateTo($"/TimeAttendance/leaveinquiry?ForceLoad={_forceLoad}");
+                case "LeavePlannerInq":
+                    Navigation.NavigateTo($"/TimeAttendance/LeavePlannerInq?ForceLoad={_forceLoad}");
                     break;
 
                 case "ApprovalDashboard":
@@ -558,7 +558,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             {
                 { "DialogTitle", "Confirm Cancel"},
                 { "DialogIcon", _iconCancel },
-                { "ContentText", "Are you sure you want to cancel submitting leave request?" },
+                { "ContentText", "Are you sure you want to cancel planned leave request?" },
                 { "ConfirmText", "Yes" },
                 { "CancelText", "No" },
                 { "Color", Color.Success }
@@ -570,31 +570,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                CancelAddingLeaveRequest();
+                HandleBackButton();
             }
-        }
-
-        private void CancelAddingLeaveRequest()
-        {
-            if (!string.IsNullOrEmpty(CallerForm))
-            {
-                switch (CallerForm)
-                {
-                    case "TNADashboard":
-                        Navigation.NavigateTo("/TimeAttendance/tnadashboard");
-                        break;
-
-                    case "LeaveInquiry":
-                        Navigation.NavigateTo("/TimeAttendance/leaveinquiry");
-                        break;
-
-                    default:
-                        Navigation.NavigateTo("/TimeAttendance/tnadashboard");
-                        break;
-                }
-            }
-            else
-                Navigation.NavigateTo("/TimeAttendance/tnadashboard");
         }
 
         private void ShowNotification(string message, NotificationType type)

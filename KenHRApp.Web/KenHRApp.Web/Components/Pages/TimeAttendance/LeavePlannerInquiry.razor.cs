@@ -11,7 +11,7 @@ using System.Text;
 
 namespace KenHRApp.Web.Components.Pages.TimeAttendance
 {
-    public partial class LeaveInquiry : IPageAuthorization
+    public partial class LeavePlannerInquiry : IPageAuthorization
     {
         #region Parameters and Injections
         [Inject] private ILeaveRequestService LeaveService { get; set; } = default!;
@@ -44,7 +44,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private StringBuilder _errorMessage = new StringBuilder();
         private int? _empNo = null;
         private int? _leaveNo = null;
-        private string _selectedLeaveType = string.Empty;
         private string _selectedDepartment = string.Empty;
         private string _selectedStatus = string.Empty;
         private DateTime? _selectedStartDate = null;
@@ -72,22 +71,20 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         private bool _isActive = true;
         private bool _redirected;
         private bool _hasValidationError = false;
+        private bool _isUsedLeave = false;
         #endregion
 
         #region Objects and collections
         private MudDatePicker _startDatePicker;
         private MudDatePicker _resumeDatePicker;
-        private List<LeaveRequestResultDTO> _leaveRequestList = new List<LeaveRequestResultDTO>();        
+        private List<PlannedLeaveResultDTO> _leaveRequestList = new List<PlannedLeaveResultDTO>();        
         private List<string> _validationMessages = new();
 
         private List<BreadcrumbItem> _breadcrumbItems =
         [
             new("Home", href: "/TimeAttendance/tnadashboard", icon: Icons.Material.Filled.Home),
-            new("Leave Inquiry", href: null, icon: @Icons.Material.Filled.AccountBalance, disabled: true)
+            new("Planned Leave Inquiry", href: null, icon: @Icons.Material.Filled.AccountBalance, disabled: true)
         ];
-
-        private string[]? _leaveTypeArray = null;
-        private List<UserDefinedCodeDTO> _leaveTypeList = new List<UserDefinedCodeDTO>();
 
         private string[]? _leaveStatusArray = null;
         private List<UserDefinedCodeDTO> _leaveStatusList = new List<UserDefinedCodeDTO>();
@@ -101,8 +98,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #region Enums
         private enum UDCKeys
         {
-            LEAVETYPES,     // Leave Types
-            STATUS,  // Leave Modes
+            STATUS,         // Leave Modes
             DEPARTMENT      // Departments
         }
 
@@ -155,22 +151,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             if (firstRender)
             {
-                #region Old authentication Logic
-                //if (!State.IsAuthenticated)
-                //    GoToLogin();
-
-                //if (State.AuthenticatedUser != null)
-                //{
-                //    UserName = State.AuthenticatedUser!.EmployeeFullName;
-                //    UserEmpNo = State.AuthenticatedUser.EmpNo;
-                //    UserID = State.AuthenticatedUser!.UserID;
-                //    UserEmail = State.AuthenticatedUser!.OfficialEmail;
-                //    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
-
-                //    BeginLoadComboboxTask();
-                //}
-                #endregion
-
                 bool isAuthenticated = UserSession.IsAuthenticated();
                 if (!isAuthenticated)
                 {
@@ -197,33 +177,27 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         #endregion
 
         #region Grid Events 
-        private Func<LeaveRequestResultDTO, bool> _quickFilter => x =>
+        private Func<PlannedLeaveResultDTO, bool> _quickFilter => x =>
         {
             if (string.IsNullOrWhiteSpace(_searchString))
                 return true;
 
-            if (x.LeaveRequestId > 0 && x.LeaveRequestId.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (x.EmpNo > 0 && x.EmpNo.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (x.LeaveEmpNo > 0 && x.LeaveEmpNo.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(x.EmpName) && x.EmpName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (!string.IsNullOrEmpty(x.LeaveEmpName) && x.LeaveEmpName!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(x.StartDayModeDesc) && x.StartDayModeDesc.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (!string.IsNullOrEmpty(x.DepartmentCode) && x.DepartmentCode.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(x.EndDayModeDesc) && x.EndDayModeDesc!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (!string.IsNullOrEmpty(x.DepartmentName) && x.DepartmentName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(x.Remarks) && x.Remarks!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (!string.IsNullOrEmpty(x.LeaveRemarks) && x.LeaveRemarks!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
-
-            if (!string.IsNullOrEmpty(x.CurrentApprover) && x.CurrentApprover!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
-
-            if (!string.IsNullOrEmpty(x.StatusSummary) && x.StatusSummary!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(x.StatusDesc) && x.StatusDesc!.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             if (x.LeaveDuration > 0 && x.LeaveDuration!.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
@@ -232,28 +206,28 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             return false;
         };
 
-        private void StartedEditingItem(LeaveRequestResultDTO item)
+        private void StartedEditingItem(PlannedLeaveResultDTO item)
         {
             _events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
         }
 
-        private void CanceledEditingItem(LeaveRequestResultDTO item)
+        private void CanceledEditingItem(PlannedLeaveResultDTO item)
         {
             _events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
         }
 
-        private void CommittedItemChanges(LeaveRequestResultDTO item)
+        private void CommittedItemChanges(PlannedLeaveResultDTO item)
         {
 
         }
 
-        private async Task ConfirmDelete(LeaveRequestResultDTO leaveRequest)
+        private async Task ConfirmDelete(PlannedLeaveResultDTO leaveRequest)
         {
             var parameters = new DialogParameters
             {
                 { "DialogTitle", "Confirm Delete"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to delete leave requisition no. '{leaveRequest.LeaveRequestId}'?" },
+                { "ContentText", $"Are you sure you want to delete leave requisition no. '{leaveRequest.PlannedLeaveId}'?" },
                 { "ConfirmText", "Delete" },
                 { "Color", Color.Error },
                 { "DialogIconColor", Color.Error }
@@ -368,26 +342,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         public void ApplyLeave()
         {
-            Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=Add&CallerForm=LeaveInquiry");
+            Navigation.NavigateTo("/TimeAttendance/LeavePlanner?ActionType=Add&CallerForm=LeavePlannerInq");
         }
 
-        public void OpenLeaveRequest(LeaveRequestResultDTO item)
+        public void OpenLeaveRequest(PlannedLeaveResultDTO item)
         {
-            Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.LeaveRequestId}&CallerForm=LeaveInquiry");
-        }
-
-        private async Task<IEnumerable<string>> SearchLeaveTypes(string value, CancellationToken token)
-        {
-            // In real life use an asynchronous function for fetching data from an api.
-            await Task.Delay(5, token);
-
-            // if text is null or empty, show complete list
-            if (string.IsNullOrEmpty(value))
-            {
-                return _leaveTypeArray!;
-            }
-
-            return _leaveTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+            Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.PlannedLeaveId}&CallerForm=LeaveInquiry");
         }
 
         private async Task<IEnumerable<string>> SearchLeaveStatus(string value, CancellationToken token)
@@ -445,7 +405,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
                 if (ForceLoad)
                 {
-                    BeginSearchLeaveTask();
+                    BeginSearchLeave();
                 }
             });
         }
@@ -459,11 +419,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _leaveNo = null;
             _empNo = null;
             _selectedDepartment = string.Empty;
-            _selectedLeaveType = string.Empty;
             _selectedStatus = string.Empty;
             _selectedStartDate = null;
             _selectedResumeDate = null;
-            
+            _isUsedLeave = false;   
+
             // Clear datagrid datasource
             _leaveRequestList = new();
 
@@ -472,7 +432,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _validationMessages.Clear();
         }
 
-        private void BeginSearchLeaveTask()
+        private void BeginSearchLeave()
         {
             // Reset validation errors
             _hasValidationError = false;
@@ -494,13 +454,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _isRunning = true;
 
             // Set the overlay message
-            //if (!State.IsAuthenticated)
             if (!UserSession.IsAuthenticated())
                 overlayMessage = "Authentication required. Redirecting to login page...";
             else
-                overlayMessage = "Loading leave requisitions, please wait...";
+                overlayMessage = "Loading data, please wait...";
 
-            _ = SearchLeaveRequestAsync(async () =>
+            _ = SearchPlannedLeaveAsync(async () =>
             {
                 _isTaskFinished = true;
                 _isRunning = false;
@@ -557,24 +516,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 var udcData = result.Value;
                 if (udcData!.Any() && udcGroupList!.Any())
                 {
-                    #region Get Leave Types
-                    try
-                    {
-                        groupID = udcGroupList!.Where(a => a.UDCGCode == UDCKeys.LEAVETYPES.ToString()).FirstOrDefault()!.UDCGroupId;
-                    }
-                    catch (Exception ex)
-                    {
-                        _errorMessage.Append($"Error getting Leave Types group id: {ex.Message}");
-                    }
-
-                    if (groupID > 0)
-                    {
-                        _leaveTypeList = udcData!.Where(a => a.GroupID == groupID).ToList();
-                        if (_leaveTypeList != null)
-                            _leaveTypeArray = _leaveTypeList.Select(s => s.UDCDesc1).OrderBy(s => s).ToArray();
-                    }
-                    #endregion
-
                     #region Get Leave Statuses
                     try
                     {
@@ -607,7 +548,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private async Task SearchLeaveRequestAsync(Func<Task> callback)
+        private async Task SearchPlannedLeaveAsync(Func<Task> callback)
         {
             await Task.Delay(500);
 
@@ -624,16 +565,6 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
             #endregion
 
-            #region Get the selected Leave Type
-            string leaveType = string.Empty;
-            if (!string.IsNullOrEmpty(_selectedLeaveType))
-            {
-                UserDefinedCodeDTO? leaveTypeUDC = _leaveTypeList.Where(d => d.UDCDesc1 == _selectedLeaveType).FirstOrDefault();
-                if (leaveTypeUDC != null)
-                    leaveType = leaveTypeUDC.UDCCode;
-            }
-            #endregion
-
             #region Get the selected status
             //string status = string.Empty;
             //if (!string.IsNullOrEmpty(_selectedStatus))
@@ -644,14 +575,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             //}
             #endregion
 
-            var repoResult = await LeaveService.SearchLeaveRequestAsync(
+            var repoResult = await LeaveService.SearchPlannedLeaveAsync(
                 _leaveNo,
                 _empNo,
                 costCenter,
-                leaveType,
                 _selectedStatus,
                 _selectedStartDate,
-                _selectedResumeDate);
+                _selectedResumeDate,
+                _isUsedLeave);
             if (repoResult.Success)
             {
                 _leaveRequestList = repoResult.Value!;

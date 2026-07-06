@@ -903,7 +903,7 @@ namespace KenHRApp.Application.Services
                         CostCenter = model.CostCenter,
                         CostCenterName = model.CostCenterName,
                         Remarks = model.Remarks,
-                        LeaveDuration = model.LeaveDuration,
+                        LeaveDuration = model.LeaveDuration.HasValue ? Convert.ToDouble(model.LeaveDuration) : 0,
                         NoOfHolidays = model.NoOfHolidays,
                         NoOfWeekends = model.NoOfWeekends,
                         HalfDayLeaveFlag = model.HalfDayLeaveFlag,

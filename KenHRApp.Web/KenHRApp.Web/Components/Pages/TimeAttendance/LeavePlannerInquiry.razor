@@ -1,7 +1,7 @@
-﻿@page "/TimeAttendance/leaveinquiry"
+﻿@page "/TimeAttendance/LeavePlannerInq"
 
 <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
-    <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Leave Inquiry</MudText>
+    <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Leave Planner</MudText>
      <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserFullName</MudText>
 </MudStack>
 
@@ -43,7 +43,7 @@
                             FullWidth="false"
                             Size="Size.Small"
                             StartIcon="@Icons.Material.Filled.PersonSearch"
-                            OnClick="BeginSearchLeaveTask"
+                            OnClick="BeginSearchLeave"
                             Disabled="@_isRunning">
                         @if (_isRunning)
                     {
@@ -120,45 +120,29 @@
                     </MudItem>
                     <MudItem xs="6" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudAutocomplete @bind-Value="_selectedLeaveType"
-                                             FullWidth="true"
-                                             Label="Leave Type"
-                                             SearchFunc="SearchLeaveTypes!"
-                                             Variant="Variant.Text"
-                                             Margin="Margin.Dense"
-                                             Dense="true"
-                                             Placeholder="Please Select"
-                                             HelperText="Type a key to search for value"
-                                             HelperTextOnFocus="true"
-                                             Clearable="true"
-                                             Typo="Typo.subtitle2"
-                                             MaxItems="@(_leaveTypeList != null ? _leaveTypeList.Count : 10)"
-                                             Modal="true" />
+                            <MudPaper Elevation="0" Class="p-0 w-100">
+                                <MudAutocomplete @bind-Value="_selectedStatus"
+                                                 FullWidth="true"
+                                                 Label="Status"
+                                                 SearchFunc="SearchLeaveStatus!"
+                                                 Variant="Variant.Text"
+                                                 Margin="Margin.Dense"
+                                                 Dense="true"
+                                                 Placeholder="Please Select"
+                                                 HelperText="Type a key to search for value"
+                                                 HelperTextOnFocus="true"
+                                                 Clearable="true"
+                                                 Typo="Typo.subtitle2"
+                                                 MaxItems="@(_leaveStatusList != null ? _leaveStatusList.Count : 10)"
+                                                 Modal="true" />
+                            </MudPaper>
                         </MudPaper>
                     </MudItem>
                 </MudGrid>
                 <MudGrid Spacing="5">
-                    <MudItem xs="6" sm="3">
+                    <MudItem xs="4" sm="3">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudAutocomplete @bind-Value="_selectedStatus"
-                                             FullWidth="true"
-                                             Label="Status"
-                                             SearchFunc="SearchLeaveStatus!"
-                                             Variant="Variant.Text"
-                                             Margin="Margin.Dense"
-                                             Dense="true"
-                                             Placeholder="Please Select"
-                                             HelperText="Type a key to search for value"
-                                             HelperTextOnFocus="true"
-                                             Clearable="true"
-                                             Typo="Typo.subtitle2"
-                                             MaxItems="@(_leaveStatusList != null ? _leaveStatusList.Count : 10)"
-                                             Modal="true" />
-                        </MudPaper>
-                    </MudItem>
-                    <MudItem xs="6" sm="3">
-                        <MudPaper Elevation="0" Class="p-0 w-100">                         
-                             <MudDatePicker @ref="_startDatePicker"
+                            <MudDatePicker @ref="_startDatePicker"
                                            Label="Start Date" Editable="true"
                                            @bind-Date="_selectedStartDate"
                                            Margin="Margin.Dense" Color="Color.Surface"
@@ -173,8 +157,8 @@
                             </MudDatePicker>
                         </MudPaper>
                     </MudItem>
-                    <MudItem xs="6" sm="3">
-                        <MudPaper Elevation="0" Class="p-0 w-100">                          
+                    <MudItem xs="4" sm="3">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudDatePicker @ref="_resumeDatePicker"
                                            Label="End Date" Editable="true"
                                            @bind-Date="_selectedResumeDate"
@@ -190,6 +174,9 @@
                             </MudDatePicker>
                         </MudPaper>
                     </MudItem>
+                    <MudItem xs="4" sm="3">
+                        <MudSwitch @bind-Value="_isUsedLeave" Color="Color.Info">Used Planned Leaves</MudSwitch>
+                    </MudItem>
                 </MudGrid>
             </MudPaper>
             
@@ -202,7 +189,7 @@
                  </MudMenu>
             </MudAppBar>
             <MudPaper Elevation="5" Square="true" Class="w-100 mb-3">
-                 <MudDataGrid T="LeaveRequestResultDTO" Items="@_leaveRequestList" Hover="true" Striped="true" Class="leave-grid"
+                 <MudDataGrid T="PlannedLeaveResultDTO" Items="@_leaveRequestList" Hover="true" Striped="true" Class="leave-grid"
                     Filterable="_enableFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                     QuickFilter="@_quickFilter" Hideable="true" PageSize="5"
                     EditTrigger="DataGridEditTrigger.Manual" ReadOnly="false" EditMode="DataGridEditMode.Form"
@@ -226,12 +213,12 @@
                         <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
                             <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
                             <MudPaper Class="ms-3" Elevation="0">
-                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Add new leave request" OnClick="ApplyLeave" />
+                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Apply planned leave" OnClick="ApplyLeave" />
                             </MudPaper>
                         </MudPaper>
                     </ToolBarContent>
                     <Columns>
-                         <PropertyColumn Property="x => x.LeaveRequestId" Title="Leave Request No." Class="col-LeaveRequestId" 
+                         <PropertyColumn Property="x => x.PlannedLeaveId" Title="Leave Request No." Class="col-PlannedLeaveId" 
                              StickyLeft="true" Editable="false">
                             <CellTemplate Context="row">
                                 <MudChip T="long" 
@@ -241,38 +228,28 @@
                                     Class="fw-bold" 
                                     Style="font-size: 14px;"
                                     OnClick="@(()=>OpenLeaveRequest(row.Item))">
-                                    @row.Item.LeaveRequestId
+                                    @row.Item.PlannedLeaveId
                                 </MudChip>
                             </CellTemplate>
                          </PropertyColumn>
-                         <PropertyColumn Property="x => x.LeaveType" Hidden Editable="false">
-                             <EditTemplate>
-                                 @* Empty to prevent rendering *@
-                             </EditTemplate>
-                         </PropertyColumn>
-                         <PropertyColumn Property="x => x.LeaveTypeDesc" Title="Leave Type" Class="col-LeaveTypeDesc" Editable="false">
-                             <CellTemplate>
-                                 @context.Item.LeaveTypeDesc
+                        <PropertyColumn Property="x => x.EmpNo" Title="Employee No." Class="col-EmpNo" Editable="false">
+                            <CellTemplate>
+                                @context.Item.EmpNo
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.LeaveEmpNo" Title="Employee No." Class="col-LeaveEmpNo" Editable="false">
+                        <PropertyColumn Property="x => x.EmpName" Title="Employee Name" Class="col-EmpName" Editable="false">
                             <CellTemplate>
-                                @context.Item.LeaveEmpNo
+                                @context.Item.EmpName
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.LeaveEmpName" Title="Employee Name" Class="col-LeaveEmpName" Editable="false">
+                        <PropertyColumn Property="x => x.CostCenterName" Title="Department" Class="col-DepartmentFullName" Editable="false">
                             <CellTemplate>
-                                @context.Item.LeaveEmpName
-                            </CellTemplate>
-                        </PropertyColumn>
-                        <PropertyColumn Property="x => x.DepartmentFullName" Title="Department" Class="col-DepartmentFullName" Editable="false">
-                            <CellTemplate>
-                                @context.Item.DepartmentFullName
+                                @context.Item.CostCenterName
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.LeaveStartDate" Title="Leave Start Date" Class="col-LeaveStartDate" Editable="false">
                             <CellTemplate>
-                                @context.Item.LeaveStartDate.ToString("dd-MMM-yyyy")
+                                @context.Item.LeaveStartDate!.Value.ToString("dd-MMM-yyyy"))
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.StartDayModeDesc" Title="Start Day Mode" Class="col-StartDayModeDesc" Editable="false">
@@ -282,7 +259,7 @@
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.LeaveResumeDate" Title="Leave Resume Date" Class="col-LeaveResumeDate" Editable="false">
                             <CellTemplate>
-                                @context.Item.LeaveResumeDate.ToString("dd-MMM-yyyy")
+                                @context.Item.LeaveResumeDate!.Value.ToString("dd-MMM-yyyy")
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.EndDayModeDesc" Title="Resume Day Mode" Class="col-EndDayModeDesc" Editable="false">
@@ -290,14 +267,9 @@
                                 @context.Item.EndDayModeDesc
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.LeaveBalance" Title="Leave Balance" Class="col-LeaveBalance" Editable="false">
-                            <CellTemplate>
-                                @context.Item.LeaveBalance.ToString("N2")
-                            </CellTemplate>
-                        </PropertyColumn>
                         <PropertyColumn Property="x => x.LeaveDuration" Title="Duration" Class="col-LeaveDuration" Editable="false">
                             <CellTemplate>
-                                @context.Item.LeaveDuration.ToString("N2")
+                                @context.Item.LeaveDuration!.Value.ToString("N2")
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.NoOfHolidays" Title="No. of Holidays" Class="col-NoOfHolidays" Editable="false">
@@ -319,31 +291,10 @@
                                      : row.Item.StatusHandlingCode == "Cancelled" ? Color.Warning
                                      : row.Item.StatusHandlingCode == "Approved" ? Color.Success
                                      : Color.Dark)">
-                                    @row.Item.StatusSummary
+                                    @row.Item.StatusDesc
                                 </MudChip>
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.CurrentApprover" Title="Currently Assigned To" Class="col-RequesterName" Editable="false">
-                            <CellTemplate>
-                                @context.Item.CurrentApprover
-                            </CellTemplate>
-                        </PropertyColumn>
-                       @*  <TemplateColumn Class="flex-column" Title="Action">
-                             <CellTemplate Context="row">
-                                 <MudIconButton title="View leave details"
-                                    Class="show-btn fa-icon-btn"
-                                    Color="Color.Surface" Size="Size.Small"
-                                    Icon="fas fa-eye-slash"
-                                    OnClick="@row.Actions.StartEditingItemAsync">
-                                 </MudIconButton>
-                                 <MudIconButton Color="Color.Error" hidden title="Delete department record" 
-                                    Class="fa-icon-btn" OnClick="() => ConfirmDelete(row.Item)">
-                                     <ChildContent>
-                                         <i class="fas fa-trash-alt fa-sm"></i>
-                                     </ChildContent>
-                                 </MudIconButton>
-                             </CellTemplate>
-                         </TemplateColumn> *@
                         <TemplateColumn Class="flex-column" Title="Action">
                             <CellTemplate Context="row">
                                 <MudIconButton title="View details"
@@ -364,7 +315,7 @@
                          </div>
                      </NoRecordsContent>
                      <PagerContent>
-                         <MudDataGridPager T="LeaveRequestResultDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
+                         <MudDataGridPager T="PlannedLeaveResultDTO" PageSizeOptions="new int[] {5,10,20,50,100,500}" />
                      </PagerContent>
                 </MudDataGrid>
             </MudPaper>
