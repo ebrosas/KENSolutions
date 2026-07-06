@@ -1007,7 +1007,7 @@ namespace KenHRApp.Infrastructure.Repositories
             string? status,
             DateTime? startDate,
             DateTime? endDate,
-            bool? usedLeave)
+            bool usedLeave)
         {
             List<PlannedLeaveResult> leaveRequestList = new();
 

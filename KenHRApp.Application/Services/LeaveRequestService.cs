@@ -939,7 +939,7 @@ namespace KenHRApp.Application.Services
             string? status,
             DateTime? startDate,
             DateTime? endDate,
-            bool? usedLeave)
+            bool usedLeave)
         {
             List<PlannedLeaveResultDTO> leaveRequestList = new();
 

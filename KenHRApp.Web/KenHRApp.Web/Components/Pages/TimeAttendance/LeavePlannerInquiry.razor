@@ -218,8 +218,8 @@
                         </MudPaper>
                     </ToolBarContent>
                     <Columns>
-                         <PropertyColumn Property="x => x.PlannedLeaveId" Title="Leave Request No." Class="col-PlannedLeaveId" 
-                             StickyLeft="true" Editable="false">
+                         <PropertyColumn Property="x => x.PlannedLeaveId" Title="Leave Request No." Class="col-LeaveRequestId"
+                                         StickyLeft="true" Editable="false">
                             <CellTemplate Context="row">
                                 <MudChip T="long" 
                                     Size=Size.Small
@@ -232,12 +232,12 @@
                                 </MudChip>
                             </CellTemplate>
                          </PropertyColumn>
-                        <PropertyColumn Property="x => x.EmpNo" Title="Employee No." Class="col-EmpNo" Editable="false">
+                        <PropertyColumn Property="x => x.EmpNo" Title="Employee No." Class="col-LeaveEmpNo" Editable="false">
                             <CellTemplate>
                                 @context.Item.EmpNo
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.EmpName" Title="Employee Name" Class="col-EmpName" Editable="false">
+                        <PropertyColumn Property="x => x.EmpName" Title="Employee Name" Class="col-LeaveEmpName" Editable="false">
                             <CellTemplate>
                                 @context.Item.EmpName
                             </CellTemplate>

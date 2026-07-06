@@ -79,7 +79,7 @@ namespace KenHRApp.Application.Interfaces
             string? status,
             DateTime? startDate,
             DateTime? endDate,
-            bool? usedLeave);
+            bool usedLeave);
         #endregion
     }
 }

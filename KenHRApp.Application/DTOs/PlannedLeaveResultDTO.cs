@@ -28,7 +28,7 @@ namespace KenHRApp.Application.DTOs
 
         #region Properties
         public long PlannedLeaveId { get; set; }       // Identity column  
-        public long LeaveNo { get; set; }
+        public long? LeaveNo { get; set; }
         public int EmpNo { get; set; }
         public string? EmpName { get; set; } = null;
 

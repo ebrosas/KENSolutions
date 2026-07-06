@@ -140,6 +140,7 @@ PARAMETERS:
 	@usedLeave		BIT = NULL
 
 	EXEC kenuser.Pr_GetPlannedLeaveRequest
+	EXEC kenuser.Pr_GetPlannedLeaveRequest NULL, NULL, '', '', NULL, NULL, 0
 	EXEC kenuser.Pr_GetPlannedLeaveRequest 1
 	EXEC kenuser.Pr_GetPlannedLeaveRequest 0, 10003632 
 	EXEC kenuser.Pr_GetPlannedLeaveRequest 0, 0, '7600'
