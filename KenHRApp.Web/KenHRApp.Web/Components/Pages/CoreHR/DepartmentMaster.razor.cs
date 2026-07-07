@@ -313,7 +313,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 CloseOnEscapeKey = true,
                 BackdropClick = false,
                 FullWidth = true,
-                MaxWidth = MaxWidth.Large
+                MaxWidth = MaxWidth.Medium
             };
 
             var dialog = await DialogService.ShowAsync<DepartmentEditDialog>("Add New Department", parameters, options);

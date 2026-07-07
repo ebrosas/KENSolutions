@@ -211,9 +211,16 @@
                         </MudPaper>
                         <MudSpacer />
                         <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
-                            <MudSwitch @bind-Value="_enableFilter" ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">Custom Filter</MudSwitch>
+                            <MudSwitch @bind-Value="_enableFilter"
+                                LabelPlacement="Placement.Start"
+                                ThumbIcon="@(_enableFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)" 
+                                ThumbIconColor="@(_enableFilter==true ? Color.Success : Color.Error)">
+                                Enable Custom Filter
+                            </MudSwitch>
+                            @* <MudSwitch @bind-Value="_enableFilter" Color="Color.Secondary" UncheckedColor="Color.Default"
+                                Label="Enable Custom Filter" LabelPlacement="Placement.Start" /> *@
                             <MudPaper Class="ms-3" Elevation="0">
-                                 <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Apply planned leave" OnClick="ApplyLeave" />
+                                 <MudFab Style="background-color: #004165; color: white;" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" title="Apply planned leave" OnClick="ApplyLeave" />
                             </MudPaper>
                         </MudPaper>
                     </ToolBarContent>
