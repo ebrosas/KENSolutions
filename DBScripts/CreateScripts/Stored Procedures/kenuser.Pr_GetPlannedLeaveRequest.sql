@@ -124,7 +124,8 @@ BEGIN
 		AND 
 		(
 			(lv.LeaveNo IS NOT NULL AND @usedLeave = 1)
-			OR @usedLeave IS NULL 
+			--OR (lv.LeaveNo IS NULL AND @usedLeave = 0)
+			OR (@usedLeave IS NULL)
 		)
 END
 
@@ -140,7 +141,7 @@ PARAMETERS:
 	@usedLeave		BIT = NULL
 
 	EXEC kenuser.Pr_GetPlannedLeaveRequest
-	EXEC kenuser.Pr_GetPlannedLeaveRequest NULL, NULL, '', '', NULL, NULL, 0
+	EXEC kenuser.Pr_GetPlannedLeaveRequest NULL, NULL, '', '', NULL, NULL, NULL
 	EXEC kenuser.Pr_GetPlannedLeaveRequest 1
 	EXEC kenuser.Pr_GetPlannedLeaveRequest 0, 10003632 
 	EXEC kenuser.Pr_GetPlannedLeaveRequest 0, 0, '7600'

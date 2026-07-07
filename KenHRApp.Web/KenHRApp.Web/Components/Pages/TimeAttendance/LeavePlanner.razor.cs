@@ -501,7 +501,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     break;
 
                 case "LeavePlannerInq":
-                    Navigation.NavigateTo($"/TimeAttendance/LeavePlannerInq?ForceLoad={_forceLoad}");
+                    Navigation.NavigateTo("/TimeAttendance/LeavePlannerInq?ForceLoad=true");
                     break;
 
                 case "ApprovalDashboard":

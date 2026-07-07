@@ -72,6 +72,10 @@ DECLARE @leaveNo BIGINT = 18
 	SET LeaveApprovalFlag = 'A'
 	WHERE LeaveRequestId = 9
 
+	UPDATE kenuser.LeaveRequisitionWF
+	SET LeavePlannedNo = 1
+	WHERE LeaveRequestId = 12
+
 	COMMIT TRAN T1
 
 */

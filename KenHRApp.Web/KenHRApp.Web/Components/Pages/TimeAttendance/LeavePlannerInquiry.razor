@@ -181,7 +181,7 @@
             </MudPaper>
             
             <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
-                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">LEAVE REQUISITION LIST</MudText>
+                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">REQUISITION LIST</MudText>
                 <MudSpacer />
                 <MudMenu Dense Variant="Variant.Text" hidden Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
                      <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply New Leave" OnClick="ApplyLeave" />
@@ -218,8 +218,8 @@
                         </MudPaper>
                     </ToolBarContent>
                     <Columns>
-                         <PropertyColumn Property="x => x.PlannedLeaveId" Title="Leave Request No." Class="col-LeaveRequestId"
-                                         StickyLeft="true" Editable="false">
+                         <PropertyColumn Property="x => x.PlannedLeaveId" Title="Planned Leave No." Class="col-LeaveRequestId"
+                            StickyLeft="true" Editable="false">
                             <CellTemplate Context="row">
                                 <MudChip T="long" 
                                     Size=Size.Small
@@ -227,7 +227,7 @@
                                     Label="true" 
                                     Class="fw-bold" 
                                     Style="font-size: 14px;"
-                                    OnClick="@(()=>OpenLeaveRequest(row.Item))">
+                                    OnClick="@(()=>OpenLeavePlanner(row.Item))">
                                     @row.Item.PlannedLeaveId
                                 </MudChip>
                             </CellTemplate>
@@ -252,7 +252,7 @@
                                 @context.Item.LeaveStartDate!.Value.ToString("dd-MMM-yyyy"))
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.StartDayModeDesc" Title="Start Day Mode" Class="col-StartDayModeDesc" Editable="false">
+                        <PropertyColumn Property="x => x.StartDayModeDesc" Title="Start Day Mode" Class="col-StartDayModeDesc" Editable="false" hidden>
                             <CellTemplate>
                                 @context.Item.StartDayModeDesc
                             </CellTemplate>
@@ -262,9 +262,23 @@
                                 @context.Item.LeaveResumeDate!.Value.ToString("dd-MMM-yyyy")
                             </CellTemplate>
                         </PropertyColumn>
-                        <PropertyColumn Property="x => x.EndDayModeDesc" Title="Resume Day Mode" Class="col-EndDayModeDesc" Editable="false">
+                        <PropertyColumn Property="x => x.EndDayModeDesc" Title="Resume Day Mode" Class="col-EndDayModeDesc" Editable="false" hidden>
                             <CellTemplate>
                                 @context.Item.EndDayModeDesc
+                            </CellTemplate>
+                        </PropertyColumn>
+                        <PropertyColumn Property="x => x.LeaveNo" Title="Annual Leave No." Class="col-LeaveRequestId" Editable="false">
+                            <CellTemplate Context="row">
+                                <MudChip T="long"
+                                    Size=Size.Small
+                                    Color="Color.Secondary"
+                                    Href="@($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={row.Item.LeaveNo}&CallerForm=LeavePlannerInq")"
+                                    Rel="nofollow"
+                                    Icon="@Icons.Material.Filled.CardTravel"
+                                    hidden="@(row.Item.LeaveNo > 0 ? false : true)"
+                                    Variant="Variant.Filled">
+                                    @row.Item.LeaveNo
+                                </MudChip>
                             </CellTemplate>
                         </PropertyColumn>
                         <PropertyColumn Property="x => x.LeaveDuration" Title="Duration" Class="col-LeaveDuration" Editable="false">
@@ -295,15 +309,14 @@
                                 </MudChip>
                             </CellTemplate>
                         </PropertyColumn>
-                        <TemplateColumn Class="flex-column" Title="Action">
+                        <TemplateColumn CellClass="text-center align-middle" Title="Action">
                             <CellTemplate Context="row">
-                                <MudIconButton title="View details"
+                                <MudIconButton Color="Color.Surface"
+                                               title="View request details"
                                                Class="show-btn fa-icon-btn"
-                                               Color="Color.Surface"
-                                               OnClick="@row.Actions.StartEditingItemAsync">
-                                    <ChildContent>
-                                        <i class="fas fa-eye fa-1x"></i>
-                                    </ChildContent>
+                                               Size="Size.Small"
+                                               Icon="fas fa-eye"
+                                               OnClick="@(()=>OpenLeavePlanner(row.Item))">
                                 </MudIconButton>
                             </CellTemplate>
                         </TemplateColumn>

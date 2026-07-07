@@ -11,7 +11,6 @@ DECLARE @leaveNo BIGINT = 1
 			where x.UDCGCode = 'STATUS'
 				AND y.UDCCode = a.StatusCode
 		) b
-
 	WHERE a.PlannedLeaveId = @leaveNo
 
 /*	Analyse data
@@ -37,6 +36,10 @@ DECLARE @leaveNo BIGINT = 1
 	UPDATE kenuser.PlannedLeaveRequest
 	SET LeaveApprovalFlag = 'A'
 	WHERE LeaveRequestId = 9
+
+	UPDATE kenuser.PlannedLeaveRequest
+	SET LeaveNo = 12
+	WHERE PlannedLeaveId = 1
 
 	COMMIT TRAN T1
 

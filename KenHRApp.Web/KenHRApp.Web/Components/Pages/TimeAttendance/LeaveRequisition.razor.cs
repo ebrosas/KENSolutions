@@ -613,6 +613,10 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     Navigation.NavigateTo("/Workflow/ApprovalDashboard?RequestType=RTYPEREGULAR");
                     break;
 
+                case "LeavePlannerInq":
+                    Navigation.NavigateTo("/TimeAttendance/LeavePlannerInq?ForceLoad=true");
+                    break;
+
                 default:
                     Navigation.NavigateTo("/TimeAttendance/tnadashboard");
                     break;

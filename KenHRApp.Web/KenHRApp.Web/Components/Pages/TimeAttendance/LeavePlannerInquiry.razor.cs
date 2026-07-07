@@ -345,9 +345,14 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             Navigation.NavigateTo("/TimeAttendance/LeavePlanner?ActionType=Add&CallerForm=LeavePlannerInq");
         }
 
+        public void OpenLeavePlanner(PlannedLeaveResultDTO item)
+        {
+            Navigation.NavigateTo($"/TimeAttendance/LeavePlanner?ActionType=View&LeaveRequestNo={item.PlannedLeaveId}&CallerForm=LeavePlannerInq");
+        }
+
         public void OpenLeaveRequest(PlannedLeaveResultDTO item)
         {
-            Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.PlannedLeaveId}&CallerForm=LeaveInquiry");
+            Navigation.NavigateTo($"/TimeAttendance/leaverequest?ActionType=View&LeaveRequestNo={item.LeaveNo}&CallerForm=LeavePlannerInq");
         }
 
         private async Task<IEnumerable<string>> SearchLeaveStatus(string value, CancellationToken token)
