@@ -159,6 +159,9 @@ namespace KenHRApp.Application.DTOs
         public int? ApproverNo { get; set; }
         public string? ApproverName { get; set; } = null;
 
+        [Display(Name = "Planned Leave?")]
+        public bool? IsPlannedLeave { get; set; } = null;
+
         public List<LeaveAttachmentDTO> Files { get; set; } = new();
         #endregion
 
