@@ -118,6 +118,11 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "varchar(20)")]
         public string? EndDayMode { get; set; } = null;
+
+        public int? SubstituteNo { get; set; }
+
+        [Column(TypeName = "varchar(100)")]
+        public string? SubstituteName { get; set; } = null;
         #endregion
 
         #region Unmapped Properties

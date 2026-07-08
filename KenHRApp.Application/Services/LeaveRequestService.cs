@@ -453,7 +453,7 @@ namespace KenHRApp.Application.Services
                         NoOfHolidays = model.NoOfHolidays,
                         NoOfWeekends = model.NoOfWeekends,
                         PlannedLeave = model.PlannedLeave,
-                        LeavePlannedNo = model.LeavePlannedNo,
+                        LeavePlannedNo = model.LeavePlannedNo.HasValue ? Convert.ToInt32(model.LeavePlannedNo) : 0,
                         HalfDayLeaveFlag = model.HalfDayLeaveFlag,
                         LeaveCreatedDate = model.LeaveCreatedDate,
                         LeaveCreatedBy = model.LeaveCreatedBy,
@@ -472,8 +472,10 @@ namespace KenHRApp.Application.Services
                         CreatedByName = model.CreatedByName,
                         ApproverNo = model.ApproverNo,
                         ApproverName = model.ApproverName,
+                        SubstituteNo = model.SubstituteNo.HasValue ? Convert.ToInt32(model.SubstituteNo) : 0,
+                        SubstituteName = model.SubstituteName,
 
-                    Files = model.AttachmentList!.Select(e => new LeaveAttachmentDTO
+                        Files = model.AttachmentList!.Select(e => new LeaveAttachmentDTO
                         {
                             Id = e.Id,
                             LeaveAttachmentId = e.LeaveAttachmentId,

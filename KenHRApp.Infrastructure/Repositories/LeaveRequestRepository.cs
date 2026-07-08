@@ -429,6 +429,8 @@ namespace KenHRApp.Infrastructure.Repositories
                     leaveRequest.CreatedByName = model[0].CreatedByName;
                     leaveRequest.ApproverNo = model[0].ApproverNo;
                     leaveRequest.ApproverName = model[0].ApproverName;
+                    leaveRequest.SubstituteNo = model[0].ApproverNo;
+                    leaveRequest.SubstituteName = model[0].ApproverName;
 
                     #region Get the file attachments
                     List<LeaveAttachment> attachments = new();

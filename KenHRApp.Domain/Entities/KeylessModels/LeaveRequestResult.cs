@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -57,6 +58,8 @@ namespace KenHRApp.Domain.Entities.KeylessModels
         public string? DepartmentName { get; set; } = null;
         public int? ApproverNo { get; set; }
         public string? ApproverName { get; set; } = null;
+        public int? SubstituteNo { get; set; }
+        public string? SubstituteName { get; set; } = null;
         public List<LeaveAttachment> AttachmentList { get; set; } = new();
         #endregion
     }

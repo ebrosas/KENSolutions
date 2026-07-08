@@ -364,8 +364,8 @@
                             </MudPaper>
                             <MudPaper Elevation="0" Class="p-0 w-100">
                                 <MudSelect T="int"
-                                           Value="_leaveRequest.LeaveEmpNo"
-                                           ValueChanged="@((v) => OnEmployeeChanged(v))"
+                                           Value="_leaveRequest.LeavePlannedNo"
+                                           ValueChanged="@((v) => OnPlannedLeaveChanged(v))"
                                            Disabled="@_isDisabled"
                                            Label="Select Planned Leave"
                                            Variant="Variant.Text"
@@ -439,8 +439,8 @@
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="ps-3 w-100">
                             <MudSelect T="int"
-                                        Value="_leaveRequest.LeaveEmpNo"
-                                        ValueChanged="@((v) => OnEmployeeChanged(v))"
+                                       Value="_leaveRequest.SubstituteNo"
+                                        ValueChanged="@((v) => OnSubstituteChanged(v))"
                                         Disabled="@_isDisabled"
                                         Label="Select Substitute"
                                         Variant="Variant.Text"

@@ -112,7 +112,7 @@ namespace KenHRApp.Application.DTOs
         [Display(Name = "Planned Leave")]
         public char? PlannedLeave { get; set; }
 
-        public int? LeavePlannedNo { get; set; }
+        public int LeavePlannedNo { get; set; }
 
         [Display(Name = "Half Day Flag")]
         public char? HalfDayLeaveFlag { get; set; }
@@ -158,9 +158,9 @@ namespace KenHRApp.Application.DTOs
 
         public int? ApproverNo { get; set; }
         public string? ApproverName { get; set; } = null;
-
-        [Display(Name = "Planned Leave?")]
-        public bool? IsPlannedLeave { get; set; } = null;
+                
+        public int SubstituteNo { get; set; }
+        public string? SubstituteName { get; set; } = null;
 
         public List<LeaveAttachmentDTO> Files { get; set; } = new();
         #endregion
@@ -195,6 +195,16 @@ namespace KenHRApp.Application.DTOs
                 }
                 else
                     return $"{StatusHandlingCode} - {StatusDesc}";
+            }
+            set { }
+        }
+
+        [Display(Name = "Planned Leave?")]
+        public bool IsPlannedLeave
+        {
+            get
+            {
+                return PlannedLeave == 'Y' ? true : false;  
             }
             set { }
         }

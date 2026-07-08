@@ -983,6 +983,45 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
+        private void OnSubstituteChanged(int newValue)
+        {
+            if (_leaveRequest.SubstituteNo != newValue)
+            {
+                _leaveRequest.SubstituteNo = newValue;
+
+                // Get the employee details
+                if (_employeeList.Any())
+                {
+                    EmployeeResultDTO? employee = _employeeList.Where(e => e.EmployeeNo == newValue).FirstOrDefault();
+                    if (employee != null)
+                    {
+                        _leaveRequest.SubstituteName = employee.EmployeeFullName;
+                    }
+                }
+            }
+        }
+
+        private void OnPlannedLeaveChanged(int newValue)
+        {
+            if (_leaveRequest.LeavePlannedNo != newValue)
+            {
+                _leaveRequest.LeavePlannedNo = newValue;
+
+                // Get the employee details
+                //if (_employeeList.Any())
+                //{
+                //    EmployeeResultDTO? employee = _employeeList.Where(e => e.EmployeeNo == newValue).FirstOrDefault();
+                //    if (employee != null)
+                //    {
+                //        _leaveRequest.LeaveEmpName = employee.EmployeeFullName;
+                //        _leaveRequest.LeaveEmpCostCenter = employee.DepartmentCode;
+                //        _leaveRequest.LeaveEmpEmail = employee.EmpEmail;
+                //        _leaveRequest.LeaveBalance = employee.LeaveBalance.HasValue ? Convert.ToDouble(employee.LeaveBalance) : 0;
+                //    }
+                //}
+            }
+        }
+
         private void OnLeaveTypeChanged(string newValue)
         {
             if (_leaveRequest.LeaveType != newValue)
