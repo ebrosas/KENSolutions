@@ -110,6 +110,8 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
 
         private List<UserDefinedCodeDTO> _leaveStatusList = new();
         private List<WorkflowDetailResultDTO> _workflowList = new List<WorkflowDetailResultDTO>();
+
+        private List<PlannedLeaveResultDTO> _leavePlannerList = new List<PlannedLeaveResultDTO>();
         #endregion
 
         #region Constants
@@ -279,9 +281,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                     // Initialize the Leave Request object
                     _leaveRequest.LeaveCreatedBy = UserEmpNo;
                     _leaveRequest.LeaveCreatedEmail = UserEmail;
-                    _leaveRequest.LeaveCreatedUserID = UserName;
-
-                    //BeginLoadComboboxTask();
+                    _leaveRequest.LeaveCreatedUserID = UserName;                                       
 
                     if (ActionType == ActionTypes.Edit.ToString() ||
                         ActionType == ActionTypes.View.ToString() ||
@@ -386,8 +386,11 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             }
                             #endregion
 
-                            // Load regularization details
-                            await GetLeaveRequestDetail(LeaveRequestNo);
+                            // Get planned leaves
+                            //GetPlannedLeave();
+
+                            // Load leave request details
+                            await GetLeaveRequestDetail(LeaveRequestNo);                                                        
 
                             #region Get the workflow data
                             var wfRepo = await WorkflowService.GetWorkflowStatusAsync(WorkflowHelper.CONST_LEAVE_REQUEST, LeaveRequestNo);
@@ -962,7 +965,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private void OnEmployeeChanged(int newValue)
+        private async Task OnEmployeeChanged(int newValue)
         {
             if (_leaveRequest.LeaveEmpNo != newValue)
             {
@@ -978,6 +981,12 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                         _leaveRequest.LeaveEmpCostCenter = employee.DepartmentCode;
                         _leaveRequest.LeaveEmpEmail = employee.EmpEmail;
                         _leaveRequest.LeaveBalance = employee.LeaveBalance.HasValue ? Convert.ToDouble(employee.LeaveBalance) : 0;
+
+                        // Remove the selected planned leave
+                        _leaveRequest.LeavePlannedNo = null;
+
+                        // Reload the leave planner combobox
+                        await GetPlannedLeave(newValue);
                     }
                 }
             }
@@ -1001,24 +1010,30 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private void OnPlannedLeaveChanged(int newValue)
+        private void OnPlannedLeaveChanged(long newValue)
         {
             if (_leaveRequest.LeavePlannedNo != newValue)
             {
-                _leaveRequest.LeavePlannedNo = newValue;
+                _leaveRequest.LeavePlannedNo = Convert.ToInt32(newValue);
+            }
+        }
 
-                // Get the employee details
-                //if (_employeeList.Any())
-                //{
-                //    EmployeeResultDTO? employee = _employeeList.Where(e => e.EmployeeNo == newValue).FirstOrDefault();
-                //    if (employee != null)
-                //    {
-                //        _leaveRequest.LeaveEmpName = employee.EmployeeFullName;
-                //        _leaveRequest.LeaveEmpCostCenter = employee.DepartmentCode;
-                //        _leaveRequest.LeaveEmpEmail = employee.EmpEmail;
-                //        _leaveRequest.LeaveBalance = employee.LeaveBalance.HasValue ? Convert.ToDouble(employee.LeaveBalance) : 0;
-                //    }
-                //}
+        private void OnPlannedLeaveFlagChanged(bool? newValue)
+        {
+            if (_leaveRequest.IsPlannedLeave != newValue)
+            {
+                _leaveRequest.PlannedLeave = newValue switch
+                {
+                    true => 'Y',
+                    false => 'N',
+                    _ => null
+                };
+
+                if (_leaveRequest.PlannedLeave != 'Y')
+                {
+                    // Remove the selected planned leave
+                    _leaveRequest.LeavePlannedNo = null;
+                }
             }
         }
 
@@ -1244,6 +1259,9 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                         _leaveStatusList = udcData!.Where(a => a.GroupID == groupID).ToList();
                     }
                     #endregion
+
+                    // Get planned leaves
+                    await GetPlannedLeave(UserEmpNo);
                 }
             }
 
@@ -1669,6 +1687,32 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             //    // Hide the spinner overlay
             //    await callback.Invoke();
             //}
+        }
+
+        private async Task GetPlannedLeave(int empNo)
+        {
+            // Reset error messages
+            _errorMessage.Clear();
+
+            var repoResult = await LeaveService.SearchPlannedLeaveAsync(
+                0,
+                empNo, 
+                string.Empty,
+                string.Empty, 
+                new DateTime(DateTime.Now.Year, 1, 1),
+                new DateTime(DateTime.Now.Year, 12, 31),
+                false);
+            if (repoResult.Success)
+            {
+                _leavePlannerList = repoResult.Value!;
+            }
+            else
+            {
+                // Show error message
+                _errorMessage.AppendLine(repoResult.Error);
+
+                ShowHideError(true);
+            }
         }
         #endregion
 

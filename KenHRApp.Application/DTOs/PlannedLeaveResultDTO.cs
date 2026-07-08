@@ -98,5 +98,19 @@ namespace KenHRApp.Application.DTOs
         public string? LastUpdatedUserID { get; set; } = null;
         public string? LastUpdatedEmail { get; set; } = null;
         #endregion
+
+        #region Extended Properties
+        public string LeavePlannerDetail
+        {
+            get
+            {
+                if (LeaveStartDate.HasValue && LeaveResumeDate.HasValue)
+                    return $"Requistion No. {PlannedLeaveId} ({LeaveStartDate!.Value.ToString("dd-MMM-yyyy")} - {LeaveResumeDate!.Value.ToString("dd-MMM-yyyy")})";
+                else
+                    return $"Requistion No. {PlannedLeaveId}";
+            }
+            set { }
+        }
+        #endregion
     }
 }

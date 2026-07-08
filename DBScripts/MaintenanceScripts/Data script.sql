@@ -1,6 +1,6 @@
 
 	--Check all EF migrations
-	SELECT * FROM [dbo].[__EFMigrationsHistory]
+	SELECT * FROM [dbo].[__EFMigrationsHistory] a
 
 	SELECT * FROM kenuser.UserDefinedCodeGroup a WITH (NOLOCK)
 	ORDER BY a.UDCGDesc1

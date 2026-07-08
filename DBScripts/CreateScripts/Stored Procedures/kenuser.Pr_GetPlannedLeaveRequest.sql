@@ -141,7 +141,12 @@ PARAMETERS:
 	@usedLeave		BIT = NULL
 
 	EXEC kenuser.Pr_GetPlannedLeaveRequest
-	EXEC kenuser.Pr_GetPlannedLeaveRequest NULL, NULL, '', '', NULL, NULL, NULL
+
+	EXEC kenuser.Pr_GetPlannedLeaveRequest NULL, 0, '', '', '01/01/2026', '12/31/2026', 0		--Get unused planned leave requests
+	EXEC kenuser.Pr_GetPlannedLeaveRequest NULL, 10003632, '', '', '01/01/2026', '12/31/2026', 0		--Get unused planned leave requests
+
+	EXEC kenuser.Pr_GetPlannedLeaveRequest NULL, NULL, '', '', NULL, NULL, 0		--Get unused planned leave requests
+	EXEC kenuser.Pr_GetPlannedLeaveRequest NULL, NULL, '', '', NULL, NULL, 1		--Get used planned leave requests
 	EXEC kenuser.Pr_GetPlannedLeaveRequest 1
 	EXEC kenuser.Pr_GetPlannedLeaveRequest 0, 10003632 
 	EXEC kenuser.Pr_GetPlannedLeaveRequest 0, 0, '7600'

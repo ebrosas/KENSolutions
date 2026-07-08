@@ -112,7 +112,7 @@ namespace KenHRApp.Application.DTOs
         [Display(Name = "Planned Leave")]
         public char? PlannedLeave { get; set; }
 
-        public int LeavePlannedNo { get; set; }
+        public long? LeavePlannedNo { get; set; }
 
         [Display(Name = "Half Day Flag")]
         public char? HalfDayLeaveFlag { get; set; }
@@ -200,13 +200,26 @@ namespace KenHRApp.Application.DTOs
         }
 
         [Display(Name = "Planned Leave?")]
-        public bool IsPlannedLeave
+        public bool? IsPlannedLeave
         {
             get
             {
-                return PlannedLeave == 'Y' ? true : false;  
+                return PlannedLeave switch
+                {
+                    'Y' => true,
+                    'N' => false,
+                    _ => null
+                };
             }
-            set { }
+            set
+            {
+                PlannedLeave = value switch
+                {
+                    true => 'Y',
+                    false => 'N',
+                    null => null
+                };
+            }
         }
         #endregion
     }
