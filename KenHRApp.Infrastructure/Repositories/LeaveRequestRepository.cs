@@ -429,8 +429,8 @@ namespace KenHRApp.Infrastructure.Repositories
                     leaveRequest.CreatedByName = model[0].CreatedByName;
                     leaveRequest.ApproverNo = model[0].ApproverNo;
                     leaveRequest.ApproverName = model[0].ApproverName;
-                    leaveRequest.SubstituteNo = model[0].ApproverNo;
-                    leaveRequest.SubstituteName = model[0].ApproverName;
+                    leaveRequest.SubstituteNo = model[0].SubstituteNo;
+                    leaveRequest.SubstituteName = model[0].SubstituteName;
 
                     #region Get the file attachments
                     List<LeaveAttachment> attachments = new();
@@ -541,7 +541,9 @@ namespace KenHRApp.Infrastructure.Repositories
                         DepartmentCode = e.DepartmentCode,
                         DepartmentName = e.DepartmentName,
                         ApproverNo = e.ApproverNo,
-                        ApproverName = e.ApproverName
+                        ApproverName = e.ApproverName,
+                        SubstituteNo = e.SubstituteNo,
+                        SubstituteName = e.SubstituteName
                     }).ToList();
 
                     if (leaveRequestList.Any())

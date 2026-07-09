@@ -1693,6 +1693,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
         {
             // Reset error messages
             _errorMessage.Clear();
+            _leavePlannerList = new();
 
             var repoResult = await LeaveService.SearchPlannedLeaveAsync(
                 0,
@@ -1704,7 +1705,18 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                 false);
             if (repoResult.Success)
             {
-                _leavePlannerList = repoResult.Value!;
+                List<PlannedLeaveResultDTO> model = repoResult.Value!;
+                if (model != null && model.Any())
+                {
+                    model.Add(new PlannedLeaveResultDTO()
+                    {
+                        PlannedLeaveId = -1,
+                        IsDummy = true,
+                        Remarks = "None"
+                    });
+
+                    _leavePlannerList = model.OrderBy(a => a.PlannedLeaveId).ToList();
+                }
             }
             else
             {

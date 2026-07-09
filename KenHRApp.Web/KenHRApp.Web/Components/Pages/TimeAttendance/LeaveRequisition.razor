@@ -362,7 +362,7 @@
                                         LabelPlacement="Placement.Start">No/Yes</MudSwitch> *@
                                     <MudSwitch T="bool?"
                                         Value="_leaveRequest.IsPlannedLeave"
-                                               ValueChanged="OnPlannedLeaveFlagChanged"
+                                        ValueChanged="OnPlannedLeaveFlagChanged"
                                         Color="Color.Info" 
                                         UncheckedColor="Color.Default"
                                         Disabled="@_isDisabled"
@@ -466,19 +466,19 @@
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="ps-3 w-100">
                             <MudSelect T="int"
-                                       Value="_leaveRequest.SubstituteNo"
-                                        ValueChanged="@((v) => OnSubstituteChanged(v))"
-                                        Disabled="@_isDisabled"
-                                        Label="Select Substitute"
-                                        Variant="Variant.Text"
-                                        Margin="Margin.Dense"
-                                        Placeholder="Please Select"
-                                        AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
-                                        AdornmentColor="Color.Default"
-                                        HelperText="Type a key to search for value"
-                                        HelperTextOnFocus="true"
-                                        Immediate="true"
-                                        Typo="Typo.subtitle2">
+                                    Value="_leaveRequest.SubstituteNo"
+                                    ValueChanged="@((v) => OnSubstituteChanged(v))"
+                                    Disabled="@_isDisabled"
+                                    Label="Select Substitute"
+                                    Variant="Variant.Text"
+                                    Margin="Margin.Dense"
+                                    Placeholder="Please Select"
+                                    AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                    AdornmentColor="Color.Default"
+                                    HelperText="Type a key to search for value"
+                                    HelperTextOnFocus="true"
+                                    Immediate="true"
+                                    Typo="Typo.subtitle2">
                                 @foreach (var emp in _employeeList!)
                                 {
                                     <MudSelectItem Value="emp.EmployeeNo">@emp.EmployeeNameWithCode</MudSelectItem>

@@ -7,6 +7,7 @@
 *	Date			Author		Rev. #		Comments:
 *	22/03/2026		Ervin		1.0			Created
 *	22/06/2026		Ervin		1.1			Returned the current approver emp. no and name
+*	09/07/2026		Ervin		1.2			Added "SubstituteNo" and "SubstituteName" fields
 ******************************************************************************************************************************************************************************/
 
 ALTER PROCEDURE kenuser.Pr_GetLeaveRequestDetail
@@ -88,15 +89,15 @@ BEGIN
 			sdm.StartDayModeDesc,
 			a.EndDayMode,
 			edm.EndDayModeDesc,
-			--RTRIM(b.UDCDesc1) as StatusDesc,
-			--RTRIM(c.UDCDesc1) as ApprovalFlagDesc,
 			b.StatusDesc,
 			c.ApprovalFlagDesc,
 			RTRIM(d.FirstName) + ' ' + RTRIM(d.MiddleName) + ' ' + RTRIM(d.LastName) AS CreatedByName,
 			emp.DepartmentCode,
 			dep.DepartmentName,
 			wf.ApproverNo,			--Rev. #1.1
-			wf.ApproverName			--Rev. #1.1
+			wf.ApproverName,		
+			a.SubstituteNo,			--Rev. #1.2
+			a.SubstituteName
 	FROM kenuser.LeaveRequisitionWF a WITH (NOLOCK)
 		INNER JOIN kenuser.Employee emp WITH (NOLOCK) ON a.LeaveEmpNo = emp.EmployeeNo
 		INNER JOIN kenuser.DepartmentMaster dep WITH (NOLOCK) ON RTRIM(emp.DepartmentCode) = RTRIM(dep.DepartmentCode)

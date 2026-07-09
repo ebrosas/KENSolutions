@@ -100,14 +100,21 @@ namespace KenHRApp.Application.DTOs
         #endregion
 
         #region Extended Properties
+        public bool IsDummy { get; set; }
+
         public string LeavePlannerDetail
         {
             get
             {
-                if (LeaveStartDate.HasValue && LeaveResumeDate.HasValue)
-                    return $"Requistion No. {PlannedLeaveId} ({LeaveStartDate!.Value.ToString("dd-MMM-yyyy")} - {LeaveResumeDate!.Value.ToString("dd-MMM-yyyy")})";
+                if (!IsDummy)
+                {
+                    if (LeaveStartDate.HasValue && LeaveResumeDate.HasValue)
+                        return $"Requistion No. {PlannedLeaveId} ({LeaveStartDate!.Value.ToString("dd-MMM-yyyy")} - {LeaveResumeDate!.Value.ToString("dd-MMM-yyyy")})";
+                    else
+                        return $"Requistion No. {PlannedLeaveId}";
+                }
                 else
-                    return $"Requistion No. {PlannedLeaveId}";
+                    return "";
             }
             set { }
         }

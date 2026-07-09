@@ -567,6 +567,8 @@ namespace KenHRApp.Application.Services
                         DepartmentName = e.DepartmentName,
                         ApproverNo = e.ApproverNo,
                         ApproverName = e.ApproverName,
+                        SubstituteNo = e.SubstituteNo.HasValue ? Convert.ToInt32(e.SubstituteNo) : 0,
+                        SubstituteName = e.SubstituteName,
                         AttachmentList = e.AttachmentList
                     }).ToList();
                 }

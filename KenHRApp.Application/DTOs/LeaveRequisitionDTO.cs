@@ -112,6 +112,7 @@ namespace KenHRApp.Application.DTOs
         [Display(Name = "Planned Leave")]
         public char? PlannedLeave { get; set; }
 
+        [CheckIfRequired("PlannedLeave")] // ✅ custom validation
         public long? LeavePlannedNo { get; set; }
 
         [Display(Name = "Half Day Flag")]
