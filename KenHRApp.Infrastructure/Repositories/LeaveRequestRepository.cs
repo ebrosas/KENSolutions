@@ -126,7 +126,11 @@ namespace KenHRApp.Infrastructure.Repositories
                     LeaveStatusCode = dto.LeaveStatusCode,
                     LeaveStatusID = dto.LeaveStatusID,
                     StatusHandlingCode = dto.StatusHandlingCode,
-                    LeaveApprovalFlag = dto.LeaveApprovalFlag
+                    LeaveApprovalFlag = dto.LeaveApprovalFlag,
+                    SubstituteNo = dto.SubstituteNo,
+                    SubstituteName = dto.SubstituteName,
+                    PlannedLeave = dto.PlannedLeave,
+                    LeavePlannedNo = dto.LeavePlannedNo
                 };
                 #endregion
 
@@ -201,6 +205,10 @@ namespace KenHRApp.Infrastructure.Repositories
                 existing.LeaveUpdatedUserID = leaveRequest.LeaveUpdatedUserID;
                 existing.LeaveUpdatedEmail = leaveRequest.LeaveUpdatedEmail;
                 existing.LeaveUpdatedDate = leaveRequest.LeaveUpdatedDate;
+                existing.SubstituteNo = leaveRequest.SubstituteNo;
+                existing.SubstituteName = leaveRequest.SubstituteName;
+                existing.PlannedLeave = leaveRequest.PlannedLeave;
+                existing.LeavePlannedNo = leaveRequest.LeavePlannedNo;
                 #endregion
 
                 rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
@@ -391,6 +399,7 @@ namespace KenHRApp.Infrastructure.Repositories
                     leaveRequest.WorkflowId = model[0].WorkflowId;
                     leaveRequest.LeaveInstanceID = model[0].LeaveInstanceID;
                     leaveRequest.LeaveType = model[0].LeaveType;
+                    leaveRequest.LeaveTypeDesc = model[0].LeaveTypeDesc;
                     leaveRequest.LeaveEmpNo = model[0].LeaveEmpNo;
                     leaveRequest.LeaveEmpName = model[0].LeaveEmpName;
                     leaveRequest.LeaveEmpEmail = model[0].LeaveEmpEmail;

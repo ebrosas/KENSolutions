@@ -66,7 +66,7 @@ namespace KenHRApp.Application.Services
         {
             try
             {
-                #region Create "LeaveRequisitionWF" entity from DTO
+                #region Create "LeaveRequisitionWF" entity from DTO                
                 LeaveRequisitionWF leaveRequest = new LeaveRequisitionWF()
                 {
                     LeaveType = dto.LeaveType,
@@ -93,7 +93,11 @@ namespace KenHRApp.Application.Services
                     LeaveStatusCode = dto.LeaveStatusCode,
                     LeaveStatusID = dto.LeaveStatusID,
                     StatusHandlingCode = dto.StatusHandlingCode,
-                    LeaveApprovalFlag = dto.LeaveApprovalFlag
+                    LeaveApprovalFlag = dto.LeaveApprovalFlag,
+                    SubstituteNo = dto.SubstituteNo,
+                    SubstituteName = dto.SubstituteName,
+                    PlannedLeave = dto.PlannedLeave,
+                    LeavePlannedNo = dto.LeavePlannedNo.HasValue ? Convert.ToInt32(dto.LeavePlannedNo) : null
                 };
                 #endregion
 
@@ -380,7 +384,7 @@ namespace KenHRApp.Application.Services
                 _holidayCount = 0;
                 _weekendCount = 0;
 
-                for (var date = start; date <= end; date = date.AddDays(1))
+                for (var date = start; date < end; date = date.AddDays(1))
                 {
                     if (await _repository.IsDayOffAsync(empNo, date))
                     {
@@ -434,6 +438,7 @@ namespace KenHRApp.Application.Services
                         WorkflowId = model.WorkflowId,
                         LeaveInstanceID = model.LeaveInstanceID,
                         LeaveType = model.LeaveType,
+                        LeaveTypeDesc = model.LeaveTypeDesc!,
                         LeaveEmpNo = model.LeaveEmpNo,
                         LeaveEmpName = model.LeaveEmpName,
                         LeaveEmpEmail = model.LeaveEmpEmail,

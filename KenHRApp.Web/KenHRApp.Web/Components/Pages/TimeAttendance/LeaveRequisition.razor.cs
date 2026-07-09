@@ -292,7 +292,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             #region Load request details and workflow
 
                             #region Get employee list
-                            var repoResult = await LookupCache.GetEmployeeAsync();
+                            var repoResult = await LookupCache.GetEmployeeAsync(true);
                             if (repoResult.Success)
                             {
                                 _employeeList = repoResult.Value!;
@@ -387,7 +387,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
                             #endregion
 
                             // Get planned leaves
-                            //GetPlannedLeave();
+                            await GetPlannedLeave(0);
 
                             // Load leave request details
                             await GetLeaveRequestDetail(LeaveRequestNo);                                                        
@@ -1010,11 +1010,29 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             }
         }
 
-        private void OnPlannedLeaveChanged(long newValue)
+        private void OnPlannedLeaveChanged(long? newValue)
         {
             if (_leaveRequest.LeavePlannedNo != newValue)
             {
-                _leaveRequest.LeavePlannedNo = Convert.ToInt32(newValue);
+                #region Get the selected leave planner
+                if (_leavePlannerList != null 
+                    && _leavePlannerList.Any())
+                {
+                    PlannedLeaveResultDTO selectedLeave = _leavePlannerList
+                        .Where(a => a.PlannedLeaveId == newValue)
+                        .FirstOrDefault();
+                    if (selectedLeave != null)
+                    {
+                        _leaveRequest.LeavePlannedNo = Convert.ToInt32(selectedLeave.PlannedLeaveId);
+                        _leaveRequest.LeaveStartDate = selectedLeave.LeaveStartDate;
+                        _leaveRequest.StartDayMode = selectedLeave.StartDayMode;
+                        _leaveRequest.LeaveResumeDate = selectedLeave.LeaveResumeDate;
+                        _leaveRequest.EndDayMode = selectedLeave.EndDayMode;
+                    }
+                }
+                #endregion
+
+                //_leaveRequest.LeavePlannedNo = Convert.ToInt32(newValue);
             }
         }
 

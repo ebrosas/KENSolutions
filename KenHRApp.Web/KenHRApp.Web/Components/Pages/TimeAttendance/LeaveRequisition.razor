@@ -307,20 +307,81 @@
                     <MudItem xs="6">
                         <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Class="mud-width-full"
                             StretchItems="StretchItems.None" Breakpoint="Breakpoint.Xs">
-                            <MudPaper Elevation="0" Class="w-100">
+                            <MudPaper Elevation="0">
+                                <MudText Typo="Typo.caption" Align="Align.Start" Style="color: #004165;">Planned Leave?</MudText>
+                                <MudPaper Elevation="0" Class="p-0 d-flex justify-content-start" Style="overflow:visible; width:120px;">
+                                    <MudSwitch T="bool?"
+                                        Value="_leaveRequest.IsPlannedLeave"
+                                        ValueChanged="OnPlannedLeaveFlagChanged"
+                                        Color="Color.Info"  
+                                        UncheckedColor="Color.Default"
+                                        Disabled="@_isDisabled"  
+                                        Label="@(_leaveRequest.IsPlannedLeave == true ? "Yes" : "No")"
+                                        LabelPlacement="Placement.End" />
+                                </MudPaper>
+                            </MudPaper>
+                            <MudPaper Elevation="0" Class="pe-3 w-100">
+                                <MudSelect T="long?"
+                                    Value="_leaveRequest.LeavePlannedNo"
+                                    ValueChanged="@((v) => OnPlannedLeaveChanged(v))"
+                                           Disabled="@(!(_leaveRequest.IsPlannedLeave ?? false) || _isDisabled)"
+                                    Label="Select Planned Leave"
+                                    Variant="Variant.Text"
+                                    Margin="Margin.Dense"
+                                    Placeholder="Please Select"
+                                    AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                    AdornmentColor="Color.Default"
+                                    HelperText="Type a key to search for value"
+                                    HelperTextOnFocus="true"
+                                    Immediate="true"
+                                    Typo="Typo.subtitle2">
+                                   @foreach (var leave in _leavePlannerList ?? Enumerable.Empty<PlannedLeaveResultDTO>())
+                                    {
+                                        <MudSelectItem T="long?" Value="@leave.PlannedLeaveId">
+                                            @leave.LeavePlannerDetail
+                                        </MudSelectItem>
+                                    }
+                                </MudSelect>
+                                @* <MudSelect T="long?"
+                                           @bind-Value="_leaveRequest.LeavePlannedNo"
+                                           Disabled="@(!(_leaveRequest.IsPlannedLeave ?? false))"
+                                           Label="Select Planned Leave"
+                                           Variant="Variant.Text"
+                                           Margin="Margin.Dense"
+                                           Placeholder="Please Select"
+                                           AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                           AdornmentColor="Color.Default"
+                                           HelperText="Type a key to search for value"
+                                           HelperTextOnFocus="true"
+                                           Immediate="true"
+                                           Typo="Typo.subtitle2">
+                                    @foreach (var leave in _leavePlannerList ?? Enumerable.Empty<PlannedLeaveResultDTO>())
+                                    {
+                                        <MudSelectItem T="long?" Value="@leave.PlannedLeaveId">
+                                            @leave.LeavePlannerDetail
+                                        </MudSelectItem>
+                                    }
+                                </MudSelect> *@
+                            </MudPaper>
+                        </MudStack>                        
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Class="mud-width-full"
+                                  StretchItems="StretchItems.None" Breakpoint="Breakpoint.Xs">
+                            <MudPaper Elevation="0" Class="w-100 ps-3">
                                 <MudDatePicker Label="Start Date" Editable="true" AutoClose="true"
-                                        Class="required-field"
-                                        For="@(() => _leaveRequest.LeaveStartDate)"
-                                        Margin="Margin.Dense" 
-                                        HelperText="Specify start period of leave" HelperTextOnFocus="true" 
-                                        Clearable="false" Disabled="@_isDisabled" 
-                                        Color="Color.Surface"
-                                        Date="_leaveRequest.LeaveStartDate"
-                                        DateChanged="OnStartDateChanged"
-                                        Mask="@(new DateMask("dd/MM/yyyy"))" 
-                                        DateFormat="dd/MM/yyyy" 
-                                        Placeholder="dd/MM/yyyy" 
-                                        Variant="Variant.Text">
+                                               Class="required-field"
+                                               For="@(() => _leaveRequest.LeaveStartDate)"
+                                               Margin="Margin.Dense"
+                                               HelperText="Specify start period of leave" HelperTextOnFocus="true"
+                                               Clearable="false" Disabled="@_isDisabled"
+                                               Color="Color.Surface"
+                                               Date="_leaveRequest.LeaveStartDate"
+                                               DateChanged="OnStartDateChanged"
+                                               Mask="@(new DateMask("dd/MM/yyyy"))"
+                                               DateFormat="dd/MM/yyyy"
+                                               Placeholder="dd/MM/yyyy"
+                                               Variant="Variant.Text">
                                     <PickerActions Context="dateContext">
                                         <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = DateTime.Today))">Today</MudButton>
                                         <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveStartDate = null))">Clear</MudButton>
@@ -351,95 +412,57 @@
                             </MudPaper>
                         </MudStack>
                     </MudItem>
-                    <MudItem xs="6">
-                        <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Class="mud-width-full"
-                            StretchItems="StretchItems.None" Breakpoint="Breakpoint.Xs">
-                            <MudPaper Elevation="0" Class="ps-3">
-                                <MudText Typo="Typo.caption" Align="Align.Start" Style="color: #004165;">Planned Leave?</MudText>
-                                <MudPaper Elevation="0" Class="p-0 w-100 d-flex justify-content-start">
-                                    @* <MudSwitch @bind-Value="_leaveRequest.IsPlannedLeave" Color="Color.Info" UncheckedColor="Color.Default"
-                                        Disabled="@_isDisabled"
-                                        LabelPlacement="Placement.Start">No/Yes</MudSwitch> *@
-                                    <MudSwitch T="bool?"
-                                        Value="_leaveRequest.IsPlannedLeave"
-                                        ValueChanged="OnPlannedLeaveFlagChanged"
-                                        Color="Color.Info" 
-                                        UncheckedColor="Color.Default"
-                                        Disabled="@_isDisabled"
-                                        LabelPlacement="Placement.Start">No/Yes</MudSwitch>
-                                </MudPaper>
-                            </MudPaper>
-                            <MudPaper Elevation="0" Class="p-0 w-100">
-                                @* <MudSelect T="long?"
-                                           Value="_leaveRequest.LeavePlannedNo"
-                                           ValueChanged="@((v) => OnPlannedLeaveChanged(v))"
-                                           Disabled="@_isDisabled"
-                                           Label="Select Planned Leave"
-                                           Variant="Variant.Text"
-                                           Margin="Margin.Dense"
-                                           Placeholder="Please Select"
-                                           AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
-                                           AdornmentColor="Color.Default"
-                                           HelperText="Type a key to search for value"
-                                           HelperTextOnFocus="true"
-                                           Immediate="true"
-                                           Typo="Typo.subtitle2">
-                                    @foreach (var leave in _leavePlannerList!)
-                                    {
-                                        <MudSelectItem Value="leave.PlannedLeaveId">@leave.LeavePlannerDetail</MudSelectItem>
-                                    }
-                                </MudSelect> *@
-                                <MudSelect T="long?"
-                                           @bind-Value="_leaveRequest.LeavePlannedNo"
-                                           Disabled="@(!(_leaveRequest.IsPlannedLeave ?? false))"
-                                           Label="Select Planned Leave"
-                                           Variant="Variant.Text"
-                                           Margin="Margin.Dense"
-                                           Placeholder="Please Select"
-                                           AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
-                                           AdornmentColor="Color.Default"
-                                           HelperText="Type a key to search for value"
-                                           HelperTextOnFocus="true"
-                                           Immediate="true"
-                                           Typo="Typo.subtitle2">
-                                    @foreach (var leave in _leavePlannerList ?? Enumerable.Empty<PlannedLeaveResultDTO>())
-                                    {
-                                        <MudSelectItem T="long?" Value="@leave.PlannedLeaveId">
-                                            @leave.LeavePlannerDetail
-                                        </MudSelectItem>
-                                    }
-                                </MudSelect>
-                            </MudPaper>
-                        </MudStack>
-                    </MudItem>
                 </MudGrid>
 
                 <MudGrid Spacing="5">
                     <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="pe-3 w-100">
+                            <MudSelect T="int"
+                                    Value="_leaveRequest.SubstituteNo"
+                                    ValueChanged="@((v) => OnSubstituteChanged(v))"
+                                    Disabled="@_isDisabled"
+                                    Label="Select Substitute"
+                                    Variant="Variant.Text"
+                                    Margin="Margin.Dense"
+                                    Placeholder="Please Select"
+                                    AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
+                                    AdornmentColor="Color.Default"
+                                    HelperText="Type a key to search for value"
+                                    HelperTextOnFocus="true"
+                                    Immediate="true"
+                                    Typo="Typo.subtitle2">
+                                @foreach (var emp in _employeeList!)
+                                {
+                                    <MudSelectItem Value="emp.EmployeeNo">@emp.EmployeeNameWithCode</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudPaper>                                            
+                    </MudItem>
+                    <MudItem xs="6">
                         <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Class="mud-width-full"
                             StretchItems="StretchItems.None" Breakpoint="Breakpoint.Xs">
-                            <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudPaper Elevation="0" Class="ps-3 w-100">
                                 <MudDatePicker Label="Resume Date" Editable="true" AutoClose="true"
-                                        Class="required-field"
-                                        Date="_leaveRequest.LeaveResumeDate"
-                                        DateChanged="OnResumeDateChanged"
-                                        For="@(() => _leaveRequest.LeaveResumeDate)"
-                                        Margin="Margin.Dense"
-                                        HelperText="Specify resume date of work" HelperTextOnFocus="true"
-                                        Clearable="false" 
-                                        Disabled="@_isDisabled" 
-                                        Color="Color.Surface"
-                                        Mask="@(new DateMask("dd/MM/yyyy"))" 
-                                        DateFormat="dd/MM/yyyy" 
-                                        Placeholder="dd/MM/yyyy" 
-                                        Variant="Variant.Text">
+                                               Class="required-field"
+                                               Date="_leaveRequest.LeaveResumeDate"
+                                               DateChanged="OnResumeDateChanged"
+                                               For="@(() => _leaveRequest.LeaveResumeDate)"
+                                               Margin="Margin.Dense"
+                                               HelperText="Specify resume date of work" HelperTextOnFocus="true"
+                                               Clearable="false"
+                                               Disabled="@_isDisabled"
+                                               Color="Color.Surface"
+                                               Mask="@(new DateMask("dd/MM/yyyy"))"
+                                               DateFormat="dd/MM/yyyy"
+                                               Placeholder="dd/MM/yyyy"
+                                               Variant="Variant.Text">
                                     <PickerActions Context="dateContext">
                                         <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveResumeDate = DateTime.Today))">Today</MudButton>
                                         <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await this.InvokeAsync(() => _leaveRequest.LeaveResumeDate = null))">Clear</MudButton>
                                     </PickerActions>
                                 </MudDatePicker>
                             </MudPaper>
-                            <MudPaper Elevation="0" Class="pe-3 w-100">
+                            <MudPaper Elevation="0" Class="w-100">
                                 <MudSelect T="string"
                                            @ref="_endDayMode"
                                            Value="_leaveRequest.EndDayMode"
@@ -461,30 +484,7 @@
                                     }
                                 </MudSelect>
                             </MudPaper>
-                        </MudStack>                        
-                    </MudItem>
-                    <MudItem xs="6">
-                        <MudPaper Elevation="0" Class="ps-3 w-100">
-                            <MudSelect T="int"
-                                    Value="_leaveRequest.SubstituteNo"
-                                    ValueChanged="@((v) => OnSubstituteChanged(v))"
-                                    Disabled="@_isDisabled"
-                                    Label="Select Substitute"
-                                    Variant="Variant.Text"
-                                    Margin="Margin.Dense"
-                                    Placeholder="Please Select"
-                                    AdornmentIcon="@Icons.Material.Filled.ArrowDropDown"
-                                    AdornmentColor="Color.Default"
-                                    HelperText="Type a key to search for value"
-                                    HelperTextOnFocus="true"
-                                    Immediate="true"
-                                    Typo="Typo.subtitle2">
-                                @foreach (var emp in _employeeList!)
-                                {
-                                    <MudSelectItem Value="emp.EmployeeNo">@emp.EmployeeNameWithCode</MudSelectItem>
-                                }
-                            </MudSelect>
-                        </MudPaper>
+                        </MudStack>
                     </MudItem>                    
                 </MudGrid>                                 
 
@@ -505,17 +505,23 @@
                                  <MudPaper Elevation="0" Class="ps-3">
                                      <MudText Typo="Typo.caption" Align="Align.Start" Style="color: #004165;">Require Visa?</MudText>
                                      <MudPaper Elevation="0" Class="p-0 w-100 d-flex justify-content-start">
-                                         <MudSwitch @bind-Value="_leaveRequest.LeaveVisaRequired" Color="Color.Info" UncheckedColor="Color.Default"
-                                                    Disabled="@_isDisabled"
-                                                    LabelPlacement="Placement.Start">No/Yes</MudSwitch>
+                                         <MudSwitch @bind-Value="_leaveRequest.LeaveVisaRequired" 
+                                            Color="Color.Info" 
+                                            UncheckedColor="Color.Default"
+                                            Disabled="@_isDisabled"
+                                            Label="@(_leaveRequest.LeaveVisaRequired == true ? "Yes" : "No")"
+                                            LabelPlacement="Placement.End" />
                                      </MudPaper>
                                  </MudPaper>
                                  <MudPaper Elevation="0">
-                                     <MudText Typo="Typo.caption" Align="Align.Start" Style="color: #004165;">Require Adv. Payment?</MudText>
+                                     <MudText Typo="Typo.caption" Align="Align.Start" Style="color: #004165;">Require Advance Payment?</MudText>
                                      <MudPaper Elevation="0" Class="p-0 w-100 d-flex justify-content-start">
-                                         <MudSwitch @bind-Value="_leaveRequest.LeavePayAdv" Color="Color.Info" UncheckedColor="Color.Default"
-                                                    Disabled="@_isDisabled"
-                                                    LabelPlacement="Placement.Start">No/Yes</MudSwitch>
+                                         <MudSwitch @bind-Value="_leaveRequest.LeavePayAdv" 
+                                            Color="Color.Info" 
+                                            UncheckedColor="Color.Default"
+                                            Disabled="@_isDisabled"
+                                            Label="@(_leaveRequest.LeavePayAdv == true ? "Yes" : "No")"
+                                            LabelPlacement="Placement.End" />
                                      </MudPaper>
                                  </MudPaper>
                             </MudStack>                            
