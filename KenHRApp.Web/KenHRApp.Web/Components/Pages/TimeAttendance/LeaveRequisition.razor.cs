@@ -1189,7 +1189,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             await Task.Delay(300);
 
             #region Get employee list
-            var repoResult = await LookupCache.GetEmployeeAsync();
+            var repoResult = await LookupCache.GetEmployeeAsync(true);
             if (repoResult.Success)
             {
                 _employeeList = repoResult.Value!;

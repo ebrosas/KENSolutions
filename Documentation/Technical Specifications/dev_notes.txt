@@ -79,6 +79,7 @@ Approval Dashboard:
 1. When opening the assigned request, the Cancel Request button should be disabled since only the creator can cancel request.	-Done
 2. Fix the bug that shows the Approve and Reject button even if the request is not assigned to the current user.	-Done
 3. Fix duplicate records when an Outdoor request is assigned to the Head of HR	-Done
+4. When clicking the Request No. link, the Approve and Reject buttons should be shown in the Leave Requisiotion page.	-Done
 
 Leave Request page:
 1. Implement the Approve and Reject buttons	-Done
