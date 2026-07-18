@@ -2230,6 +2230,74 @@ namespace KenHRApp.Application.Services
                 return Result<int>.Failure(ex.Message.ToString());
             }
         }
+
+        public async Task<Result<int>> SaveQualificationAsync(
+            QualificationDTO dto, 
+            CancellationToken cancellationToken = default)
+        {
+            int saveResult = 0;
+
+            try
+            {
+                #region Initialize EmergencyContact entity
+                Qualification qualificationEntity = new Qualification()
+                {
+                    AutoId = dto.AutoId,
+                    QualificationCode = dto.QualificationCode,
+                    StreamCode = dto.StreamCode,
+                    SpecializationCode = dto.SpecializationCode,
+                    UniversityName = dto.UniversityName,
+                    Institute = dto.Institute,
+                    QualificationMode = dto.QualificationMode,
+                    CountryCode = dto.CountryCode,
+                    StateCode = dto.StateCode,
+                    FromMonthCode = dto.FromMonthCode,
+                    FromYear = dto.FromYear,
+                    ToMonthCode = dto.ToMonthCode,
+                    ToYear = dto.ToYear,
+                    PassMonthCode = dto.PassMonthCode,
+                    PassYear = dto.PassYear
+                };
+                #endregion
+
+                if (qualificationEntity.AutoId == 0)
+                {
+                    var addResult = await _repository.AddQualificationAsync(qualificationEntity, cancellationToken);
+                    if (addResult.Success)
+                    {
+                        saveResult = addResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(addResult.Error))
+                            throw new Exception(addResult.Error);
+                        else
+                            throw new Exception("Unable to add new qualification to the database. Please try saving again.");
+                    }
+                }
+                else
+                {
+                    var updateResult = await _repository.UpdateQualificationAsync(qualificationEntity, cancellationToken);
+                    if (updateResult.Success)
+                    {
+                        saveResult = updateResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(updateResult.Error))
+                            throw new Exception(updateResult.Error);
+                        else
+                            throw new Exception("Unable to update the selected qualification. Please try saving again.");
+                    }
+                }
+
+                return Result<int>.SuccessResult(saveResult);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
         #endregion
     }
 }

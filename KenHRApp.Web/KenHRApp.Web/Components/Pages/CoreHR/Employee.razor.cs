@@ -209,6 +209,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         #region Grid Fields
         private string _emergencySearchString = string.Empty;
         private bool _emergencyFilter = false;
+        
+        private string _qualificationSearchString = string.Empty;
+        private bool _qualificationFilter = false;
         #endregion
 
         #endregion
@@ -225,7 +228,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 _isDisabled = true;
 
                 if (EmployeeId > 0)
-                    BeginGetEmployeeDetailTask();
+                    BeginGetEmployeeDetail();
             }
             else if (ActionType == ActionTypes.Add.ToString())
             {
@@ -589,6 +592,165 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         }
         #endregion
 
+        #region Qualifications Grid
+        private Func<QualificationDTO, bool> _qualificationQuickFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(_emergencySearchString))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.QualificationDesc) && x.QualificationDesc.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.StreamDesc) && x.StreamDesc.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.SpecializationDesc) && x.SpecializationDesc!.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.UniversityName) && x.UniversityName!.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.Institute) && x.Institute!.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.QualificationModeDesc) && x.QualificationModeDesc!.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.CountryDesc) && x.CountryDesc!.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.StateDesc) && x.StateDesc!.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.CityTownName) && x.CityTownName!.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
+        };
+
+        private void QualificationStartedEditingItem(QualificationDTO item)
+        {
+            //_events.Insert(0, $"Event = StartedEditingShiftTimingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+        }
+
+        private void QualificationCommittedItemChanges(QualificationDTO item)
+        {
+            try
+            {
+                if (item == null) return;
+
+                #region Get selected qualification
+                if (!string.IsNullOrEmpty(item.QualificationCode))
+                {
+                    UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCCode == item.QualificationCode).FirstOrDefault();
+                    if (udc != null)
+                        item.QualificationDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected stream
+                if (!string.IsNullOrEmpty(item.StreamCode))
+                {
+                    UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCCode == item.StreamCode).FirstOrDefault();
+                    if (udc != null)
+                        item.StreamDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected specialization
+                if (!string.IsNullOrEmpty(item.SpecializationCode))
+                {
+                    UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCCode == item.SpecializationCode).FirstOrDefault();
+                    if (udc != null)
+                        item.SpecializationDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected qualification mode
+                if (!string.IsNullOrEmpty(item.QualificationMode))
+                {
+                    UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCCode == item.QualificationMode).FirstOrDefault();
+                    if (udc != null)
+                        item.QualificationModeDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected country
+                if (!string.IsNullOrEmpty(item.CountryCode))
+                {
+                    UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCCode == item.CountryCode).FirstOrDefault();
+                    if (udc != null)
+                        item.CountryDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Saving changes, please wait...";
+
+                _ = SaveQualificationAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+                }, item);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Save cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task SaveQualificationAsync(Func<Task> callback, QualificationDTO qualification)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            var result = await EmployeeService.SaveQualificationAsync(qualification, _cts.Token);
+            if (!result.Success)
+            {
+                // Set the error message
+                _errorMessage.AppendLine(result.Error!);
+                ShowHideError(true);
+            }
+            else
+            {
+                if (qualification.AutoId == 0)
+                {
+                    // Get the new identity seed
+                    qualification.AutoId = employee.QualificationList.Max(d => d.AutoId) + 1;
+
+                    // Add locally to the list so UI updates immediately
+                    employee.QualificationList.Add(qualification);
+
+                    StateHasChanged();
+                }
+
+                // Show notification
+                ShowNotification("The specified qualification was saved successfully!", NotificationType.Success);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+        #endregion
+
         #endregion
 
         #region Button Event Handlers
@@ -626,7 +788,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
             if (EmployeeId > 0)
             {
-                BeginGetEmployeeDetailTask();
+                BeginGetEmployeeDetail();
             }
         }
 
@@ -680,7 +842,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         #endregion
 
         #region Async Events
-        private void BeginGetEmployeeDetailTask()
+        private void BeginGetEmployeeDetail()
         {
             _isRunning = true;
 
@@ -699,7 +861,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         private async Task GetEmployeeDetailAsync(Func<Task> callback)
         {
             // Wait for 1 second then gives control back to the runtime
-            await Task.Delay(1000);
+            await Task.Delay(500);
 
             // Reset error messages
             _errorMessage.Clear();

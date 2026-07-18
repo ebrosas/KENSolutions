@@ -41,6 +41,18 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<Employee?>> GetByEmployeeNoAndHireDateAsync(int? empNo, DateTime doj, CancellationToken cancellationToken = default);
         Task<Result<bool>> VerifyEmailTokenAsync(string token, CancellationToken cancellationToken = default);
         Task<Result<string>> GenerateEmailVerificationTokenAsync(int empNo, DateTime doj, CancellationToken cancellationToken = default);
+
+        Task<Result<int>> AddQualificationAsync(
+            Qualification qualification,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<int>> UpdateQualificationAsync(
+            Qualification dto,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<bool>> DeleteQualificationAsync(
+            int autoID,
+            CancellationToken cancellationToken = default);
         #endregion
     }
 }

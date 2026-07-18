@@ -2146,6 +2146,110 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<string>.Failure(ex.Message.ToString() ?? "Unknown error in GenerateEmailVerificationTokenAsync() method.");
             }
         }
+
+        public async Task<Result<int>> AddQualificationAsync(
+            Qualification qualification, 
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                // Save to database
+                _db.Qualifications.Add(qualification);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> UpdateQualificationAsync(
+            Qualification dto, 
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                var qualification = await _db.Qualifications.FirstOrDefaultAsync(x => x.AutoId == dto.AutoId, cancellationToken);
+                if (qualification == null)
+                    throw new InvalidOperationException("Qualification was not found");
+
+                #region Update Qualification entity
+                qualification.QualificationCode = dto.QualificationCode;
+                qualification.StreamCode = dto.StreamCode;
+                qualification.SpecializationCode = dto.SpecializationCode;
+                qualification.UniversityName = dto.UniversityName;
+                qualification.Institute = dto.Institute;
+                qualification.QualificationMode = dto.QualificationMode;
+                qualification.CountryCode = dto.CountryCode;
+                qualification.StateCode = dto.StateCode;
+                qualification.FromMonthCode = dto.FromMonthCode;
+                qualification.FromYear = dto.FromYear;
+                qualification.ToMonthCode = dto.ToMonthCode;
+                qualification.ToYear = dto.ToYear;
+                qualification.PassMonthCode = dto.PassMonthCode;
+                qualification.PassYear = dto.PassYear;
+                #endregion
+
+                // Save to database
+                _db.Qualifications.Update(qualification);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<bool>> DeleteQualificationAsync(
+            int autoID, 
+            CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var qualification = await _db.Qualifications.FindAsync(autoID);
+                if (qualification == null)
+                    throw new Exception("Could not perform deletion because the selected qualification was not found in the database.");
+
+                _db.Qualifications.Remove(qualification);
+
+                int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
+                if (rowsDeleted > 0)
+                    isSuccess = true;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

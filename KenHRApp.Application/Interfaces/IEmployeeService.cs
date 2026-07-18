@@ -44,6 +44,10 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<int>> AddDepartmentAsync(DepartmentDTO dto, CancellationToken cancellationToken = default);
         Task<Result<bool>> DeleteEmergencyContactAsync(int autoID, CancellationToken cancellationToken = default);
         Task<Result<int>> SaveEmergencyContactAsync(EmergencyContactDTO dto, CancellationToken cancellationToken = default);
+
+        Task<Result<int>> SaveQualificationAsync(
+            QualificationDTO dto,
+            CancellationToken cancellationToken = default);
         #endregion
     }
 }

@@ -1559,15 +1559,58 @@
                             <TitleContent>
                                 <div class="d-flex">
                                     <MudIcon Icon="fas fa-graduation-cap" Size=Size.Small Style="color: #004165;" class="mr-3"></MudIcon>
-                                    <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Qualifications</strong></MudText>
-                                    <MudSpacer />  
-                                    <MudFab Style="background-color: #004165; color: white;" StartIcon="@Icons.Material.Filled.Add" Size=Size.Small Class="mr-3" />
+                                    <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Qualifications</strong></MudText>                                    
                                 </div>
                             </TitleContent>
                             <ChildContent>
-                                <MudPaper Elevation="4" Square="true" Class="w-100">
+                                <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-2 mb-0">
+                                    <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
+                                        <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Qualifications List</MudText>
+                                        <MudSpacer />
+                                        <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
+                                             <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply new qualification..." OnClick="AddEmergencyContact" />
+                                         </MudMenu>
+                                     </MudAppBar>
+                                </MudStack>
+                                <MudPaper Elevation="4" Square="true" Class="w-100 mb-3">
                                     <MudDataGrid T="QualificationDTO" Items="@employee.QualificationList" Hover="true" Striped="true" Class="skill-qualification-grid"
-                                                 TableClass="fixed-table" Dense="false" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true" EditMode="DataGridEditMode.Form">
+                                        Filterable="@_qualificationFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                                        QuickFilter="@_qualificationQuickFilter" Hideable="true" PageSize="5"
+                                        EditTrigger="DataGridEditTrigger.Manual" ReadOnly="@(!_allowGridEdit)" EditMode="DataGridEditMode.Form"
+                                        EditDialogOptions="new DialogOptions 
+                                        { 
+                                            MaxWidth = MaxWidth.Small, 
+                                            FullWidth = true,
+                                            BackdropClick = false,
+                                            CloseOnEscapeKey = false
+                                        }"
+                                        StartedEditingItem="@QualificationStartedEditingItem" CommittedItemChanges="@QualificationCommittedItemChanges"
+                                        TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                                        <ToolBarContent>
+                                             <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                                                 <MudTextField @bind-Value="_qualificationSearchString" Placeholder="Enter search string"
+                                                               Adornment="Adornment.Start" ReadOnly="@(!_allowGridEdit)"
+                                                    Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"   
+                                                    AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                                                 </MudTextField>
+                                             </MudPaper>
+                                            <MudSpacer />
+                                            <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                                <MudSwitch @bind-Value="_qualificationFilter"
+                                                    Disabled="@(!_allowGridEdit)"                                                        
+                                                    ThumbIcon="@(_qualificationFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)"
+                                                    ThumbIconColor="@(_qualificationFilter==true ? Color.Success : Color.Error)"
+                                                    LabelPlacement="Placement.Start"
+                                                    Label="Enable Custom Filter" />
+                                                 <MudPaper Class="ms-3" Elevation="0">
+                                                    <MudFab Style="background-color: #004165; color: white;" 
+                                                        StartIcon="@Icons.Material.Filled.Add" 
+                                                        Size="Size.Small" title="Add new qualification" 
+                                                        Disabled="@(!_allowGridEdit)"
+                                                        OnClick="AddEmergencyContact" />                                                        
+                                                 </MudPaper>                             
+                                            </MudPaper>
+                                        </ToolBarContent>
                                         <Columns>
                                             <PropertyColumn Property="x => x.QualificationDesc" Title="Qualification" Class="col-qualification" />
                                             <PropertyColumn Property="x => x.StreamDesc" Title="Stream" Width="150px" Class="col-stream" />
