@@ -10,6 +10,19 @@
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'PAYGRADE')
 
+	--Get Countries
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'COUNTRY')
+	ORDER BY a.SequenceNo
+
+	--Get Relationship Types
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'RELATIONTYPE')
+	ORDER BY a.SequenceNo
+	
+
 	--Request Types
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
@@ -92,10 +105,6 @@
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'QUALIFACTIONMODE')
 
-	--Get Countries
-	SELECT a.* 
-	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
-	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'COUNTRY')
 	
 	--Get Salutations
 	SELECT a.* 

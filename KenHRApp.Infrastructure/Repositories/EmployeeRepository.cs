@@ -517,16 +517,22 @@ namespace KenHRApp.Infrastructure.Repositories
                         #endregion
 
                         #region Get Emergency Contacts
+                        int countryGroupID = _db.UserDefinedCodeGroups.Where(a => a.UDCGCode == "COUNTRY").FirstOrDefault()!.UDCGroupId;
+                        int relationshipGroupID = _db.UserDefinedCodeGroups.Where(a => a.UDCGCode == "RELATIONTYPE").FirstOrDefault()!.UDCGroupId;
+
                         var emergencyContactModel = await (from ec in _db.EmergencyContacts
                                                            join rel in _db.UserDefinedCodes on ec.RelationCode equals rel.UDCCode 
                                                            join cty in _db.UserDefinedCodes on ec.CountryCode equals cty.UDCCode into gjCTY from subCTY in gjCTY.DefaultIfEmpty()   // LEFT JOIN 
                                                            where ec.EmployeeNo == employeeDetail.EmployeeNo
+                                                            && (subCTY == null || subCTY.GroupID == countryGroupID)
+                                                            && rel.GroupID == relationshipGroupID
                                                            select new
                                                            {
                                                                EmergencyContact = ec,
                                                                Relation = rel.UDCDesc1,
                                                                CountryDesc = subCTY != null ? subCTY.UDCDesc1 : null
                                                            }).ToListAsync();
+
                         if (emergencyContactModel != null)
                         {
                             foreach (var item in emergencyContactModel)

@@ -8,7 +8,7 @@ using MudBlazor;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
 
-namespace KenHRApp.Web.Components.Pages
+namespace KenHRApp.Web.Components.Pages.CoreHR
 {
     public partial class Employee 
     {
@@ -417,7 +417,7 @@ namespace KenHRApp.Web.Components.Pages
             {
                 { "DialogTitle", "Confirm Delete"},
                 { "DialogIcon", _iconDelete },
-                { "ContentText", $"Are you sure you want to delete the contact person '{contactPerson.ContactPerson}'?" },
+                { "ContentText", $"Are you sure you want to delete this contact person: '{contactPerson.ContactPerson}'?" },
                 { "ConfirmText", "Delete" },
                 { "Color", Color.Error }
             };
