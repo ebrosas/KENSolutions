@@ -1568,7 +1568,7 @@
                                         <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Qualifications List</MudText>
                                         <MudSpacer />
                                         <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
-                                             <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply new qualification..." OnClick="AddEmergencyContact" />
+                                             <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply new qualification..." OnClick="AddQualification" />
                                          </MudMenu>
                                      </MudAppBar>
                                 </MudStack>
@@ -1607,45 +1607,227 @@
                                                         StartIcon="@Icons.Material.Filled.Add" 
                                                         Size="Size.Small" title="Add new qualification" 
                                                         Disabled="@(!_allowGridEdit)"
-                                                        OnClick="AddEmergencyContact" />                                                        
+                                                        OnClick="AddQualification" />                                                        
                                                  </MudPaper>                             
                                             </MudPaper>
                                         </ToolBarContent>
                                         <Columns>
-                                            <PropertyColumn Property="x => x.QualificationDesc" Title="Qualification" Class="col-qualification" />
-                                            <PropertyColumn Property="x => x.StreamDesc" Title="Stream" Width="150px" Class="col-stream" />
-                                            <PropertyColumn Property="x => x.SpecializationDesc" Title="Specialization" Class="col-specialization" />
-                                            <PropertyColumn Property="x => x.UniversityName" Title="University" Class="col-university" />
-                                            <PropertyColumn Property="x => x.Institute" Width="100px" Class="col-institute" />
-                                            <PropertyColumn Property="x => x.QualificationModeDesc" Title="Qualification Mode" Class="col-qualification-mode" />
-                                            <PropertyColumn Property="x => x.CountryDesc" Title="Country" Width="120px" />
-                                            <PropertyColumn Property="x => x.StateDesc" Title="State" Width="120px" />
-                                            <PropertyColumn Property="x => x.CityTownName" Title="City" Width="120px" />
-                                            <PropertyColumn Property="x => x.FromMonthDesc" Title="From Month" Width="130px" />
-                                            <PropertyColumn Property="x => x.FromYear" Title="From Year" Width="130px" />
-                                            <PropertyColumn Property="x => x.ToMonthDesc" Title="To Month" Width="130px" />
-                                            <PropertyColumn Property="x => x.ToYear" Title="To Year" Width="130px" />
-                                            <PropertyColumn Property="x => x.PassMonthDesc" Title="Pass Month" Width="130px" />
-                                            <PropertyColumn Property="x => x.PassYear" Title="Pass Year" Width="130px" />
-                                            <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                                            <PropertyColumn Property="x => x.QualificationDesc" Title="Qualification" Class="col-qualification" StickyLeft="true">
+                                                <EditTemplate Context="row">
+                                                    <MudTextField @bind-Value="row.Item.QualificationDesc" Label="Qualification" HelperText="Maximum input is 200 chars."
+                                                        Variant="Variant.Text" HelperTextOnFocus="true" Counter="200" MaxLength="200"
+                                                        Required RequiredError="Qualification is required"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                </EditTemplate>
                                                 <CellTemplate Context="row">
-                                                    <MudIconButton Color="Color.Info" title="Edit record" Class="show-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
+                                                    <MudChip T="long" 
+                                                        Size=Size.Small
+                                                        Color="Color.Info"
+                                                        Label="true" 
+                                                        Class="fw-bold" 
+                                                        Style="font-size: 14px;">
+                                                        @row.Item.QualificationDesc
+                                                    </MudChip>
+                                                </CellTemplate>
+                                            </PropertyColumn>  
+                                            <PropertyColumn Property="x => x.StreamDesc" Title="Stream" Class="col-stream">
+                                                <EditTemplate Context="row">
+                                                    <MudAutocomplete @bind-Value="row.Item.StreamDesc"
+                                                        SearchFunc="SearchStream!"
+                                                        Variant="Variant.Text"
+                                                        Label="Stream"
+                                                        Margin="Margin.Normal"
+                                                        Dense="true"
+                                                        Placeholder="Please Select"
+                                                        HelperText="Type a key to search for stream"
+                                                        HelperTextOnFocus="true"
+                                                        Clearable="true" Typo="Typo.subtitle2"
+                                                        MaxItems="@(_streamList != null ? _streamList.Count : 10)"
+                                                        Modal="true" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.SpecializationDesc" Title="Stream" Class="col-specialization">
+                                                <EditTemplate Context="row">
+                                                    <MudAutocomplete @bind-Value="row.Item.SpecializationDesc"
+                                                        SearchFunc="SearchSpecialization!"
+                                                        Variant="Variant.Text"
+                                                        Label="Stream"
+                                                        Margin="Margin.Normal"
+                                                        Dense="true"
+                                                        Placeholder="Please Select"
+                                                        HelperText="Type a key to search for specialization"
+                                                        HelperTextOnFocus="true"
+                                                        Clearable="true" Typo="Typo.subtitle2"
+                                                        MaxItems="@(_specializationList != null ? _specializationList.Count : 10)"
+                                                        Modal="true" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.UniversityName" Title="University" Class="col-university">
+                                                <EditTemplate Context="row">
+                                                    <MudTextField @bind-Value="row.Item.UniversityName" Label="University" HelperText="Maximum input is 200 chars."
+                                                        Variant="Variant.Text" HelperTextOnFocus="true" Counter="200" MaxLength="200"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.Institute" Title="University" Class="col-institute">
+                                                <EditTemplate Context="row">
+                                                    <MudTextField @bind-Value="row.Item.Institute" Label="Institute" HelperText="Maximum input is 100 chars."
+                                                        Variant="Variant.Text" HelperTextOnFocus="true" Counter="100" MaxLength="100"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.QualificationModeDesc" Title="Qualification Mode" Class="col-qualification-mode">
+                                                <EditTemplate Context="row">
+                                                    <MudAutocomplete @bind-Value="row.Item.QualificationModeDesc"
+                                                        SearchFunc="SearchQualificationMode!"
+                                                        Variant="Variant.Text"
+                                                        Label="Stream"
+                                                        Margin="Margin.Normal"
+                                                        Dense="true"
+                                                        Placeholder="Please Select"
+                                                        HelperText="Type a key to search for qualification mode"
+                                                        HelperTextOnFocus="true"
+                                                        Clearable="true" Typo="Typo.subtitle2"
+                                                        MaxItems="@(_qualificationModeList != null ? _qualificationModeList.Count : 10)"
+                                                        Modal="true" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.CountryDesc" Title="Country" Class="col-Country">
+                                                <EditTemplate Context="row">
+                                                    <MudAutocomplete @bind-Value="row.Item.CountryDesc"
+                                                                     SearchFunc="SearchCountry!"
+                                                        Variant="Variant.Text"
+                                                        Label="Stream"
+                                                        Margin="Margin.Normal"
+                                                        Dense="true"
+                                                        Placeholder="Please Select"
+                                                        HelperText="Type a key to search for country"
+                                                        HelperTextOnFocus="true"
+                                                        Clearable="true" Typo="Typo.subtitle2"
+                                                                     MaxItems="@(_countryList != null ? _countryList.Count : 10)"
+                                                        Modal="true" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.StateDesc" Title="State" Class="col-State">
+                                                <EditTemplate Context="row">
+                                                    <MudAutocomplete @bind-Value="row.Item.StateDesc"
+                                                                     SearchFunc="SearchState!"
+                                                                     Variant="Variant.Text"
+                                                                     Label="Stream"
+                                                                     Margin="Margin.Normal"
+                                                                     Dense="true"
+                                                                     Placeholder="Please Select"
+                                                                     HelperText="Type a key to search for state"
+                                                                     HelperTextOnFocus="true"
+                                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                                     MaxItems="@(_stateList != null ? _stateList.Count : 10)"
+                                                                     Modal="true" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.CityTownName" Title="City/Town Name" Class="col-CityTownName">
+                                                <EditTemplate Context="row">
+                                                    <MudTextField @bind-Value="row.Item.CityTownName" Label="City/Town Name" HelperText="Maximum input is 100 chars."
+                                                        Variant="Variant.Text" HelperTextOnFocus="true" Counter="100" MaxLength="100"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.FromMonthDesc" Title="From Month" Class="col-FromMonth">
+                                                <EditTemplate Context="row">
+                                                    <MudAutocomplete @bind-Value="row.Item.FromMonthDesc"
+                                                                     SearchFunc="SearchMonth!"
+                                                                     Variant="Variant.Text"
+                                                                     Label="From Month"
+                                                                     Margin="Margin.Normal"
+                                                                     Dense="true"
+                                                                     Placeholder="Please Select"
+                                                                     HelperText="Type a key to search for month"
+                                                                     HelperTextOnFocus="true"
+                                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                                     MaxItems="@(_monthList != null ? _monthList.Count : 10)"
+                                                                     Modal="true" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.FromYear" Title="From Year" Class="col-FromYear">
+                                                <EditTemplate Context="row">
+                                                    <MudNumericField @bind-Value="row.Item.FromYear" Label="From Year"
+                                                        For="@(() => row.Item.FromYear)"
+                                                        Variant="Variant.Outlined"
+                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.ToMonthDesc" Title="To Month" Class="col-ToMonth">
+                                                <EditTemplate Context="row">
+                                                    <MudAutocomplete @bind-Value="row.Item.ToMonthDesc"
+                                                                     SearchFunc="SearchMonth!"
+                                                                     Variant="Variant.Text"
+                                                                     Label="To Month"
+                                                                     Margin="Margin.Normal"
+                                                                     Dense="true"
+                                                                     Placeholder="Please Select"
+                                                                     HelperText="Type a key to search for month"
+                                                                     HelperTextOnFocus="true"
+                                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                                     MaxItems="@(_monthList != null ? _monthList.Count : 10)"
+                                                                     Modal="true" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.ToYear" Title="To Year" Class="col-ToYear">
+                                                <EditTemplate Context="row">
+                                                    <MudNumericField @bind-Value="row.Item.ToYear" Label="To Year"
+                                                        For="@(() => row.Item.ToYear)"
+                                                        Variant="Variant.Outlined"
+                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.PassMonthDesc" Title="Pass Month" Class="col-PassMonth">
+                                                <EditTemplate Context="row">
+                                                    <MudAutocomplete @bind-Value="row.Item.PassMonthDesc"
+                                                                     SearchFunc="SearchMonth!"
+                                                                     Variant="Variant.Text"
+                                                                     Label="Pass Month"
+                                                                     Margin="Margin.Normal"
+                                                                     Dense="true"
+                                                                     Placeholder="Please Select"
+                                                                     HelperText="Type a key to search for month"
+                                                                     HelperTextOnFocus="true"
+                                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                                     MaxItems="@(_monthList != null ? _monthList.Count : 10)"
+                                                                     Modal="true" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.PassYear" Title="Pass Year" Class="col-PassYear">
+                                                <EditTemplate Context="row">
+                                                    <MudNumericField @bind-Value="row.Item.PassYear" Label="Pass Year"
+                                                        For="@(() => row.Item.PassYear)"
+                                                        Variant="Variant.Outlined"
+                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <TemplateColumn CellClass="d-flex justify-end" Title="Actions">
+                                                <CellTemplate Context="row">
+                                                    <MudIconButton title="Edit details" 
+                                                        Class="show-btn fa-icon-btn"
+                                                        Color="Color.Surface"
+                                                        Disabled="@(!_allowGridEdit)"
+                                                        OnClick="@row.Actions.StartEditingItemAsync">
                                                         <ChildContent>
-                                                            ,<i class="fas fa-edit fa-1x"></i>
+                                                            <i class="fas fa-pen-alt fa-1x"></i>
                                                         </ChildContent>
                                                     </MudIconButton>
-                                                    <MudIconButton Color="Color.Success" title="Save changes" Class="hide-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
-                                                        <ChildContent>
-                                                            <i class="fas fa-save fa-1x"></i>
-                                                        </ChildContent>
-                                                    </MudIconButton>
-                                                    <MudIconButton Color="Color.Error" title="Delete record" Class="show-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
+                                                    <MudIconButton title="Delete record" 
+                                                        Class="fa-icon-btn" 
+                                                        Color="Color.Error"
+                                                        Disabled="@(!_allowGridEdit)"
+                                                        OnClick="() => ConfirmDeleteQualification(row.Item)">
                                                         <ChildContent>
                                                             <i class="fas fa-trash-alt fa-1x"></i>
                                                         </ChildContent>
                                                     </MudIconButton>
                                                 </CellTemplate>
-                                            </TemplateColumn>
+                                            </TemplateColumn>                                                                                        
                                         </Columns>
                                         <NoRecordsContent>
                                          <div class="no-data-box">

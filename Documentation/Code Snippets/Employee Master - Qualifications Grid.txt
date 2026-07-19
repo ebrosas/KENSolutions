@@ -1,0 +1,34 @@
+<PropertyColumn Property="x => x.QualificationDesc" Title="Qualification" Class="col-qualification" />
+<PropertyColumn Property="x => x.StreamDesc" Title="Stream" Width="150px" Class="col-stream" />
+<PropertyColumn Property="x => x.SpecializationDesc" Title="Specialization" Class="col-specialization" />
+<PropertyColumn Property="x => x.UniversityName" Title="University" Class="col-university" />
+<PropertyColumn Property="x => x.Institute" Width="100px" Class="col-institute" />
+<PropertyColumn Property="x => x.QualificationModeDesc" Title="Qualification Mode" Class="col-qualification-mode" />
+<PropertyColumn Property="x => x.CountryDesc" Title="Country" Width="120px" />
+<PropertyColumn Property="x => x.StateDesc" Title="State" Width="120px" />
+<PropertyColumn Property="x => x.CityTownName" Title="City" Width="120px" />
+<PropertyColumn Property="x => x.FromMonthDesc" Title="From Month" Width="130px" />
+<PropertyColumn Property="x => x.FromYear" Title="From Year" Width="130px" />
+<PropertyColumn Property="x => x.ToMonthDesc" Title="To Month" Width="130px" />
+<PropertyColumn Property="x => x.ToYear" Title="To Year" Width="130px" />
+<PropertyColumn Property="x => x.PassMonthDesc" Title="Pass Month" Width="130px" />
+<PropertyColumn Property="x => x.PassYear" Title="Pass Year" Width="130px" />
+<TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+    <CellTemplate Context="row">
+        <MudIconButton Color="Color.Info" title="Edit record" Class="show-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
+            <ChildContent>
+                ,<i class="fas fa-edit fa-1x"></i>
+            </ChildContent>
+        </MudIconButton>
+        <MudIconButton Color="Color.Success" title="Save changes" Class="hide-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
+            <ChildContent>
+                <i class="fas fa-save fa-1x"></i>
+            </ChildContent>
+        </MudIconButton>
+        <MudIconButton Color="Color.Error" title="Delete record" Class="show-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
+            <ChildContent>
+                <i class="fas fa-trash-alt fa-1x"></i>
+            </ChildContent>
+        </MudIconButton>
+    </CellTemplate>
+</TemplateColumn>

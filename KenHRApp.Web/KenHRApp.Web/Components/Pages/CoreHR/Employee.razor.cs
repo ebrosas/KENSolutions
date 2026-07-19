@@ -138,6 +138,21 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         private List<UserDefinedCodeDTO> _relationTypeList = new List<UserDefinedCodeDTO>();
         private string[]? _relationTypeArray = null;
+
+        private List<UserDefinedCodeDTO> _streamList = new List<UserDefinedCodeDTO>();
+        private string[]? _streamArray = null;
+
+        private List<UserDefinedCodeDTO> _specializationList = new List<UserDefinedCodeDTO>();
+        private string[]? _specializationArray = null;
+
+        private List<UserDefinedCodeDTO> _qualificationModeList = new List<UserDefinedCodeDTO>();
+        private string[]? _qualificationModeArray = null;
+
+        private List<UserDefinedCodeDTO> _stateList = new List<UserDefinedCodeDTO>();
+        private string[]? _stateArray = null;
+
+        private List<UserDefinedCodeDTO> _monthList = new List<UserDefinedCodeDTO>();
+        private string[]? _monthArray = null;
         #endregion
 
         #region Enums and Collections
@@ -747,6 +762,100 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             {
                 // Hide the spinner overlay
                 await callback.Invoke();
+            }
+        }
+
+        private async Task AddQualification()
+        {
+            try
+            {
+                var parameters = new DialogParameters
+                {
+                    ["Qualification"] = new QualificationDTO(),
+                    ["RelationTypeList"] = _relationTypeList,
+                    ["CountryList"] = _countryList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Large
+                };
+
+                // Show the dialog box
+                var dialog = await DialogService.ShowAsync<EmergencyContactDialog>("Add New Qualification", parameters, options);
+                var result = await dialog.Result;
+                if (result != null && !result.Canceled)
+                {
+                    var newContact = (EmergencyContactDTO)result.Data!;
+                    newContact.AutoId = 0;
+
+                    #region Get the selected relationship type
+                    if (!string.IsNullOrEmpty(newContact.Relation))
+                    {
+                        UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCDesc1 == newContact.Relation).FirstOrDefault();
+                        if (udc != null)
+                            newContact.RelationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get the selected country
+                    if (!string.IsNullOrEmpty(newContact.CountryDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCDesc1 == newContact.CountryDesc).FirstOrDefault();
+                        if (udc != null)
+                            newContact.CountryCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Check for duplicate entries
+                    var duplicateContact = employee.EmergencyContactList.FirstOrDefault(e => e.ContactPerson.Trim().ToUpper() == newContact.ContactPerson.Trim().ToUpper()
+                        && e.RelationCode.Trim().ToUpper() == newContact.RelationCode.Trim().ToUpper()
+                        && e.MobileNo.Trim() == newContact.MobileNo.Trim());
+                    if (duplicateContact != null)
+                    {
+                        // Show error
+                        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified contact person and relationship already exists. Please enter a different contact name and details.");
+                        return;
+                    }
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task ConfirmDeleteQualification(QualificationDTO qualification)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to delete this qualificiation: '{qualification.QualificationDesc}'?" },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Qualification", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                //BeginDeleteEmergencyContact(qualification);
             }
         }
         #endregion
@@ -2535,6 +2644,76 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             }
 
             return _relationTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchStream(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _streamArray!;
+            }
+
+            return _streamArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchSpecialization(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _specializationArray!;
+            }
+
+            return _specializationArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchQualificationMode(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _qualificationModeArray!;
+            }
+
+            return _qualificationModeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchState(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _stateArray!;
+            }
+
+            return _stateArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchMonth(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _monthArray!;
+            }
+
+            return _monthArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
         #endregion
     }

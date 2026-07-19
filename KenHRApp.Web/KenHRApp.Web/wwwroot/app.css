@@ -569,11 +569,11 @@ h1:focus {
 
 /* Format table header */
 .skill-qualification-grid .mud-table-head {
-    background-color: #CFD8DC;      /* Table header background color */
+    background-color: #BBDEFB; /* Table header background color */
     font-weight: bold;
     text-align: center !important;
-    font-size: 14px !important;
-    text-decoration: underline;
+    font-size: 18px !important;
+    text-decoration: solid;
     height: 20px;
     line-height: 20px;
 }
@@ -584,7 +584,7 @@ h1:focus {
     white-space: nowrap;
     text-overflow: ellipsis;
     text-align: left;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 /* Grid Column widths */
@@ -599,43 +599,56 @@ h1:focus {
 .skill-qualification-grid .col-qualification {
     width: 180px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .skill-qualification-grid .col-stream {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .skill-qualification-grid .col-specialization {
     width: 180px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .skill-qualification-grid .col-university {
     width: 200px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .skill-qualification-grid .col-institute {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .skill-qualification-grid .col-qualification-mode {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
+}
+
+skill-qualification-grid .col-Country {
+    width: 120px !important;
+    text-align: left;
+}
+
+skill-qualification-grid .col-State {
+    width: 120px !important;
+    text-align: left;
+}
+
+skill-qualification-grid .col-CityTownName {
+    width: 150px !important;
+    text-align: left;
+}
+
+skill-qualification-grid .col-FromMonth, .col-ToMonth, .col-PassMonth {
+    width: 100px !important;
+    text-align: left;
+}
+
+skill-qualification-grid .col-FromYear, .col-ToYear, .col-PassYear {
+    width: 100px !important;
+    text-align: left;
 }
 /* #endregion */
 
