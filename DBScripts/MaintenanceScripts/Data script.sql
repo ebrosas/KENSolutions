@@ -16,6 +16,37 @@
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'COUNTRY')
 	ORDER BY a.SequenceNo
 
+	--Get Qualification Types
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'QUALIFACTIONTYPE')
+	ORDER BY a.SequenceNo
+	
+	--Get Stream Types
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'STREAMTYPE')
+	ORDER BY a.SequenceNo
+
+	--Get Specialization Types
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'SPECIALIZATION')
+	ORDER BY a.SequenceNo	
+
+	--Get Qualification Modes
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'QUALIFACTIONMODE')
+	ORDER BY a.SequenceNo	
+
+	--Get Months
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'MONTHCODE')
+	ORDER BY a.SequenceNo	
+	
+
 	--Get Relationship Types
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)

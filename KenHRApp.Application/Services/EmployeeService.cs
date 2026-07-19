@@ -2298,6 +2298,29 @@ namespace KenHRApp.Application.Services
                 return Result<int>.Failure(ex.Message.ToString());
             }
         }
+
+        public async Task<Result<bool>> DeleteQualificationAsync(
+            int autoID, 
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _repository.DeleteQualificationAsync(autoID, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to delete the selected qualification due to unknown error. Please refresh the page then try again.");
+                }
+
+                return Result<bool>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString());
+            }
+        }
         #endregion
     }
 }

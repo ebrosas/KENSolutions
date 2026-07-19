@@ -139,6 +139,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         private List<UserDefinedCodeDTO> _relationTypeList = new List<UserDefinedCodeDTO>();
         private string[]? _relationTypeArray = null;
 
+        private List<UserDefinedCodeDTO> _qualificationList = new List<UserDefinedCodeDTO>();
+        private string[]? _qualificationArray = null;
+
         private List<UserDefinedCodeDTO> _streamList = new List<UserDefinedCodeDTO>();
         private string[]? _streamArray = null;
 
@@ -182,10 +185,15 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             PAYGRADE,       // Pay Grades
             COMPANYBRANCH,  // Company Branches
             VISATYPE,       // Visa Types
-            NATIONALITYTYPE,    // Nationality ID Types
-            ATTENDANCEMODE,     // Attendance Modes
-            ROLETYPES,          // Role Types
-            RELATIONTYPE        //Relationship Types
+            NATIONALITYTYPE,        // Nationality ID Types
+            ATTENDANCEMODE,         // Attendance Modes
+            ROLETYPES,              // Role Types
+            RELATIONTYPE,           // Relationship Types
+            QUALIFACTIONTYPE,       // Qualification Types
+            STREAMTYPE,             // Stream Types
+            SPECIALIZATION,         // Specialization Types
+            QUALIFACTIONMODE,       // Qualification Modes
+            MONTHCODE               // Months
         }
 
         private enum NotificationType
@@ -520,7 +528,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             if (isSuccess)
             {
                 // Show notification
-                ShowNotification("The selected department has been deleted successfully!", NotificationType.Success);
+                ShowNotification("The selected contact person has been deleted successfully!", NotificationType.Success);
             }
             else
             {
@@ -657,7 +665,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 #region Get selected qualification
                 if (!string.IsNullOrEmpty(item.QualificationCode))
                 {
-                    UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCCode == item.QualificationCode).FirstOrDefault();
+                    UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCCode == item.QualificationCode).FirstOrDefault();
                     if (udc != null)
                         item.QualificationDesc = udc.UDCDesc1;
                 }
@@ -666,7 +674,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 #region Get selected stream
                 if (!string.IsNullOrEmpty(item.StreamCode))
                 {
-                    UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCCode == item.StreamCode).FirstOrDefault();
+                    UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCCode == item.StreamCode).FirstOrDefault();
                     if (udc != null)
                         item.StreamDesc = udc.UDCDesc1;
                 }
@@ -675,7 +683,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 #region Get selected specialization
                 if (!string.IsNullOrEmpty(item.SpecializationCode))
                 {
-                    UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCCode == item.SpecializationCode).FirstOrDefault();
+                    UserDefinedCodeDTO? udc = _specializationList.Where(d => d.UDCCode == item.SpecializationCode).FirstOrDefault();
                     if (udc != null)
                         item.SpecializationDesc = udc.UDCDesc1;
                 }
@@ -684,7 +692,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 #region Get selected qualification mode
                 if (!string.IsNullOrEmpty(item.QualificationMode))
                 {
-                    UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCCode == item.QualificationMode).FirstOrDefault();
+                    UserDefinedCodeDTO? udc = _qualificationModeList.Where(d => d.UDCCode == item.QualificationMode).FirstOrDefault();
                     if (udc != null)
                         item.QualificationModeDesc = udc.UDCDesc1;
                 }
@@ -696,6 +704,33 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCCode == item.CountryCode).FirstOrDefault();
                     if (udc != null)
                         item.CountryDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected from month
+                if (!string.IsNullOrEmpty(item.FromMonthCode))
+                {
+                    UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCCode == item.FromMonthCode).FirstOrDefault();
+                    if (udc != null)
+                        item.FromMonthDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected to month
+                if (!string.IsNullOrEmpty(item.ToMonthCode))
+                {
+                    UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCCode == item.ToMonthCode).FirstOrDefault();
+                    if (udc != null)
+                        item.ToMonthDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected pass month
+                if (!string.IsNullOrEmpty(item.PassMonthCode))
+                {
+                    UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCCode == item.PassMonthCode).FirstOrDefault();
+                    if (udc != null)
+                        item.PassMonthDesc = udc.UDCDesc1;
                 }
                 #endregion
 
@@ -772,8 +807,12 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 var parameters = new DialogParameters
                 {
                     ["Qualification"] = new QualificationDTO(),
-                    ["RelationTypeList"] = _relationTypeList,
+                    ["QualificationList"] = _qualificationList,
+                    ["StreamList"] = _streamList,
+                    ["SpecializationList"] = _specializationList,
+                    ["QualificationModeList"] = _qualificationModeList,
                     ["CountryList"] = _countryList,
+                    ["MonthList"] = _monthList,
                     ["IsClearable"] = true,
                     ["IsDisabled"] = false
                 };
@@ -791,35 +830,88 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 var result = await dialog.Result;
                 if (result != null && !result.Canceled)
                 {
-                    var newContact = (EmergencyContactDTO)result.Data!;
-                    newContact.AutoId = 0;
+                    var newQualification = (QualificationDTO)result.Data!;
+                    newQualification.AutoId = 0;
 
-                    #region Get the selected relationship type
-                    if (!string.IsNullOrEmpty(newContact.Relation))
+                    #region Get selected qualification
+                    if (!string.IsNullOrEmpty(newQualification.QualificationDesc))
                     {
-                        UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCDesc1 == newContact.Relation).FirstOrDefault();
+                        UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCDesc1 == newQualification.QualificationDesc).FirstOrDefault();
                         if (udc != null)
-                            newContact.RelationCode = udc.UDCCode;
+                            newQualification.QualificationCode = udc.UDCCode;
                     }
                     #endregion
 
-                    #region Get the selected country
-                    if (!string.IsNullOrEmpty(newContact.CountryDesc))
+                    #region Get selected stream
+                    if (!string.IsNullOrEmpty(newQualification.StreamDesc))
                     {
-                        UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCDesc1 == newContact.CountryDesc).FirstOrDefault();
+                        UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCDesc1 == newQualification.StreamDesc).FirstOrDefault();
                         if (udc != null)
-                            newContact.CountryCode = udc.UDCCode;
+                            newQualification.StreamCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected specialization
+                    if (!string.IsNullOrEmpty(newQualification.SpecializationDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _specializationList.Where(d => d.UDCDesc1 == newQualification.SpecializationDesc).FirstOrDefault();
+                        if (udc != null)
+                            newQualification.SpecializationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected qualification mode
+                    if (!string.IsNullOrEmpty(newQualification.QualificationModeDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _qualificationModeList.Where(d => d.UDCDesc1 == newQualification.QualificationModeDesc).FirstOrDefault();
+                        if (udc != null)
+                            newQualification.QualificationMode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected country
+                    if (!string.IsNullOrEmpty(newQualification.CountryDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCDesc1 == newQualification.CountryDesc).FirstOrDefault();
+                        if (udc != null)
+                            newQualification.CountryCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected from month
+                    if (!string.IsNullOrEmpty(newQualification.FromMonthDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == newQualification.FromMonthDesc).FirstOrDefault();
+                        if (udc != null)
+                            newQualification.FromMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected to month
+                    if (!string.IsNullOrEmpty(newQualification.ToMonthDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == newQualification.ToMonthDesc).FirstOrDefault();
+                        if (udc != null)
+                            newQualification.ToMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected pass month
+                    if (!string.IsNullOrEmpty(newQualification.PassMonthDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == newQualification.PassMonthDesc).FirstOrDefault();
+                        if (udc != null)
+                            newQualification.PassMonthCode = udc.UDCCode;
                     }
                     #endregion
 
                     #region Check for duplicate entries
-                    var duplicateContact = employee.EmergencyContactList.FirstOrDefault(e => e.ContactPerson.Trim().ToUpper() == newContact.ContactPerson.Trim().ToUpper()
-                        && e.RelationCode.Trim().ToUpper() == newContact.RelationCode.Trim().ToUpper()
-                        && e.MobileNo.Trim() == newContact.MobileNo.Trim());
-                    if (duplicateContact != null)
+                    var duplicateQualification = employee.QualificationList.FirstOrDefault(e => e.EmployeeNo == newQualification.EmployeeNo
+                        && e.QualificationCode.Trim().ToUpper() == newQualification.QualificationCode.Trim().ToUpper());
+                    if (duplicateQualification != null)
                     {
                         // Show error
-                        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified contact person and relationship already exists. Please enter a different contact name and details.");
+                        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified qualification already exists. Please enter a different qualification details.");
                         return;
                     }
                     #endregion
@@ -855,7 +947,89 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                //BeginDeleteEmergencyContact(qualification);
+                BeginDeleteQualification(qualification);
+            }
+        }
+
+        private void BeginDeleteQualification(QualificationDTO qualification)
+        {
+            try
+            {
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Deleting qualification, please wait...";
+
+                _ = DeleteQualificationAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    // Remove locally from the list so UI updates immediately
+                    employee.QualificationList.Remove(qualification);
+
+                    StateHasChanged();
+
+                }, qualification);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Delete cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task DeleteQualificationAsync(Func<Task> callback, QualificationDTO qualification)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            if (qualification.AutoId == 0)
+            {
+                errorMsg = "Qualification ID is not defined.";
+            }
+            else
+            {
+                var deleteResult = await EmployeeService.DeleteQualificationAsync(qualification.AutoId, _cts.Token);
+                isSuccess = deleteResult.Success;
+                if (!isSuccess)
+                    errorMsg = deleteResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Show notification
+                ShowNotification("The selected qualification has been deleted successfully!", NotificationType.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(errorMsg);
+                    ShowHideError(true);
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
             }
         }
         #endregion
@@ -1923,6 +2097,96 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                                 _relationTypeArray = _relationTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
                         }
                         #endregion
+
+                        #region Populate Qualification Types dropdown
+                        try
+                        {
+                            groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.QUALIFACTIONTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                        }
+                        catch (Exception ex)
+                        {
+                            _errorMessage.Append($"Error getting qualification types: {ex.Message}");
+                        }
+
+                        if (groupID > 0)
+                        {
+                            _qualificationList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                            if (_qualificationList != null)
+                                _qualificationArray = _qualificationList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                        }
+                        #endregion
+
+                        #region Populate Stream Types dropdown
+                        try
+                        {
+                            groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.STREAMTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                        }
+                        catch (Exception ex)
+                        {
+                            _errorMessage.Append($"Error getting stream types: {ex.Message}");
+                        }
+
+                        if (groupID > 0)
+                        {
+                            _streamList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                            if (_streamList != null)
+                                _streamArray = _streamList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                        }
+                        #endregion
+
+                        #region Populate Specialization Types dropdown
+                        try
+                        {
+                            groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.SPECIALIZATION.ToString()).FirstOrDefault()!.UDCGroupId;
+                        }
+                        catch (Exception ex)
+                        {
+                            _errorMessage.Append($"Error getting specialization types: {ex.Message}");
+                        }
+
+                        if (groupID > 0)
+                        {
+                            _specializationList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                            if (_specializationList != null)
+                                _specializationArray = _specializationList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                        }
+                        #endregion
+
+                        #region Populate Qualification Modes dropdown
+                        try
+                        {
+                            groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.QUALIFACTIONMODE.ToString()).FirstOrDefault()!.UDCGroupId;
+                        }
+                        catch (Exception ex)
+                        {
+                            _errorMessage.Append($"Error getting qualification modes: {ex.Message}");
+                        }
+
+                        if (groupID > 0)
+                        {
+                            _qualificationModeList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                            if (_qualificationModeList != null)
+                                _qualificationModeArray = _qualificationModeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                        }
+                        #endregion
+
+                        #region Populate Months dropdown
+                        try
+                        {
+                            groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.MONTHCODE.ToString()).FirstOrDefault()!.UDCGroupId;
+                        }
+                        catch (Exception ex)
+                        {
+                            _errorMessage.Append($"Error getting months list: {ex.Message}");
+                        }
+
+                        if (groupID > 0)
+                        {
+                            _monthList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                            if (_monthList != null)
+                                _monthArray = _monthList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                        }
+                        #endregion
                     }
                 }
                 else
@@ -2327,6 +2591,114 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                             _roleTypeArray = _roleTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
                     }
                     #endregion
+
+                    #region Populate Relationship Type dropdown
+                    try
+                    {
+                        groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.RELATIONTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Relationship Types group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _relationTypeList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.UDCDesc1).ToList();
+                        if (_relationTypeList != null)
+                            _relationTypeArray = _relationTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                    }
+                    #endregion
+
+                    #region Populate Qualification Types dropdown
+                    try
+                    {
+                        groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.QUALIFACTIONTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting qualification types: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _qualificationList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                        if (_qualificationList != null)
+                            _qualificationArray = _qualificationList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                    }
+                    #endregion
+
+                    #region Populate Stream Types dropdown
+                    try
+                    {
+                        groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.STREAMTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting stream types: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _streamList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                        if (_streamList != null)
+                            _streamArray = _streamList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                    }
+                    #endregion
+
+                    #region Populate Specialization Types dropdown
+                    try
+                    {
+                        groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.SPECIALIZATION.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting specialization types: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _specializationList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                        if (_specializationList != null)
+                            _specializationArray = _specializationList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                    }
+                    #endregion
+
+                    #region Populate Qualification Modes dropdown
+                    try
+                    {
+                        groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.QUALIFACTIONMODE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting qualification modes: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _qualificationModeList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                        if (_qualificationModeList != null)
+                            _qualificationModeArray = _qualificationModeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                    }
+                    #endregion
+
+                    #region Populate Months dropdown
+                    try
+                    {
+                        groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.MONTHCODE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting months list: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _monthList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                        if (_monthList != null)
+                            _monthArray = _monthList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                    }
+                    #endregion
                 }
             }
             else
@@ -2714,6 +3086,20 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             }
 
             return _monthArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchQualification(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _qualificationArray!;
+            }
+
+            return _qualificationArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
         #endregion
     }

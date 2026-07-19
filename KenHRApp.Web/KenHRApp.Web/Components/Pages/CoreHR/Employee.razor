@@ -1614,12 +1614,20 @@
                                         <Columns>
                                             <PropertyColumn Property="x => x.QualificationDesc" Title="Qualification" Class="col-qualification" StickyLeft="true">
                                                 <EditTemplate Context="row">
-                                                    <MudTextField @bind-Value="row.Item.QualificationDesc" Label="Qualification" HelperText="Maximum input is 200 chars."
-                                                        Variant="Variant.Text" HelperTextOnFocus="true" Counter="200" MaxLength="200"
-                                                        Required RequiredError="Qualification is required"
-                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                    <MudAutocomplete @bind-Value="row.Item.QualificationDesc"
+                                                        SearchFunc="SearchQualification!"
+                                                        Variant="Variant.Text"
+                                                        Label="Qualification"
+                                                        Margin="Margin.Normal"
+                                                        Dense="true"
+                                                        Placeholder="Please Select"
+                                                        HelperText="Type a key to search for qualification"
+                                                        HelperTextOnFocus="true"
+                                                        Clearable="true" Typo="Typo.subtitle2"
+                                                        MaxItems="@(_qualificationList != null ? _qualificationList.Count : 10)"
+                                                        Modal="true" />
                                                 </EditTemplate>
-                                                <CellTemplate Context="row">
+                                                 <CellTemplate Context="row">
                                                     <MudChip T="long" 
                                                         Size=Size.Small
                                                         Color="Color.Info"
@@ -1629,7 +1637,7 @@
                                                         @row.Item.QualificationDesc
                                                     </MudChip>
                                                 </CellTemplate>
-                                            </PropertyColumn>  
+                                            </PropertyColumn>
                                             <PropertyColumn Property="x => x.StreamDesc" Title="Stream" Class="col-stream">
                                                 <EditTemplate Context="row">
                                                     <MudAutocomplete @bind-Value="row.Item.StreamDesc"
@@ -1646,12 +1654,12 @@
                                                         Modal="true" />
                                                 </EditTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.SpecializationDesc" Title="Stream" Class="col-specialization">
+                                            <PropertyColumn Property="x => x.SpecializationDesc" Title="Specialization" Class="col-specialization">
                                                 <EditTemplate Context="row">
                                                     <MudAutocomplete @bind-Value="row.Item.SpecializationDesc"
                                                         SearchFunc="SearchSpecialization!"
                                                         Variant="Variant.Text"
-                                                        Label="Stream"
+                                                        Label="Specialization"
                                                         Margin="Margin.Normal"
                                                         Dense="true"
                                                         Placeholder="Please Select"
@@ -1669,7 +1677,7 @@
                                                         Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                                 </EditTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.Institute" Title="University" Class="col-institute">
+                                            <PropertyColumn Property="x => x.Institute" Title="Institute" Class="col-institute">
                                                 <EditTemplate Context="row">
                                                     <MudTextField @bind-Value="row.Item.Institute" Label="Institute" HelperText="Maximum input is 100 chars."
                                                         Variant="Variant.Text" HelperTextOnFocus="true" Counter="100" MaxLength="100"
@@ -1681,7 +1689,7 @@
                                                     <MudAutocomplete @bind-Value="row.Item.QualificationModeDesc"
                                                         SearchFunc="SearchQualificationMode!"
                                                         Variant="Variant.Text"
-                                                        Label="Stream"
+                                                        Label="Qualification Mode"
                                                         Margin="Margin.Normal"
                                                         Dense="true"
                                                         Placeholder="Please Select"
@@ -1695,9 +1703,9 @@
                                             <PropertyColumn Property="x => x.CountryDesc" Title="Country" Class="col-Country">
                                                 <EditTemplate Context="row">
                                                     <MudAutocomplete @bind-Value="row.Item.CountryDesc"
-                                                                     SearchFunc="SearchCountry!"
+                                                        SearchFunc="SearchCountry!"
                                                         Variant="Variant.Text"
-                                                        Label="Stream"
+                                                        Label="Country"
                                                         Margin="Margin.Normal"
                                                         Dense="true"
                                                         Placeholder="Please Select"
@@ -1713,7 +1721,7 @@
                                                     <MudAutocomplete @bind-Value="row.Item.StateDesc"
                                                                      SearchFunc="SearchState!"
                                                                      Variant="Variant.Text"
-                                                                     Label="Stream"
+                                                                     Label="State"
                                                                      Margin="Margin.Normal"
                                                                      Dense="true"
                                                                      Placeholder="Please Select"
