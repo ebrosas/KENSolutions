@@ -651,9 +651,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             return false;
         };
 
-        private void QualificationStartedEditingItem(QualificationDTO item)
+        private async Task QualificationStartedEditingItem(QualificationDTO item)
         {
-            //_events.Insert(0, $"Event = StartedEditingShiftTimingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+            await EditQualificationAsync(item);
         }
 
         private void QualificationCommittedItemChanges(QualificationDTO item)
@@ -800,7 +800,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             }
         }
 
-        private async Task AddQualification()
+        private async Task AddQualificationAsync()
         {
             try
             {
@@ -834,6 +834,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 {
                     var newQualification = (QualificationDTO)result.Data!;
                     newQualification.AutoId = 0;
+                    newQualification.EmployeeNo = employee.EmployeeNo;
 
                     #region Get selected qualification
                     if (!string.IsNullOrEmpty(newQualification.QualificationDesc))
@@ -916,6 +917,185 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                         await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified qualification already exists. Please enter a different qualification details.");
                         return;
                     }
+                    #endregion
+
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Adding qualification, please wait...";
+
+                    _ = SaveQualificationAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, newQualification);
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task EditQualificationAsync(QualificationDTO qualification)
+        {
+            try
+            {
+                // Clone the object so the dialog can edit without affecting the grid until Save
+                var editableCopy = new QualificationDTO
+                {
+                    AutoId = qualification.AutoId,
+                    QualificationCode = qualification.QualificationCode,
+                    QualificationDesc = qualification.QualificationDesc,
+                    StreamCode = qualification.StreamCode,
+                    StreamDesc = qualification.StreamDesc,
+                    SpecializationCode = qualification.SpecializationCode,
+                    SpecializationDesc = qualification.SpecializationDesc,
+                    UniversityName = qualification.UniversityName,
+                    Institute = qualification.Institute,
+                    QualificationMode = qualification.QualificationMode,
+                    QualificationModeDesc = qualification.QualificationModeDesc,
+                    CountryCode = qualification.CountryCode,
+                    CountryDesc = qualification.CountryDesc,
+                    StateCode = qualification.StateCode,
+                    FromMonthCode = qualification.FromMonthCode,
+                    FromMonthDesc = qualification.FromMonthDesc,
+                    FromYear = qualification.FromYear,
+                    ToMonthCode = qualification.ToMonthCode,
+                    ToMonthDesc = qualification.ToMonthDesc,
+                    ToYear = qualification.ToYear,
+                    PassMonthCode = qualification.PassMonthCode,
+                    PassMonthDesc = qualification.PassMonthDesc,
+                    PassYear = qualification.PassYear
+                };
+
+                var parameters = new DialogParameters
+                {
+                    ["Qualification"] = editableCopy,
+                    ["QualificationList"] = _qualificationList,
+                    ["StreamList"] = _streamList,
+                    ["SpecializationList"] = _specializationList,
+                    ["QualificationModeList"] = _qualificationModeList,
+                    ["CountryList"] = _countryList,
+                    ["MonthList"] = _monthList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = true
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                var dialog = await DialogService.ShowAsync<SkillQualificationDialog>("Edit Qualification", parameters, options);
+                var result = await dialog.Result;
+
+                if (result != null && !result.Canceled)
+                {
+                    var updated = (QualificationDTO)result.Data!;
+
+                    #region Get selected qualification
+                    if (!string.IsNullOrEmpty(updated.QualificationDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCDesc1 == updated.QualificationDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.QualificationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected stream
+                    if (!string.IsNullOrEmpty(updated.StreamDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCDesc1 == updated.StreamDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.StreamCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected specialization
+                    if (!string.IsNullOrEmpty(updated.SpecializationDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _specializationList.Where(d => d.UDCDesc1 == updated.SpecializationDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.SpecializationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected qualification mode
+                    if (!string.IsNullOrEmpty(updated.QualificationModeDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _qualificationModeList.Where(d => d.UDCDesc1 == updated.QualificationModeDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.QualificationMode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected country
+                    if (!string.IsNullOrEmpty(updated.CountryDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCDesc1 == updated.CountryDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.CountryCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected from month
+                    if (!string.IsNullOrEmpty(updated.FromMonthDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == updated.FromMonthDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.FromMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected to month
+                    if (!string.IsNullOrEmpty(updated.ToMonthDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == updated.ToMonthDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.ToMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected pass month
+                    if (!string.IsNullOrEmpty(updated.PassMonthDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == updated.PassMonthDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.PassMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    // Update in-memory grid item
+                    var index = employee.QualificationList.FindIndex(x => x.AutoId == updated.AutoId);
+                    if (index >= 0)
+                    {
+                        employee.QualificationList[index] = updated;
+                        await InvokeAsync(StateHasChanged);
+                    }
+
+                    #region Persist changes to DB
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Saving qualification changes, please wait...";
+
+                    _ = SaveQualificationAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, updated);
                     #endregion
                 }
             }

@@ -1568,7 +1568,7 @@
                                         <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Qualifications List</MudText>
                                         <MudSpacer />
                                         <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
-                                             <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply new qualification..." OnClick="AddQualification" />
+                                             <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply new qualification..." OnClick="AddQualificationAsync" />
                                          </MudMenu>
                                      </MudAppBar>
                                 </MudStack>
@@ -1607,7 +1607,7 @@
                                                         StartIcon="@Icons.Material.Filled.Add" 
                                                         Size="Size.Small" title="Add new qualification" 
                                                         Disabled="@(!_allowGridEdit)"
-                                                        OnClick="AddQualification" />                                                        
+                                                        OnClick="AddQualificationAsync" />                                                        
                                                  </MudPaper>                             
                                             </MudPaper>
                                         </ToolBarContent>
@@ -1816,11 +1816,18 @@
                                             </PropertyColumn>
                                             <TemplateColumn CellClass="d-flex justify-end" Title="Actions">
                                                 <CellTemplate Context="row">
+                                                    @* <MudIconButton title="Add qualification" 
+                                                        Class="show-btn fa-icon-btn"
+                                                        Color="Color.Surface"
+                                                        OnClick="AddQualificationAsync">
+                                                        <ChildContent>
+                                                            <i class="fas fa-plus-circle fa-1x"></i>
+                                                        </ChildContent>
+                                                    </MudIconButton> *@
                                                     <MudIconButton title="Edit details" 
                                                         Class="show-btn fa-icon-btn"
                                                         Color="Color.Surface"
-                                                        Disabled="@(!_allowGridEdit)"
-                                                        OnClick="@row.Actions.StartEditingItemAsync">
+                                                        OnClick="@(() => EditQualificationAsync(row.Item))">
                                                         <ChildContent>
                                                             <i class="fas fa-pen-alt fa-1x"></i>
                                                         </ChildContent>

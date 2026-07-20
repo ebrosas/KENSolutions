@@ -557,6 +557,12 @@ namespace KenHRApp.Infrastructure.Repositories
                         #endregion
 
                         #region Get Qualifications
+                        int qualGroupID = _db.UserDefinedCodeGroups.Where(a => a.UDCGCode == "QUALIFACTIONTYPE").FirstOrDefault()!.UDCGroupId;
+                        int streamGroupID = _db.UserDefinedCodeGroups.Where(a => a.UDCGCode == "STREAMTYPE").FirstOrDefault()!.UDCGroupId;
+                        int specialGroupID = _db.UserDefinedCodeGroups.Where(a => a.UDCGCode == "SPECIALIZATION").FirstOrDefault()!.UDCGroupId;
+                        int qualModeGroupID = _db.UserDefinedCodeGroups.Where(a => a.UDCGCode == "QUALIFACTIONMODE").FirstOrDefault()!.UDCGroupId;
+                        int monthGroupID = _db.UserDefinedCodeGroups.Where(a => a.UDCGCode == "MONTHCODE").FirstOrDefault()!.UDCGroupId;
+
                         var qualificationModel = await (from q in _db.Qualifications
                                                         join qCode in _db.UserDefinedCodes on q.QualificationCode equals qCode.UDCCode     // INNER JOIN
                                                         join qMode in _db.UserDefinedCodes on q.QualificationMode equals qMode.UDCCode     // INNER JOIN
@@ -568,6 +574,11 @@ namespace KenHRApp.Infrastructure.Repositories
                                                         join country in _db.UserDefinedCodes on q.CountryCode equals country.UDCCode into gjCountry from subCountry in gjCountry.DefaultIfEmpty()          // LEFT JOIN 
                                                         join state in _db.UserDefinedCodes on q.StateCode equals state.UDCCode into gjState from subState in gjState.DefaultIfEmpty()          // LEFT JOIN 
                                                         where q.EmployeeNo == employeeDetail.EmployeeNo
+                                                            && qCode.GroupID == qualGroupID
+                                                            && qMode.GroupID == qualModeGroupID
+                                                            && (subStream == null || subStream.GroupID == streamGroupID)
+                                                            && (subSpec == null || subSpec.GroupID == specialGroupID)
+                                                            && (subCountry == null || subCountry.GroupID == countryGroupID)
                                                         select new
                                                         {
                                                             Qualification = q,

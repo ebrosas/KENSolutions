@@ -2239,10 +2239,11 @@ namespace KenHRApp.Application.Services
 
             try
             {
-                #region Initialize EmergencyContact entity
+                #region Initialize Qualification entity
                 Qualification qualificationEntity = new Qualification()
                 {
                     AutoId = dto.AutoId,
+                    EmployeeNo = dto.EmployeeNo,
                     QualificationCode = dto.QualificationCode,
                     StreamCode = dto.StreamCode,
                     SpecializationCode = dto.SpecializationCode,
@@ -2251,6 +2252,7 @@ namespace KenHRApp.Application.Services
                     QualificationMode = dto.QualificationMode,
                     CountryCode = dto.CountryCode,
                     StateCode = dto.StateCode,
+                    CityTownName = dto.CityTownName,
                     FromMonthCode = dto.FromMonthCode,
                     FromYear = dto.FromYear,
                     ToMonthCode = dto.ToMonthCode,

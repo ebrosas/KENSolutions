@@ -15,6 +15,7 @@
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="Qualification.QualificationDesc"
+                                             For="@(() => Qualification.QualificationDesc)"
                                               SearchFunc="SearchQualification!"
                                               Variant="Variant.Text"
                                               Label="Qualification"
@@ -31,6 +32,7 @@
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="Qualification.StreamDesc"
+                                             For="@(() => Qualification.StreamDesc)"
                                              SearchFunc="SearchStream!"
                                              Variant="Variant.Text"
                                              Label="Stream"
@@ -49,6 +51,7 @@
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="Qualification.SpecializationDesc"
+                                             For="@(() => Qualification.SpecializationDesc)"
                                              SearchFunc="SearchSpecialization!"
                                              Variant="Variant.Text"
                                              Label="Specialization"
@@ -65,6 +68,7 @@
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="Qualification.QualificationModeDesc"
+                                             For="@(() => Qualification.QualificationModeDesc)"
                                              SearchFunc="SearchQualificationMode!"
                                              Variant="Variant.Text"
                                              Label="Qualification Mode"
@@ -103,6 +107,7 @@
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="Qualification.CountryDesc"
+                                             For="@(() => Qualification.CountryDesc)"
                                              SearchFunc="SearchCountry!"
                                              Variant="Variant.Text"
                                              Label="Country"
@@ -127,18 +132,13 @@
                     </MudItem>
                 </MudGrid>
                 <MudGrid Spacing="7">
-                    <MudItem xs="6">
+                    <MudItem xs="12">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudTextField @bind-Value="Qualification.CityTownName"
                                           For="@(() => Qualification.CityTownName)"
                                           HelperText="Max. text input is 100 chars." Variant="Variant.Text" HelperTextOnFocus="true"
-                                          Counter="100" MaxLength="100" Disabled="false" Label="State"
+                                          Counter="100" MaxLength="100" Disabled="false" Label="City / Town"
                                           Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                        </MudPaper>
-                    </MudItem>
-                    <MudItem xs="6">
-                        <MudPaper Elevation="0" Class="p-0 w-100">
-                        
                         </MudPaper>
                     </MudItem>
                 </MudGrid>
@@ -146,6 +146,7 @@
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="Qualification.FromMonthDesc"
+                                             For="@(() => Qualification.FromMonthDesc)"
                                              SearchFunc="SearchMonth!"
                                              Variant="Variant.Text"
                                              Label="From Month"
@@ -160,7 +161,7 @@
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="6">
-                        <MudPaper Elevation="0" Class="p-0 w-50">
+                        <MudPaper Elevation="0" Class="p-0 w-25">
                             <MudNumericField @bind-Value="Qualification.FromYear" Label="From Year"
                                              For="@(() => Qualification.FromYear)"
                                              Variant="Variant.Outlined"
@@ -173,6 +174,7 @@
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="Qualification.ToMonthDesc"
+                                             For="@(() => Qualification.ToMonthDesc)"
                                              SearchFunc="SearchMonth!"
                                              Variant="Variant.Text"
                                              Label="To Month"
@@ -187,7 +189,7 @@
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="6">
-                        <MudPaper Elevation="0" Class="p-0 w-50">
+                        <MudPaper Elevation="0" Class="p-0 w-25">
                             <MudNumericField @bind-Value="Qualification.ToYear" Label="To Year"
                                              For="@(() => Qualification.ToYear)"
                                              Variant="Variant.Outlined"
@@ -200,6 +202,7 @@
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="Qualification.PassMonthDesc"
+                                             For="@(() => Qualification.PassMonthDesc)"
                                              SearchFunc="SearchMonth!"
                                              Variant="Variant.Text"
                                              Label="Pass Month"
@@ -214,7 +217,7 @@
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="6">
-                        <MudPaper Elevation="0" Class="p-0 w-50">
+                        <MudPaper Elevation="0" Class="p-0 w-25">
                             <MudNumericField @bind-Value="Qualification.PassYear" Label="Pass Year"
                                              For="@(() => Qualification.PassYear)"
                                              Variant="Variant.Outlined"
@@ -304,7 +307,7 @@
             _countryArray = CountryList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
 
         if (MonthList != null)
-            _monthArray = MonthList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+            _monthArray = MonthList.OrderBy(o => o.SequenceNo).Select(d => d.UDCDesc1).ToArray();
     }
     #endregion
 
