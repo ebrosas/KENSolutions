@@ -814,7 +814,8 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     ["CountryList"] = _countryList,
                     ["MonthList"] = _monthList,
                     ["IsClearable"] = true,
-                    ["IsDisabled"] = false
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = false
                 };
 
                 var options = new DialogOptions
@@ -822,11 +823,12 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     CloseOnEscapeKey = true,
                     BackdropClick = false,
                     FullWidth = true,
-                    MaxWidth = MaxWidth.Large
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
                 };
 
                 // Show the dialog box
-                var dialog = await DialogService.ShowAsync<EmergencyContactDialog>("Add New Qualification", parameters, options);
+                var dialog = await DialogService.ShowAsync<SkillQualificationDialog>("Add New Qualification", parameters, options);
                 var result = await dialog.Result;
                 if (result != null && !result.Canceled)
                 {
