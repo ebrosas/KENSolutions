@@ -1716,9 +1716,9 @@
                                                         Modal="true" />
                                                 </EditTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.StateDesc" Title="State" Class="col-State">
+                                            <PropertyColumn Property="x => x.StateName" Title="State" Class="col-State">
                                                 <EditTemplate Context="row">
-                                                    <MudAutocomplete @bind-Value="row.Item.StateDesc"
+                                                   @*  <MudAutocomplete @bind-Value="row.Item.StateDesc"
                                                                      SearchFunc="SearchState!"
                                                                      Variant="Variant.Text"
                                                                      Label="State"
@@ -1729,7 +1729,11 @@
                                                                      HelperTextOnFocus="true"
                                                                      Clearable="true" Typo="Typo.subtitle2"
                                                                      MaxItems="@(_stateList != null ? _stateList.Count : 10)"
-                                                                     Modal="true" />
+                                                                     Modal="true" /> *@
+                                                    <MudTextField @bind-Value="row.Item.StateName" Label="State" 
+                                                        HelperText="Maximum input is 100 chars."
+                                                        Variant="Variant.Text" HelperTextOnFocus="true" Counter="100" MaxLength="100"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                                 </EditTemplate>
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.CityTownName" Title="City/Town Name" Class="col-CityTownName">

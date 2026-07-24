@@ -1077,7 +1077,8 @@ namespace KenHRApp.Application.Services
                             ToYear = e.ToYear,
                             PassMonthCode = e.PassMonthCode,
                             PassMonthDesc = e.PassMonthDesc,
-                            PassYear = e.PassYear
+                            PassYear = e.PassYear,
+                            StateName = e.StateName
                         }).ToList();
                     }
                     #endregion
@@ -2258,7 +2259,8 @@ namespace KenHRApp.Application.Services
                     ToMonthCode = dto.ToMonthCode,
                     ToYear = dto.ToYear,
                     PassMonthCode = dto.PassMonthCode,
-                    PassYear = dto.PassYear
+                    PassYear = dto.PassYear,
+                    StateName = dto.StateName
                 };
                 #endregion
 

@@ -123,10 +123,10 @@
                     </MudItem>
                     <MudItem xs="6">
                         <MudPaper Elevation="0" Class="p-0 w-100">
-                            <MudTextField @bind-Value="Qualification.StateCode"
-                                          For="@(() => Qualification.StateCode)"
-                                          HelperText="Max. text input is 20 chars." Variant="Variant.Text" HelperTextOnFocus="true"
-                                          Counter="20" MaxLength="20" Disabled="false" Label="State"
+                            <MudTextField @bind-Value="Qualification.StateName"
+                                          For="@(() => Qualification.StateName)"
+                                          HelperText="Max. text input is 100 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="100" MaxLength="100" Disabled="false" Label="State"
                                           Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                         </MudPaper>
                     </MudItem>

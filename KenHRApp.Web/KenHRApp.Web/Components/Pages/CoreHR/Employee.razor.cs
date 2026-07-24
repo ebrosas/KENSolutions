@@ -791,7 +791,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 }
 
                 // Show notification
-                ShowNotification("The specified qualification was saved successfully!", NotificationType.Success);
+                ShowNotification("Qualification has been saved successfully!", NotificationType.Success);
             }
 
             if (callback != null)
@@ -970,7 +970,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     ToYear = qualification.ToYear,
                     PassMonthCode = qualification.PassMonthCode,
                     PassMonthDesc = qualification.PassMonthDesc,
-                    PassYear = qualification.PassYear
+                    PassYear = qualification.PassYear,
+                    CityTownName = qualification.CityTownName,
+                    StateName = qualification.StateName
                 };
 
                 var parameters = new DialogParameters

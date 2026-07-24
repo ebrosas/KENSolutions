@@ -622,7 +622,8 @@ namespace KenHRApp.Infrastructure.Repositories
                                     ToYear  = item.Qualification.ToYear,
                                     PassMonthCode  = item.Qualification.PassMonthCode,
                                     PassMonthDesc  = item.PassMonthDesc,
-                                    PassYear  = item.Qualification.PassYear
+                                    PassYear  = item.Qualification.PassYear,
+                                    StateName = item.Qualification.StateName
                                 });
                             }
                         }
