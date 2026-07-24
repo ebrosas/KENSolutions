@@ -2168,10 +2168,12 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 // Save to database
                 _db.Qualifications.Add(qualification);
-
                 rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
 
-                return Result<int>.SuccessResult(rowsUpdated);
+                // ✅ EF Core automatically populates identity after SaveChanges
+                int generatedId = qualification.AutoId;
+
+                return Result<int>.SuccessResult(generatedId);
             }
             catch (InvalidOperationException invEx)
             {

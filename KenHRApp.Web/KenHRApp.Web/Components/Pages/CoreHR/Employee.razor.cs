@@ -781,7 +781,8 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 if (qualification.AutoId == 0)
                 {
                     // Get the new identity seed
-                    qualification.AutoId = employee.QualificationList.Max(d => d.AutoId) + 1;
+                    //qualification.AutoId = employee.QualificationList.Max(d => d.AutoId) + 1;
+                    qualification.AutoId = result.Value;
 
                     // Add locally to the list so UI updates immediately
                     employee.QualificationList.Add(qualification);
