@@ -630,13 +630,15 @@ namespace KenHRApp.Infrastructure.Repositories
                         #endregion
 
                         #region Get Employee Skills
+                        int levelGroupID = _db.UserDefinedCodeGroups.Where(a => a.UDCGCode == "SKILLLEVEL").FirstOrDefault()!.UDCGroupId;
                         var skillModel = await (from s in _db.EmployeeSkills
                                                         join level in _db.UserDefinedCodes on s.LevelCode equals level.UDCCode into gjLevel from subLevel in gjLevel.DefaultIfEmpty()      // LEFT JOIN 
                                                         join lastUsedMonth in _db.UserDefinedCodes on s.LastUsedMonthCode equals lastUsedMonth.UDCCode into gjLastUsedMonth from subLastUsedMonth in gjLastUsedMonth.DefaultIfEmpty()      // LEFT JOIN 
                                                         join fromMonth in _db.UserDefinedCodes on s.FromMonthCode equals fromMonth.UDCCode into gjFromMonth from subFromMonth in gjFromMonth.DefaultIfEmpty()      // LEFT JOIN 
                                                         join toMonth in _db.UserDefinedCodes on s.ToMonthCode equals toMonth.UDCCode into gjToMonth from subToMonth in gjToMonth.DefaultIfEmpty()      // LEFT JOIN                                                         
                                                         where s.EmployeeNo == employeeDetail.EmployeeNo
-                                                        select new
+                                                            && subLevel.GroupID == levelGroupID
+                                                select new
                                                         {
                                                             EmployeeSkill = s,
                                                             LevelDesc = subLevel != null ? subLevel.UDCDesc1 : null,
@@ -2249,6 +2251,106 @@ namespace KenHRApp.Infrastructure.Repositories
                     throw new Exception("Could not perform deletion because the selected qualification was not found in the database.");
 
                 _db.Qualifications.Remove(qualification);
+
+                int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
+                if (rowsDeleted > 0)
+                    isSuccess = true;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> AddEmployeeSkillAsync(
+            EmployeeSkill skill,
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                // Save to database
+                _db.EmployeeSkills.Add(skill);
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                // ✅ EF Core automatically populates identity after SaveChanges
+                int generatedId = skill.AutoId;
+
+                return Result<int>.SuccessResult(generatedId);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> UpdateEmployeeSkillAsync(
+            EmployeeSkill dto,
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                var skill = await _db.EmployeeSkills.FirstOrDefaultAsync(x => x.AutoId == dto.AutoId, cancellationToken);
+                if (skill == null)
+                    throw new InvalidOperationException("Employee skill was not found");
+
+                #region Update Employee skill entity
+                skill.SkillName = dto.SkillName;
+                skill.LevelCode = dto.LevelCode;
+                skill.LastUsedMonthCode = dto.LastUsedMonthCode;
+                skill.LastUsedYear = dto.LastUsedYear;
+                skill.FromMonthCode = dto.FromMonthCode;
+                skill.FromYear = dto.FromYear;
+                skill.ToMonthCode = dto.ToMonthCode;
+                skill.ToYear = dto.ToYear;
+                #endregion
+
+                // Save to database
+                _db.EmployeeSkills.Update(skill);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<bool>> DeleteEmployeeSkillAsync(
+            int autoID,
+            CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var skill = await _db.EmployeeSkills.FindAsync(autoID);
+                if (skill == null)
+                    throw new Exception("Could not perform deletion because the selected skill was not found in the database.");
+
+                _db.EmployeeSkills.Remove(skill);
 
                 int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
                 if (rowsDeleted > 0)

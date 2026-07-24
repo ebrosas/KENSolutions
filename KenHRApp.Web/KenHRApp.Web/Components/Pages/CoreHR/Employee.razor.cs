@@ -156,6 +156,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         private List<UserDefinedCodeDTO> _monthList = new List<UserDefinedCodeDTO>();
         private string[]? _monthArray = null;
+
+        private List<UserDefinedCodeDTO> _skillLevelList = new List<UserDefinedCodeDTO>();
+        private string[]? _skillLevelArray = null;
         #endregion
 
         #region Enums and Collections
@@ -235,6 +238,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         
         private string _qualificationSearchString = string.Empty;
         private bool _qualificationFilter = false;
+
+        private string _skillSearchString = string.Empty;
+        private bool _skillFilter = false;
         #endregion
 
         #endregion
@@ -618,7 +624,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         #region Qualifications Grid
         private Func<QualificationDTO, bool> _qualificationQuickFilter => x =>
         {
-            if (string.IsNullOrWhiteSpace(_emergencySearchString))
+            if (string.IsNullOrWhiteSpace(_qualificationSearchString))
                 return true;
 
             if (!string.IsNullOrEmpty(x.QualificationDesc) && x.QualificationDesc.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
@@ -1200,6 +1206,460 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             {
                 // Show notification
                 ShowNotification("The selected qualification has been deleted successfully!", NotificationType.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(errorMsg);
+                    ShowHideError(true);
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+        #endregion
+
+        #region Skills Grid
+        private Func<EmployeeSkillDTO, bool> _skillQuickFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(_skillSearchString))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.SkillName) && x.SkillName.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.LevelDesc) && x.LevelDesc.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
+        };
+
+        private async Task SkillStartedEditingItem(EmployeeSkillDTO item)
+        {
+            await EditSkillAsync(item);
+        }
+
+        private void SkillCommittedItemChanges(EmployeeSkillDTO item)
+        {
+            try
+            {
+                if (item == null) return;
+
+                #region Get selected skill level
+                if (!string.IsNullOrEmpty(item.LevelCode))
+                {
+                    UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCCode == item.LevelCode).FirstOrDefault();
+                    if (udc != null)
+                        item.LevelDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected Last Used Month
+                if (!string.IsNullOrEmpty(item.LastUsedMonthCode))
+                {
+                    UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCCode == item.LastUsedMonthCode).FirstOrDefault();
+                    if (udc != null)
+                        item.LastUsedMonthDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected from month
+                if (!string.IsNullOrEmpty(item.FromMonthCode))
+                {
+                    UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCCode == item.FromMonthCode).FirstOrDefault();
+                    if (udc != null)
+                        item.FromMonthDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected to month
+                if (!string.IsNullOrEmpty(item.ToMonthCode))
+                {
+                    UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCCode == item.ToMonthCode).FirstOrDefault();
+                    if (udc != null)
+                        item.ToMonthDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Saving changes, please wait...";
+
+                _ = SaveSkillAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+                }, item);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Save cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task SaveSkillAsync(Func<Task> callback, EmployeeSkillDTO skill)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            var result = await EmployeeService.SaveEmployeeSkillAsync(skill, _cts.Token);
+            if (!result.Success)
+            {
+                // Set the error message
+                _errorMessage.AppendLine(result.Error!);
+                ShowHideError(true);
+            }
+            else
+            {
+                if (skill.AutoId == 0)
+                {
+                    // Get the new identity seed
+                    skill.AutoId = result.Value;
+
+                    // Add locally to the list so UI updates immediately
+                    employee.EmployeeSkillList.Add(skill);
+
+                    StateHasChanged();
+                }
+
+                // Show notification
+                ShowNotification("Skill has been saved successfully!", NotificationType.Success);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task AddSkillAsync()
+        {
+            try
+            {
+                var parameters = new DialogParameters
+                {
+                    ["EmployeeSkill"] = new EmployeeSkillDTO(),
+                    ["SkillLevelList"] = _skillLevelList,
+                    ["MonthList"] = _monthList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = false
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                // Show the dialog box
+                var dialog = await DialogService.ShowAsync<SkillQualificationDialog>("Add New Skill", parameters, options);
+                var result = await dialog.Result;
+                if (result != null && !result.Canceled)
+                {
+                    var newSkill = (EmployeeSkillDTO)result.Data!;
+                    newSkill.AutoId = 0;
+                    newSkill.EmployeeNo = employee.EmployeeNo;
+
+                    #region Get selected skill level
+                    if (!string.IsNullOrEmpty(newSkill.LevelDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _skillLevelList.Where(d => d.UDCDesc1 == newSkill.LevelDesc).FirstOrDefault();
+                        if (udc != null)
+                            newSkill.LevelCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected last used month
+                    if (!string.IsNullOrEmpty(newSkill.LastUsedMonthDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == newSkill.LastUsedMonthDesc).FirstOrDefault();
+                        if (udc != null)
+                            newSkill.LastUsedMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected from month
+                    if (!string.IsNullOrEmpty(newSkill.FromMonthDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == newSkill.FromMonthDesc).FirstOrDefault();
+                        if (udc != null)
+                            newSkill.FromMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected to month
+                    if (!string.IsNullOrEmpty(newSkill.ToMonthDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == newSkill.ToMonthDesc).FirstOrDefault();
+                        if (udc != null)
+                            newSkill.ToMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Check for duplicate entries
+                    var duplicateSkill = employee.EmployeeSkillList.FirstOrDefault(e => e.EmployeeNo == newSkill.EmployeeNo
+                        && e.SkillName.Trim().ToUpper() == newSkill.SkillName.Trim().ToUpper());
+                    if (duplicateSkill != null)
+                    {
+                        // Show error
+                        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified skill already exists. Please enter a unique skill.");
+                        return;
+                    }
+                    #endregion
+
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Adding skill, please wait...";
+
+                    _ = SaveSkillAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, newSkill);
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task EditSkillAsync(EmployeeSkillDTO skill)
+        {
+            try
+            {
+                // Clone the object so the dialog can edit without affecting the grid until Save
+                var editableCopy = new EmployeeSkillDTO
+                {
+                    AutoId = skill.AutoId,
+                    SkillName = skill.SkillName,
+                    LevelCode = skill.LevelCode,
+                    LevelDesc = skill.LevelDesc,
+                    LastUsedMonthCode = skill.LastUsedMonthCode,
+                    LastUsedMonthDesc = skill.LastUsedMonthDesc,
+                    LastUsedYear = skill.LastUsedYear,
+                    FromMonthCode = skill.FromMonthCode,
+                    FromMonthDesc = skill.FromMonthDesc,
+                    FromYear = skill.FromYear,
+                    ToMonthCode = skill.ToMonthCode,
+                    ToMonthDesc = skill.ToMonthDesc,
+                    ToYear = skill.ToYear
+                };
+
+                var parameters = new DialogParameters
+                {
+                    ["EmployeeSkill"] = editableCopy,
+                    ["SkillLevelList"] = _skillLevelList,
+                    ["MonthList"] = _monthList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = true
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                var dialog = await DialogService.ShowAsync<SkillQualificationDialog>("Edit Skill", parameters, options);
+                var result = await dialog.Result;
+
+                if (result != null && !result.Canceled)
+                {
+                    var updated = (EmployeeSkillDTO)result.Data!;
+
+                    #region Get selected level
+                    if (!string.IsNullOrEmpty(updated.LevelDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCDesc1 == updated.LevelDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.LevelCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected last used month
+                    if (!string.IsNullOrEmpty(updated.LastUsedMonthDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == updated.LastUsedMonthDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.LastUsedMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected from month
+                    if (!string.IsNullOrEmpty(updated.FromMonthDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == updated.FromMonthDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.FromMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected to month
+                    if (!string.IsNullOrEmpty(updated.ToMonthDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == updated.ToMonthDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.ToMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    // Update in-memory grid item
+                    var index = employee.EmployeeSkillList.FindIndex(x => x.AutoId == updated.AutoId);
+                    if (index >= 0)
+                    {
+                        employee.EmployeeSkillList[index] = updated;
+                        await InvokeAsync(StateHasChanged);
+                    }
+
+                    #region Persist changes to DB
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Saving skill changes, please wait...";
+
+                    _ = SaveSkillAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, updated);
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task ConfirmDeleteSkill(EmployeeSkillDTO skill)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to delete this skill: '{skill.SkillName}'?" },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Skill", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                BeginDeleteSkill(skill);
+            }
+        }
+
+        private void BeginDeleteSkill(EmployeeSkillDTO skill)
+        {
+            try
+            {
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Deleting skill, please wait...";
+
+                _ = DeleteSkillAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    // Remove locally from the list so UI updates immediately
+                    employee.EmployeeSkillList.Remove(skill);
+
+                    StateHasChanged();
+
+                }, skill);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Delete cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task DeleteSkillAsync(Func<Task> callback, EmployeeSkillDTO skill)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            if (skill.AutoId == 0)
+            {
+                errorMsg = "Skill ID is not defined.";
+            }
+            else
+            {
+                var deleteResult = await EmployeeService.DeleteEmployeeSkillAsync(skill.AutoId, _cts.Token);
+                isSuccess = deleteResult.Success;
+                if (!isSuccess)
+                    errorMsg = deleteResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Show notification
+                ShowNotification("The selected skill has been deleted successfully!", NotificationType.Success);
             }
             else
             {
@@ -3285,6 +3745,20 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             }
 
             return _qualificationArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchSkillLevel(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _skillLevelArray!;
+            }
+
+            return _skillLevelArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
         #endregion
     }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -13,7 +14,12 @@ namespace KenHRApp.Application.DTOs
     {
         #region Properties
         public int AutoId { get; set; }
+
+        [Required(ErrorMessage = "Skill Name is required")]
+        [Display(Name = "Skill Name")]
+        [StringLength(50, ErrorMessage = "Skill Name can't be more than 50 characters.")]
         public string SkillName { get; set; } = null!;
+
         public string? LevelCode { get; set; } = null;
         public string? LevelDesc { get; set; } = null;
         public string? LastUsedMonthCode { get; set; } = null;

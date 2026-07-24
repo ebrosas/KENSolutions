@@ -53,6 +53,18 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<bool>> DeleteQualificationAsync(
             int autoID,
             CancellationToken cancellationToken = default);
+
+        Task<Result<int>> AddEmployeeSkillAsync(
+            EmployeeSkill skill,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<int>> UpdateEmployeeSkillAsync(
+            EmployeeSkill dto,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<bool>> DeleteEmployeeSkillAsync(
+            int autoID,
+            CancellationToken cancellationToken = default);
         #endregion
     }
 }

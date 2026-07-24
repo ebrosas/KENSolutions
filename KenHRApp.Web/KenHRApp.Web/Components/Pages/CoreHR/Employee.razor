@@ -1568,7 +1568,7 @@
                                         <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Qualifications List</MudText>
                                         <MudSpacer />
                                         <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
-                                             <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply new qualification..." OnClick="AddQualificationAsync" />
+                                             <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add new qualification..." OnClick="AddQualificationAsync" />
                                          </MudMenu>
                                      </MudAppBar>
                                 </MudStack>
@@ -1718,18 +1718,6 @@
                                             </PropertyColumn>
                                             <PropertyColumn Property="x => x.StateName" Title="State" Class="col-State">
                                                 <EditTemplate Context="row">
-                                                   @*  <MudAutocomplete @bind-Value="row.Item.StateDesc"
-                                                                     SearchFunc="SearchState!"
-                                                                     Variant="Variant.Text"
-                                                                     Label="State"
-                                                                     Margin="Margin.Normal"
-                                                                     Dense="true"
-                                                                     Placeholder="Please Select"
-                                                                     HelperText="Type a key to search for state"
-                                                                     HelperTextOnFocus="true"
-                                                                     Clearable="true" Typo="Typo.subtitle2"
-                                                                     MaxItems="@(_stateList != null ? _stateList.Count : 10)"
-                                                                     Modal="true" /> *@
                                                     <MudTextField @bind-Value="row.Item.StateName" Label="State" 
                                                         HelperText="Maximum input is 100 chars."
                                                         Variant="Variant.Text" HelperTextOnFocus="true" Counter="100" MaxLength="100"
@@ -1858,48 +1846,197 @@
                                 </MudPaper>
                             </ChildContent>
                         </MudExpansionPanel>
+
                         <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters Expanded>
                             <TitleContent>
                                 <div class="d-flex">
                                     <MudIcon Icon="fas fa-user-tag" Style="color: #004165;" Size=Size.Small class="mr-3"></MudIcon>
-                                    <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Skills</strong></MudText>
-                                    <MudSpacer />
-                                    <MudFab Style="background-color: #004165; color: white;" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" Class="mr-3" />
+                                    <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Skills</strong></MudText>                                    
                                 </div>
                             </TitleContent>
                             <ChildContent>
-                                <MudPaper Elevation="4" Square="true" Class="w-100">
+                                <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-2 mb-0">
+                                    <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
+                                        <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Skills List</MudText>
+                                        <MudSpacer />
+                                        <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
+                                             <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add new skill..." OnClick="AddQualificationAsync" />
+                                         </MudMenu>
+                                     </MudAppBar>
+                                </MudStack>
+                                <MudPaper Elevation="4" Square="true" Class="w-100 mb-3">
                                     <MudDataGrid T="EmployeeSkillDTO" Items="@employee.EmployeeSkillList" Hover="true" Striped="true" Class="skill-grid"
-                                        TableClass="fixed-table" Dense="false" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true"
-                                        EditMode="DataGridEditMode.Form">
+                                        Filterable="@_skillFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" 
+                                        FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                                        QuickFilter="@_skillQuickFilter" Hideable="true" PageSize="5"
+                                        EditTrigger="DataGridEditTrigger.Manual" ReadOnly="@(!_allowGridEdit)" EditMode="DataGridEditMode.Form"
+                                        EditDialogOptions="new DialogOptions 
+                                        { 
+                                            MaxWidth = MaxWidth.Small, 
+                                            FullWidth = true,
+                                            BackdropClick = false,
+                                            CloseOnEscapeKey = false
+                                        }"
+                                        StartedEditingItem="@SkillStartedEditingItem" CommittedItemChanges="@SkillCommittedItemChanges"
+                                        TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                                        <ToolBarContent>
+                                            <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                                                 <MudTextField @bind-Value="_skillSearchString" Placeholder="Enter search string"
+                                                    Adornment="Adornment.Start" ReadOnly="@(!_allowGridEdit)"
+                                                    Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"   
+                                                    AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                                                 </MudTextField>
+                                             </MudPaper>
+                                            <MudSpacer />
+                                            <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                                <MudSwitch @bind-Value="_skillFilter"
+                                                    Disabled="@(!_allowGridEdit)"                                                        
+                                                    ThumbIcon="@(_skillFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)"
+                                                    ThumbIconColor="@(_skillFilter==true ? Color.Success : Color.Error)"
+                                                    LabelPlacement="Placement.Start"
+                                                    Label="Enable Custom Filter" />
+                                                 <MudPaper Class="ms-3" Elevation="0">
+                                                    <MudFab Style="background-color: #004165; color: white;" 
+                                                        StartIcon="@Icons.Material.Filled.Add" 
+                                                        Size="Size.Small" title="Add new skill" 
+                                                        Disabled="@(!_allowGridEdit)"
+                                                        OnClick="AddSkillAsync" />                                                        
+                                                 </MudPaper>                             
+                                            </MudPaper>
+                                        </ToolBarContent>
                                         <Columns>
-                                            <PropertyColumn Property="x => x.SkillName" Title="Skill Name" Class="col-skillname" />
-                                            <PropertyColumn Property="x => x.LevelDesc" Width="150px" Class="col-level" />
-                                            <PropertyColumn Property="x => x.LastUsedMonthDesc" Title="Last Used Month" Class="col-LastUsedMonth" />
-                                            <PropertyColumn Property="x => x.LastUsedYear" Title="Last Used Year" />
-                                            <PropertyColumn Property="x => x.FromMonthDesc" Title="From Month" Class="col-FromMonth" />
-                                            <PropertyColumn Property="x => x.FromYear" Title="From Year" />
-                                            <PropertyColumn Property="x => x.ToMonthDesc" Title="To Month" />
-                                            <PropertyColumn Property="x => x.ToYear" Title="To Year" />
-                                            <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                                             <PropertyColumn Property="x => x.SkillName" Title="Skill Name" Class="col-skillname" StickyLeft="true">
+                                                <EditTemplate Context="row">
+                                                    <MudTextField @bind-Value="row.Item.SkillName" Label="Skill Name" 
+                                                        Variant="Variant.Text" 
+                                                        HelperText="Maximum input is 50 chars."
+                                                        HelperTextOnFocus="true" Counter="50" MaxLength="50"
+                                                        Required RequiredError="Contact Person is required"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                </EditTemplate>
                                                 <CellTemplate Context="row">
-                                                    <MudIconButton Color="Color.Info" title="Edit record" Class="show-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
+                                                    <MudChip T="long" 
+                                                        Size=Size.Small
+                                                        Color="Color.Info"
+                                                        Label="true" 
+                                                        Class="fw-bold" 
+                                                        Style="font-size: 14px;">
+                                                        @row.Item.SkillName
+                                                    </MudChip>
+                                                </CellTemplate>
+                                            </PropertyColumn>  
+                                            <PropertyColumn Property="x => x.LevelDesc" Title="Level" Class="col-level">
+                                                <EditTemplate Context="row">
+                                                    <MudAutocomplete @bind-Value="row.Item.LevelDesc"
+                                                        SearchFunc="SearchSkillLevel!"
+                                                        Variant="Variant.Text"
+                                                        Label="Level"
+                                                        Margin="Margin.Normal"
+                                                        Dense="true"
+                                                        Placeholder="Please Select"
+                                                        HelperText="Type a key to search for level"
+                                                        HelperTextOnFocus="true"
+                                                        Clearable="true" Typo="Typo.subtitle2"
+                                                                     MaxItems="@(_skillLevelList != null ? _skillLevelList.Count : 10)"
+                                                        Modal="true" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.LastUsedMonthDesc" Title="Last Used Month" Class="col-Month">
+                                                <EditTemplate Context="row">
+                                                    <MudAutocomplete @bind-Value="row.Item.LastUsedMonthDesc"
+                                                                     SearchFunc="SearchMonth!"
+                                                                     Variant="Variant.Text"
+                                                                     Label="Last Used Month"
+                                                                     Margin="Margin.Normal"
+                                                                     Dense="true"
+                                                                     Placeholder="Please Select"
+                                                                     HelperText="Type a key to search for month"
+                                                                     HelperTextOnFocus="true"
+                                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                                     MaxItems="@(_monthList != null ? _monthList.Count : 10)"
+                                                                     Modal="true" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.LastUsedYear" Title="Last Used Year" Class="col-Year">
+                                                <EditTemplate Context="row">
+                                                    <MudNumericField @bind-Value="row.Item.LastUsedYear" Label="Last Used Year"
+                                                        For="@(() => row.Item.LastUsedYear)"
+                                                        Variant="Variant.Outlined"
+                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.FromMonthDesc" Title="From Month" Class="col-Month">
+                                                <EditTemplate Context="row">
+                                                    <MudAutocomplete @bind-Value="row.Item.FromMonthDesc"
+                                                                     SearchFunc="SearchMonth!"
+                                                                     Variant="Variant.Text"
+                                                                     Label="From Month"
+                                                                     Margin="Margin.Normal"
+                                                                     Dense="true"
+                                                                     Placeholder="Please Select"
+                                                                     HelperText="Type a key to search for month"
+                                                                     HelperTextOnFocus="true"
+                                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                                     MaxItems="@(_monthList != null ? _monthList.Count : 10)"
+                                                                     Modal="true" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.FromYear" Title="From Year" Class="col-Year">
+                                                <EditTemplate Context="row">
+                                                    <MudNumericField @bind-Value="row.Item.FromYear" Label="From Year"
+                                                        For="@(() => row.Item.FromYear)"
+                                                        Variant="Variant.Outlined"
+                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.ToMonthDesc" Title="To Month" Class="col-Month">
+                                                <EditTemplate Context="row">
+                                                    <MudAutocomplete @bind-Value="row.Item.ToMonthDesc"
+                                                                     SearchFunc="SearchMonth!"
+                                                                     Variant="Variant.Text"
+                                                                     Label="To Month"
+                                                                     Margin="Margin.Normal"
+                                                                     Dense="true"
+                                                                     Placeholder="Please Select"
+                                                                     HelperText="Type a key to search for month"
+                                                                     HelperTextOnFocus="true"
+                                                                     Clearable="true" Typo="Typo.subtitle2"
+                                                                     MaxItems="@(_monthList != null ? _monthList.Count : 10)"
+                                                                     Modal="true" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.ToYear" Title="To Year" Class="col-Year">
+                                                <EditTemplate Context="row">
+                                                    <MudNumericField @bind-Value="row.Item.ToYear" Label="To Year"
+                                                        For="@(() => row.Item.ToYear)"
+                                                        Variant="Variant.Outlined"
+                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                        Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                                                </EditTemplate>
+                                            </PropertyColumn>
+                                            <TemplateColumn CellClass="d-flex justify-end" Title="Actions">
+                                                <CellTemplate Context="row">
+                                                    <MudIconButton title="Edit details" 
+                                                        Class="show-btn fa-icon-btn"
+                                                        Color="Color.Surface"
+                                                        OnClick="@(() => EditSkillAsync(row.Item))">
                                                         <ChildContent>
-                                                            ,<i class="fas fa-edit fa-1x"></i>
+                                                            <i class="fas fa-pen-alt fa-1x"></i>
                                                         </ChildContent>
                                                     </MudIconButton>
-                                                    <MudIconButton Color="Color.Success" title="Save changes" Class="hide-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
-                                                        <ChildContent>
-                                                            <i class="fas fa-save fa-1x"></i>
-                                                        </ChildContent>
-                                                    </MudIconButton>
-                                                    <MudIconButton Color="Color.Error" title="Delete record" Class="show-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
+                                                    <MudIconButton title="Delete skill" 
+                                                        Class="fa-icon-btn" 
+                                                        Color="Color.Error"
+                                                        Disabled="@(!_allowGridEdit)"
+                                                        OnClick="() => ConfirmDeleteSkill(row.Item)">
                                                         <ChildContent>
                                                             <i class="fas fa-trash-alt fa-1x"></i>
                                                         </ChildContent>
                                                     </MudIconButton>
                                                 </CellTemplate>
-                                            </TemplateColumn>
+                                            </TemplateColumn>  
                                         </Columns>
                                         <NoRecordsContent>
 			                                 <div class="no-data-box">
@@ -1911,6 +2048,7 @@
                                 </MudPaper>
                             </ChildContent>
                         </MudExpansionPanel>
+
                         <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters Expanded>
                             <TitleContent>
                                 <div class="d-flex">
@@ -1977,7 +2115,8 @@
                                  </MudPaper>
                             </ChildContent>
                         </MudExpansionPanel>
-                         <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters>
+
+                        <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters>
                             <TitleContent>
                                 <div class="d-flex">
                                     <MudIcon Icon="fas fa-globe" Style="color: #004165;" Size=Size.Small class="mr-3"></MudIcon>
@@ -2028,6 +2167,7 @@
                                  </MudPaper>
                              </ChildContent>
                          </MudExpansionPanel>
+
                         <MudScrollToTop TopOffset="100"
                                         Selector="#qualificationPanel"
                                          VisibleCssClass="visible absolute"

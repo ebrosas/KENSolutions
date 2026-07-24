@@ -2325,6 +2325,92 @@ namespace KenHRApp.Application.Services
                 return Result<bool>.Failure(ex.Message.ToString());
             }
         }
+
+        public async Task<Result<int>> SaveEmployeeSkillAsync(
+            EmployeeSkillDTO dto,
+            CancellationToken cancellationToken = default)
+        {
+            int saveResult = 0;
+
+            try
+            {
+                #region Initialize EmployeeSkill entity
+                EmployeeSkill skillEntity = new EmployeeSkill()
+                {
+                    AutoId = dto.AutoId,
+                    EmployeeNo = dto.EmployeeNo,
+                    SkillName = dto.SkillName,
+                    LevelCode = dto.LevelCode,
+                    LastUsedMonthCode = dto.LastUsedMonthCode,
+                    LastUsedYear = dto.LastUsedYear,
+                    FromMonthCode = dto.FromMonthCode,
+                    FromYear = dto.FromYear,
+                    ToMonthCode = dto.ToMonthCode,
+                    ToYear = dto.ToYear
+                };
+                #endregion
+
+                if (skillEntity.AutoId == 0)
+                {
+                    var addResult = await _repository.AddEmployeeSkillAsync(skillEntity, cancellationToken);
+                    if (addResult.Success)
+                    {
+                        saveResult = addResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(addResult.Error))
+                            throw new Exception(addResult.Error);
+                        else
+                            throw new Exception("Unable to add new skill to the database. Please try saving again.");
+                    }
+                }
+                else
+                {
+                    var updateResult = await _repository.UpdateEmployeeSkillAsync(skillEntity, cancellationToken);
+                    if (updateResult.Success)
+                    {
+                        saveResult = updateResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(updateResult.Error))
+                            throw new Exception(updateResult.Error);
+                        else
+                            throw new Exception("Unable to update the selected skill. Please try saving again.");
+                    }
+                }
+
+                return Result<int>.SuccessResult(saveResult);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<bool>> DeleteEmployeeSkillAsync(
+           int autoID,
+           CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _repository.DeleteEmployeeSkillAsync(autoID, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to delete the selected skill due to unknown error. Please refresh the page then try again.");
+                }
+
+                return Result<bool>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString());
+            }
+        }
         #endregion
     }
 }

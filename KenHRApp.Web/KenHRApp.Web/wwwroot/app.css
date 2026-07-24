@@ -680,7 +680,7 @@ skill-qualification-grid .col-FromYear, .col-ToYear, .col-PassYear {
 
 /* Format table header */
 .skill-grid .mud-table-head {
-    background-color: #CFD8DC; /* Table header background color */
+    background-color: #BBDEFB; /* Table header background color */
     font-weight: bold;
     text-align: center !important;
     font-size: 14px !important;
@@ -710,29 +710,21 @@ skill-qualification-grid .col-FromYear, .col-ToYear, .col-PassYear {
 .skill-grid .col-skillname {
     width: 200px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .skill-grid .col-level {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-.skill-grid .col-LastUsedMonth {
+.skill-grid .col-Month {
     width: 150px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-.skill-grid .col-FromMonth {
-    width: 150px !important;
+.skill-grid .col-Year {
+    width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 /* #endregion */
 
