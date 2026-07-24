@@ -60,6 +60,14 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<bool>> DeleteEmployeeSkillAsync(
            int autoID,
            CancellationToken cancellationToken = default);
+
+        Task<Result<int>> SaveCertificationAsync(
+            EmployeeCertificationDTO dto,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<bool>> DeleteCertificationAsync(
+            int autoID,
+            CancellationToken cancellationToken = default);
         #endregion
     }
 }

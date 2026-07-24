@@ -679,6 +679,9 @@ namespace KenHRApp.Infrastructure.Repositories
                                                 join country in _db.UserDefinedCodes on e.CountryCode equals country.UDCCode into gjCountry from subCountry in gjCountry.DefaultIfEmpty()      // LEFT JOIN                                                                                                        
                                                 join stream in _db.UserDefinedCodes on e.StreamCode equals stream.UDCCode into gjStream from subStream in gjStream.DefaultIfEmpty()      // LEFT JOIN 
                                                 where e.EmployeeNo == employeeDetail.EmployeeNo
+                                                    && qualification.GroupID == qualGroupID
+                                                    && (subCountry == null || subCountry.GroupID == countryGroupID)
+                                                    && (subStream == null || subStream.GroupID == streamGroupID)
                                                 select new
                                                 {
                                                     EmployeeCertification = e,
@@ -2351,6 +2354,111 @@ namespace KenHRApp.Infrastructure.Repositories
                     throw new Exception("Could not perform deletion because the selected skill was not found in the database.");
 
                 _db.EmployeeSkills.Remove(skill);
+
+                int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
+                if (rowsDeleted > 0)
+                    isSuccess = true;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> AddCertificationAsync(
+            EmployeeCertification certification,
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                // Save to database
+                _db.EmployeeCertifications.Add(certification);
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                // ✅ EF Core automatically populates identity after SaveChanges
+                int generatedId = certification.AutoId;
+
+                return Result<int>.SuccessResult(generatedId);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> UpdateCertificationAsync(
+            EmployeeCertification dto,
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                var certification = await _db.EmployeeCertifications.FirstOrDefaultAsync(x => x.AutoId == dto.AutoId, cancellationToken);
+                if (certification == null)
+                    throw new InvalidOperationException("Employee certification was not found");
+
+                #region Update Certification entity
+                certification.QualificationCode = dto.QualificationCode;
+                certification.StreamCode = dto.StreamCode;
+                certification.Specialization = dto.Specialization;
+                certification.University = dto.University;
+                certification.Institute = dto.Institute;
+                certification.Country= dto.Country;
+                certification.State = dto.State;
+                certification.FromMonthCode = dto.FromMonthCode;
+                certification.FromYear = dto.FromYear;
+                certification.ToMonthCode = dto.ToMonthCode;
+                certification.ToYear = dto.ToYear;
+                certification.PassMonthCode = dto.PassMonthCode;
+                certification.PassYear = dto.PassYear;
+                #endregion
+
+                // Save to database
+                _db.EmployeeCertifications.Update(certification);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<bool>> DeleteCertificationAsync(
+            int autoID,
+            CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var certification = await _db.EmployeeCertifications.FindAsync(autoID);
+                if (certification == null)
+                    throw new Exception("Could not perform deletion because the selected certification was not found in the database.");
+
+                _db.EmployeeCertifications.Remove(certification);
 
                 int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
                 if (rowsDeleted > 0)

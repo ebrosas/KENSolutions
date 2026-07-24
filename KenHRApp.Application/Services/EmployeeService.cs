@@ -2411,6 +2411,98 @@ namespace KenHRApp.Application.Services
                 return Result<bool>.Failure(ex.Message.ToString());
             }
         }
+
+        public async Task<Result<int>> SaveCertificationAsync(
+            EmployeeCertificationDTO dto,
+            CancellationToken cancellationToken = default)
+        {
+            int saveResult = 0;
+
+            try
+            {
+                #region Initialize EmployeeCertification entity
+                EmployeeCertification certificationEntity = new EmployeeCertification()
+                {
+                    AutoId = dto.AutoId,
+                    EmployeeNo = dto.EmployeeNo,
+                    QualificationCode = dto.QualificationCode,
+                    StreamCode = dto.StreamCode,
+                    Specialization = dto.Specialization,
+                    University = dto.University,
+                    Institute = dto.Institute,
+                    CountryCode = dto.CountryCode,
+                    State = dto.State,
+                    CityTownName = dto.CityTownName,
+                    FromMonthCode = dto.FromMonthCode,
+                    FromYear = dto.FromYear,
+                    ToMonthCode = dto.ToMonthCode,
+                    ToYear = dto.ToYear,
+                    PassMonthCode = dto.PassMonthCode,
+                    PassYear = dto.PassYear
+                };
+                #endregion
+
+                if (certificationEntity.AutoId == 0)
+                {
+                    var addResult = await _repository.AddCertificationAsync(certificationEntity, cancellationToken);
+                    if (addResult.Success)
+                    {
+                        saveResult = addResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(addResult.Error))
+                            throw new Exception(addResult.Error);
+                        else
+                            throw new Exception("Unable to add new certification to the database. Please try saving again.");
+                    }
+                }
+                else
+                {
+                    var updateResult = await _repository.UpdateCertificationAsync(certificationEntity, cancellationToken);
+                    if (updateResult.Success)
+                    {
+                        saveResult = updateResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(updateResult.Error))
+                            throw new Exception(updateResult.Error);
+                        else
+                            throw new Exception("Unable to update the selected certification. Please try saving again.");
+                    }
+                }
+
+                return Result<int>.SuccessResult(saveResult);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<bool>> DeleteCertificationAsync(
+            int autoID,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _repository.DeleteCertificationAsync(autoID, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to delete the selected certification due to unknown error. Please refresh the page then try again.");
+                }
+
+                return Result<bool>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString());
+            }
+        }
         #endregion
     }
 }

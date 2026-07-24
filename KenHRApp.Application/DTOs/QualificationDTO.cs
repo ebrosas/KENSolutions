@@ -25,9 +25,9 @@ namespace KenHRApp.Application.DTOs
         public string? SpecializationCode { get; set; } = null;
         public string? SpecializationDesc { get; set; } = null;
 
-        [Required(ErrorMessage = "University Name is required")]
-        [StringLength(150, ErrorMessage = "University Name can't be more than 200 characters.")]
-        [Display(Name = "University Name")]
+        [Required(ErrorMessage = "University is required")]
+        [StringLength(150, ErrorMessage = "University can't be more than 150 characters.")]
+        [Display(Name = "University")]
         public string UniversityName { get; set; } = null!;
 
         public string? Institute { get; set; } = null;

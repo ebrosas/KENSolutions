@@ -1,0 +1,337 @@
+﻿@using KenHRApp.Web.Components.Common
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@DialogIcon" Class="mr-1" Size="Size.Medium" Color="@DialogIconColor" />
+            @DialogTitle
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudPaper Elevation="0" Square="true" Class="w-100 px-5">
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="EmployeeCertification.QualificationDesc"
+                                             For="@(() => EmployeeCertification.QualificationDesc)"
+                                             SearchFunc="SearchQualification!"
+                                             Variant="Variant.Text"
+                                             Label="Qualification"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for qualification"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(QualificationList != null ? QualificationList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="EmployeeCertification.StreamDesc"
+                                             For="@(() => EmployeeCertification.StreamDesc)"
+                                             SearchFunc="SearchStream!"
+                                             Variant="Variant.Text"
+                                             Label="Stream"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for stream"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(StreamList != null ? StreamList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="EmployeeCertification.Specialization"
+                                          For="@(() => EmployeeCertification.Specialization)"
+                                          HelperText="Max. text input is 150 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="150" MaxLength="150" Disabled="false" Label="Specialization"
+                                          Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="EmployeeCertification.University"
+                                          For="@(() => EmployeeCertification.University)"
+                                          HelperText="Max. text input is 150 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="150" MaxLength="150" Disabled="false" Label="University"
+                                          Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="EmployeeCertification.Institute"
+                                          For="@(() => EmployeeCertification.Institute)"
+                                          HelperText="Max. text input is 100 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="100" MaxLength="100" Disabled="false" Label="Institute"
+                                          Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="EmployeeCertification.Country"
+                                             For="@(() => EmployeeCertification.Country)"
+                                             SearchFunc="SearchCountry!"
+                                             Variant="Variant.Text"
+                                             Label="Country"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for country"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(CountryList != null ? CountryList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="EmployeeCertification.State"
+                                          For="@(() => EmployeeCertification.State)"
+                                          HelperText="Max. text input is 100 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="100" MaxLength="100" Disabled="false" Label="State"
+                                          Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="EmployeeCertification.CityTownName"
+                                          For="@(() => EmployeeCertification.CityTownName)"
+                                          HelperText="Max. text input is 100 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="100" MaxLength="100" Disabled="false" Label="City/Town Name"
+                                          Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="EmployeeCertification.FromMonth"
+                                             For="@(() => EmployeeCertification.FromMonth)"
+                                             SearchFunc="SearchMonth!"
+                                             Variant="Variant.Text"
+                                             Label="From Month"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for month"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(MonthList != null ? MonthList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-50">
+                            <MudNumericField @bind-Value="EmployeeCertification.FromYear" Label="From Year"
+                                             For="@(() => EmployeeCertification.FromYear)"
+                                             Variant="Variant.Outlined"
+                                             HelperText="Enter 4-digit year" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                             Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="EmployeeCertification.ToMonth"
+                                             For="@(() => EmployeeCertification.ToMonth)"
+                                             SearchFunc="SearchMonth!"
+                                             Variant="Variant.Text"
+                                             Label="To Month"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for month"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(MonthList != null ? MonthList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-50">
+                            <MudNumericField @bind-Value="EmployeeCertification.ToYear" Label="To Year"
+                                             For="@(() => EmployeeCertification.ToYear)"
+                                             Variant="Variant.Outlined"
+                                             HelperText="Enter 4-digit year" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                             Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="EmployeeCertification.PassMonth"
+                                             For="@(() => EmployeeCertification.PassMonth)"
+                                             SearchFunc="SearchMonth!"
+                                             Variant="Variant.Text"
+                                             Label="Pass Month"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for month"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(MonthList != null ? MonthList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-50">
+                            <MudNumericField @bind-Value="EmployeeCertification.PassYear" Label="Pass Year"
+                                             For="@(() => EmployeeCertification.PassYear)"
+                                             Variant="Variant.Outlined"
+                                             HelperText="Enter 4-digit year" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                             Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Info" Style="background-color:#004165;" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
+        <MudButton Color="Color.Default" Variant="Variant.Text" Size="Size.Medium" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Fields
+    private MudForm _form = new();
+    private string[]? _qualificationArray = null;
+    private string[]? _streamArray = null;
+    private string[]? _countryArray = null;
+    private string[]? _monthArray = null;
+    #endregion
+
+    #region Parameters and Injections
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public EmployeeCertificationDTO EmployeeCertification { get; set; } = new();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> QualificationList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> StreamList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> CountryList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> MonthList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public bool IsClearable { get; set; } = true;
+
+    [Parameter]
+    public bool IsDisabled { get; set; } = true;
+
+    [Parameter]
+    public bool IsEditMode { get; set; }
+
+    // Optional UI helpers
+    protected string DialogTitle => IsEditMode ? "Edit Certification" : "Add New Certification";
+    protected string DialogIcon => IsEditMode ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add;
+    protected Color DialogIconColor => IsEditMode ? Color.Info : Color.Success;
+    #endregion
+
+    #region Page Methods
+    protected override void OnInitialized()
+    {
+        if (QualificationList != null)
+            _qualificationArray = QualificationList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (StreamList != null)
+            _streamArray = StreamList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (CountryList != null)
+            _countryArray = CountryList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (MonthList != null)
+            _monthArray = MonthList.OrderBy(o => o.SequenceNo).Select(d => d.UDCDesc1).ToArray();
+    }
+    #endregion
+
+    #region Private Methods
+    private async Task Save()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        MudDialog.Close(DialogResult.Ok(EmployeeCertification));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task<IEnumerable<string>> SearchQualification(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _qualificationArray!;
+        }
+
+        return _qualificationArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchStream(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _streamArray!;
+        }
+
+        return _streamArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    
+    private async Task<IEnumerable<string>> SearchCountry(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _countryArray!;
+        }
+
+        return _countryArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchMonth(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _monthArray!;
+        }
+
+        return _monthArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    #endregion
+}

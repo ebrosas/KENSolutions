@@ -242,6 +242,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         private string _skillSearchString = string.Empty;
         private bool _skillFilter = false;
+
+        private string _certificationSearchString = string.Empty;
+        private bool _certificationFilter = false;
         #endregion
 
         #endregion
@@ -1232,10 +1235,10 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             if (string.IsNullOrWhiteSpace(_skillSearchString))
                 return true;
 
-            if (!string.IsNullOrEmpty(x.SkillName) && x.SkillName.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(x.SkillName) && x.SkillName.Contains(_skillSearchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (!string.IsNullOrEmpty(x.LevelDesc) && x.LevelDesc.Contains(_qualificationSearchString, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(x.LevelDesc) && x.LevelDesc.Contains(_skillSearchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             return false;
@@ -1661,6 +1664,548 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             {
                 // Show notification
                 ShowNotification("The selected skill has been deleted successfully!", NotificationType.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(errorMsg);
+                    ShowHideError(true);
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+        #endregion
+
+        #region Certifications & Training Grid
+        private Func<EmployeeCertificationDTO, bool> _certificationQuickFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(_certificationSearchString))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.QualificationDesc) && x.QualificationDesc.Contains(_certificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.StreamDesc) && x.StreamDesc.Contains(_certificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.Specialization) && x.Specialization!.Contains(_certificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.University) && x.University!.Contains(_certificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.Institute) && x.Institute!.Contains(_certificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.Country) && x.Country!.Contains(_certificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.State) && x.State!.Contains(_certificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.CityTownName) && x.CityTownName!.Contains(_certificationSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
+        };
+
+        private async Task CertificationStartedEditingItem(EmployeeCertificationDTO item)
+        {
+            await EditCertificationAsync(item);
+        }
+
+        private void CertificationCommittedItemChanges(EmployeeCertificationDTO item)
+        {
+            try
+            {
+                if (item == null) return;
+
+                #region Get selected qualification
+                if (!string.IsNullOrEmpty(item.QualificationCode))
+                {
+                    UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCCode == item.QualificationCode).FirstOrDefault();
+                    if (udc != null)
+                        item.QualificationDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected stream
+                if (!string.IsNullOrEmpty(item.StreamCode))
+                {
+                    UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCCode == item.StreamCode).FirstOrDefault();
+                    if (udc != null)
+                        item.StreamDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected country
+                if (!string.IsNullOrEmpty(item.CountryCode))
+                {
+                    UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCCode == item.CountryCode).FirstOrDefault();
+                    if (udc != null)
+                        item.Country = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected from month
+                if (!string.IsNullOrEmpty(item.FromMonthCode))
+                {
+                    UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCCode == item.FromMonthCode).FirstOrDefault();
+                    if (udc != null)
+                        item.FromMonth = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected to month
+                if (!string.IsNullOrEmpty(item.ToMonthCode))
+                {
+                    UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCCode == item.ToMonthCode).FirstOrDefault();
+                    if (udc != null)
+                        item.ToMonth = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected pass month
+                if (!string.IsNullOrEmpty(item.PassMonthCode))
+                {
+                    UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCCode == item.PassMonthCode).FirstOrDefault();
+                    if (udc != null)
+                        item.PassMonth = udc.UDCDesc1;
+                }
+                #endregion
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Saving changes, please wait...";
+
+                _ = SaveCertificationAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+                }, item);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Save cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task SaveCertificationAsync(Func<Task> callback, EmployeeCertificationDTO certification)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            var result = await EmployeeService.SaveCertificationAsync(certification, _cts.Token);
+            if (!result.Success)
+            {
+                // Set the error message
+                _errorMessage.AppendLine(result.Error!);
+                ShowHideError(true);
+            }
+            else
+            {
+                if (certification.AutoId == 0)
+                {
+                    // Get the new identity seed
+                    certification.AutoId = result.Value;
+
+                    // Add locally to the list so UI updates immediately
+                    employee.EmployeeCertificationList.Add(certification);
+
+                    StateHasChanged();
+                }
+
+                // Show notification
+                ShowNotification("Certification has been saved successfully!", NotificationType.Success);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task AddCertificationAsync()
+        {
+            try
+            {
+                var parameters = new DialogParameters
+                {
+                    ["EmployeeCertification"] = new EmployeeCertificationDTO(),
+                    ["QualificationList"] = _qualificationList,
+                    ["StreamList"] = _streamList,
+                    ["CountryList"] = _countryList,
+                    ["MonthList"] = _monthList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = false
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                // Show the dialog box
+                var dialog = await DialogService.ShowAsync<CertificationDialog>("Add New Certification", parameters, options);
+                var result = await dialog.Result;
+                if (result != null && !result.Canceled)
+                {
+                    var newCertification = (EmployeeCertificationDTO)result.Data!;
+                    newCertification.AutoId = 0;
+                    newCertification.EmployeeNo = employee.EmployeeNo;
+
+                    #region Get selected qualification
+                    if (!string.IsNullOrEmpty(newCertification.QualificationDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCDesc1 == newCertification.QualificationDesc).FirstOrDefault();
+                        if (udc != null)
+                            newCertification.QualificationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected stream
+                    if (!string.IsNullOrEmpty(newCertification.StreamDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCDesc1 == newCertification.StreamDesc).FirstOrDefault();
+                        if (udc != null)
+                            newCertification.StreamCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected country
+                    if (!string.IsNullOrEmpty(newCertification.Country))
+                    {
+                        UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCDesc1 == newCertification.Country).FirstOrDefault();
+                        if (udc != null)
+                            newCertification.CountryCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected from month
+                    if (!string.IsNullOrEmpty(newCertification.FromMonth))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == newCertification.FromMonth).FirstOrDefault();
+                        if (udc != null)
+                            newCertification.FromMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected to month
+                    if (!string.IsNullOrEmpty(newCertification.ToMonth))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == newCertification.ToMonth).FirstOrDefault();
+                        if (udc != null)
+                            newCertification.ToMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected pass month
+                    if (!string.IsNullOrEmpty(newCertification.PassMonth))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == newCertification.PassMonth).FirstOrDefault();
+                        if (udc != null)
+                            newCertification.PassMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Check for duplicate entries
+                    var duplicateCertification = employee.EmployeeCertificationList.FirstOrDefault(e => e.EmployeeNo == newCertification.EmployeeNo
+                        && e.QualificationCode.Trim().ToUpper() == newCertification.QualificationCode.Trim().ToUpper()
+                        && e.FromMonthCode.Trim().ToUpper() == newCertification.FromMonthCode.Trim().ToUpper()
+                        && e.FromYear == newCertification.FromYear
+                        && e.ToMonthCode.Trim().ToUpper() == newCertification.ToMonthCode.Trim().ToUpper()
+                        && e.ToYear == newCertification.ToYear);
+                    if (duplicateCertification != null)
+                    {
+                        // Show error
+                        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified certification already exists. Please enter a different qualification details.");
+                        return;
+                    }
+                    #endregion
+
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Adding certification, please wait...";
+
+                    _ = SaveCertificationAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, newCertification);
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task EditCertificationAsync(EmployeeCertificationDTO certification)
+        {
+            try
+            {
+                // Clone the object so the dialog can edit without affecting the grid until Save
+                var editableCopy = new EmployeeCertificationDTO
+                {
+                    AutoId = certification.AutoId,
+                    QualificationCode = certification.QualificationCode,
+                    QualificationDesc = certification.QualificationDesc,
+                    StreamCode = certification.StreamCode,
+                    StreamDesc = certification.StreamDesc,
+                    Specialization = certification.Specialization,
+                    University = certification.University,
+                    Institute = certification.Institute,
+                    CountryCode = certification.CountryCode,
+                    Country = certification.Country,
+                    State = certification.State,
+                    CityTownName = certification.CityTownName,
+                    FromMonthCode = certification.FromMonthCode,
+                    FromMonth = certification.FromMonth,
+                    FromYear = certification.FromYear,
+                    ToMonthCode = certification.ToMonthCode,
+                    ToMonth = certification.ToMonth,
+                    ToYear = certification.ToYear,
+                    PassMonthCode = certification.PassMonthCode,
+                    PassMonth= certification.PassMonth,
+                    PassYear = certification.PassYear
+                };
+
+                var parameters = new DialogParameters
+                {
+                    ["EmployeeCertification"] = editableCopy,
+                    ["QualificationList"] = _qualificationList,
+                    ["StreamList"] = _streamList,
+                    ["CountryList"] = _countryList,
+                    ["MonthList"] = _monthList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = true
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                var dialog = await DialogService.ShowAsync<CertificationDialog>("Edit Certification", parameters, options);
+                var result = await dialog.Result;
+
+                if (result != null && !result.Canceled)
+                {
+                    var updated = (EmployeeCertificationDTO)result.Data!;
+
+                    #region Get selected qualification
+                    if (!string.IsNullOrEmpty(updated.QualificationDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCDesc1 == updated.QualificationDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.QualificationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected stream
+                    if (!string.IsNullOrEmpty(updated.StreamDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCDesc1 == updated.StreamDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.StreamCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected country
+                    if (!string.IsNullOrEmpty(updated.Country))
+                    {
+                        UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCDesc1 == updated.Country).FirstOrDefault();
+                        if (udc != null)
+                            updated.CountryCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected from month
+                    if (!string.IsNullOrEmpty(updated.FromMonth))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == updated.FromMonth).FirstOrDefault();
+                        if (udc != null)
+                            updated.FromMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected to month
+                    if (!string.IsNullOrEmpty(updated.ToMonth))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == updated.ToMonth).FirstOrDefault();
+                        if (udc != null)
+                            updated.ToMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected pass month
+                    if (!string.IsNullOrEmpty(updated.PassMonth))
+                    {
+                        UserDefinedCodeDTO? udc = _monthList.Where(d => d.UDCDesc1 == updated.PassMonth).FirstOrDefault();
+                        if (udc != null)
+                            updated.PassMonthCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    // Update in-memory grid item
+                    var index = employee.EmployeeCertificationList.FindIndex(x => x.AutoId == updated.AutoId);
+                    if (index >= 0)
+                    {
+                        employee.EmployeeCertificationList[index] = updated;
+                        await InvokeAsync(StateHasChanged);
+                    }
+
+                    #region Persist changes to DB
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Saving certification changes, please wait...";
+
+                    _ = SaveCertificationAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, updated);
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task ConfirmDeleteCertification(EmployeeCertificationDTO certification)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to delete this certification: '{certification.QualificationDesc}'?" },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Certification", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                BeginDeleteCertification(certification);
+            }
+        }
+
+        private void BeginDeleteCertification(EmployeeCertificationDTO certification)
+        {
+            try
+            {
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Deleting certification, please wait...";
+
+                _ = DeleteCertificationAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    // Remove locally from the list so UI updates immediately
+                    employee.EmployeeCertificationList.Remove(certification);
+
+                    StateHasChanged();
+
+                }, certification);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Delete cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task DeleteCertificationAsync(Func<Task> callback, EmployeeCertificationDTO certification)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            if (certification.AutoId == 0)
+            {
+                errorMsg = "Certification ID is not defined.";
+            }
+            else
+            {
+                var deleteResult = await EmployeeService.DeleteCertificationAsync(certification.AutoId, _cts.Token);
+                isSuccess = deleteResult.Success;
+                if (!isSuccess)
+                    errorMsg = deleteResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Show notification
+                ShowNotification("The selected certification has been deleted successfully!", NotificationType.Success);
             }
             else
             {
