@@ -2215,6 +2215,7 @@ namespace KenHRApp.Infrastructure.Repositories
                 qualification.ToYear = dto.ToYear;
                 qualification.PassMonthCode = dto.PassMonthCode;
                 qualification.PassYear = dto.PassYear;
+                qualification.StateName = dto.StateName;
                 #endregion
 
                 // Save to database

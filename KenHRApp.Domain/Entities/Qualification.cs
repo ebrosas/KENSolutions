@@ -81,6 +81,9 @@ namespace KenHRApp.Domain.Entities
         public string PassMonthDesc { get; set; } = null!;
 
         public int PassYear { get; set; }
+
+        [Column(TypeName = "varchar(100)")]
+        public string? StateName { get; set; } = null;
         #endregion
 
         #region Reference Navigation to Employee   

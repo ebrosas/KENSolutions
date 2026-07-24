@@ -71,6 +71,8 @@ namespace KenHRApp.Application.DTOs
         [Required(ErrorMessage = "Pass Year is required")]
         [Display(Name = "Pass Year")]
         public int PassYear { get; set; }
+
+        public string? StateName { get; set; } = null;
         #endregion
 
         #region Reference Navigation to Employee   
