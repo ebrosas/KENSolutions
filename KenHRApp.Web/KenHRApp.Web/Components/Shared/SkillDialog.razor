@@ -1,0 +1,221 @@
+﻿@using KenHRApp.Web.Components.Common
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@DialogIcon" Class="mr-1" Size="Size.Medium" Color="@DialogIconColor" />
+            @DialogTitle
+        </MudText>
+    </TitleContent>
+
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudPaper Elevation="0" Square="true" Class="w-100 px-5">
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="EmployeeSkill.SkillName"
+                                          For="@(() => EmployeeSkill.SkillName)"
+                                          HelperText="Max. text input is 50 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="50" MaxLength="50" Disabled="false" Label="Skill Name"
+                                          Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="EmployeeSkill.LevelDesc"
+                                             For="@(() => EmployeeSkill.LevelDesc)"
+                                             SearchFunc="SearchSkillLevel!"
+                                             Variant="Variant.Text"
+                                             Label="Level"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for level"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(SkillLevelList != null ? SkillLevelList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="EmployeeSkill.LastUsedMonthDesc"
+                                             For="@(() => EmployeeSkill.LastUsedMonthDesc)"
+                                             SearchFunc="SearchMonth!"
+                                             Variant="Variant.Text"
+                                             Label="Last Used Month"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for month"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(MonthList != null ? MonthList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-50">
+                            <MudNumericField @bind-Value="EmployeeSkill.LastUsedYear" Label="Last Used Year"
+                                             For="@(() => EmployeeSkill.LastUsedYear)"
+                                             Variant="Variant.Outlined"
+                                             HelperText="Enter 4-digit year" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                             Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="EmployeeSkill.FromMonthDesc"
+                                             For="@(() => EmployeeSkill.FromMonthDesc)"
+                                             SearchFunc="SearchMonth!"
+                                             Variant="Variant.Text"
+                                             Label="From Month"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for month"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(MonthList != null ? MonthList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-50">
+                            <MudNumericField @bind-Value="EmployeeSkill.FromYear" Label="From Year"
+                                             For="@(() => EmployeeSkill.FromYear)"
+                                             Variant="Variant.Outlined"
+                                             HelperText="Enter 4-digit year" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                             Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="EmployeeSkill.ToMonthDesc"
+                                             For="@(() => EmployeeSkill.ToMonthDesc)"
+                                             SearchFunc="SearchMonth!"
+                                             Variant="Variant.Text"
+                                             Label="To Month"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for month"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(MonthList != null ? MonthList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-50">
+                            <MudNumericField @bind-Value="EmployeeSkill.ToYear" Label="To Year"
+                                             For="@(() => EmployeeSkill.ToYear)"
+                                             Variant="Variant.Outlined"
+                                             HelperText="Enter 4-digit year" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                             Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudForm>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Info" Style="background-color:#004165;" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
+        <MudButton Color="Color.Default" Variant="Variant.Text" Size="Size.Medium" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Fields
+    private MudForm _form = new();
+    private string[]? _skillLevelArray = null;
+    private string[]? _monthArray = null;
+    #endregion
+
+    #region Parameters and Injections
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public EmployeeSkillDTO EmployeeSkill { get; set; } = new();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> SkillLevelList { get; set; } = new List<UserDefinedCodeDTO>();
+        
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> MonthList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public bool IsClearable { get; set; } = true;
+
+    [Parameter]
+    public bool IsDisabled { get; set; } = true;
+
+    [Parameter]
+    public bool IsEditMode { get; set; }
+
+    // Optional UI helpers
+    protected string DialogTitle => IsEditMode ? "Edit Skill" : "Add New Skill";
+    protected string DialogIcon => IsEditMode ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add;
+    protected Color DialogIconColor => IsEditMode ? Color.Info : Color.Success;
+    #endregion
+
+    #region Page Methods
+    protected override void OnInitialized()
+    {
+        if (SkillLevelList != null)
+            _skillLevelArray = SkillLevelList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (MonthList != null)
+            _monthArray = MonthList.OrderBy(o => o.SequenceNo).Select(d => d.UDCDesc1).ToArray();
+    }
+    #endregion
+
+    #region Private Methods
+    private async Task Save()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        MudDialog.Close(DialogResult.Ok(EmployeeSkill));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task<IEnumerable<string>> SearchSkillLevel(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _skillLevelArray!;
+        }
+
+        return _skillLevelArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchMonth(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _monthArray!;
+        }
+
+        return _monthArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    #endregion
+}

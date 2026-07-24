@@ -196,7 +196,8 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             STREAMTYPE,             // Stream Types
             SPECIALIZATION,         // Specialization Types
             QUALIFACTIONMODE,       // Qualification Modes
-            MONTHCODE               // Months
+            MONTHCODE,              // Months
+            SKILLLEVEL              // Skill Levels
         }
 
         private enum NotificationType
@@ -1377,7 +1378,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 };
 
                 // Show the dialog box
-                var dialog = await DialogService.ShowAsync<SkillQualificationDialog>("Add New Skill", parameters, options);
+                var dialog = await DialogService.ShowAsync<SkillDialog>("Add New Skill", parameters, options);
                 var result = await dialog.Result;
                 if (result != null && !result.Canceled)
                 {
@@ -1494,7 +1495,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     CloseButton = false
                 };
 
-                var dialog = await DialogService.ShowAsync<SkillQualificationDialog>("Edit Skill", parameters, options);
+                var dialog = await DialogService.ShowAsync<SkillDialog>("Edit Skill", parameters, options);
                 var result = await dialog.Result;
 
                 if (result != null && !result.Canceled)
@@ -2832,6 +2833,23 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                                 _monthArray = _monthList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
                         }
                         #endregion
+                        #region Populate Skills Level dropdown
+                        try
+                        {
+                            groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.SKILLLEVEL.ToString()).FirstOrDefault()!.UDCGroupId;
+                        }
+                        catch (Exception ex)
+                        {
+                            _errorMessage.Append($"Error getting skills level list: {ex.Message}");
+                        }
+
+                        if (groupID > 0)
+                        {
+                            _skillLevelList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                            if (_skillLevelList != null)
+                                _skillLevelArray = _skillLevelList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                        }
+                        #endregion
                     }
                 }
                 else
@@ -3342,6 +3360,24 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                         _monthList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
                         if (_monthList != null)
                             _monthArray = _monthList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                    }
+                    #endregion
+
+                    #region Populate Skills Level dropdown
+                    try
+                    {
+                        groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.SKILLLEVEL.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting skills level list: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _skillLevelList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                        if (_skillLevelList != null)
+                            _skillLevelArray = _skillLevelList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
                     }
                     #endregion
                 }

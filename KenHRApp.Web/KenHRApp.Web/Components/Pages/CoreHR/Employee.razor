@@ -1807,18 +1807,11 @@
                                                 </EditTemplate>
                                             </PropertyColumn>
                                             <TemplateColumn CellClass="d-flex justify-end" Title="Actions">
-                                                <CellTemplate Context="row">
-                                                    @* <MudIconButton title="Add qualification" 
-                                                        Class="show-btn fa-icon-btn"
-                                                        Color="Color.Surface"
-                                                        OnClick="AddQualificationAsync">
-                                                        <ChildContent>
-                                                            <i class="fas fa-plus-circle fa-1x"></i>
-                                                        </ChildContent>
-                                                    </MudIconButton> *@
+                                                <CellTemplate Context="row">                                                    
                                                     <MudIconButton title="Edit details" 
                                                         Class="show-btn fa-icon-btn"
                                                         Color="Color.Surface"
+                                                        Disabled="@(!_allowGridEdit)"
                                                         OnClick="@(() => EditQualificationAsync(row.Item))">
                                                         <ChildContent>
                                                             <i class="fas fa-pen-alt fa-1x"></i>
@@ -1962,7 +1955,7 @@
                                                     <MudNumericField @bind-Value="row.Item.LastUsedYear" Label="Last Used Year"
                                                         For="@(() => row.Item.LastUsedYear)"
                                                         Variant="Variant.Outlined"
-                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                        HelperText="Enter numeric value for year" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="2999"
                                                         Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                                 </EditTemplate>
                                             </PropertyColumn>
@@ -1987,7 +1980,7 @@
                                                     <MudNumericField @bind-Value="row.Item.FromYear" Label="From Year"
                                                         For="@(() => row.Item.FromYear)"
                                                         Variant="Variant.Outlined"
-                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                        HelperText="Enter numeric value for year" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="2999"
                                                         Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                                 </EditTemplate>
                                             </PropertyColumn>
@@ -2012,7 +2005,7 @@
                                                     <MudNumericField @bind-Value="row.Item.ToYear" Label="To Year"
                                                         For="@(() => row.Item.ToYear)"
                                                         Variant="Variant.Outlined"
-                                                        HelperText="Maximum input is 9999" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="9999"
+                                                        HelperText="Enter numeric value for year" HelperTextOnFocus="true" MaxLength="4" Min="0" Max="2999"
                                                         Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
                                                 </EditTemplate>
                                             </PropertyColumn>
@@ -2021,6 +2014,7 @@
                                                     <MudIconButton title="Edit details" 
                                                         Class="show-btn fa-icon-btn"
                                                         Color="Color.Surface"
+                                                        Disabled="@(!_allowGridEdit)"
                                                         OnClick="@(() => EditSkillAsync(row.Item))">
                                                         <ChildContent>
                                                             <i class="fas fa-pen-alt fa-1x"></i>

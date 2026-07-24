@@ -24,12 +24,23 @@ namespace KenHRApp.Application.DTOs
         public string? LevelDesc { get; set; } = null;
         public string? LastUsedMonthCode { get; set; } = null;
         public string? LastUsedMonthDesc { get; set; } = null;
+
+        [Display(Name = "Last User Year")]
+        [Range(1900, 9999, ErrorMessage = "Last Used Year must be between 1900 and 9999")]
         public int? LastUsedYear { get; set; }
+
         public string? FromMonthCode { get; set; } = null;
         public string? FromMonthDesc { get; set; } = null;
+
+        [Display(Name = "From Year")]
+        [Range(1900, 9999, ErrorMessage = "From Year must be between 1900 and 9999")]
         public int? FromYear { get; set; }
+
         public string? ToMonthCode { get; set; } = null;
         public string? ToMonthDesc { get; set; } = null;
+
+        [Display(Name = "To Year")]
+        [Range(1900, 9999, ErrorMessage = "To Year must be between 1900 and 9999")]
         public int? ToYear { get; set; }
         #endregion
 
