@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,11 @@ namespace KenHRApp.Application.DTOs
         #region Properties
         public int AutoId { get; set; }
         public string LanguageCode { get; set; } = null!;
-        public string? LanguageDesc { get; set; } = null;
+
+        [Required(ErrorMessage = "Qualification is required")]
+        [Display(Name = "Qualification")]
+        public string LanguageDesc { get; set; } = null!;
+
         public bool? CanWrite { get; set; } = null;
         public bool? CanSpeak { get; set; } = null;
         public bool? CanRead { get; set; } = null;

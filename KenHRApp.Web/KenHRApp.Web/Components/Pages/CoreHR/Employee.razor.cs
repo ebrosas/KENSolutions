@@ -159,6 +159,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         private List<UserDefinedCodeDTO> _skillLevelList = new List<UserDefinedCodeDTO>();
         private string[]? _skillLevelArray = null;
+
+        private List<UserDefinedCodeDTO> _languageList = new List<UserDefinedCodeDTO>();
+        private string[]? _languageArray = null;
         #endregion
 
         #region Enums and Collections
@@ -245,6 +248,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         private string _certificationSearchString = string.Empty;
         private bool _certificationFilter = false;
+
+        private string _languageSearchString = string.Empty;
+        private bool _languageFilter = false;
         #endregion
 
         #endregion
@@ -2206,6 +2212,368 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             {
                 // Show notification
                 ShowNotification("The selected certification has been deleted successfully!", NotificationType.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(errorMsg);
+                    ShowHideError(true);
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+        #endregion
+
+        #region Languages Grid
+        private Func<LanguageSkillDTO, bool> _languageQuickFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(_languageSearchString))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.LanguageDesc) && x.LanguageDesc.Contains(_languageSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
+        };
+
+        private async Task LanguageStartedEditingItem(LanguageSkillDTO item)
+        {
+            await EditLanguageAsync(item);
+        }
+
+        private void LanguageCommittedItemChanges(LanguageSkillDTO item)
+        {
+            try
+            {
+                if (item == null) return;
+
+                #region Get selected language
+                if (!string.IsNullOrEmpty(item.LanguageCode))
+                {
+                    UserDefinedCodeDTO? udc = _languageList.Where(d => d.UDCCode == item.LanguageCode).FirstOrDefault();
+                    if (udc != null)
+                        item.LanguageDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Saving changes, please wait...";
+
+                _ = SaveLanguageAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+                }, item);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Save cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task SaveLanguageAsync(Func<Task> callback, LanguageSkillDTO language)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            var result = await EmployeeService.SaveLanguageSkillAsync(language, _cts.Token);
+            if (!result.Success)
+            {
+                // Set the error message
+                _errorMessage.AppendLine(result.Error!);
+                ShowHideError(true);
+            }
+            else
+            {
+                if (language.AutoId == 0)
+                {
+                    // Get the new identity seed
+                    language.AutoId = result.Value;
+
+                    // Add locally to the list so UI updates immediately
+                    employee.LanguageSkillList.Add(language);
+
+                    StateHasChanged();
+                }
+
+                // Show notification
+                ShowNotification("Language has been saved successfully!", NotificationType.Success);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task AddLanguageAsync()
+        {
+            try
+            {
+                var parameters = new DialogParameters
+                {
+                    ["LanguageSkill"] = new LanguageSkillDTO(),
+                    ["LanguageList"] = _languageList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = false
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                // Show the dialog box
+                var dialog = await DialogService.ShowAsync<SkillDialog>("Add New Language", parameters, options);
+                var result = await dialog.Result;
+                if (result != null && !result.Canceled)
+                {
+                    var newLanguage = (LanguageSkillDTO)result.Data!;
+                    newLanguage.AutoId = 0;
+                    newLanguage.EmployeeNo = employee.EmployeeNo;
+
+                    #region Get selected language
+                    if (!string.IsNullOrEmpty(newLanguage.LanguageDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _languageList.Where(d => d.UDCDesc1 == newLanguage.LanguageDesc).FirstOrDefault();
+                        if (udc != null)
+                            newLanguage.LanguageCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Check for duplicate entries
+                    var duplicateSkill = employee.LanguageSkillList.FirstOrDefault(e => e.EmployeeNo == newLanguage.EmployeeNo
+                        && e.LanguageCode.Trim().ToUpper() == newLanguage.LanguageCode.Trim().ToUpper());
+                    if (duplicateSkill != null)
+                    {
+                        // Show error
+                        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified language already exists. Please enter a unique language then try again.");
+                        return;
+                    }
+                    #endregion
+
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Adding language, please wait...";
+
+                    _ = SaveLanguageAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, newLanguage);
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task EditLanguageAsync(LanguageSkillDTO language)
+        {
+            try
+            {
+                // Clone the object so the dialog can edit without affecting the grid until Save
+                var editableCopy = new LanguageSkillDTO
+                {
+                    AutoId = language.AutoId,
+                    LanguageCode = language.LanguageCode,
+                    LanguageDesc = language.LanguageDesc,
+                    CanWrite = language.CanWrite,
+                    CanSpeak = language.CanSpeak,
+                    CanRead = language.CanRead,
+                    MotherTongue = language.MotherTongue
+                };
+
+                var parameters = new DialogParameters
+                {
+                    ["LanguageSkill"] = editableCopy,
+                    ["LanguageList"] = _languageList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = true
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                var dialog = await DialogService.ShowAsync<SkillDialog>("Edit Language", parameters, options);
+                var result = await dialog.Result;
+
+                if (result != null && !result.Canceled)
+                {
+                    var updated = (LanguageSkillDTO)result.Data!;
+
+                    #region Get selected language
+                    if (!string.IsNullOrEmpty(updated.LanguageDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _languageList.Where(d => d.UDCDesc1 == updated.LanguageDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.LanguageCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    // Update in-memory grid item
+                    var index = employee.LanguageSkillList.FindIndex(x => x.AutoId == updated.AutoId);
+                    if (index >= 0)
+                    {
+                        employee.LanguageSkillList[index] = updated;
+                        await InvokeAsync(StateHasChanged);
+                    }
+
+                    #region Persist changes to DB
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Saving language, please wait...";
+
+                    _ = SaveLanguageAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, updated);
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task ConfirmDeleteLanguage(LanguageSkillDTO language)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to delete this language: '{language.LanguageDesc}'?" },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Language", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                BeginDeleteLanguage(language);
+            }
+        }
+
+        private void BeginDeleteLanguage(LanguageSkillDTO language)
+        {
+            try
+            {
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Deleting language, please wait...";
+
+                _ = DeleteLanguageAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    // Remove locally from the list so UI updates immediately
+                    employee.LanguageSkillList.Remove(language);
+
+                    StateHasChanged();
+
+                }, language);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Delete cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task DeleteLanguageAsync(Func<Task> callback, LanguageSkillDTO language)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            if (language.AutoId == 0)
+            {
+                errorMsg = "Language ID is not defined.";
+            }
+            else
+            {
+                var deleteResult = await EmployeeService.DeleteLanguageSkillAsync(language.AutoId, _cts.Token);
+                isSuccess = deleteResult.Success;
+                if (!isSuccess)
+                    errorMsg = deleteResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Show notification
+                ShowNotification("The selected language has been deleted successfully!", NotificationType.Success);
             }
             else
             {
@@ -4340,6 +4708,20 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             }
 
             return _skillLevelArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchLanguage(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _languageArray!;
+            }
+
+            return _languageArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
         #endregion
     }

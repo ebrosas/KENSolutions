@@ -2503,6 +2503,90 @@ namespace KenHRApp.Application.Services
                 return Result<bool>.Failure(ex.Message.ToString());
             }
         }
+
+        public async Task<Result<int>> SaveLanguageSkillAsync(
+            LanguageSkillDTO dto,
+            CancellationToken cancellationToken = default)
+        {
+            int saveResult = 0;
+
+            try
+            {
+                #region Initialize LanguageSkill entity
+                LanguageSkill languageEntity = new LanguageSkill()
+                {
+                    AutoId = dto.AutoId,
+                    EmployeeNo = dto.EmployeeNo,
+                    LanguageCode = dto.LanguageCode,
+                    LanguageDesc = dto.LanguageDesc,
+                    CanWrite = dto.CanWrite,
+                    CanSpeak = dto.CanSpeak,
+                    CanRead = dto.CanRead,
+                    MotherTongue = dto.MotherTongue
+                };
+                #endregion
+
+                if (languageEntity.AutoId == 0)
+                {
+                    var addResult = await _repository.AddLanguageSkillAsync(languageEntity, cancellationToken);
+                    if (addResult.Success)
+                    {
+                        saveResult = addResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(addResult.Error))
+                            throw new Exception(addResult.Error);
+                        else
+                            throw new Exception("Unable to add new language to the database. Please try saving again.");
+                    }
+                }
+                else
+                {
+                    var updateResult = await _repository.UpdateLanguageSkillAsync(languageEntity, cancellationToken);
+                    if (updateResult.Success)
+                    {
+                        saveResult = updateResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(updateResult.Error))
+                            throw new Exception(updateResult.Error);
+                        else
+                            throw new Exception("Unable to update the selected language. Please try saving again.");
+                    }
+                }
+
+                return Result<int>.SuccessResult(saveResult);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<bool>> DeleteLanguageSkillAsync(
+           int autoID,
+           CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _repository.DeleteLanguageSkillAsync(autoID, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to delete the selected language due to unknown error. Please refresh the page then try again.");
+                }
+
+                return Result<bool>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString());
+            }
+        }
         #endregion
     }
 }

@@ -77,6 +77,18 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<bool>> DeleteCertificationAsync(
             int autoID,
             CancellationToken cancellationToken = default);
+
+        Task<Result<int>> AddLanguageSkillAsync(
+            LanguageSkill language,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<int>> UpdateLanguageSkillAsync(
+            LanguageSkill dto,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<bool>> DeleteLanguageSkillAsync(
+            int autoID,
+            CancellationToken cancellationToken = default);
         #endregion
     }
 }

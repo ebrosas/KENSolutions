@@ -2475,6 +2475,103 @@ namespace KenHRApp.Infrastructure.Repositories
                 return Result<bool>.Failure($"Database error: {ex.Message}");
             }
         }
+
+        public async Task<Result<int>> AddLanguageSkillAsync(
+            LanguageSkill language,
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                // Save to database
+                _db.LanguageSkills.Add(language);
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                // ✅ EF Core automatically populates identity after SaveChanges
+                int generatedId = language.AutoId;
+
+                return Result<int>.SuccessResult(generatedId);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> UpdateLanguageSkillAsync(
+            LanguageSkill dto,
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                var Language = await _db.LanguageSkills.FirstOrDefaultAsync(x => x.AutoId == dto.AutoId, cancellationToken);
+                if (Language == null)
+                    throw new InvalidOperationException("The specified language was not found");
+
+                #region Update LanguageSkill entity
+                Language.LanguageCode = dto.LanguageCode;
+                Language.CanWrite = dto.CanWrite;
+                Language.CanSpeak = dto.CanSpeak;
+                Language.CanRead = dto.CanRead;
+                Language.MotherTongue = dto.MotherTongue;
+                #endregion
+
+                // Save to database
+                _db.LanguageSkills.Update(Language);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<bool>> DeleteLanguageSkillAsync(
+            int autoID,
+            CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var Language = await _db.LanguageSkills.FindAsync(autoID);
+                if (Language == null)
+                    throw new Exception("Could not perform deletion because the selected language was not found in the database.");
+
+                _db.LanguageSkills.Remove(Language);
+
+                int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
+                if (rowsDeleted > 0)
+                    isSuccess = true;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
+        }
         #endregion
     }
 }
