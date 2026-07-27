@@ -2352,7 +2352,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 };
 
                 // Show the dialog box
-                var dialog = await DialogService.ShowAsync<SkillDialog>("Add New Language", parameters, options);
+                var dialog = await DialogService.ShowAsync<LanguageSkillDialog>("Add New Language", parameters, options);
                 var result = await dialog.Result;
                 if (result != null && !result.Canceled)
                 {
@@ -2435,7 +2435,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     CloseButton = false
                 };
 
-                var dialog = await DialogService.ShowAsync<SkillDialog>("Edit Language", parameters, options);
+                var dialog = await DialogService.ShowAsync<LanguageSkillDialog>("Edit Language", parameters, options);
                 var result = await dialog.Result;
 
                 if (result != null && !result.Canceled)
