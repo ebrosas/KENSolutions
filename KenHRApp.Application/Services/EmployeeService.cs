@@ -1035,6 +1035,7 @@ namespace KenHRApp.Application.Services
                         employeeDetail.EmergencyContactList = model.EmergencyContactList!.Select(e => new EmergencyContactDTO
                         {
                             AutoId = e.AutoId,
+                            EmployeeNo = e.EmployeeNo,
                             ContactPerson = e.ContactPerson,
                             RelationCode = e.RelationCode,
                             Relation = e.Relation,
@@ -1054,6 +1055,7 @@ namespace KenHRApp.Application.Services
                         employeeDetail.QualificationList = model.Qualifications!.Select(e => new QualificationDTO
                         {
                             AutoId = e.AutoId,
+                            EmployeeNo = e.EmployeeNo,
                             QualificationCode = e.QualificationCode,
                             QualificationDesc = e.QualificationDesc,
                             StreamCode = e.StreamCode,
@@ -1089,6 +1091,7 @@ namespace KenHRApp.Application.Services
                         employeeDetail.EmployeeSkillList = model.EmployeeSkills!.Select(e => new EmployeeSkillDTO
                         {
                             AutoId = e.AutoId,
+                            EmployeeNo = e.EmployeeNo,
                             SkillName = e.SkillName,
                             LevelCode = e.LevelCode,
                             LevelDesc = e.LevelDesc,
@@ -1111,6 +1114,7 @@ namespace KenHRApp.Application.Services
                         employeeDetail.EmployeeCertificationList = model.EmployeeCertifications!.Select(e => new EmployeeCertificationDTO
                         {
                             AutoId = e.AutoId,
+                            EmployeeNo = e.EmployeeNo,
                             QualificationCode = e.QualificationCode,
                             QualificationDesc = e.QualificationDesc,
                             StreamCode = e.StreamCode,
@@ -1141,6 +1145,7 @@ namespace KenHRApp.Application.Services
                         employeeDetail.LanguageSkillList = model.LanguageSkills!.Select(e => new LanguageSkillDTO
                         {
                             AutoId = e.AutoId,
+                            EmployeeNo = e.EmployeeNo,
                             LanguageCode = e.LanguageCode,
                             LanguageDesc = e.LanguageDesc,
                             CanWrite = e.CanWrite,
@@ -2183,6 +2188,7 @@ namespace KenHRApp.Application.Services
                 EmergencyContact contactEntity = new EmergencyContact()
                 {
                     AutoId = dto.AutoId,
+                    EmployeeNo = dto.EmployeeNo,
                     ContactPerson = dto.ContactPerson,
                     RelationCode = dto.RelationCode,
                     MobileNo = dto.MobileNo,

@@ -994,7 +994,7 @@
                                         <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Emergency Contacts List</MudText>
                                         <MudSpacer />
                                         <MudMenu Dense Variant="Variant.Text" hidden Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
-                                             <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply new contact..." OnClick="AddEmergencyContact" />
+                                             <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply new contact..." OnClick="AddEmergencyContactAsync" />
                                          </MudMenu>
                                     </MudAppBar>
                                     <MudPaper Elevation="4" Square="true" Class="w-100 mb-3">                            
@@ -1033,7 +1033,7 @@
                                                             StartIcon="@Icons.Material.Filled.Add" 
                                                             Size="Size.Small" title="Add new contact person" 
                                                             Disabled="@(!_allowGridEdit)"
-                                                            OnClick="AddEmergencyContact" />                                                        
+                                                                 OnClick="AddEmergencyContactAsync" />
                                                      </MudPaper>                             
                                                 </MudPaper>
                                             </ToolBarContent>
@@ -2320,7 +2320,7 @@
                                         <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Languages List</MudText>
                                         <MudSpacer />
                                         <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
-                                             <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply new language..." OnClick="AddQualificationAsync" />
+                                             <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply new language..." OnClick="AddLanguageAsync" />
                                          </MudMenu>
                                      </MudAppBar>
                                 </MudStack>

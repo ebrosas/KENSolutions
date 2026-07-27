@@ -200,7 +200,8 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             SPECIALIZATION,         // Specialization Types
             QUALIFACTIONMODE,       // Qualification Modes
             MONTHCODE,              // Months
-            SKILLLEVEL              // Skill Levels
+            SKILLLEVEL,             // Skill Levels
+            LANGUAGE                // Languages        
         }
 
         private enum NotificationType
@@ -434,7 +435,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 if (contactPerson.AutoId == 0)
                 {
                     // Get the new identity seed
-                    contactPerson.AutoId = employee.EmergencyContactList.Max(d => d.AutoId) + 1;
+                    contactPerson.AutoId = result.Value;
 
                     // Add locally to the list so UI updates immediately
                     employee.EmergencyContactList.Add(contactPerson);
@@ -563,7 +564,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             }
         }
 
-        private async Task AddEmergencyContact()
+        private async Task AddEmergencyContactAsync()
         {
             try
             {
@@ -573,7 +574,8 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     ["RelationTypeList"] = _relationTypeList,
                     ["CountryList"] = _countryList,
                     ["IsClearable"] = true,
-                    ["IsDisabled"] = false
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = false
                 };
 
                 var options = new DialogOptions
@@ -581,7 +583,8 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     CloseOnEscapeKey = true,
                     BackdropClick = false,
                     FullWidth = true,
-                    MaxWidth = MaxWidth.Large
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
                 };
 
                 // Show the dialog box
@@ -592,6 +595,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 {
                     var newContact = (EmergencyContactDTO)result.Data!;
                     newContact.AutoId = 0;
+                    newContact.EmployeeNo = employee.EmployeeNo;
 
                     #region Get the selected relationship type
                     if (!string.IsNullOrEmpty(newContact.Relation))
@@ -612,7 +616,8 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     #endregion
 
                     #region Check for duplicate entries
-                    var duplicateContact = employee.EmergencyContactList.FirstOrDefault(e => e.ContactPerson.Trim().ToUpper() == newContact.ContactPerson.Trim().ToUpper()
+                    var duplicateContact = employee.EmergencyContactList.FirstOrDefault(e => e.EmployeeNo == newContact.EmployeeNo 
+                        && e.ContactPerson.Trim().ToUpper() == newContact.ContactPerson.Trim().ToUpper()
                         && e.RelationCode.Trim().ToUpper() == newContact.RelationCode.Trim().ToUpper()
                         && e.MobileNo.Trim() == newContact.MobileNo.Trim());
                     if (duplicateContact != null)
@@ -622,6 +627,20 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                         return;
                     }
                     #endregion
+
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Adding new contact, please wait...";
+
+                    _ = SaveEmergencyContactAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, newContact);
                 }
             }
             catch (Exception ex)
@@ -2369,10 +2388,24 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     }
                     #endregion
 
+                    #region Process flags
+                    if (!newLanguage.CanRead.HasValue)
+                        newLanguage.CanRead = false;
+
+                    if (!newLanguage.CanWrite.HasValue)
+                        newLanguage.CanWrite = false;
+
+                    if (!newLanguage.CanSpeak.HasValue)
+                        newLanguage.CanSpeak = false;
+
+                    if (!newLanguage.MotherTongue.HasValue)
+                        newLanguage.MotherTongue = false;
+                    #endregion
+
                     #region Check for duplicate entries
-                    var duplicateSkill = employee.LanguageSkillList.FirstOrDefault(e => e.EmployeeNo == newLanguage.EmployeeNo
+                    var duplicateLanguage = employee.LanguageSkillList.FirstOrDefault(e => e.EmployeeNo == newLanguage.EmployeeNo
                         && e.LanguageCode.Trim().ToUpper() == newLanguage.LanguageCode.Trim().ToUpper());
-                    if (duplicateSkill != null)
+                    if (duplicateLanguage != null)
                     {
                         // Show error
                         await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified language already exists. Please enter a unique language then try again.");
@@ -2449,6 +2482,20 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                         if (udc != null)
                             updated.LanguageCode = udc.UDCCode;
                     }
+                    #endregion
+
+                    #region Process flags
+                    if (!updated.CanRead.HasValue)
+                        updated.CanRead = false;
+
+                    if (!updated.CanWrite.HasValue)
+                        updated.CanWrite = false;
+
+                    if (!updated.CanSpeak.HasValue)
+                        updated.CanSpeak = false;
+
+                    if (!updated.MotherTongue.HasValue)
+                        updated.MotherTongue = false;
                     #endregion
 
                     // Update in-memory grid item
@@ -3746,6 +3793,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                                 _monthArray = _monthList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
                         }
                         #endregion
+
                         #region Populate Skills Level dropdown
                         try
                         {
@@ -3761,6 +3809,24 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                             _skillLevelList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
                             if (_skillLevelList != null)
                                 _skillLevelArray = _skillLevelList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                        }
+                        #endregion
+
+                        #region Populate Languages dropdown
+                        try
+                        {
+                            groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.LANGUAGE.ToString()).FirstOrDefault()!.UDCGroupId;
+                        }
+                        catch (Exception ex)
+                        {
+                            _errorMessage.Append($"Error getting language list: {ex.Message}");
+                        }
+
+                        if (groupID > 0)
+                        {
+                            _languageList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.UDCDesc1).ToList();
+                            if (_languageList != null)
+                                _languageArray = _languageList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
                         }
                         #endregion
                     }
@@ -4291,6 +4357,24 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                         _skillLevelList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
                         if (_skillLevelList != null)
                             _skillLevelArray = _skillLevelList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                    }
+                    #endregion
+
+                    #region Populate Languages dropdown
+                    try
+                    {
+                        groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.LANGUAGE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting language list: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _languageList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.UDCDesc1).ToList();
+                        if (_languageList != null)
+                            _languageArray = _languageList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
                     }
                     #endregion
                 }

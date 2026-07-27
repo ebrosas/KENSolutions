@@ -103,6 +103,9 @@ Workflow Service:
 2. Implement workflow code for Outdoor Request in the "WorkflowRepository" class.	-Done
 3. Test the workflow of Outdoor request upon submission.	-Done
 
+Employee Master:
+1. Fixed bug when adding new emergency contact.
+
 10003637 - Naga
 02/02/2010
 ervin_brosas@yahoo.com

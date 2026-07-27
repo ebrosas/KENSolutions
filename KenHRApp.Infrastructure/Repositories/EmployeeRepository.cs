@@ -540,6 +540,7 @@ namespace KenHRApp.Infrastructure.Repositories
                                 employeeDetail.EmergencyContactList.Add(new EmergencyContact()
                                 {
                                     AutoId = item.EmergencyContact.AutoId,
+                                    EmployeeNo = item.EmergencyContact.EmployeeNo,
                                     ContactPerson = item.EmergencyContact.ContactPerson,
                                     RelationCode = item.EmergencyContact.RelationCode,
                                     Relation = item.Relation,
@@ -549,7 +550,6 @@ namespace KenHRApp.Infrastructure.Repositories
                                     CountryCode = item.EmergencyContact.CountryCode,
                                     CountryDesc = item.CountryDesc,
                                     City = item.EmergencyContact.City,
-                                    EmployeeNo = item.EmergencyContact.EmployeeNo,
                                     TransactionNo = item.EmergencyContact.TransactionNo
                                 });
                             }
@@ -599,6 +599,7 @@ namespace KenHRApp.Infrastructure.Repositories
                                 employeeDetail.Qualifications.Add(new Qualification()
                                 {
                                     AutoId = item.Qualification.AutoId,
+                                    EmployeeNo = item.Qualification.EmployeeNo,
                                     QualificationCode  = item.Qualification.QualificationCode,
                                     QualificationDesc  = item.QualificationDesc,
                                     StreamCode  = item.Qualification.StreamCode,
@@ -653,6 +654,7 @@ namespace KenHRApp.Infrastructure.Repositories
                                 employeeDetail.EmployeeSkills.Add(new EmployeeSkill()
                                 {
                                     AutoId = item.EmployeeSkill.AutoId,
+                                    EmployeeNo = item.EmployeeSkill.EmployeeNo,
                                     SkillName = item.EmployeeSkill.SkillName,
                                     LevelCode = item.EmployeeSkill.LevelCode,
                                     LevelDesc = item.LevelDesc,
@@ -699,6 +701,7 @@ namespace KenHRApp.Infrastructure.Repositories
                                 employeeDetail.EmployeeCertifications.Add(new EmployeeCertification()
                                 {
                                     AutoId = item.EmployeeCertification.AutoId,
+                                    EmployeeNo = item.EmployeeCertification.EmployeeNo,   
                                     QualificationCode = item.EmployeeCertification.QualificationCode,
                                     QualificationDesc = item.QualificationDesc,
                                     StreamCode = item.EmployeeCertification.StreamCode,
@@ -725,14 +728,16 @@ namespace KenHRApp.Infrastructure.Repositories
                         #endregion
 
                         #region Get Language Skills
+                        int languageGroupID = _db.UserDefinedCodeGroups.Where(a => a.UDCGCode == "LANGUAGE").FirstOrDefault()!.UDCGroupId;
                         var languageModel = await (from l in _db.LanguageSkills
-                                                        join langCode in _db.UserDefinedCodes on l.LanguageCode equals langCode.UDCCode     // INNER JOIN 
-                                                        where l.EmployeeNo == employeeDetail.EmployeeNo
-                                                        select new
-                                                        {
-                                                            LanguageSkill = l,
-                                                            LanguageDesc = langCode.UDCDesc1
-                                                        }).ToListAsync();
+                                                    join langCode in _db.UserDefinedCodes on l.LanguageCode equals langCode.UDCCode     // INNER JOIN 
+                                                    where l.EmployeeNo == employeeDetail.EmployeeNo
+                                                        && langCode.GroupID == languageGroupID
+                                                   select new
+                                                    {
+                                                        LanguageSkill = l,
+                                                        LanguageDesc = langCode.UDCDesc1
+                                                    }).ToListAsync();
                         if (languageModel != null)
                         {
                             foreach (var item in languageModel)
@@ -740,6 +745,7 @@ namespace KenHRApp.Infrastructure.Repositories
                                 employeeDetail.LanguageSkills.Add(new LanguageSkill()
                                 {
                                     AutoId = item.LanguageSkill.AutoId,
+                                    EmployeeNo = item.LanguageSkill.EmployeeNo,
                                     LanguageCode = item.LanguageSkill.LanguageCode,
                                     LanguageDesc = item.LanguageDesc,
                                     CanWrite = item.LanguageSkill.CanWrite,
@@ -1807,10 +1813,12 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 // Save to database
                 _db.EmergencyContacts.Add(contact);
-
                 rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
 
-                return Result<int>.SuccessResult(rowsUpdated);
+                // ✅ EF Core automatically populates identity after SaveChanges
+                int generatedId = contact.AutoId;
+
+                return Result<int>.SuccessResult(generatedId);
             }
             catch (InvalidOperationException invEx)
             {

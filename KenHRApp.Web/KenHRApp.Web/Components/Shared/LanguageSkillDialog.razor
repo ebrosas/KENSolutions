@@ -12,7 +12,7 @@
         <MudForm @ref="_form">
             <MudPaper Elevation="0" Square="true" Class="w-100 px-5">
                 <MudGrid Spacing="7">
-                    <MudItem xs="3">
+                    <MudItem xs="4">
                         <MudPaper Elevation="0" Class="p-0 w-100">
                             <MudAutocomplete @bind-Value="LanguageSkill.LanguageDesc"
                                              For="@(() => LanguageSkill.LanguageDesc)"
@@ -29,7 +29,7 @@
                                              Modal="true" />
                         </MudPaper>
                     </MudItem>
-                    <MudItem xs="9">
+                    <MudItem xs="8">
                         <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Breakpoint="Breakpoint.Xs" Class="pt-3">
                             <MudSwitch @bind-Value="LanguageSkill.CanRead" Color="Color.Info" UncheckedColor="Color.Default" LabelPlacement="Placement.Start">Can Read?</MudSwitch>
                             <MudSwitch @bind-Value="LanguageSkill.CanSpeak" Color="Color.Info" UncheckedColor="Color.Default" LabelPlacement="Placement.Start">Can Speak?</MudSwitch>

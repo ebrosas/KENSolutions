@@ -1,6 +1,13 @@
 ﻿@using KenHRApp.Web.Components.Common
 
 <MudDialog>
+     <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@DialogIcon" Class="mr-1" Size="Size.Medium" Color="@DialogIconColor" />
+            @DialogTitle
+        </MudText>
+    </TitleContent>
+
     <DialogContent>
         <MudForm @ref="_form">
             <MudGrid Spacing="7">
@@ -90,8 +97,8 @@
     </DialogContent>
 
     <DialogActions>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
-        <MudButton Color="Color.Default" Variant="Variant.Text" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Info" Style="background-color:#004165;" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
+        <MudButton Color="Color.Default" Variant="Variant.Text" Size="Size.Medium" OnClick="Cancel">Cancel</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -120,6 +127,14 @@
 
     [Parameter]
     public bool IsDisabled { get; set; } = true;
+
+    [Parameter]
+    public bool IsEditMode { get; set; }
+
+    // Optional UI helpers
+    protected string DialogTitle => IsEditMode ? "Edit Language" : "Add New Language";
+    protected string DialogIcon => IsEditMode ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add;
+    protected Color DialogIconColor => IsEditMode ? Color.Info : Color.Success;
     #endregion
 
     #region Page Methods
