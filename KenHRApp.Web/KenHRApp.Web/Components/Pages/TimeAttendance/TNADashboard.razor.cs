@@ -159,20 +159,20 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (firstRender)
             {
                 #region Old authentication Logic
-                //if (!State.IsAuthenticated)
+                //if (!StateName.IsAuthenticated)
                 //    GoToLogin();
 
                 //PopulateFiscalYears();
                 //_selectedFiscalYear = DateTime.Now.Year;
                 //await LoadPayrollPeriodsAsync(_selectedFiscalYear);
 
-                //if (State.AuthenticatedUser != null)
+                //if (StateName.AuthenticatedUser != null)
                 //{
-                //    UserName = State.AuthenticatedUser!.UserFullName;
-                //    UserEmpNo = State.AuthenticatedUser.EmpNo;
-                //    UserID = State.AuthenticatedUser!.UserID;
-                //    UserEmail = State.AuthenticatedUser!.OfficialEmail;
-                //    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
+                //    UserName = StateName.AuthenticatedUser!.UserFullName;
+                //    UserEmpNo = StateName.AuthenticatedUser.EmpNo;
+                //    UserID = StateName.AuthenticatedUser!.UserID;
+                //    UserEmail = StateName.AuthenticatedUser!.OfficialEmail;
+                //    UserCostCenter = StateName.AuthenticatedUser!.DepartmentCode;
 
                 //    BeginGetAttendanceSummary();
                 //}

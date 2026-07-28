@@ -210,7 +210,7 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
                     ShowNotification("User Account has been unlocked successfully!", SnackBarTypes.Success);
 
                     // Set authentication state
-                    //State.IsAuthenticated = true;
+                    //StateName.IsAuthenticated = true;
                 }
                 else
                 {

@@ -252,6 +252,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         private string _languageSearchString = string.Empty;
         private bool _languageFilter = false;
+
+        private string _familySearchString = string.Empty;
+        private bool _familyFilter = false;
         #endregion
 
         #endregion
@@ -2621,6 +2624,535 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             {
                 // Show notification
                 ShowNotification("The selected language has been deleted successfully!", NotificationType.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(errorMsg);
+                    ShowHideError(true);
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+        #endregion
+
+        #region Family Members Grid
+        private Func<FamilyMemberDTO, bool> _familyQuickFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(_familySearchString))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.FullName) && x.FullName.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            //if (!string.IsNullOrEmpty(x.MiddleName) && x.MiddleName.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            //if (!string.IsNullOrEmpty(x.LastName) && x.LastName.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
+            //    return true;
+
+            if (!string.IsNullOrEmpty(x.Relation) && x.Relation.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.Qualification) && x.Qualification.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.StreamDesc) && x.StreamDesc.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.Specialization) && x.Specialization!.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.Country) && x.Country!.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.StateName) && x.StateName!.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.CityTownName) && x.CityTownName!.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
+        };
+
+        private async Task FamilyStartedEditingItem(FamilyMemberDTO item)
+        {
+            await EditFamilyMemberAsync(item);
+        }
+
+        private void FamilyCommittedItemChanges(FamilyMemberDTO item)
+        {
+            try
+            {
+                if (item == null) return;
+
+                #region Get selected relation
+                if (!string.IsNullOrEmpty(item.RelationCode))
+                {
+                    UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCCode == item.RelationCode).FirstOrDefault();
+                    if (udc != null)
+                        item.Relation = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected qualification
+                if (!string.IsNullOrEmpty(item.QualificationCode))
+                {
+                    UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCCode == item.QualificationCode).FirstOrDefault();
+                    if (udc != null)
+                        item.Qualification = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected stream
+                if (!string.IsNullOrEmpty(item.StreamCode))
+                {
+                    UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCCode == item.StreamCode).FirstOrDefault();
+                    if (udc != null)
+                        item.StreamDesc = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected specialization
+                if (!string.IsNullOrEmpty(item.SpecializationCode))
+                {
+                    UserDefinedCodeDTO? udc = _specializationList.Where(d => d.UDCCode == item.SpecializationCode).FirstOrDefault();
+                    if (udc != null)
+                        item.Specialization = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected country
+                if (!string.IsNullOrEmpty(item.CountryCode))
+                {
+                    UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCCode == item.CountryCode).FirstOrDefault();
+                    if (udc != null)
+                        item.Country = udc.UDCDesc1;
+                }
+                #endregion
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Saving changes, please wait...";
+
+                _ = SaveFamilyMemberAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+                }, item);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Save cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task SaveFamilyMemberAsync(Func<Task> callback, FamilyMemberDTO familyMember)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            var result = await EmployeeService.SaveFamilyMemberAsync(familyMember, _cts.Token);
+            if (!result.Success)
+            {
+                // Set the error message
+                _errorMessage.AppendLine(result.Error!);
+                ShowHideError(true);
+            }
+            else
+            {
+                if (familyMember.AutoId == 0)
+                {
+                    // Get the new identity seed
+                    familyMember.AutoId = result.Value;
+
+                    // Add locally to the list so UI updates immediately
+                    employee.FamilyMemberList.Add(familyMember);
+
+                    StateHasChanged();
+                }
+
+                // Show notification
+                ShowNotification("Family member has been saved successfully!", NotificationType.Success);
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task AddFamilyMemberAsync()
+        {
+            try
+            {
+                var parameters = new DialogParameters
+                {
+                    ["FamilyMember"] = new FamilyMemberDTO(),
+                    ["RelationTypeList"] = _relationTypeList,
+                    ["QualificationList"] = _qualificationList,
+                    ["StreamList"] = _streamList,
+                    ["SpecializationList"] = _specializationList,
+                    ["CountryList"] = _countryList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = false
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                // Show the dialog box
+                var dialog = await DialogService.ShowAsync<CertificationDialog>("Add Family Member", parameters, options);
+                var result = await dialog.Result;
+                if (result != null && !result.Canceled)
+                {
+                    var newMember = (FamilyMemberDTO)result.Data!;
+                    newMember.AutoId = 0;
+                    newMember.EmployeeNo = employee.EmployeeNo;
+
+                    #region Get selected qualification
+                    if (!string.IsNullOrEmpty(newMember.Qualification))
+                    {
+                        UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCDesc1 == newMember.Qualification).FirstOrDefault();
+                        if (udc != null)
+                            newMember.QualificationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected relationship
+                    if (!string.IsNullOrEmpty(newMember.Relation))
+                    {
+                        UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCDesc1 == newMember.Relation).FirstOrDefault();
+                        if (udc != null)
+                            newMember.RelationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected qualification
+                    if (!string.IsNullOrEmpty(newMember.Qualification))
+                    {
+                        UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCDesc1 == newMember.Qualification).FirstOrDefault();
+                        if (udc != null)
+                            newMember.QualificationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected stream
+                    if (!string.IsNullOrEmpty(newMember.StreamDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCDesc1 == newMember.StreamDesc).FirstOrDefault();
+                        if (udc != null)
+                            newMember.StreamCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected specialization
+                    if (!string.IsNullOrEmpty(newMember.Specialization))
+                    {
+                        UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCDesc1 == newMember.Specialization).FirstOrDefault();
+                        if (udc != null)
+                            newMember.SpecializationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected country
+                    if (!string.IsNullOrEmpty(newMember.Country))
+                    {
+                        UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCDesc1 == newMember.Country).FirstOrDefault();
+                        if (udc != null)
+                            newMember.CountryCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Check for duplicate entries
+                    var duplicateMember = employee.FamilyMemberList.FirstOrDefault(e => e.EmployeeNo == newMember.EmployeeNo
+                        && e.FirstName.Trim().ToUpper() == newMember.FirstName.Trim().ToUpper()
+                        && e.LastName.Trim().ToUpper() == newMember.LastName.Trim().ToUpper()
+                        && e.RelationCode.Trim().ToUpper() == newMember.RelationCode.Trim().ToUpper());
+                    if (duplicateMember != null)
+                    {
+                        // Show error
+                        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified family member already exists. Please enter a unique name then try to save again.");
+                        return;
+                    }
+                    #endregion
+
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Adding family member, please wait...";
+
+                    _ = SaveFamilyMemberAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, newMember);
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task EditFamilyMemberAsync(FamilyMemberDTO familyMember)
+        {
+            try
+            {
+                // Clone the object so the dialog can edit without affecting the grid until Save
+                var editableCopy = new FamilyMemberDTO
+                {
+                    AutoId = familyMember.AutoId,
+                    FirstName = familyMember.FirstName,
+                    MiddleName = familyMember.MiddleName,
+                    LastName = familyMember.LastName,
+                    RelationCode = familyMember.RelationCode,
+                    Relation = familyMember.Relation,
+                    QualificationCode = familyMember.QualificationCode,
+                    Qualification = familyMember.Qualification,
+                    StreamCode = familyMember.StreamCode,
+                    StreamDesc = familyMember.StreamDesc,
+                    SpecializationCode = familyMember.SpecializationCode,
+                    Specialization = familyMember.Specialization,
+                    Occupation = familyMember.Occupation,
+                    ContactNo = familyMember.ContactNo,
+                    CountryCode = familyMember.CountryCode,
+                    Country = familyMember.Country,
+                    StateName = familyMember.StateName,
+                    District = familyMember.District,
+                    CityTownName = familyMember.CityTownName,
+                    IsDependent = familyMember.IsDependent
+                };
+
+                var parameters = new DialogParameters
+                {
+                    ["FamilyMember"] = editableCopy,
+                    ["RelationTypeList"] = _relationTypeList,
+                    ["QualificationList"] = _qualificationList,
+                    ["StreamList"] = _streamList,
+                    ["SpecializationList"] = _specializationList,
+                    ["CountryList"] = _countryList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = true
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                var dialog = await DialogService.ShowAsync<CertificationDialog>("Edit Family Member", parameters, options);
+                var result = await dialog.Result;
+
+                if (result != null && !result.Canceled)
+                {
+                    var updated = (FamilyMemberDTO)result.Data!;
+
+                    #region Get selected relationship
+                    if (!string.IsNullOrEmpty(updated.Relation))
+                    {
+                        UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCDesc1 == updated.Relation).FirstOrDefault();
+                        if (udc != null)
+                            updated.RelationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected qualification
+                    if (!string.IsNullOrEmpty(updated.Qualification))
+                    {
+                        UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCDesc1 == updated.Qualification).FirstOrDefault();
+                        if (udc != null)
+                            updated.QualificationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected stream
+                    if (!string.IsNullOrEmpty(updated.StreamDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCDesc1 == updated.StreamDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.StreamCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected specialization
+                    if (!string.IsNullOrEmpty(updated.Specialization))
+                    {
+                        UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCDesc1 == updated.Specialization).FirstOrDefault();
+                        if (udc != null)
+                            updated.SpecializationCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected country
+                    if (!string.IsNullOrEmpty(updated.Country))
+                    {
+                        UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCDesc1 == updated.Country).FirstOrDefault();
+                        if (udc != null)
+                            updated.CountryCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    // Update in-memory grid item
+                    var index = employee.FamilyMemberList.FindIndex(x => x.AutoId == updated.AutoId);
+                    if (index >= 0)
+                    {
+                        employee.FamilyMemberList[index] = updated;
+                        await InvokeAsync(StateHasChanged);
+                    }
+
+                    #region Persist changes to DB
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Saving family member, please wait...";
+
+                    _ = SaveFamilyMemberAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, updated);
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task ConfirmDeleteFamilyMember(FamilyMemberDTO familyMember)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to delete this family member: '{familyMember.FirstName} {familyMember.MiddleName} {familyMember.LastName}'?" },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Family Member", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                BeginDeleteFamilyMember(familyMember);
+            }
+        }
+
+        private void BeginDeleteFamilyMember(FamilyMemberDTO familyMember)
+        {
+            try
+            {
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Deleting family member, please wait...";
+
+                _ = DeleteFamilyMemberAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    // Remove locally from the list so UI updates immediately
+                    employee.FamilyMemberList.Remove(familyMember);
+
+                    StateHasChanged();
+
+                }, familyMember);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Delete cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task DeleteFamilyMemberAsync(Func<Task> callback, FamilyMemberDTO familyMember)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            if (familyMember.AutoId == 0)
+            {
+                errorMsg = "Family Member ID is not defined.";
+            }
+            else
+            {
+                var deleteResult = await EmployeeService.DeleteFamilyMemberAsync(familyMember.AutoId, _cts.Token);
+                isSuccess = deleteResult.Success;
+                if (!isSuccess)
+                    errorMsg = deleteResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Show notification
+                ShowNotification("The selected familyMember has been deleted successfully!", NotificationType.Success);
             }
             else
             {

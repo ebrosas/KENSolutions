@@ -76,6 +76,14 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<bool>> DeleteLanguageSkillAsync(
            int autoID,
            CancellationToken cancellationToken = default);
+
+        Task<Result<int>> SaveFamilyMemberAsync(
+            FamilyMemberDTO dto,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<bool>> DeleteFamilyMemberAsync(
+           int autoID,
+           CancellationToken cancellationToken = default);
         #endregion
     }
 }

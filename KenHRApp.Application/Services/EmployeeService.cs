@@ -310,7 +310,7 @@ namespace KenHRApp.Application.Services
                     CountryCode = "PHL",
                     Country = "Philippines",
                     StateCode = "BAT",
-                    State = "Batangas",
+                    StateName = "Batangas",
                     CityTownName = "Lipa City",
                     District = "69",
                     IsDependent = true
@@ -336,7 +336,7 @@ namespace KenHRApp.Application.Services
                     CountryCode = "PHL",
                     Country = "Philippines",
                     StateCode = "LAG",
-                    State = "Laguna",
+                    StateName = "Laguna",
                     CityTownName = "San Pablo City",
                     District = "4004",
                     IsDependent = true
@@ -1181,6 +1181,7 @@ namespace KenHRApp.Application.Services
                         employeeDetail.FamilyMemberList = model.FamilyMembers!.Select(e => new FamilyMemberDTO
                         {
                             AutoId = e.AutoId,
+                            EmployeeNo = e.EmployeeNo,
                             FirstName = e.FirstName,
                             MiddleName = e.MiddleName,
                             LastName = e.LastName,
@@ -1197,8 +1198,7 @@ namespace KenHRApp.Application.Services
                             ContactNo = e.ContactNo,
                             CountryCode = e.CountryCode,
                             Country = e.Country,
-                            StateCode = e.StateCode,
-                            State = e.State,
+                            StateName = e.StateName,
                             CityTownName = e.CityTownName,
                             District = e.District,
                             IsDependent = e.IsDependent
@@ -1565,7 +1565,7 @@ namespace KenHRApp.Application.Services
                         Occupation = e.Occupation,
                         ContactNo = e.ContactNo,
                         CountryCode = e.CountryCode,
-                        StateCode = e.StateCode,
+                        StateName = e.StateName,
                         CityTownName = e.CityTownName,
                         District = e.District,
                         IsDependent = e.IsDependent
@@ -1944,7 +1944,7 @@ namespace KenHRApp.Application.Services
                         Occupation = e.Occupation,
                         ContactNo = e.ContactNo,
                         CountryCode = e.CountryCode,
-                        StateCode = e.StateCode,
+                        StateName = e.StateName,
                         CityTownName = e.CityTownName,
                         District = e.District,
                         IsDependent = e.IsDependent
@@ -2584,6 +2584,99 @@ namespace KenHRApp.Application.Services
                         throw new Exception(result.Error);
                     else
                         throw new Exception("Unable to delete the selected language due to unknown error. Please refresh the page then try again.");
+                }
+
+                return Result<bool>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<int>> SaveFamilyMemberAsync(
+            FamilyMemberDTO dto,
+            CancellationToken cancellationToken = default)
+        {
+            int saveResult = 0;
+
+            try
+            {
+                #region Initialize FamilyMember entity
+                FamilyMember familyMember = new FamilyMember()
+                {
+                    AutoId = dto.AutoId,
+                    EmployeeNo = dto.EmployeeNo,
+                    FirstName = dto.FirstName,
+                    MiddleName = dto.MiddleName,
+                    LastName = dto.LastName,
+                    RelationCode = dto.RelationCode,
+                    DOB = dto.DOB,
+                    QualificationCode = dto.QualificationCode,
+                    StreamCode = dto.StreamCode,
+                    SpecializationCode = dto.SpecializationCode,
+                    Occupation = dto.Occupation,
+                    ContactNo = dto.ContactNo,
+                    CountryCode = dto.CountryCode,
+                    StateName = dto.StateName,
+                    CityTownName = dto.CityTownName,
+                    District = dto.District,
+                    IsDependent = dto.IsDependent
+                };
+                #endregion
+
+                if (familyMember.AutoId == 0)
+                {
+                    var addResult = await _repository.AddFamilyMemberAsync(familyMember, cancellationToken);
+                    if (addResult.Success)
+                    {
+                        saveResult = addResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(addResult.Error))
+                            throw new Exception(addResult.Error);
+                        else
+                            throw new Exception("Unable to add new family member to the database. Please try saving again.");
+                    }
+                }
+                else
+                {
+                    var updateResult = await _repository.UpdateFamilyMemberAsync(familyMember, cancellationToken);
+                    if (updateResult.Success)
+                    {
+                        saveResult = updateResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(updateResult.Error))
+                            throw new Exception(updateResult.Error);
+                        else
+                            throw new Exception("Unable to update the selected family member. Please try saving again.");
+                    }
+                }
+
+                return Result<int>.SuccessResult(saveResult);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<bool>> DeleteFamilyMemberAsync(
+           int autoID,
+           CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _repository.DeleteFamilyMemberAsync(autoID, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to delete the selected family member due to unknown error. Please refresh the page then try again.");
                 }
 
                 return Result<bool>.SuccessResult(result.Value);

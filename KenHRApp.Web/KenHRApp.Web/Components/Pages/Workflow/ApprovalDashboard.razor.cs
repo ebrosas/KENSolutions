@@ -154,16 +154,16 @@ namespace KenHRApp.Web.Components.Pages.Workflow
             if (firstRender)
             {
                 #region Old authentication Logic
-                //if (!State.IsAuthenticated)
+                //if (!StateName.IsAuthenticated)
                 //    GoToLogin();
 
-                //if (State.AuthenticatedUser != null)
+                //if (StateName.AuthenticatedUser != null)
                 //{
-                //    UserName = State.AuthenticatedUser!.EmployeeFullName;
-                //    UserEmpNo = State.AuthenticatedUser.EmpNo;
-                //    UserID = State.AuthenticatedUser!.UserID;
-                //    UserEmail = State.AuthenticatedUser!.OfficialEmail;
-                //    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
+                //    UserName = StateName.AuthenticatedUser!.EmployeeFullName;
+                //    UserEmpNo = StateName.AuthenticatedUser.EmpNo;
+                //    UserID = StateName.AuthenticatedUser!.UserID;
+                //    UserEmail = StateName.AuthenticatedUser!.OfficialEmail;
+                //    UserCostCenter = StateName.AuthenticatedUser!.DepartmentCode;
 
                 //    BeginLoadComboboxTask();
                 //}

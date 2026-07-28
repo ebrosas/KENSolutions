@@ -13,6 +13,12 @@
 	--Get Skill Level
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'LANGUAGE')
+	ORDER BY a.SequenceNo
+
+	--Get Skill Level
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'SKILLLEVEL')
 	ORDER BY a.SequenceNo
 

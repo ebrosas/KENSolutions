@@ -104,7 +104,8 @@ Workflow Service:
 3. Test the workflow of Outdoor request upon submission.	-Done
 
 Employee Master:
-1. Fixed bug when adding new emergency contact.
+1. Fixed bug when adding new emergency contact.	-Done
+2. Implement FamilyMemberDialog
 
 10003637 - Naga
 02/02/2010

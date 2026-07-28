@@ -969,7 +969,7 @@ skill-qualification-grid .col-FromYear, .col-ToYear, .col-PassYear {
 
 /* Format table header */
 .language-grid .mud-table-head {
-    background-color: #CFD8DC; /* Table header background color */
+    background-color: #BBDEFB; /* Table header background color */
     font-weight: bold;
     text-align: center !important;
     font-size: 14px !important;
@@ -999,8 +999,11 @@ skill-qualification-grid .col-FromYear, .col-ToYear, .col-PassYear {
 .language-grid .col-language-desc {
     width: 200px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
+}
+
+.language-grid .col-active {
+    width: 120px !important;
+    text-align: left;
 }
 /* #endregion */
 
@@ -1032,7 +1035,7 @@ skill-qualification-grid .col-FromYear, .col-ToYear, .col-PassYear {
 
 /* Format table header */
 .family-member-grid .mud-table-head {
-    background-color: #CFD8DC; /* Table header background color */
+    background-color: #BBDEFB; /* Table header background color */
     font-weight: bold;
     text-align: center !important;
     font-size: 14px !important;
@@ -1062,85 +1065,66 @@ skill-qualification-grid .col-FromYear, .col-ToYear, .col-PassYear {
 .family-member-grid .col-familyname {
     width: 130px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .family-member-grid .col-relation {
     width: 150px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .family-member-grid .col-dob {
     width: 100px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .family-member-grid .col-qualification {
     width: 170px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .family-member-grid .col-stream {
     width: 170px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .family-member-grid .col-specialization {
     width: 170px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .family-member-grid .col-occupation {
     width: 170px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .family-member-grid .col-country {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .family-member-grid .col-state {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .family-member-grid .col-city {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .family-member-grid .col-district {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .family-member-grid .col-contact {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
+}
+
+.family-member-grid .col-dependent {
+    width: 100px !important;
+    text-align: left;
 }
 /* #endregion */
 

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -13,11 +14,25 @@ namespace KenHRApp.Application.DTOs
     {
         #region Properties
         public int AutoId { get; set; }
+
+        [Required(ErrorMessage = "First Name is required")]
+        [StringLength(50, ErrorMessage = "First Name can't be more than 50 characters.")]
+        [Display(Name = "First Name")]
         public string FirstName { get; set; } = null!;
+
         public string? MiddleName { get; set; } = null;
+
+        [Required(ErrorMessage = "Last Name is required")]
+        [StringLength(50, ErrorMessage = "Last Name can't be more than 50 characters.")]
+        [Display(Name = "Last Name")]
         public string LastName { get; set; } = null!;
+
         public string RelationCode { get; set; } = null!;
-        public string? Relation { get; set; } = null;
+
+        [Required(ErrorMessage = "Relation is required")]
+        [Display(Name = "Relation")]
+        public string Relation { get; set; } = null!;
+
         public DateTime? DOB { get; set; }
         public string? QualificationCode { get; set; } = null;
         public string? Qualification { get; set; } = null;
@@ -30,7 +45,7 @@ namespace KenHRApp.Application.DTOs
         public string? CountryCode { get; set; } = null;
         public string? Country { get; set; } = null;
         public string? StateCode { get; set; } = null;
-        public string? State { get; set; } = null;
+        public string? StateName { get; set; } = null;
         public string? CityTownName { get; set; } = null;
         public string? District { get; set; } = null;
         public bool? IsDependent { get; set; } = null;
@@ -51,6 +66,17 @@ namespace KenHRApp.Application.DTOs
                     ? (this.IsDependent.Value ? "Yes" : "No")
                     : "Not Specified";
             }
+            set { }
+        }
+
+        [Display(Name = "Full Name")]
+        public string FullName
+        {
+            get
+            {
+                return $"{this.FirstName} {(string.IsNullOrEmpty(this.MiddleName) ? "" : this.MiddleName + " ")}{this.LastName}";   
+            }
+            set { }
         }
         #endregion
     }

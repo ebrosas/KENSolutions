@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -797,18 +798,18 @@ namespace KenHRApp.Infrastructure.Repositories
                                                         join qualification in _db.UserDefinedCodes on f.QualificationCode equals qualification.UDCCode into gjQualification from subQualification in gjQualification.DefaultIfEmpty()      // LEFT JOIN    
                                                         join stream in _db.UserDefinedCodes on f.StreamCode equals stream.UDCCode into gjStream from subStream in gjStream.DefaultIfEmpty()      // LEFT JOIN 
                                                         join spec in _db.UserDefinedCodes on f.SpecializationCode equals spec.UDCCode into gjSpec from subSpec in gjSpec.DefaultIfEmpty()                  // LEFT JOIN 
-                                                        join country in _db.UserDefinedCodes on f.CountryCode equals country.UDCCode into gjCountry from subCountry in gjCountry.DefaultIfEmpty()          // LEFT JOIN 
-                                                        join state in _db.UserDefinedCodes on f.StateCode equals state.UDCCode into gjState from subState in gjState.DefaultIfEmpty()          // LEFT JOIN 
+                                                        join country in _db.UserDefinedCodes on f.CountryCode equals country.UDCCode into gjCountry from subCountry in gjCountry.DefaultIfEmpty()          // LEFT JOIN                                                         
                                                         where f.EmployeeNo == employeeDetail.EmployeeNo
-                                                         select new
+                                                            && relation.GroupID == relationshipGroupID
+                                                            && (subCountry == null || subCountry.GroupID == countryGroupID)
+                                                       select new
                                                          {
                                                              FamilyMember = f,
                                                              Relation = relation.UDCDesc1,
                                                              Qualification = subQualification != null ? subQualification.UDCDesc1 : null,
                                                              StreamDesc = subStream != null ? subStream.UDCDesc1 : null,
                                                              Specialization = subSpec != null ? subSpec.UDCDesc1 : null,
-                                                             Country = subCountry != null ? subCountry.UDCDesc1 : null,
-                                                             State = subState != null ? subState.UDCDesc1 : null
+                                                             Country = subCountry != null ? subCountry.UDCDesc1 : null
                                                          }).ToListAsync();
                         if (familyMemberModel != null)
                         {
@@ -817,6 +818,7 @@ namespace KenHRApp.Infrastructure.Repositories
                                 employeeDetail.FamilyMembers.Add(new FamilyMember()
                                 {
                                     AutoId = item.FamilyMember.AutoId,
+                                    EmployeeNo = item.FamilyMember.EmployeeNo,  
                                     FirstName = item.FamilyMember.FirstName,
                                     MiddleName = item.FamilyMember.MiddleName,
                                     LastName = item.FamilyMember.LastName,
@@ -833,8 +835,7 @@ namespace KenHRApp.Infrastructure.Repositories
                                     ContactNo = item.FamilyMember.ContactNo,
                                     CountryCode = item.FamilyMember.CountryCode,
                                     Country = item.Country,
-                                    StateCode = item.FamilyMember.StateCode,
-                                    State = item.State,
+                                    StateName = item.FamilyMember.StateName,
                                     CityTownName = item.FamilyMember.CityTownName,
                                     District = item.FamilyMember.District,
                                     IsDependent = item.FamilyMember.IsDependent
@@ -1379,7 +1380,7 @@ namespace KenHRApp.Infrastructure.Repositories
                             existingFamily.Occupation = family.Occupation;
                             existingFamily.ContactNo = family.ContactNo;
                             existingFamily.CountryCode = family.CountryCode;
-                            existingFamily.StateCode = family.StateCode;
+                            existingFamily.StateName = family.StateName;
                             existingFamily.CityTownName = family.CityTownName;
                             existingFamily.District = family.District;
                             existingFamily.IsDependent = family.IsDependent;
@@ -1401,7 +1402,7 @@ namespace KenHRApp.Infrastructure.Repositories
                                 Occupation = family.Occupation,
                                 ContactNo = family.ContactNo,
                                 CountryCode = family.CountryCode,
-                                StateCode = family.StateCode,
+                                StateName = family.StateName,
                                 CityTownName = family.CityTownName,
                                 District = family.District,
                                 IsDependent = family.IsDependent
@@ -2564,6 +2565,113 @@ namespace KenHRApp.Infrastructure.Repositories
                     throw new Exception("Could not perform deletion because the selected language was not found in the database.");
 
                 _db.LanguageSkills.Remove(Language);
+
+                int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
+                if (rowsDeleted > 0)
+                    isSuccess = true;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> AddFamilyMemberAsync(
+           FamilyMember member,
+           CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                // Save to database
+                _db.FamilyMembers.Add(member);
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                // ✅ EF Core automatically populates identity after SaveChanges
+                int generatedId = member.AutoId;
+
+                return Result<int>.SuccessResult(generatedId);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> UpdateFamilyMemberAsync(
+            FamilyMember dto,
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                var member = await _db.FamilyMembers.FirstOrDefaultAsync(x => x.AutoId == dto.AutoId, cancellationToken);
+                if (member == null)
+                    throw new InvalidOperationException("The specified language was not found");
+
+                #region Update FamilyMember entity                
+                member.FirstName = dto.FirstName;
+                member.MiddleName = dto.MiddleName;
+                member.LastName = dto.LastName;
+                member.RelationCode = dto.RelationCode;
+                member.DOB = dto.DOB;
+                member.QualificationCode = dto.QualificationCode;
+                member.StreamCode = dto.StreamCode;
+                member.SpecializationCode = dto.SpecializationCode;
+                member.Occupation = dto.Occupation;
+                member.ContactNo = dto.ContactNo;
+                member.CountryCode = dto.CountryCode;
+                member.StateName = dto.StateName;
+                member.CityTownName = dto.CityTownName;
+                member.District = dto.District;
+                member.IsDependent = dto.IsDependent;
+                #endregion
+
+                // Save to database
+                _db.FamilyMembers.Update(member);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<bool>> DeleteFamilyMemberAsync(
+            int autoID,
+            CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var member = await _db.FamilyMembers.FindAsync(autoID);
+                if (member == null)
+                    throw new Exception("Could not delete because the selected family member was not found in the database.");
+
+                _db.FamilyMembers.Remove(member);
 
                 int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
                 if (rowsDeleted > 0)

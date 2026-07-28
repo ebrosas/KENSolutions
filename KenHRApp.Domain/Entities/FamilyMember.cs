@@ -26,7 +26,7 @@ namespace KenHRApp.Domain.Entities
         public string RelationCode { get; set; } = null!;
 
         [NotMapped]
-        public string? Relation { get; set; } = null;
+        public string Relation { get; set; } = null;
 
         [Column(TypeName = "datetime")]
         public DateTime? DOB { get; set; }
@@ -61,11 +61,11 @@ namespace KenHRApp.Domain.Entities
         [NotMapped]
         public string? Country { get; set; } = null;
 
-        [Column(TypeName = "varchar(20)")]
-        public string? StateCode { get; set; } = null;
+        //[Column(TypeName = "varchar(20)")]
+        //public string? StateCode { get; set; } = null;
 
-        [NotMapped]
-        public string? State { get; set; } = null;
+        //[NotMapped]
+        //public string? State { get; set; } = null;
 
         [Column(TypeName = "varchar(100)")]
         public string? CityTownName { get; set; } = null;
@@ -75,6 +75,9 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "bit")]
         public bool? IsDependent { get; set; } = null;
+
+        [Column(TypeName = "varchar(100)")]
+        public string? StateName { get; set; } = null;
         #endregion
 
         #region Reference Navigation to Employee   

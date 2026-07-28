@@ -156,16 +156,16 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             if (firstRender)
             {
                 #region Old authentication Logic
-                //if (!State.IsAuthenticated)
+                //if (!StateName.IsAuthenticated)
                 //    GoToLogin();
 
-                //if (State.AuthenticatedUser != null)
+                //if (StateName.AuthenticatedUser != null)
                 //{
-                //    UserName = State.AuthenticatedUser!.EmployeeFullName;
-                //    UserEmpNo = State.AuthenticatedUser.EmpNo;
-                //    UserID = State.AuthenticatedUser!.UserID;
-                //    UserEmail = State.AuthenticatedUser!.OfficialEmail;
-                //    UserCostCenter = State.AuthenticatedUser!.DepartmentCode;
+                //    UserName = StateName.AuthenticatedUser!.EmployeeFullName;
+                //    UserEmpNo = StateName.AuthenticatedUser.EmpNo;
+                //    UserID = StateName.AuthenticatedUser!.UserID;
+                //    UserEmail = StateName.AuthenticatedUser!.OfficialEmail;
+                //    UserCostCenter = StateName.AuthenticatedUser!.DepartmentCode;
 
                 //    BeginLoadComboboxTask();
                 //}
@@ -426,7 +426,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _isRunning = true;
 
             // Set the overlay message
-            //if (!State.IsAuthenticated)
+            //if (!StateName.IsAuthenticated)
             if (!UserSession.IsAuthenticated())
                 overlayMessage = "Authentication required. Redirecting to login page...";
             else
@@ -494,7 +494,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _isRunning = true;
 
             // Set the overlay message
-            //if (!State.IsAuthenticated)
+            //if (!StateName.IsAuthenticated)
             if (!UserSession.IsAuthenticated())
                 overlayMessage = "Authentication required. Redirecting to login page...";
             else

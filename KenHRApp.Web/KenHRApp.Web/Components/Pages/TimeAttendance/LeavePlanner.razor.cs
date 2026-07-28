@@ -910,7 +910,7 @@ namespace KenHRApp.Web.Components.Pages.TimeAttendance
             _isRunning = true;
 
             // Set the overlay message
-            //if (!State.IsAuthenticated)
+            //if (!StateName.IsAuthenticated)
             if (!UserSession.IsAuthenticated())
                 overlayMessage = "Authentication required. Redirecting to login page...";
             else
