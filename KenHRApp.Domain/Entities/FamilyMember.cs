@@ -26,7 +26,7 @@ namespace KenHRApp.Domain.Entities
         public string RelationCode { get; set; } = null!;
 
         [NotMapped]
-        public string Relation { get; set; } = null;
+        public string Relation { get; set; } = null!;
 
         [Column(TypeName = "datetime")]
         public DateTime? DOB { get; set; }

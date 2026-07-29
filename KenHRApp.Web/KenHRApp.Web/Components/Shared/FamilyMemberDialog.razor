@@ -1,0 +1,367 @@
+﻿@using KenHRApp.Web.Components.Common
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@DialogIcon" Class="mr-1 mt-n1" Size="Size.Medium" Color="@DialogIconColor" />
+            @DialogTitle
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudPaper Elevation="0" Square="true" Class="w-100 px-5">
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="FamilyMember.FirstName"
+                                          For="@(() => FamilyMember.FirstName)"
+                                          HelperText="Max. text input is 50 chars." Variant="Variant.Text"
+                                          HelperTextOnFocus="true" Counter="50" MaxLength="50"
+                                          Disabled="false" Label="First Name"
+                                          Clearable="false" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="FamilyMember.MiddleName"
+                                          For="@(() => FamilyMember.MiddleName)"
+                                          HelperText="Max. text input is 50 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="50" MaxLength="50" Disabled="false" Label="Middle Name"
+                                          Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="FamilyMember.LastName"
+                                          For="@(() => FamilyMember.LastName)"
+                                          HelperText="Max. text input is 50 chars." Variant="Variant.Text"
+                                          HelperTextOnFocus="true" Counter="50" MaxLength="50"
+                                          Disabled="false" Label="Last Name"
+                                          Clearable="false" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.FlexStart"
+                            Breakpoint="Breakpoint.Xs" Class="pt-3">
+                            <MudSwitch @bind-Value="FamilyMember.IsDependent"
+                                       Color="Color.Info"
+                                       UncheckedColor="Color.Default"
+                                       LabelPlacement="Placement.Start">Is Dependent?</MudSwitch>
+                        </MudStack>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="FamilyMember.Relation"
+                                             For="@(() => FamilyMember.Relation)"
+                                             SearchFunc="SearchRelationship!"
+                                             Variant="Variant.Text"
+                                             Label="Relation"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for relation"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(RelationTypeList != null ? RelationTypeList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudDatePicker Color="Color.Info" Editable="true"
+                                @bind-Date="FamilyMember.DOB"
+                                For="@(() => FamilyMember.DOB)" MaxDate="@DateTime.Now"
+                                Label="Date of Birth"                                
+                                Placeholder="Select Date" />
+                         </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="FamilyMember.Qualification"
+                                             For="@(() => FamilyMember.Qualification)"
+                                             SearchFunc="SearchQualification!"
+                                             Variant="Variant.Text"
+                                             Label="Qualification"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for qualification"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(QualificationList != null ? QualificationList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="FamilyMember.StreamDesc"
+                                             For="@(() => FamilyMember.StreamDesc)"
+                                             SearchFunc="SearchStream!"
+                                             Variant="Variant.Text"
+                                             Label="Stream"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for stream"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(StreamList != null ? StreamList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="FamilyMember.Specialization"
+                                             For="@(() => FamilyMember.Specialization)"
+                                             SearchFunc="SearchSpecialization!"
+                                             Variant="Variant.Text"
+                                             Label="Specialization"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for specialization"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(SpecializationList != null ? SpecializationList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="FamilyMember.Occupation"
+                                          For="@(() => FamilyMember.Occupation)"
+                                          HelperText="Max. text input is 120 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="120" MaxLength="120" Disabled="false" Label="Occupation"
+                                          Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="FamilyMember.ContactNo"
+                                          For="@(() => FamilyMember.ContactNo)"
+                                          HelperText="Max. text input is 20 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="20" MaxLength="20" Disabled="false" Label="Contact No."
+                                          Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="FamilyMember.Country"
+                                             For="@(() => FamilyMember.Country)"
+                                             SearchFunc="SearchCountry!"
+                                             Variant="Variant.Text"
+                                             Label="Country"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for country"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(CountryList != null ? CountryList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="FamilyMember.StateName"
+                                          For="@(() => FamilyMember.StateName)"
+                                          HelperText="Max. text input is 100 chars." Variant="Variant.Text" 
+                                          HelperTextOnFocus="true" Counter="100" MaxLength="100" 
+                                          Disabled="false" Label="State"
+                                          Clearable="false" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="FamilyMember.CityTownName"
+                                          For="@(() => FamilyMember.CityTownName)"
+                                          HelperText="Max. text input is 100 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="100" MaxLength="100" Disabled="false" Label="City/Town Name"
+                                          Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="FamilyMember.District"
+                                          For="@(() => FamilyMember.District)"
+                                          HelperText="Max. text input is 100 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="100" MaxLength="100" Disabled="@IsDisabled" Label="District" 
+                                          Clearable="false" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                       
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Info" Style="background-color:#004165;" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
+        <MudButton Color="Color.Default" Variant="Variant.Text" Size="Size.Medium" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Fields
+    private MudForm _form = new();
+    private string[]? _relationTypeArray = null;
+    private string[]? _qualificationArray = null;
+    private string[]? _streamArray = null;
+    private string[]? _specializationArray = null;
+    private string[]? _countryArray = null;
+    #endregion
+
+    #region Parameters and Injections
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public FamilyMemberDTO FamilyMember { get; set; } = new();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> RelationTypeList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> QualificationList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> StreamList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> SpecializationList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> CountryList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public bool IsClearable { get; set; } = true;
+
+    [Parameter]
+    public bool IsDisabled { get; set; } = true;
+
+    [Parameter]
+    public bool IsEditMode { get; set; }
+
+    // Optional UI helpers
+    protected string DialogTitle => IsEditMode ? "Edit Family Member" : "Add Family Member";
+    protected string DialogIcon => IsEditMode ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add;
+    protected Color DialogIconColor => IsEditMode ? Color.Info : Color.Success;
+    #endregion
+
+    #region Page Methods
+    protected override void OnInitialized()
+    {
+        if (RelationTypeList != null)
+            _relationTypeArray = RelationTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (QualificationList != null)
+            _qualificationArray = QualificationList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (StreamList != null)
+            _streamArray = StreamList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (SpecializationList != null)
+            _specializationArray = SpecializationList.OrderBy(o => o.SequenceNo).Select(d => d.UDCDesc1).ToArray();
+
+        if (CountryList != null)
+            _countryArray = CountryList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+    }
+    #endregion
+
+    #region Private Methods
+    private async Task Save()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        MudDialog.Close(DialogResult.Ok(FamilyMember));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task<IEnumerable<string>> SearchRelationship(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _relationTypeArray!;
+        }
+
+        return _relationTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchQualification(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _qualificationArray!;
+        }
+
+        return _qualificationArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchStream(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _streamArray!;
+        }
+
+        return _streamArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchSpecialization(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _specializationArray!;
+        }
+
+        return _specializationArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    
+    private async Task<IEnumerable<string>> SearchCountry(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _countryArray!;
+        }
+
+        return _countryArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    #endregion
+}

@@ -2831,7 +2831,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 };
 
                 // Show the dialog box
-                var dialog = await DialogService.ShowAsync<CertificationDialog>("Add Family Member", parameters, options);
+                var dialog = await DialogService.ShowAsync<FamilyMemberDialog>("Add Family Member", parameters, options);
                 var result = await dialog.Result;
                 if (result != null && !result.Canceled)
                 {
@@ -2839,19 +2839,10 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     newMember.AutoId = 0;
                     newMember.EmployeeNo = employee.EmployeeNo;
 
-                    #region Get selected qualification
-                    if (!string.IsNullOrEmpty(newMember.Qualification))
-                    {
-                        UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCDesc1 == newMember.Qualification).FirstOrDefault();
-                        if (udc != null)
-                            newMember.QualificationCode = udc.UDCCode;
-                    }
-                    #endregion
-
                     #region Get selected relationship
                     if (!string.IsNullOrEmpty(newMember.Relation))
                     {
-                        UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCDesc1 == newMember.Relation).FirstOrDefault();
+                        UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCDesc1 == newMember.Relation).FirstOrDefault();
                         if (udc != null)
                             newMember.RelationCode = udc.UDCCode;
                     }
@@ -2878,7 +2869,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     #region Get selected specialization
                     if (!string.IsNullOrEmpty(newMember.Specialization))
                     {
-                        UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCDesc1 == newMember.Specialization).FirstOrDefault();
+                        UserDefinedCodeDTO? udc = _specializationList.Where(d => d.UDCDesc1 == newMember.Specialization).FirstOrDefault();
                         if (udc != null)
                             newMember.SpecializationCode = udc.UDCCode;
                     }
@@ -2938,6 +2929,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     FirstName = familyMember.FirstName,
                     MiddleName = familyMember.MiddleName,
                     LastName = familyMember.LastName,
+                    DOB = familyMember.DOB, 
                     RelationCode = familyMember.RelationCode,
                     Relation = familyMember.Relation,
                     QualificationCode = familyMember.QualificationCode,
@@ -2978,7 +2970,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     CloseButton = false
                 };
 
-                var dialog = await DialogService.ShowAsync<CertificationDialog>("Edit Family Member", parameters, options);
+                var dialog = await DialogService.ShowAsync<FamilyMemberDialog>("Edit Family Member", parameters, options);
                 var result = await dialog.Result;
 
                 if (result != null && !result.Canceled)
@@ -2988,7 +2980,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     #region Get selected relationship
                     if (!string.IsNullOrEmpty(updated.Relation))
                     {
-                        UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCDesc1 == updated.Relation).FirstOrDefault();
+                        UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCDesc1 == updated.Relation).FirstOrDefault();
                         if (udc != null)
                             updated.RelationCode = udc.UDCCode;
                     }
@@ -3015,7 +3007,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     #region Get selected specialization
                     if (!string.IsNullOrEmpty(updated.Specialization))
                     {
-                        UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCDesc1 == updated.Specialization).FirstOrDefault();
+                        UserDefinedCodeDTO? udc = _specializationList.Where(d => d.UDCDesc1 == updated.Specialization).FirstOrDefault();
                         if (udc != null)
                             updated.SpecializationCode = udc.UDCCode;
                     }

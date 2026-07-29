@@ -46,7 +46,10 @@ namespace KenHRApp.Application.DTOs
         public string? Country { get; set; } = null;
         public string? StateCode { get; set; } = null;
         public string? StateName { get; set; } = null;
+
+        [Display(Name = "City/Town Name")]
         public string? CityTownName { get; set; } = null;
+
         public string? District { get; set; } = null;
         public bool? IsDependent { get; set; } = null;
         #endregion
