@@ -2569,7 +2569,7 @@
                                             </MudPaper>
                                         </ToolBarContent>
                                         <Columns>
-                                            <PropertyColumn Property="x => x.FullName" Title="Full Name" Class="col-familyname"
+                                            <PropertyColumn Property="x => x.FullName" Title="Family Name" Class="col-familyname"
                                                 StickyLeft="true" Editable="false">
                                                 <CellTemplate Context="row">
                                                     <MudChip T="long" 
@@ -2679,19 +2679,63 @@
                                 </MudPaper>
                             </ChildContent>
                         </MudExpansionPanel>
-                         <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters Expanded>
+                        <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters Expanded>
                             <TitleContent>
                                 <div class="d-flex">
                                     <MudIcon Icon="fas fa-file-alt" Size=Size.Small Style="color: #004165;" class="mr-3"></MudIcon>
                                     <MudText Typo="Typo.subtitle1" Style="text-decoration: underline; color: #004165;"><strong>Family Visa Details</strong></MudText>
-                                    <MudSpacer />
-                                    <MudFab Style="background-color: #004165; color: white;" StartIcon="@Icons.Material.Filled.Add" Size=Size.Small Class="mr-3" />
                                 </div>
                             </TitleContent>
                             <ChildContent>
-                                <MudPaper Elevation="4" Square="true" Class="w-100">
+                                <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-2 mb-0">
+                                    <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
+                                        <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">Family Visa List</MudText>
+                                        <MudSpacer />
+                                        <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu">
+                                             <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Add new family visa" OnClick="AddFamilyVisaAsync" />
+                                         </MudMenu>
+                                     </MudAppBar>
+                                </MudStack>
+                                 <MudPaper Elevation="4" Square="true" Class="w-100 mb-3">
                                     <MudDataGrid T="FamilyVisaDTO" Items="@employee.FamilyVisaList" Hover="true" Striped="true" Class="family-visa-grid"
-                                        TableClass="fixed-table" Dense="false" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true" EditMode="DataGridEditMode.Form">
+                                        TableClass="fixed-table" TableStyle="table-layout: fixed; width: 100%;"
+                                        Filterable="@_familyVisaFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
+                                                  QuickFilter="@_familyVisaQuickFilter" Hideable="true" PageSize="5"
+                                        EditTrigger="DataGridEditTrigger.Manual" ReadOnly="@(!_allowGridEdit)" EditMode="DataGridEditMode.Form"
+                                        EditDialogOptions="new DialogOptions 
+                                        { 
+                                            MaxWidth = MaxWidth.Small, 
+                                            FullWidth = true,
+                                            BackdropClick = false,
+                                            CloseOnEscapeKey = false
+                                        }"
+                                        StartedEditingItem="@FamilyVisaStartedEditingItem" CommittedItemChanges="@FamilyVisaCommittedItemChanges"
+                                        Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                                        <ToolBarContent>
+                                            <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
+                                                 <MudTextField @bind-Value="_familyVisaSearchString" Placeholder="Enter search string"
+                                                    Adornment="Adornment.Start" ReadOnly="@(!_allowGridEdit)"
+                                                    Immediate="true" Style="width:400px;" Typo="Typo.subtitle1"   
+                                                    AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0">
+                                                 </MudTextField>
+                                             </MudPaper>
+                                            <MudSpacer />
+                                            <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
+                                                <MudSwitch @bind-Value="_familyVisaFilter"
+                                                    Disabled="@(!_allowGridEdit)"                                                        
+                                                    ThumbIcon="@(_familyVisaFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)"
+                                                    ThumbIconColor="@(_familyVisaFilter==true ? Color.Success : Color.Error)"
+                                                    LabelPlacement="Placement.Start"
+                                                    Label="Enable Custom Filter" />
+                                                 <MudPaper Class="ms-3" Elevation="0">
+                                                    <MudFab Style="background-color: #004165; color: white;" 
+                                                        StartIcon="@Icons.Material.Filled.Add" 
+                                                        Size="Size.Small" title="Add new family visa" 
+                                                        Disabled="@(!_allowGridEdit)"
+                                                        OnClick="AddFamilyVisaAsync" />                                                        
+                                                 </MudPaper>                             
+                                            </MudPaper>
+                                        </ToolBarContent>
                                         <Columns>
                                             <PropertyColumn Property="x => x.AutoId" Hidden />
                                             <PropertyColumn Property="x => x.FamilyId" Hidden />

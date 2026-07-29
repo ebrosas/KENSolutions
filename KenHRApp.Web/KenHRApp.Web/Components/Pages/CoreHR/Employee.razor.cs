@@ -162,6 +162,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         private List<UserDefinedCodeDTO> _languageList = new List<UserDefinedCodeDTO>();
         private string[]? _languageArray = null;
+
+        private IReadOnlyList<EmployeeMasterDTO> _familyMemberList = new List<EmployeeMasterDTO>();
+        private string[]? _familyMemberArray = null;
         #endregion
 
         #region Enums and Collections
@@ -255,6 +258,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         private string _familySearchString = string.Empty;
         private bool _familyFilter = false;
+
+        private string _familyVisaSearchString = string.Empty;
+        private bool _familyVisaFilter = false;
         #endregion
 
         #endregion
@@ -2926,6 +2932,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 var editableCopy = new FamilyMemberDTO
                 {
                     AutoId = familyMember.AutoId,
+                    EmployeeNo = familyMember.EmployeeNo,
                     FirstName = familyMember.FirstName,
                     MiddleName = familyMember.MiddleName,
                     LastName = familyMember.LastName,
@@ -3145,6 +3152,440 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             {
                 // Show notification
                 ShowNotification("The selected familyMember has been deleted successfully!", NotificationType.Success);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    // Display error message
+                    _errorMessage.AppendLine(errorMsg);
+                    ShowHideError(true);
+                }
+            }
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+        #endregion
+
+        #region Family Visa Grid
+        private Func<FamilyVisaDTO, bool> _familyVisaQuickFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(_familyVisaSearchString))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.FamilyMemberName) && x.FamilyMemberName.Contains(_familyVisaSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.Country) && x.Country.Contains(_familyVisaSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.VisaType) && x.VisaType.Contains(_familyVisaSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.Profession) && x.Profession.Contains(_familyVisaSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
+        };
+
+        private async Task FamilyVisaStartedEditingItem(FamilyVisaDTO item)
+        {
+            await EditFamilyVisaAsync(item);
+        }
+
+        private void FamilyVisaCommittedItemChanges(FamilyVisaDTO item)
+        {
+            try
+            {
+                if (item == null) return;
+
+                #region Get selected family member
+                if (item.FamilyId > 0)
+                {
+                    EmployeeMasterDTO? emp = _familyMemberList.Where(d => d.EmployeeNo == item.FamilyId).FirstOrDefault();
+                    if (emp != null)
+                        item.FamilyMemberName = emp.FullName;
+                }
+                #endregion
+
+                #region Get selected visa type
+                if (!string.IsNullOrEmpty(item.VisaTypeCode))
+                {
+                    UserDefinedCodeDTO? udc = _visaTypeList.Where(d => d.UDCCode == item.VisaTypeCode).FirstOrDefault();
+                    if (udc != null)
+                        item.VisaType = udc.UDCDesc1;
+                }
+                #endregion
+
+                #region Get selected country
+                if (!string.IsNullOrEmpty(item.CountryCode))
+                {
+                    UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCCode == item.CountryCode).FirstOrDefault();
+                    if (udc != null)
+                        item.Country = udc.UDCDesc1;
+                }
+                #endregion
+
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Saving changes, please wait...";
+
+                _ = SaveFamilyVisaAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Shows the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+                }, item);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Save cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task SaveFamilyVisaAsync(Func<Task> callback, FamilyVisaDTO familyVisa)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            //var result = await EmployeeService.SaveFamilyMemberAsync(familyVisa, _cts.Token);
+            //if (!result.Success)
+            //{
+            //    // Set the error message
+            //    _errorMessage.AppendLine(result.Error!);
+            //    ShowHideError(true);
+            //}
+            //else
+            //{
+            //    if (familyVisa.AutoId == 0)
+            //    {
+            //        // Get the new identity seed
+            //        familyVisa.AutoId = result.Value;
+
+            //        // Add locally to the list so UI updates immediately
+            //        employee.FamilyVisaList.Add(familyVisa);
+
+            //        StateHasChanged();
+            //    }
+
+            //    // Show notification
+            //    ShowNotification("Family visa has been saved successfully!", NotificationType.Success);
+            //}
+
+            if (callback != null)
+            {
+                // Hide the spinner overlay
+                await callback.Invoke();
+            }
+        }
+
+        private async Task AddFamilyVisaAsync()
+        {
+            try
+            {
+                var parameters = new DialogParameters
+                {
+                    ["FamilyVisa"] = new FamilyVisaDTO(),
+                    ["FamilyMemberList"] = _familyMemberList,
+                    ["VisaTypeList"] = _visaTypeList,
+                    ["CountryList"] = _countryList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = false
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                // Show the dialog box
+                var dialog = await DialogService.ShowAsync<FamilyMemberDialog>("Add Family Visa", parameters, options);
+                var result = await dialog.Result;
+                if (result != null && !result.Canceled)
+                {
+                    var newVisa = (FamilyVisaDTO)result.Data!;
+                    newVisa.AutoId = 0;
+                    newVisa.EmployeeNo = employee.EmployeeNo;
+
+                    #region Get selected family member
+                    if (!string.IsNullOrEmpty(newVisa.FamilyMemberName))
+                    {
+                        EmployeeMasterDTO? emp = _familyMemberList.Where(d => d.FullName == newVisa.FamilyMemberName).FirstOrDefault();
+                        if (emp != null)
+                            newVisa.FamilyId = emp.EmployeeNo;
+                    }
+                    #endregion
+
+                    #region Get selected visa
+                    if (!string.IsNullOrEmpty(newVisa.VisaType))
+                    {
+                        UserDefinedCodeDTO? udc = _visaTypeList.Where(d => d.UDCDesc1 == newVisa.VisaType).FirstOrDefault();
+                        if (udc != null)
+                            newVisa.VisaTypeCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected country
+                    if (!string.IsNullOrEmpty(newVisa.Country))
+                    {
+                        UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCDesc1 == newVisa.Country).FirstOrDefault();
+                        if (udc != null)
+                            newVisa.CountryCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Check for duplicate entries
+                    var duplicateVisa = employee.FamilyVisaList.FirstOrDefault(e => e.EmployeeNo == newVisa.EmployeeNo
+                        && e.VisaTypeCode.Trim().ToUpper() == newVisa.VisaTypeCode.Trim().ToUpper()
+                        && e.CountryCode.Trim().ToUpper() == newVisa.CountryCode.Trim().ToUpper());
+                    if (duplicateVisa != null)
+                    {
+                        // Show error
+                        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified family visa already exists. Please enter a unique visa then try to save again.");
+                        return;
+                    }
+                    #endregion
+
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Adding family visa, please wait...";
+
+                    _ = SaveFamilyVisaAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, newVisa);
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task EditFamilyVisaAsync(FamilyVisaDTO familyVisa)
+        {
+            try
+            {
+                // Clone the object so the dialog can edit without affecting the grid until Save
+                var editableCopy = new FamilyVisaDTO
+                {
+                    AutoId = familyVisa.AutoId,
+                    EmployeeNo = familyVisa.EmployeeNo,
+                    FamilyId = familyVisa.FamilyId,
+                    FamilyMemberName = familyVisa.FamilyMemberName,
+                    CountryCode = familyVisa.CountryCode,
+                    Country = familyVisa.Country,
+                    VisaTypeCode = familyVisa.VisaTypeCode,
+                    VisaType = familyVisa.VisaType,
+                    Profession = familyVisa.Profession,
+                    IssueDate = familyVisa.IssueDate,
+                    ExpiryDate = familyVisa.ExpiryDate
+                };
+
+                var parameters = new DialogParameters
+                {
+                    ["FamilyVisa"] = editableCopy,
+                    ["FamilyMemberList"] = _familyMemberList,
+                    ["VisaTypeList"] = _visaTypeList,
+                    ["CountryList"] = _countryList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = true
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                var dialog = await DialogService.ShowAsync<FamilyMemberDialog>("Edit Family Visa", parameters, options);
+                var result = await dialog.Result;
+
+                if (result != null && !result.Canceled)
+                {
+                    var updated = (FamilyVisaDTO)result.Data!;
+
+                    #region Get selected family member
+                    if (!string.IsNullOrEmpty(updated.FamilyMemberName))
+                    {
+                        EmployeeMasterDTO? emp = _familyMemberList.Where(d => d.FullName == updated.FamilyMemberName).FirstOrDefault();
+                        if (emp != null)
+                            updated.FamilyId = emp.EmployeeNo;
+                    }
+                    #endregion
+
+                    #region Get selected visa type
+                    if (!string.IsNullOrEmpty(updated.VisaType))
+                    {
+                        UserDefinedCodeDTO? udc = _visaTypeList.Where(d => d.UDCDesc1 == updated.VisaType).FirstOrDefault();
+                        if (udc != null)
+                            updated.VisaTypeCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected country
+                    if (!string.IsNullOrEmpty(updated.Country))
+                    {
+                        UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCDesc1 == updated.Country).FirstOrDefault();
+                        if (udc != null)
+                            updated.CountryCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    // Update in-memory grid item
+                    var index = employee.FamilyVisaList.FindIndex(x => x.AutoId == updated.AutoId);
+                    if (index >= 0)
+                    {
+                        employee.FamilyVisaList[index] = updated;
+                        await InvokeAsync(StateHasChanged);
+                    }
+
+                    #region Persist changes to DB
+                    // Set flag to display the loading panel
+                    _isRunning = true;
+
+                    // Set the overlay message
+                    overlayMessage = "Saving family visa, please wait...";
+
+                    _ = SaveFamilyVisaAsync(async () =>
+                    {
+                        _isRunning = false;
+
+                        // Shows the spinner overlay
+                        await InvokeAsync(StateHasChanged);
+                    }, updated);
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task ConfirmDeleteFamilyVisa(FamilyVisaDTO familyVisa)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to delete this visa: '{familyVisa.FamilyMemberName} - {familyVisa.Profession}'?" },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Family Visa", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                BeginDeleteFamilyVisa(familyVisa);
+            }
+        }
+
+        private void BeginDeleteFamilyVisa(FamilyVisaDTO familyVisa)
+        {
+            try
+            {
+                // Set flag to display the loading panel
+                _isRunning = true;
+
+                // Set the overlay message
+                overlayMessage = "Deleting family visa, please wait...";
+
+                _ = DeleteFamilyVisaAsync(async () =>
+                {
+                    _isRunning = false;
+
+                    // Hide the spinner overlay
+                    await InvokeAsync(StateHasChanged);
+
+                    // Remove locally from the list so UI updates immediately
+                    employee.FamilyVisaList.Remove(familyVisa);
+
+                    StateHasChanged();
+
+                }, familyVisa);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification("Delete cancelled (navigated away).", NotificationType.Warning);
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+            }
+        }
+
+        private async Task DeleteFamilyVisaAsync(Func<Task> callback, FamilyVisaDTO familyVisa)
+        {
+            // Wait for 1 second then gives control back to the runtime
+            await Task.Delay(500);
+
+            // Reset error messages
+            _errorMessage.Clear();
+
+            // Initialize the cancellation token
+            _cts = new CancellationTokenSource();
+
+            bool isSuccess = false;
+            string errorMsg = string.Empty;
+
+            if (familyVisa.AutoId == 0)
+            {
+                errorMsg = "Family Visa ID is not defined.";
+            }
+            else
+            {
+                var deleteResult = await EmployeeService.DeleteFamilyMemberAsync(familyVisa.AutoId, _cts.Token);
+                isSuccess = deleteResult.Success;
+                if (!isSuccess)
+                    errorMsg = deleteResult.Error!;
+            }
+
+            if (isSuccess)
+            {
+                // Show notification
+                ShowNotification("The selected family Visa has been deleted successfully!", NotificationType.Success);
             }
             else
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,18 @@ namespace KenHRApp.Application.DTOs
         public string? DepartmentName { get; set; } = null;
         public string? EmployeeStatusCode { get; set; } = null;
         public string? EmployeeStatus { get; set; } = null;
+        #endregion
+
+        #region Extended Properties
+        [Display(Name = "Full Name")]
+        public string FullName
+        {
+            get
+            {
+                return $"{this.FirstName} {this.LastName}";
+            }
+            set { }
+        }
         #endregion
     }
 }
