@@ -162,9 +162,6 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         private List<UserDefinedCodeDTO> _languageList = new List<UserDefinedCodeDTO>();
         private string[]? _languageArray = null;
-
-        private IReadOnlyList<EmployeeMasterDTO> _familyMemberList = new List<EmployeeMasterDTO>();
-        private string[]? _familyMemberArray = null;
         #endregion
 
         #region Enums and Collections
@@ -3204,9 +3201,10 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 if (item == null) return;
 
                 #region Get selected family member
-                if (item.FamilyId > 0)
+                if (item.FamilyId > 0 
+                    && employee.FamilyMemberList.Any())
                 {
-                    EmployeeMasterDTO? emp = _familyMemberList.Where(d => d.EmployeeNo == item.FamilyId).FirstOrDefault();
+                    FamilyMemberDTO? emp = employee.FamilyMemberList.Where(d => d.EmployeeNo == item.EmployeeNo && d.AutoId == item.FamilyId).FirstOrDefault();
                     if (emp != null)
                         item.FamilyMemberName = emp.FullName;
                 }
@@ -3265,29 +3263,29 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             // Initialize the cancellation token
             _cts = new CancellationTokenSource();
 
-            //var result = await EmployeeService.SaveFamilyMemberAsync(familyVisa, _cts.Token);
-            //if (!result.Success)
-            //{
-            //    // Set the error message
-            //    _errorMessage.AppendLine(result.Error!);
-            //    ShowHideError(true);
-            //}
-            //else
-            //{
-            //    if (familyVisa.AutoId == 0)
-            //    {
-            //        // Get the new identity seed
-            //        familyVisa.AutoId = result.Value;
+            var result = await EmployeeService.SaveFamilyVisaAsync(familyVisa, _cts.Token);
+            if (!result.Success)
+            {
+                // Set the error message
+                _errorMessage.AppendLine(result.Error!);
+                ShowHideError(true);
+            }
+            else
+            {
+                if (familyVisa.AutoId == 0)
+                {
+                    // Get the new identity seed
+                    familyVisa.AutoId = result.Value;
 
-            //        // Add locally to the list so UI updates immediately
-            //        employee.FamilyVisaList.Add(familyVisa);
+                    // Add locally to the list so UI updates immediately
+                    employee.FamilyVisaList.Add(familyVisa);
 
-            //        StateHasChanged();
-            //    }
+                    StateHasChanged();
+                }
 
-            //    // Show notification
-            //    ShowNotification("Family visa has been saved successfully!", NotificationType.Success);
-            //}
+                // Show notification
+                ShowNotification("Family visa has been saved successfully!", NotificationType.Success);
+            }
 
             if (callback != null)
             {
@@ -3303,7 +3301,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 var parameters = new DialogParameters
                 {
                     ["FamilyVisa"] = new FamilyVisaDTO(),
-                    ["FamilyMemberList"] = _familyMemberList,
+                    ["FamilyMemberList"] = employee.FamilyMemberList,
                     ["VisaTypeList"] = _visaTypeList,
                     ["CountryList"] = _countryList,
                     ["IsClearable"] = true,
@@ -3321,7 +3319,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 };
 
                 // Show the dialog box
-                var dialog = await DialogService.ShowAsync<FamilyMemberDialog>("Add Family Visa", parameters, options);
+                var dialog = await DialogService.ShowAsync<FamilyVisaDialog>("Add Family Visa", parameters, options);
                 var result = await dialog.Result;
                 if (result != null && !result.Canceled)
                 {
@@ -3330,11 +3328,12 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     newVisa.EmployeeNo = employee.EmployeeNo;
 
                     #region Get selected family member
-                    if (!string.IsNullOrEmpty(newVisa.FamilyMemberName))
+                    if (!string.IsNullOrEmpty(newVisa.FamilyMemberName) &&
+                        employee.FamilyMemberList.Any())
                     {
-                        EmployeeMasterDTO? emp = _familyMemberList.Where(d => d.FullName == newVisa.FamilyMemberName).FirstOrDefault();
+                        FamilyMemberDTO? emp = employee.FamilyMemberList.Where(d => d.FullName == newVisa.FamilyMemberName).FirstOrDefault();
                         if (emp != null)
-                            newVisa.FamilyId = emp.EmployeeNo;
+                            newVisa.FamilyId = emp.AutoId;
                     }
                     #endregion
 
@@ -3412,7 +3411,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 var parameters = new DialogParameters
                 {
                     ["FamilyVisa"] = editableCopy,
-                    ["FamilyMemberList"] = _familyMemberList,
+                    ["FamilyMemberList"] = employee.FamilyMemberList,
                     ["VisaTypeList"] = _visaTypeList,
                     ["CountryList"] = _countryList,
                     ["IsClearable"] = true,
@@ -3429,7 +3428,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     CloseButton = false
                 };
 
-                var dialog = await DialogService.ShowAsync<FamilyMemberDialog>("Edit Family Visa", parameters, options);
+                var dialog = await DialogService.ShowAsync<FamilyVisaDialog>("Edit Family Visa", parameters, options);
                 var result = await dialog.Result;
 
                 if (result != null && !result.Canceled)
@@ -3437,11 +3436,12 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     var updated = (FamilyVisaDTO)result.Data!;
 
                     #region Get selected family member
-                    if (!string.IsNullOrEmpty(updated.FamilyMemberName))
+                    if (!string.IsNullOrEmpty(updated.FamilyMemberName) &&
+                        employee.FamilyMemberList.Any())
                     {
-                        EmployeeMasterDTO? emp = _familyMemberList.Where(d => d.FullName == updated.FamilyMemberName).FirstOrDefault();
+                        FamilyMemberDTO? emp = employee.FamilyMemberList.Where(d => d.FullName == updated.FamilyMemberName).FirstOrDefault();
                         if (emp != null)
-                            updated.FamilyId = emp.EmployeeNo;
+                            updated.FamilyId = emp.AutoId;
                     }
                     #endregion
 
@@ -3471,7 +3471,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                         await InvokeAsync(StateHasChanged);
                     }
 
-                    #region Persist changes to DB
+                    #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
                     // Set flag to display the loading panel
                     _isRunning = true;
 

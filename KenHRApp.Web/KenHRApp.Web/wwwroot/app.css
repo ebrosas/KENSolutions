@@ -878,7 +878,7 @@ skill-qualification-grid .col-FromYear, .col-ToYear, .col-PassYear {
 
 /* Format table header */
 .family-visa-grid .mud-table-head {
-    background-color: #CFD8DC; /* Table header background color */
+    background-color: #BBDEFB; /* Table header background color */
     font-weight: bold;
     text-align: center !important;
     font-size: 14px !important;
@@ -906,38 +906,30 @@ skill-qualification-grid .col-FromYear, .col-ToYear, .col-PassYear {
 }
 
 .family-visa-grid .col-family-name {
-    width: 280px !important;
+    width: 300px !important;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .family-visa-grid .col-country {
-    width: 150px !important;
+    width: 200px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .family-visa-grid .col-visa-type {
-    width: 150px !important;
+    width: 200px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .family-visa-grid .col-profession {
-    width: 220px !important;
+    width: 250px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-.family-visa-grid .col-issue-date {
+.family-visa-grid .col-date {
     width: 120px !important;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 /* #endregion */
 

@@ -84,6 +84,14 @@ namespace KenHRApp.Application.Interfaces
         Task<Result<bool>> DeleteFamilyMemberAsync(
            int autoID,
            CancellationToken cancellationToken = default);
+
+        Task<Result<int>> SaveFamilyVisaAsync(
+            FamilyVisaDTO dto,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<bool>> DeleteFamilyVisaAsync(
+           int autoID,
+           CancellationToken cancellationToken = default);
         #endregion
     }
 }

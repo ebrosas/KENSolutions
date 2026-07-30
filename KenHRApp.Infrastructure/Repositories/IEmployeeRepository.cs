@@ -101,6 +101,18 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<bool>> DeleteFamilyMemberAsync(
             int autoID,
             CancellationToken cancellationToken = default);
+
+        Task<Result<int>> AddFamilyVisaAsync(
+           FamilyVisa visa,
+           CancellationToken cancellationToken = default);
+
+        Task<Result<int>> UpdateFamilyVisaAsync(
+            FamilyVisa dto,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<bool>> DeleteFamilyVisaAsync(
+            int autoID,
+            CancellationToken cancellationToken = default);
         #endregion
     }
 }

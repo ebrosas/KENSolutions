@@ -1,0 +1,211 @@
+﻿@using KenHRApp.Web.Components.Common
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@DialogIcon" Class="mr-1 mt-n1" Size="Size.Medium" Color="@DialogIconColor" />
+            @DialogTitle
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudPaper Elevation="0" Square="true" Class="w-100 px-5">
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="FamilyVisa.FamilyMemberName"
+                                             For="@(() => FamilyVisa.FamilyMemberName)"
+                                             SearchFunc="SearchFamilyMember!"
+                                             Variant="Variant.Text"
+                                             Label="Family Name"
+                                             Margin="Margin.Dense"
+                                             Dense="true" 
+                                             Disabled="@IsEditMode"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for family member"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(FamilyMemberList != null ? FamilyMemberList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="FamilyVisa.Country"
+                                             For="@(() => FamilyVisa.Country)"
+                                             SearchFunc="SearchCountry!"
+                                             Variant="Variant.Text"
+                                             Label="Country"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for country"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(CountryList != null ? CountryList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="FamilyVisa.VisaType"
+                                             For="@(() => FamilyVisa.VisaType)"
+                                             SearchFunc="SearchVisaType!"
+                                             Variant="Variant.Text"
+                                             Label="Visa Type"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for visa type"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(VisaTypeList != null ? VisaTypeList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="FamilyVisa.Profession"
+                                      For="@(() => FamilyVisa.Profession)"
+                                      HelperText="Max. text input is 150 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                      Counter="150" MaxLength="150" Disabled="false" Label="Profession"
+                                      Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudDatePicker Color="Color.Info" Editable="true"
+                                           @bind-Date="FamilyVisa.IssueDate"
+                                           For="@(() => FamilyVisa.IssueDate)" 
+                                           Label="Issue Date"
+                                           Placeholder="Select Date" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudDatePicker Color="Color.Info" Editable="true"
+                                @bind-Date="FamilyVisa.ExpiryDate"
+                                For="@(() => FamilyVisa.ExpiryDate)" 
+                                Label="Expiry Date"                                
+                                Placeholder="Select Date" />
+                         </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Info" Style="background-color:#004165;" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
+        <MudButton Color="Color.Default" Variant="Variant.Text" Size="Size.Medium" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Fields
+    private MudForm _form = new();
+    private string[]? _familyMemberArray = null;
+    private string[]? _visaTypeArray = null;
+    private string[]? _countryArray = null;
+    #endregion
+
+    #region Parameters and Injections
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public FamilyVisaDTO FamilyVisa { get; set; } = new();
+
+    [Parameter]
+    public IReadOnlyList<FamilyMemberDTO> FamilyMemberList { get; set; } = new List<FamilyMemberDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> VisaTypeList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> CountryList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public bool IsClearable { get; set; } = true;
+
+    [Parameter]
+    public bool IsDisabled { get; set; } = true;
+
+    [Parameter]
+    public bool IsEditMode { get; set; }
+
+    // Optional UI helpers
+    protected string DialogTitle => IsEditMode ? "Edit Family Visa" : "Add Family Visa";
+    protected string DialogIcon => IsEditMode ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add;
+    protected Color DialogIconColor => IsEditMode ? Color.Info : Color.Success;
+    #endregion
+
+    #region Page Methods
+    protected override void OnInitialized()
+    {
+        if (FamilyMemberList != null)
+            _familyMemberArray = FamilyMemberList.Select(d => d.FullName).OrderBy(d => d).ToArray();
+
+        if (VisaTypeList != null)
+            _visaTypeArray = VisaTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (CountryList != null)
+            _countryArray = CountryList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+    }
+    #endregion
+
+    #region Private Methods
+    private async Task Save()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        MudDialog.Close(DialogResult.Ok(FamilyVisa));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task<IEnumerable<string>> SearchFamilyMember(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _familyMemberArray!;
+        }
+
+        return _familyMemberArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchVisaType(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _visaTypeArray!;
+        }
+
+        return _visaTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchCountry(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _countryArray!;
+        }
+
+        return _countryArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    #endregion
+}

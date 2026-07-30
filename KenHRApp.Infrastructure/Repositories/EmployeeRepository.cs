@@ -757,41 +757,7 @@ namespace KenHRApp.Infrastructure.Repositories
                             }
                         }
                         #endregion
-
-                        #region Get Family Visas
-                        var familyVisaModel = await (from f in _db.FamilyVisas
-                                                    join fm in _db.FamilyMembers on f.FamilyId equals fm.AutoId    // INNER JOIN 
-                                                    join visaType in _db.UserDefinedCodes on f.VisaTypeCode equals visaType.UDCCode    // INNER JOIN 
-                                                    join country in _db.UserDefinedCodes on f.CountryCode equals country.UDCCode       // INNER JOIN 
-                                                    where f.EmployeeNo == employeeDetail.EmployeeNo
-                                                    select new
-                                                    {
-                                                        FamilyVisa = f,
-                                                        FamilyMemberName = $"{fm.FirstName} {fm.MiddleName} {fm.LastName}",
-                                                        VisaType = visaType.UDCDesc1,
-                                                        Country = country.UDCDesc1
-                                                    }).ToListAsync();
-                        if (familyVisaModel != null)
-                        {
-                            foreach (var item in familyVisaModel)
-                            {
-                                employeeDetail.FamilyVisas.Add(new FamilyVisa()
-                                {
-                                    AutoId = item.FamilyVisa.AutoId,
-                                    FamilyId = item.FamilyVisa.FamilyId,    
-                                    FamilyMemberName = item.FamilyMemberName,
-                                    CountryCode = item.FamilyVisa.CountryCode,
-                                    Country = item.Country,
-                                    VisaTypeCode = item.FamilyVisa.VisaTypeCode,
-                                    VisaType = item.VisaType,
-                                    Profession = item.FamilyVisa.Profession,
-                                    IssueDate = item.FamilyVisa.IssueDate,
-                                    ExpiryDate = item.FamilyVisa.ExpiryDate
-                                });
-                            }
-                        }
-                        #endregion
-
+                        
                         #region Get Family Members
                         var familyMemberModel = await (from f in _db.FamilyMembers
                                                         join relation in _db.UserDefinedCodes on f.RelationCode equals relation.UDCCode    // INNER JOIN 
@@ -839,6 +805,43 @@ namespace KenHRApp.Infrastructure.Repositories
                                     CityTownName = item.FamilyMember.CityTownName,
                                     District = item.FamilyMember.District,
                                     IsDependent = item.FamilyMember.IsDependent
+                                });
+                            }
+                        }
+                        #endregion
+
+                        #region Get Family Visas
+                        int visaTypeGroupID = _db.UserDefinedCodeGroups.Where(a => a.UDCGCode == "VISATYPE").FirstOrDefault()!.UDCGroupId;
+                        var familyVisaModel = await (from f in _db.FamilyVisas
+                                                     join fm in _db.FamilyMembers on f.FamilyId equals fm.AutoId    // INNER JOIN 
+                                                     join visaType in _db.UserDefinedCodes on f.VisaTypeCode equals visaType.UDCCode    // INNER JOIN 
+                                                     join country in _db.UserDefinedCodes on f.CountryCode equals country.UDCCode       // INNER JOIN 
+                                                     where f.EmployeeNo == employeeDetail.EmployeeNo
+                                                         && country.GroupID == countryGroupID
+                                                         && visaType.GroupID == visaTypeGroupID
+                                                     select new
+                                                     {
+                                                         FamilyVisa = f,
+                                                         FamilyMemberName = $"{fm.FirstName} {fm.MiddleName} {fm.LastName}",
+                                                         VisaType = visaType.UDCDesc1,
+                                                         Country = country.UDCDesc1
+                                                     }).ToListAsync();
+                        if (familyVisaModel != null)
+                        {
+                            foreach (var item in familyVisaModel)
+                            {
+                                employeeDetail.FamilyVisas.Add(new FamilyVisa()
+                                {
+                                    AutoId = item.FamilyVisa.AutoId,
+                                    FamilyId = item.FamilyVisa.FamilyId,
+                                    FamilyMemberName = item.FamilyMemberName,
+                                    CountryCode = item.FamilyVisa.CountryCode,
+                                    Country = item.Country,
+                                    VisaTypeCode = item.FamilyVisa.VisaTypeCode,
+                                    VisaType = item.VisaType,
+                                    Profession = item.FamilyVisa.Profession,
+                                    IssueDate = item.FamilyVisa.IssueDate,
+                                    ExpiryDate = item.FamilyVisa.ExpiryDate
                                 });
                             }
                         }
@@ -1440,8 +1443,8 @@ namespace KenHRApp.Infrastructure.Repositories
                             existingFamilyVisa.Profession = visa.Profession;
                             existingFamilyVisa.IssueDate = visa.IssueDate;
                             existingFamilyVisa.ExpiryDate = visa.ExpiryDate;
-                            existingFamilyVisa.FamilyId = visa.FamilyId;
-                            existingFamilyVisa.TransactionNo = visa.TransactionNo;
+                            //existingFamilyVisa.FamilyId = visa.FamilyId;
+                            //existingFamilyVisa.TransactionNo = visa.TransactionNo;
                         }
                         else
                         {
@@ -1449,13 +1452,13 @@ namespace KenHRApp.Infrastructure.Repositories
                             var newFamilyVisa = new FamilyVisa
                             {
                                 EmployeeNo = dto.EmployeeNo,
+                                FamilyId = visa.FamilyId,
                                 CountryCode = visa.CountryCode,
                                 VisaTypeCode = visa.VisaTypeCode,
                                 Profession = visa.Profession,
                                 IssueDate = visa.IssueDate,
-                                ExpiryDate = visa.ExpiryDate,
-                                FamilyId = visa.FamilyId,
-                                TransactionNo = visa.TransactionNo
+                                ExpiryDate = visa.ExpiryDate
+                                //TransactionNo = visa.TransactionNo
                             };
                             await _db.FamilyVisas.AddAsync(newFamilyVisa, cancellationToken);
                         }
@@ -2622,7 +2625,7 @@ namespace KenHRApp.Infrastructure.Repositories
             {
                 var member = await _db.FamilyMembers.FirstOrDefaultAsync(x => x.AutoId == dto.AutoId, cancellationToken);
                 if (member == null)
-                    throw new InvalidOperationException("The specified language was not found");
+                    throw new InvalidOperationException("The specified family member was not found");
 
                 #region Update FamilyMember entity                
                 member.FirstName = dto.FirstName;
@@ -2672,6 +2675,103 @@ namespace KenHRApp.Infrastructure.Repositories
                     throw new Exception("Could not delete because the selected family member was not found in the database.");
 
                 _db.FamilyMembers.Remove(member);
+
+                int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
+                if (rowsDeleted > 0)
+                    isSuccess = true;
+
+                return Result<bool>.SuccessResult(isSuccess);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> AddFamilyVisaAsync(
+           FamilyVisa visa,
+           CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                // Save to database
+                _db.FamilyVisas.Add(visa);
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                // ✅ EF Core automatically populates identity after SaveChanges
+                int generatedId = visa.AutoId;
+
+                return Result<int>.SuccessResult(generatedId);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                    return Result<int>.Failure($"Database error: {ex.InnerException.Message}");
+                else
+                    return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> UpdateFamilyVisaAsync(
+            FamilyVisa dto,
+            CancellationToken cancellationToken = default)
+        {
+            int rowsUpdated = 0;
+
+            try
+            {
+                var visa = await _db.FamilyVisas.FirstOrDefaultAsync(x => x.AutoId == dto.AutoId, cancellationToken);
+                if (visa == null)
+                    throw new InvalidOperationException("The specified visa was not found");
+
+                #region Update FamilyVisa entity                
+                visa.CountryCode = dto.CountryCode;
+                visa.VisaTypeCode = dto.VisaTypeCode;
+                visa.Profession = dto.Profession;
+                visa.IssueDate = dto.IssueDate;
+                visa.ExpiryDate = dto.ExpiryDate;
+                #endregion
+
+                // Save to database
+                _db.FamilyVisas.Update(visa);
+
+                rowsUpdated = await _db.SaveChangesAsync(cancellationToken);
+
+                return Result<int>.SuccessResult(rowsUpdated);
+            }
+            catch (InvalidOperationException invEx)
+            {
+                throw new Exception(invEx.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure($"Database error: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<bool>> DeleteFamilyVisaAsync(
+            int autoID,
+            CancellationToken cancellationToken = default)
+        {
+            bool isSuccess = false;
+
+            try
+            {
+                var visa = await _db.FamilyVisas.FindAsync(autoID);
+                if (visa == null)
+                    throw new Exception("Could not delete because the selected family visa was not found in the database.");
+
+                _db.FamilyVisas.Remove(visa);
 
                 int rowsDeleted = await _db.SaveChangesAsync(cancellationToken);
                 if (rowsDeleted > 0)

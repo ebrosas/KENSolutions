@@ -2737,43 +2737,65 @@
                                             </MudPaper>
                                         </ToolBarContent>
                                         <Columns>
-                                            <PropertyColumn Property="x => x.AutoId" Hidden />
-                                            <PropertyColumn Property="x => x.FamilyId" Hidden />
-                                            <PropertyColumn Property="x => x.FamilyMemberName" Title="Family Name" Class="col-family-name" />
-                                            <PropertyColumn Property="x => x.CountryCode" Hidden />
-                                            <PropertyColumn Property="x => x.Country" Class="col-country" />
-                                            <PropertyColumn Property="x => x.VisaTypeCode" Hidden />
-                                            <PropertyColumn Property="x => x.VisaType" Title="Visa Type" Class="col-visa-type" />
-                                            <PropertyColumn Property="x => x.Profession" Class="col-profession" />
-                                            <PropertyColumn Property="x => x.IssueDate" Title="Date of Issue" Class="col-issue-date">
+                                            <PropertyColumn Property="x => x.FamilyMemberName" Title="Family Name" Class="col-family-name" StickyLeft="true" Editable="false">
                                                 <CellTemplate Context="row">
-                                                    @row.Item.IssueDate?.ToString("dd-MMM-yyyy")
+                                                    <MudChip T="long" 
+                                                        Size=Size.Small
+                                                        Color="Color.Info"
+                                                        Label="true" 
+                                                        Class="fw-bold" 
+                                                        Style="font-size: 14px;">
+                                                         @row.Item.FamilyMemberName
+                                                    </MudChip>
+                                                </CellTemplate>
+                                            </PropertyColumn>  
+                                            <PropertyColumn Property="x => x.Country" Title="Country" Class="col-country" Editable="false">
+                                                <CellTemplate Context="row">
+                                                    @row.Item.Country
                                                 </CellTemplate>
                                             </PropertyColumn>
-                                            <PropertyColumn Property="x => x.ExpiryDate" Title="Date of Expiry">
+                                            <PropertyColumn Property="x => x.VisaType" Title="Visa Type" Class="col-visa-type" Editable="false">
                                                 <CellTemplate Context="row">
-                                                    @row.Item.ExpiryDate?.ToString("dd-MMM-yyyy")
+                                                    @row.Item.VisaType
                                                 </CellTemplate>
                                             </PropertyColumn>
-                                             <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
-                                                 <CellTemplate Context="row">
-                                                    <MudIconButton Color="Color.Info" title="Edit record" Class="show-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
+                                            <PropertyColumn Property="x => x.Profession" Title="Profession" Class="col-profession" Editable="false">
+                                                <CellTemplate Context="row">
+                                                    @row.Item.Profession
+                                                </CellTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.IssueDate" Title="Issue Date" Class="col-date" Editable="false">
+                                                <CellTemplate Context="row">
+                                                    @(row.Item.IssueDate.HasValue ? row.Item.IssueDate.Value.ToString("dd-MMM-yyyy") : "")
+                                                </CellTemplate>
+                                            </PropertyColumn>
+                                            <PropertyColumn Property="x => x.ExpiryDate" Title="Expiry Date" Class="col-date" Editable="false">
+                                                <CellTemplate Context="row">
+                                                    @(row.Item.ExpiryDate.HasValue ? row.Item.ExpiryDate.Value.ToString("dd-MMM-yyyy") : "")
+                                                </CellTemplate>
+                                            </PropertyColumn>
+                                            <TemplateColumn CellClass="d-flex justify-end" Title="Actions">
+                                                <CellTemplate Context="row">
+                                                    <MudIconButton title="Edit details" 
+                                                        Class="show-btn fa-icon-btn"
+                                                        Color="Color.Surface"
+                                                        Disabled="@(!_allowGridEdit)"
+                                                        OnClick="@(() => EditFamilyVisaAsync(row.Item))">
                                                         <ChildContent>
-                                                            ,<i class="fas fa-edit fa-1x"></i>
+                                                            <i class="fas fa-pen-alt fa-1x"></i>
                                                         </ChildContent>
                                                     </MudIconButton>
-                                                    <MudIconButton Color="Color.Success" title="Save changes" Class="hide-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
-                                                        <ChildContent>
-                                                            <i class="fas fa-save fa-1x"></i>
-                                                        </ChildContent>
-                                                    </MudIconButton>
-                                                    <MudIconButton Color="Color.Error" title="Delete record" Class="show-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
+                                                    <MudIconButton title="Delete record" 
+                                                        Class="fa-icon-btn" 
+                                                        Color="Color.Error"
+                                                        Disabled="@(!_allowGridEdit)"
+                                                        OnClick="() => ConfirmDeleteFamilyVisa(row.Item)">
                                                         <ChildContent>
                                                             <i class="fas fa-trash-alt fa-1x"></i>
                                                         </ChildContent>
                                                     </MudIconButton>
-                                                 </CellTemplate>
-                                             </TemplateColumn>
+                                                </CellTemplate>
+                                            </TemplateColumn>   
                                          </Columns>
                                         <NoRecordsContent>
 			                                 <div class="no-data-box">

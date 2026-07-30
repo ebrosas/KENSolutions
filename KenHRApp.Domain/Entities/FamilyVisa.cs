@@ -50,9 +50,6 @@ namespace KenHRApp.Domain.Entities
 
         [Comment("Foreign key that references primary key: FamilyMember.AutoId")]
         public int FamilyId { get; set; }
-
-        // Navigation back to FamilyMember
-        //public FamilyMember FamilyMember { get; set; } = null!;
         #endregion
     }
 }

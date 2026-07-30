@@ -321,7 +321,7 @@ namespace KenHRApp.Infrastructure.Data
                  entity.HasKey(c => c.AutoId)
                      .HasName("PK_FamilyVisa_AutoId");
 
-                 entity.HasIndex(e => new { e.EmployeeNo, e.VisaTypeCode, e.CountryCode, e.IssueDate, e.ExpiryDate })
+                 entity.HasIndex(e => new { e.EmployeeNo, e.FamilyId, e.VisaTypeCode, e.IssueDate, e.ExpiryDate })
                       .HasDatabaseName("IX_FamilyVisa_CompoKeys")
                       .IsUnique()
                       .HasFilter(null);

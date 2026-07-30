@@ -2691,6 +2691,90 @@ namespace KenHRApp.Application.Services
                 return Result<bool>.Failure(ex.Message.ToString());
             }
         }
+
+        public async Task<Result<int>> SaveFamilyVisaAsync(
+            FamilyVisaDTO dto,
+            CancellationToken cancellationToken = default)
+        {
+            int saveResult = 0;
+
+            try
+            {
+                #region Initialize FamilyMember entity
+                FamilyVisa familyVisa = new FamilyVisa()
+                {
+                    AutoId = dto.AutoId,
+                    EmployeeNo = dto.EmployeeNo,
+                    FamilyId = dto.FamilyId,
+                    CountryCode = dto.CountryCode,
+                    VisaTypeCode = dto.VisaTypeCode,
+                    Profession = dto.Profession,
+                    IssueDate = dto.IssueDate,
+                    ExpiryDate = dto.ExpiryDate
+                };
+                #endregion
+
+                if (familyVisa.AutoId == 0)
+                {
+                    var addResult = await _repository.AddFamilyVisaAsync(familyVisa, cancellationToken);
+                    if (addResult.Success)
+                    {
+                        saveResult = addResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(addResult.Error))
+                            throw new Exception(addResult.Error);
+                        else
+                            throw new Exception("Unable to add new family visa to the database. Please try saving again.");
+                    }
+                }
+                else
+                {
+                    var updateResult = await _repository.UpdateFamilyVisaAsync(familyVisa, cancellationToken);
+                    if (updateResult.Success)
+                    {
+                        saveResult = updateResult.Value;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(updateResult.Error))
+                            throw new Exception(updateResult.Error);
+                        else
+                            throw new Exception("Unable to update the selected family visa. Please try saving again.");
+                    }
+                }
+
+                return Result<int>.SuccessResult(saveResult);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure(ex.Message.ToString());
+            }
+        }
+
+        public async Task<Result<bool>> DeleteFamilyVisaAsync(
+           int autoID,
+           CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _repository.DeleteFamilyVisaAsync(autoID, cancellationToken);
+                if (!result.Success)
+                {
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new Exception(result.Error);
+                    else
+                        throw new Exception("Unable to delete the selected family visa due to unknown error. Please refresh the page then try again.");
+                }
+
+                return Result<bool>.SuccessResult(result.Value);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure(ex.Message.ToString());
+            }
+        }
         #endregion
     }
 }
