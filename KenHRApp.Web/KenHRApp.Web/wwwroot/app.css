@@ -1246,7 +1246,7 @@ skill-qualification-grid .col-FromYear, .col-ToYear, .col-PassYear {
 
 /* Format table header */
 .employment-history-grid .mud-table-head {
-    background-color: #CFD8DC; /* Table header background color */
+    background-color: #BBDEFB; /* Table header background color */
     font-weight: bold;
     text-align: center !important;
     font-size: 14px !important;

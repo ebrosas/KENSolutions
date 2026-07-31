@@ -162,6 +162,12 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         private List<UserDefinedCodeDTO> _languageList = new List<UserDefinedCodeDTO>();
         private string[]? _languageArray = null;
+
+        private List<UserDefinedCodeDTO> _salaryTypeList = new List<UserDefinedCodeDTO>();
+        private string[]? _salaryTypeArray = null;
+
+        private List<UserDefinedCodeDTO> _currencyTypeList = new List<UserDefinedCodeDTO>();
+        private string[]? _currencyTypeArray = null;
         #endregion
 
         #region Enums and Collections
@@ -201,7 +207,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             QUALIFACTIONMODE,       // Qualification Modes
             MONTHCODE,              // Months
             SKILLLEVEL,             // Skill Levels
-            LANGUAGE                // Languages        
+            LANGUAGE,               // Languages        
+            SALARYTYPE,             // Salary Types
+            CURRENCYTYPE            // Currency Types
         }
 
         private enum NotificationType
@@ -258,6 +266,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
 
         private string _familyVisaSearchString = string.Empty;
         private bool _familyVisaFilter = false;
+
+        private string _employmentSearchString = string.Empty;
+        private bool _employmentFilter = false;
         #endregion
 
         #endregion
@@ -3605,6 +3616,487 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
         }
         #endregion
 
+        #region Employment History Grid
+        private Func<EmploymentHistoryDTO, bool> _employmentQuickFilter => x =>
+        {
+            if (string.IsNullOrWhiteSpace(_employmentSearchString))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.CompanyName) && x.CompanyName.Contains(_employmentSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.CompanyAddress) && x.CompanyAddress.Contains(_employmentSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.Designation) && x.Designation.Contains(_employmentSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.RoleDesc) && x.RoleDesc.Contains(_employmentSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.SalaryType) && x.SalaryType!.Contains(_employmentSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.ReasonOfChange) && x.ReasonOfChange!.Contains(_employmentSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.ReportingManager) && x.ReportingManager!.Contains(_employmentSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(x.CompanyWebsite) && x.CompanyWebsite!.Contains(_employmentSearchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
+        };
+
+        private async Task EmploymentStartedEditingItem(EmploymentHistoryDTO item)
+        {
+            await EditEmploymentAsync(item);
+        }
+
+        //private void FamilyCommittedItemChanges(EmploymentHistoryDTO item)
+        //{
+        //    try
+        //    {
+        //        if (item == null) return;
+
+        //        #region Get selected relation
+        //        if (!string.IsNullOrEmpty(item.RelationCode))
+        //        {
+        //            UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCCode == item.RelationCode).FirstOrDefault();
+        //            if (udc != null)
+        //                item.Relation = udc.UDCDesc1;
+        //        }
+        //        #endregion
+
+        //        #region Get selected qualification
+        //        if (!string.IsNullOrEmpty(item.QualificationCode))
+        //        {
+        //            UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCCode == item.QualificationCode).FirstOrDefault();
+        //            if (udc != null)
+        //                item.Qualification = udc.UDCDesc1;
+        //        }
+        //        #endregion
+
+        //        #region Get selected stream
+        //        if (!string.IsNullOrEmpty(item.StreamCode))
+        //        {
+        //            UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCCode == item.StreamCode).FirstOrDefault();
+        //            if (udc != null)
+        //                item.StreamDesc = udc.UDCDesc1;
+        //        }
+        //        #endregion
+
+        //        #region Get selected specialization
+        //        if (!string.IsNullOrEmpty(item.SpecializationCode))
+        //        {
+        //            UserDefinedCodeDTO? udc = _specializationList.Where(d => d.UDCCode == item.SpecializationCode).FirstOrDefault();
+        //            if (udc != null)
+        //                item.Specialization = udc.UDCDesc1;
+        //        }
+        //        #endregion
+
+        //        #region Get selected country
+        //        if (!string.IsNullOrEmpty(item.CountryCode))
+        //        {
+        //            UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCCode == item.CountryCode).FirstOrDefault();
+        //            if (udc != null)
+        //                item.Country = udc.UDCDesc1;
+        //        }
+        //        #endregion
+
+        //        // Set flag to display the loading panel
+        //        _isRunning = true;
+
+        //        // Set the overlay message
+        //        overlayMessage = "Saving changes, please wait...";
+
+        //        _ = SaveFamilyMemberAsync(async () =>
+        //        {
+        //            _isRunning = false;
+
+        //            // Shows the spinner overlay
+        //            await InvokeAsync(StateHasChanged);
+        //        }, item);
+        //    }
+        //    catch (OperationCanceledException)
+        //    {
+        //        ShowNotification("Save cancelled (navigated away).", NotificationType.Warning);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+        //    }
+        //}
+
+        //private async Task SaveEmploymentAsync(Func<Task> callback, EmploymentHistoryDTO employment)
+        //{
+        //    // Wait for 1 second then gives control back to the runtime
+        //    await Task.Delay(500);
+
+        //    // Reset error messages
+        //    _errorMessage.Clear();
+
+        //    // Initialize the cancellation token
+        //    _cts = new CancellationTokenSource();
+
+        //    var result = await EmployeeService.SaveFamilyMemberAsync(employment, _cts.Token);
+        //    if (!result.Success)
+        //    {
+        //        // Set the error message
+        //        _errorMessage.AppendLine(result.Error!);
+        //        ShowHideError(true);
+        //    }
+        //    else
+        //    {
+        //        if (employment.AutoId == 0)
+        //        {
+        //            // Get the new identity seed
+        //            employment.AutoId = result.Value;
+
+        //            // Add locally to the list so UI updates immediately
+        //            employee.FamilyMemberList.Add(employment);
+
+        //            StateHasChanged();
+        //        }
+
+        //        // Show notification
+        //        ShowNotification("Family member has been saved successfully!", NotificationType.Success);
+        //    }
+
+        //    if (callback != null)
+        //    {
+        //        // Hide the spinner overlay
+        //        await callback.Invoke();
+        //    }
+        //}
+
+        private async Task AddEmploymentAsync()
+        {
+            try
+            {
+                var parameters = new DialogParameters
+                {
+                    ["EmploymentHistory"] = new EmploymentHistoryDTO(),
+                    ["RoleTypeList"] = _roleTypeList,
+                    ["SalaryTypeList"] = _salaryTypeList,
+                    ["CurrencyTypeList"] = _currencyTypeList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = false
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                // Show the dialog box
+                var dialog = await DialogService.ShowAsync<FamilyMemberDialog>("Add Family Member", parameters, options);
+                var result = await dialog.Result;
+                if (result != null && !result.Canceled)
+                {
+                    var newEmployment = (EmploymentHistoryDTO)result.Data!;
+                    newEmployment.AutoId = 0;
+                    newEmployment.EmployeeNo = employee.EmployeeNo;
+
+                    #region Get selected Role
+                    if (!string.IsNullOrEmpty(newEmployment.RoleDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _roleTypeList.Where(d => d.UDCDesc1 == newEmployment.RoleDesc).FirstOrDefault();
+                        if (udc != null)
+                            newEmployment.Role = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected salary type
+                    if (!string.IsNullOrEmpty(newEmployment.SalaryType))
+                    {
+                        UserDefinedCodeDTO? udc = _salaryTypeList.Where(d => d.UDCDesc1 == newEmployment.SalaryType).FirstOrDefault();
+                        if (udc != null)
+                            newEmployment.SalaryTypeCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected currency
+                    if (!string.IsNullOrEmpty(newEmployment.SalaryCurrency))
+                    {
+                        UserDefinedCodeDTO? udc = _currencyTypeList.Where(d => d.UDCDesc1 == newEmployment.SalaryCurrency).FirstOrDefault();
+                        if (udc != null)
+                            newEmployment.SalaryCurrencyCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Check for duplicate entries
+                    var duplicateMember = employee.EmploymentHistoryList.FirstOrDefault(e => e.EmployeeNo == newEmployment.EmployeeNo
+                        && e.CompanyName.Trim().ToUpper() == newEmployment.CompanyName.Trim().ToUpper()
+                        && e.Designation.Trim().ToUpper() == newEmployment.Designation.Trim().ToUpper()
+                        && e.FromDate == newEmployment.FromDate
+                        && e.ToDate == newEmployment.ToDate);
+                    if (duplicateMember != null)
+                    {
+                        // Show error
+                        await ShowErrorMessage(MessageBoxTypes.Error, "Error", "The specified employment already exists. Please enter a unique employment details then try again.");
+                        return;
+                    }
+                    #endregion
+
+                    // Add locally to the list so UI updates immediately
+                    employee.EmploymentHistoryList.Add(newEmployment);
+
+                    await InvokeAsync(StateHasChanged);
+
+                    #region Save to database
+                    //_isRunning = true;
+
+                    //// Set the overlay message
+                    //overlayMessage = "Adding employment history, please wait...";
+
+                    //_ = SaveEmploymentAsync(async () =>
+                    //{
+                    //    _isRunning = false;
+
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, newEmployment);
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task EditEmploymentAsync(EmploymentHistoryDTO employment)
+        {
+            try
+            {
+                // Clone the object so the dialog can edit without affecting the grid until Save
+                var editableCopy = new EmploymentHistoryDTO
+                {
+                    AutoId = employment.AutoId,
+                    EmployeeNo = employment.EmployeeNo,
+                    CompanyName = employment.CompanyName,
+                    CompanyAddress = employment.CompanyAddress,
+                    Designation = employment.Designation,
+                    Role = employment.Role,
+                    RoleDesc = employment.RoleDesc,
+                    FromDate = employment.FromDate,
+                    ToDate = employment.ToDate,
+                    LastDrawnSalary = employment.LastDrawnSalary,
+                    SalaryTypeCode = employment.SalaryTypeCode,
+                    SalaryType = employment.SalaryType,
+                    SalaryCurrencyCode = employment.SalaryCurrencyCode,
+                    SalaryCurrency = employment.SalaryCurrency,
+                    ReasonOfChange = employment.ReasonOfChange,
+                    ReportingManager = employment.ReportingManager,
+                    CompanyWebsite = employment.CompanyWebsite
+                };
+
+                var parameters = new DialogParameters
+                {
+                    ["EmploymentHistory"] = editableCopy,
+                    ["RoleTypeList"] = _roleTypeList,
+                    ["SalaryTypeList"] = _salaryTypeList,
+                    ["CurrencyTypeList"] = _currencyTypeList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = true
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                var dialog = await DialogService.ShowAsync<FamilyMemberDialog>("Edit Employment", parameters, options);
+                var result = await dialog.Result;
+
+                if (result != null && !result.Canceled)
+                {
+                    var updated = (EmploymentHistoryDTO)result.Data!;
+
+                    #region Get selected Role
+                    if (!string.IsNullOrEmpty(updated.RoleDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _roleTypeList.Where(d => d.UDCDesc1 == updated.RoleDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.Role = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected salary type
+                    if (!string.IsNullOrEmpty(updated.SalaryType))
+                    {
+                        UserDefinedCodeDTO? udc = _salaryTypeList.Where(d => d.UDCDesc1 == updated.SalaryType).FirstOrDefault();
+                        if (udc != null)
+                            updated.SalaryTypeCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    #region Get selected currency
+                    if (!string.IsNullOrEmpty(updated.SalaryCurrency))
+                    {
+                        UserDefinedCodeDTO? udc = _currencyTypeList.Where(d => d.UDCDesc1 == updated.SalaryCurrency).FirstOrDefault();
+                        if (udc != null)
+                            updated.SalaryCurrencyCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    // Update in-memory grid item
+                    var index = employee.EmploymentHistoryList.FindIndex(x => x.AutoId == updated.AutoId);
+                    if (index >= 0)
+                    {
+                        employee.EmploymentHistoryList[index] = updated;
+                        await InvokeAsync(StateHasChanged);
+                    }
+
+                    #region Persist changes to DB
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
+
+                    //// Set the overlay message
+                    //overlayMessage = "Saving family member, please wait...";
+
+                    //_ = SaveFamilyMemberAsync(async () =>
+                    //{
+                    //    _isRunning = false;
+
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, updated);
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task ConfirmDeleteEmployment(EmploymentHistoryDTO employment)
+        {
+            var parameters = new DialogParameters
+            {
+                { "DialogTitle", "Confirm Delete"},
+                { "DialogIcon", _iconDelete },
+                { "ContentText", $"Are you sure you want to delete this employment history: '{employment.CompanyName} - {employment.Designation}'?" },
+                { "ConfirmText", "Delete" },
+                { "Color", Color.Error }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Small,
+                Position = DialogPosition.TopCenter,
+                CloseOnEscapeKey = true,   // Prevent ESC from closing
+                BackdropClick = false       // Prevent clicking outside to close
+            };
+
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Employment History", parameters, options);
+            var result = await dialog.Result;
+            if (result != null && !result.Canceled)
+            {
+                // Remove locally from the list so UI updates immediately
+                employee.EmploymentHistoryList.Remove(employment);
+
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+
+        //private void BeginDeleteEmployment(EmploymentHistoryDTO employment)
+        //{
+        //    try
+        //    {
+        //        // Set flag to display the loading panel
+        //        _isRunning = true;
+
+        //        // Set the overlay message
+        //        overlayMessage = "Deleting employment, please wait...";
+
+        //        _ = DeleteFamilyMemberAsync(async () =>
+        //        {
+        //            _isRunning = false;
+
+        //            // Hide the spinner overlay
+        //            await InvokeAsync(StateHasChanged);
+
+        //            // Remove locally from the list so UI updates immediately
+        //            employee.EmploymentHistoryList.Remove(employment);
+
+        //            StateHasChanged();
+
+        //        }, employment);
+        //    }
+        //    catch (OperationCanceledException)
+        //    {
+        //        ShowNotification("Delete cancelled (navigated away).", NotificationType.Warning);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ShowNotification($"Error: {ex.Message}", NotificationType.Error);
+        //    }
+        //}
+
+        //private async Task DeleteFamilyMemberAsync(Func<Task> callback, FamilyMemberDTO familyMember)
+        //{
+        //    // Wait for 1 second then gives control back to the runtime
+        //    await Task.Delay(500);
+
+        //    // Reset error messages
+        //    _errorMessage.Clear();
+
+        //    // Initialize the cancellation token
+        //    _cts = new CancellationTokenSource();
+
+        //    bool isSuccess = false;
+        //    string errorMsg = string.Empty;
+
+        //    if (familyMember.AutoId == 0)
+        //    {
+        //        errorMsg = "Family Member ID is not defined.";
+        //    }
+        //    else
+        //    {
+        //        var deleteResult = await EmployeeService.DeleteFamilyMemberAsync(familyMember.AutoId, _cts.Token);
+        //        isSuccess = deleteResult.Success;
+        //        if (!isSuccess)
+        //            errorMsg = deleteResult.Error!;
+        //    }
+
+        //    if (isSuccess)
+        //    {
+        //        // Show notification
+        //        ShowNotification("The selected familyMember has been deleted successfully!", NotificationType.Success);
+        //    }
+        //    else
+        //    {
+        //        if (!string.IsNullOrEmpty(errorMsg))
+        //        {
+        //            // Display error message
+        //            _errorMessage.AppendLine(errorMsg);
+        //            ShowHideError(true);
+        //        }
+        //    }
+
+        //    if (callback != null)
+        //    {
+        //        // Hide the spinner overlay
+        //        await callback.Invoke();
+        //    }
+        //}
+        #endregion
+
         #endregion
 
         #region Button Event Handlers
@@ -4794,6 +5286,42 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                                 _languageArray = _languageList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
                         }
                         #endregion
+
+                        #region Populate Salary Types dropdown
+                        try
+                        {
+                            groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.SALARYTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                        }
+                        catch (Exception ex)
+                        {
+                            _errorMessage.Append($"Error getting Salary Types group ID: {ex.Message}");
+                        }
+
+                        if (groupID > 0)
+                        {
+                            _salaryTypeList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                            if (_salaryTypeList != null)
+                                _salaryTypeArray = _salaryTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                        }
+                        #endregion
+
+                        #region Populate Currency Types dropdown
+                        try
+                        {
+                            groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.CURRENCYTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                        }
+                        catch (Exception ex)
+                        {
+                            _errorMessage.Append($"Error getting Currency Types group ID: {ex.Message}");
+                        }
+
+                        if (groupID > 0)
+                        {
+                            _currencyTypeList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                            if (_currencyTypeList != null)
+                                _currencyTypeArray = _currencyTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                        }
+                        #endregion
                     }
                 }
                 else
@@ -5342,6 +5870,42 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                             _languageArray = _languageList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
                     }
                     #endregion
+
+                    #region Populate Salary Types dropdown
+                    try
+                    {
+                        groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.SALARYTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Salary Types group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _salaryTypeList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                        if (_salaryTypeList != null)
+                            _salaryTypeArray = _salaryTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                    }
+                    #endregion
+
+                    #region Populate Currency Types dropdown
+                    try
+                    {
+                        groupID = udcGroupList.Where(a => a.UDCGCode == UDCGroupCodes.CURRENCYTYPE.ToString()).FirstOrDefault()!.UDCGroupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorMessage.Append($"Error getting Currency Types group ID: {ex.Message}");
+                    }
+
+                    if (groupID > 0)
+                    {
+                        _currencyTypeList = udcData.Where(a => a.GroupID == groupID).OrderBy(a => a.SequenceNo).ToList();
+                        if (_currencyTypeList != null)
+                            _currencyTypeArray = _currencyTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+                    }
+                    #endregion
                 }
             }
             else
@@ -5771,6 +6335,34 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             }
 
             return _languageArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchSalaryType(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _salaryTypeArray!;
+            }
+
+            return _salaryTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private async Task<IEnumerable<string>> SearchCurrencyType(string value, CancellationToken token)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5, token);
+
+            // if text is null or empty, show complete list
+            if (string.IsNullOrEmpty(value))
+            {
+                return _currencyTypeArray!;
+            }
+
+            return _currencyTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         }
         #endregion
     }
