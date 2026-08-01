@@ -1,0 +1,277 @@
+﻿@using KenHRApp.Web.Components.Common
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@DialogIcon" Class="mr-1 mt-n1" Size="Size.Medium" Color="@DialogIconColor" />
+            @DialogTitle
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form">
+            <MudPaper Elevation="0" Square="true" Class="w-100 px-5">
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="EmploymentHistory.CompanyName"
+                                          For="@(() => EmploymentHistory.CompanyName)"
+                                          HelperText="Max. text input is 150 chars." Variant="Variant.Text"
+                                          HelperTextOnFocus="true" Counter="150" MaxLength="150"
+                                          Disabled="false" Label="Company Name"
+                                          Clearable="false" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="EmploymentHistory.CompanyAddress"
+                                          For="@(() => EmploymentHistory.CompanyAddress)"
+                                          HelperText="Max. text input is 300 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="300" MaxLength="300" Disabled="false" Label="Company Address"
+                                          Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="EmploymentHistory.Designation"
+                                          For="@(() => EmploymentHistory.Designation)"
+                                          HelperText="Max. text input is 100 chars." Variant="Variant.Text"
+                                          HelperTextOnFocus="true" Counter="100" MaxLength="100"
+                                          Disabled="false" Label="Designation"
+                                          Clearable="false" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="EmploymentHistory.RoleDesc"
+                                             For="@(() => EmploymentHistory.RoleDesc)"
+                                             SearchFunc="SearchRoleType!"
+                                             Variant="Variant.Text"
+                                             Label="Role"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for role"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(RoleTypeList != null ? RoleTypeList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudDatePicker Color="Color.Info" Editable="true"
+                                           @bind-Date="EmploymentHistory.FromDate"
+                                           For="@(() => EmploymentHistory.FromDate)"
+                                           Label="From Date"
+                                           Placeholder="Select Date" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudDatePicker Color="Color.Info" Editable="true"
+                                @bind-Date="EmploymentHistory.ToDate"
+                                For="@(() => EmploymentHistory.ToDate)" 
+                                Label="To Date"                                
+                                Placeholder="Select Date" />
+                         </MudPaper>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="EmploymentHistory.SalaryType"
+                                             For="@(() => EmploymentHistory.SalaryType)"
+                                             SearchFunc="SearchSalaryType!"
+                                             Variant="Variant.Text"
+                                             Label="Salary Type"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for salary type"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(SalaryTypeList != null ? SalaryTypeList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudNumericField @bind-Value="EmploymentHistory.LastDrawnSalary" 
+                                For="@(() => EmploymentHistory.LastDrawnSalary)"
+                                Label="Last Drawn Salary"
+                                Variant="Variant.Text" Clearable="true"
+                                HelperText="Enter numeric value only"
+                                HelperTextOnFocus="true"
+                                Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>                        
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudAutocomplete @bind-Value="EmploymentHistory.SalaryCurrency"
+                                             For="@(() => EmploymentHistory.SalaryCurrency)"
+                                             SearchFunc="SearchCurrencyType!"
+                                             Variant="Variant.Text"
+                                             Label="Currency"
+                                             Margin="Margin.Dense"
+                                             Dense="true"
+                                             Placeholder="Please Select"
+                                             HelperText="Type a key to search for currency"
+                                             HelperTextOnFocus="true"
+                                             Clearable="@IsClearable" Typo="Typo.subtitle2"
+                                             MaxItems="@(CurrencyTypeList != null ? CurrencyTypeList.Count : 10)"
+                                             Modal="true" />
+                        </MudPaper>                        
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="EmploymentHistory.ReasonOfChange"
+                                          For="@(() => EmploymentHistory.ReasonOfChange)"
+                                          HelperText="Max. text input is 200 chars." Variant="Variant.Text"
+                                          HelperTextOnFocus="true" Counter="200" MaxLength="200"
+                                          Disabled="false" Label="Reason of Change"
+                                          Clearable="false" Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>                        
+                    </MudItem>
+                </MudGrid>
+                <MudGrid Spacing="7">
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="EmploymentHistory.ReportingManager"
+                                          For="@(() => EmploymentHistory.ReportingManager)"
+                                          HelperText="Max. text input is 150 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="150" MaxLength="150" Disabled="false" Label="Reporting Manager"
+                                          Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudPaper Elevation="0" Class="p-0 w-100">
+                            <MudTextField @bind-Value="EmploymentHistory.CompanyWebsite"
+                                          For="@(() => EmploymentHistory.CompanyWebsite)"
+                                          HelperText="Max. text input is 100 chars." Variant="Variant.Text" HelperTextOnFocus="true"
+                                          Counter="100" MaxLength="100" Disabled="false" Label="Company Website"
+                                          Clearable="false" Immediate="@IsDisabled" Margin="Margin.Dense" Typo="Typo.subtitle2" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Info" Style="background-color:#004165;" Variant="Variant.Filled" Size="Size.Medium" OnClick="Save">Save</MudButton>
+        <MudButton Color="Color.Default" Variant="Variant.Text" Size="Size.Medium" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Fields
+    private MudForm _form = new();
+    private string[]? _roleTypeArray = null;
+    private string[]? _salaryTypeArray = null;
+    private string[]? _currencyTypeArray = null;
+    #endregion
+
+    #region Parameters and Injections
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public EmploymentHistoryDTO EmploymentHistory { get; set; } = new();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> RoleTypeList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> SalaryTypeList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public IReadOnlyList<UserDefinedCodeDTO> CurrencyTypeList { get; set; } = new List<UserDefinedCodeDTO>();
+
+    [Parameter]
+    public bool IsClearable { get; set; } = true;
+
+    [Parameter]
+    public bool IsDisabled { get; set; } = true;
+
+    [Parameter]
+    public bool IsEditMode { get; set; }
+
+    // Optional UI helpers
+    protected string DialogTitle => IsEditMode ? "Edit Employment" : "Add New Employment";
+    protected string DialogIcon => IsEditMode ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add;
+    protected Color DialogIconColor => IsEditMode ? Color.Info : Color.Success;
+    #endregion
+
+    #region Page Methods
+    protected override void OnInitialized()
+    {
+        if (RoleTypeList != null)
+            _roleTypeArray = RoleTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (SalaryTypeList != null)
+            _salaryTypeArray = SalaryTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+
+        if (CurrencyTypeList != null)
+            _currencyTypeArray = CurrencyTypeList.Select(d => d.UDCDesc1).OrderBy(d => d).ToArray();
+    }
+    #endregion
+
+    #region Private Methods
+    private async Task Save()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        MudDialog.Close(DialogResult.Ok(EmploymentHistory));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task<IEnumerable<string>> SearchRoleType(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _roleTypeArray!;
+        }
+
+        return _roleTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchSalaryType(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _salaryTypeArray!;
+        }
+
+        return _salaryTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> SearchCurrencyType(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+        {
+            return _currencyTypeArray!;
+        }
+
+        return _currencyTypeArray!.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    #endregion
+}

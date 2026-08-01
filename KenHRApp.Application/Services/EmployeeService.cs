@@ -1216,6 +1216,7 @@ namespace KenHRApp.Application.Services
                             CompanyAddress = e.CompanyAddress,
                             Designation = e.Designation,
                             Role = e.Role,
+                            RoleDesc = e.RoleDesc,
                             FromDate = e.FromDate,
                             ToDate = e.ToDate,
                             LastDrawnSalary = e.LastDrawnSalary,

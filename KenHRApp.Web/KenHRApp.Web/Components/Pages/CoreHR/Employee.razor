@@ -2920,6 +2920,11 @@
                                                     @row.Item.SalaryType
                                                 </CellTemplate>
                                             </PropertyColumn>
+                                            <PropertyColumn Property="x => x.LastDrawnSalary" Title="Last Drawn Salary" Class="col-salary" Editable="false">
+                                                <CellTemplate Context="row">
+                                                    @(row.Item.LastDrawnSalary.HasValue ? row.Item.LastDrawnSalary.Value.ToString("N2") : "")
+                                                </CellTemplate>
+                                            </PropertyColumn>
                                             <PropertyColumn Property="x => x.SalaryCurrency" Title="Currency" Class="col-currency" Editable="false">
                                                 <CellTemplate Context="row">
                                                     @row.Item.SalaryCurrency

@@ -881,12 +881,14 @@ namespace KenHRApp.Infrastructure.Repositories
 
                         #region Get Employment History
                         var employmentHistoryModel = await (from e in _db.EmploymentHistories
+                                                            join roleType in _db.UserDefinedCodes on e.Role equals roleType.UDCCode into gjRoleType from subRoleType in gjRoleType.DefaultIfEmpty()      // LEFT JOIN    
                                                             join salType in _db.UserDefinedCodes on e.SalaryTypeCode equals salType.UDCCode into gjSalType from subSalType in gjSalType.DefaultIfEmpty()      // LEFT JOIN    
                                                             join salCurrency in _db.UserDefinedCodes on e.SalaryCurrencyCode equals salCurrency.UDCCode into gjSalCurrency from subSalCurrency in gjSalCurrency.DefaultIfEmpty()      // LEFT JOIN    
                                                             where e.EmployeeNo == employeeDetail.EmployeeNo
                                                             select new
                                                             {
                                                                 EmploymentHistory = e,
+                                                                RoleDesc = subRoleType != null ? subRoleType.UDCDesc1 : null,
                                                                 SalaryType = subSalType != null ? subSalType.UDCDesc1 : null,
                                                                 SalaryCurrency = subSalCurrency != null ? subSalCurrency.UDCDesc1 : null
                                                             }).ToListAsync();
@@ -901,6 +903,7 @@ namespace KenHRApp.Infrastructure.Repositories
                                     CompanyAddress = item.EmploymentHistory.CompanyAddress,
                                     Designation = item.EmploymentHistory.Designation,
                                     Role = item.EmploymentHistory.Role,
+                                    RoleDesc = item.RoleDesc,
                                     FromDate = item.EmploymentHistory.FromDate,
                                     ToDate = item.EmploymentHistory.ToDate,
                                     LastDrawnSalary = item.EmploymentHistory.LastDrawnSalary,

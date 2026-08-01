@@ -3796,7 +3796,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 };
 
                 // Show the dialog box
-                var dialog = await DialogService.ShowAsync<FamilyMemberDialog>("Add Family Member", parameters, options);
+                var dialog = await DialogService.ShowAsync<EmploymentDialog>("Add Family Member", parameters, options);
                 var result = await dialog.Result;
                 if (result != null && !result.Canceled)
                 {
@@ -3918,7 +3918,7 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     CloseButton = false
                 };
 
-                var dialog = await DialogService.ShowAsync<FamilyMemberDialog>("Edit Employment", parameters, options);
+                var dialog = await DialogService.ShowAsync<EmploymentDialog>("Edit Employment", parameters, options);
                 var result = await dialog.Result;
 
                 if (result != null && !result.Canceled)

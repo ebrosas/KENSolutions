@@ -25,6 +25,9 @@ namespace KenHRApp.Domain.Entities
         [Column(TypeName = "varchar(100)")]
         public string? Role { get; set; } = null;
 
+        [NotMapped]
+        public string? RoleDesc { get; set; } = null;
+
         [Column(TypeName = "datetime"), Comment("Part of composite unique key index")]
         public DateTime? FromDate { get; set; }
 
