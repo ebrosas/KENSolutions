@@ -376,9 +376,9 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             return false;
         };
 
-        private void EmergencyStartedEditingItem(EmergencyContactDTO item)
+        private async Task EmergencyStartedEditingItem(EmergencyContactDTO item)
         {
-            //_events.Insert(0, $"Event = StartedEditingShiftTimingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+            await EditEmergencyContactAsync(item);
         }
 
         private void EmergencyCommittedItemChanges(EmergencyContactDTO item)
@@ -405,19 +405,21 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 }
                 #endregion
 
-                // Set flag to display the loading panel
-                _isRunning = true;
+                #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                //// Set flag to display the loading panel
+                //_isRunning = true;
 
-                // Set the overlay message
-                overlayMessage = "Saving changes, please wait...";
+                //// Set the overlay message
+                //overlayMessage = "Saving changes, please wait...";
 
-                _ = SaveEmergencyContactAsync(async () =>
-                {
-                    _isRunning = false;
+                //_ = SaveEmergencyContactAsync(async () =>
+                //{
+                //    _isRunning = false;
 
-                    // Shows the spinner overlay
-                    await InvokeAsync(StateHasChanged);
-                }, item);
+                //    // Shows the spinner overlay
+                //    await InvokeAsync(StateHasChanged);
+                //}, item);
+                #endregion
             }
             catch (OperationCanceledException)
             {
@@ -495,7 +497,12 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                BeginDeleteEmergencyContact(contactPerson);
+                //BeginDeleteEmergencyContact(contactPerson);
+
+                // Remove locally from the list so UI updates immediately
+                employee.EmergencyContactList.Remove(contactPerson);
+
+                await InvokeAsync(StateHasChanged);
             }
         }
 
@@ -645,19 +652,106 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     }
                     #endregion
 
-                    // Set flag to display the loading panel
-                    _isRunning = true;
+                    // Add locally to the list so UI updates immediately
+                    employee.EmergencyContactList.Add(newContact);
 
-                    // Set the overlay message
-                    overlayMessage = "Adding new contact, please wait...";
+                    // Refresh the page
+                    await InvokeAsync(StateHasChanged);
 
-                    _ = SaveEmergencyContactAsync(async () =>
+                    #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
+
+                    //// Set the overlay message
+                    //overlayMessage = "Adding new contact, please wait...";
+
+                    //_ = SaveEmergencyContactAsync(async () =>
+                    //{
+                    //    _isRunning = false;
+
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, newContact);
+                    #endregion
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage(MessageBoxTypes.Error, "Error", ex.Message.ToString());
+            }
+        }
+
+        private async Task EditEmergencyContactAsync(EmergencyContactDTO contactPerson)
+        {
+            try
+            {
+                // Clone the object so the dialog can edit without affecting the grid until Save
+                var editableCopy = new EmergencyContactDTO
+                {
+                    AutoId = contactPerson.AutoId,
+                    EmployeeNo = contactPerson.EmployeeNo,
+                    ContactPerson = contactPerson.ContactPerson,
+                    RelationCode = contactPerson.RelationCode,
+                    Relation = contactPerson.Relation,
+                    MobileNo = contactPerson.MobileNo,
+                    LandlineNo = contactPerson.LandlineNo,
+                    Address = contactPerson.Address,
+                    CountryCode = contactPerson.CountryCode,
+                    CountryDesc = contactPerson.CountryDesc,
+                    City = contactPerson.City
+                };
+
+                var parameters = new DialogParameters
+                {
+                    ["EmergencyContact"] = editableCopy,
+                    ["RelationTypeList"] = _relationTypeList,
+                    ["CountryList"] = _countryList,
+                    ["IsClearable"] = true,
+                    ["IsDisabled"] = false,
+                    ["IsEditMode"] = true
+                };
+
+                var options = new DialogOptions
+                {
+                    CloseOnEscapeKey = true,
+                    BackdropClick = false,
+                    FullWidth = true,
+                    MaxWidth = MaxWidth.Medium,
+                    CloseButton = false
+                };
+
+                var dialog = await DialogService.ShowAsync<EmergencyContactDialog>("Edit Emergency Contact", parameters, options);
+                var result = await dialog.Result;
+
+                if (result != null && !result.Canceled)
+                {
+                    var updated = (EmergencyContactDTO)result.Data!;
+
+                    #region Get selected relation
+                    if (!string.IsNullOrEmpty(updated.Relation))
                     {
-                        _isRunning = false;
+                        UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCDesc1 == updated.Relation).FirstOrDefault();
+                        if (udc != null)
+                            updated.RelationCode = udc.UDCCode;
+                    }
+                    #endregion
 
-                        // Shows the spinner overlay
+                    #region Get selected country
+                    if (!string.IsNullOrEmpty(updated.CountryDesc))
+                    {
+                        UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCDesc1 == updated.CountryDesc).FirstOrDefault();
+                        if (udc != null)
+                            updated.CountryCode = udc.UDCCode;
+                    }
+                    #endregion
+
+                    // Update in-memory grid item
+                    var index = employee.EmergencyContactList.FindIndex(x => x.AutoId == updated.AutoId);
+                    if (index >= 0)
+                    {
+                        employee.EmergencyContactList[index] = updated;
                         await InvokeAsync(StateHasChanged);
-                    }, newContact);
+                    }
                 }
             }
             catch (Exception ex)
@@ -786,19 +880,21 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 }
                 #endregion
 
-                // Set flag to display the loading panel
-                _isRunning = true;
+                #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                //// Set flag to display the loading panel
+                //_isRunning = true;
 
-                // Set the overlay message
-                overlayMessage = "Saving changes, please wait...";
+                //// Set the overlay message
+                //overlayMessage = "Saving changes, please wait...";
 
-                _ = SaveQualificationAsync(async () =>
-                {
-                    _isRunning = false;
+                //_ = SaveQualificationAsync(async () =>
+                //{
+                //    _isRunning = false;
 
-                    // Shows the spinner overlay
-                    await InvokeAsync(StateHasChanged);
-                }, item);
+                //    // Shows the spinner overlay
+                //    await InvokeAsync(StateHasChanged);
+                //}, item);
+                #endregion
             }
             catch (OperationCanceledException)
             {
@@ -972,19 +1068,27 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     }
                     #endregion
 
-                    // Set flag to display the loading panel
-                    _isRunning = true;
+                    // Add locally to the list so UI updates immediately
+                    employee.QualificationList.Add(newQualification);
 
-                    // Set the overlay message
-                    overlayMessage = "Adding qualification, please wait...";
+                    // Refresh the page
+                    await InvokeAsync(StateHasChanged);
 
-                    _ = SaveQualificationAsync(async () =>
-                    {
-                        _isRunning = false;
+                    #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
 
-                        // Shows the spinner overlay
-                        await InvokeAsync(StateHasChanged);
-                    }, newQualification);
+                    //// Set the overlay message
+                    //overlayMessage = "Adding qualification, please wait...";
+
+                    //_ = SaveQualificationAsync(async () =>
+                    //{
+                    //    _isRunning = false;
+
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, newQualification);
+                    #endregion
                 }
             }
             catch (Exception ex)
@@ -1137,20 +1241,20 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                         await InvokeAsync(StateHasChanged);
                     }
 
-                    #region Persist changes to DB
-                    // Set flag to display the loading panel
-                    _isRunning = true;
+                    #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
 
-                    // Set the overlay message
-                    overlayMessage = "Saving qualification changes, please wait...";
+                    //// Set the overlay message
+                    //overlayMessage = "Saving qualification changes, please wait...";
 
-                    _ = SaveQualificationAsync(async () =>
-                    {
-                        _isRunning = false;
+                    //_ = SaveQualificationAsync(async () =>
+                    //{
+                    //    _isRunning = false;
 
-                        // Shows the spinner overlay
-                        await InvokeAsync(StateHasChanged);
-                    }, updated);
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, updated);
                     #endregion
                 }
             }
@@ -1184,7 +1288,12 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                BeginDeleteQualification(qualification);
+                //BeginDeleteQualification(qualification);
+
+                // Remove locally from the list so UI updates immediately
+                employee.QualificationList.Remove(qualification);
+
+                await InvokeAsync(StateHasChanged);
             }
         }
 
@@ -1333,19 +1442,21 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 }
                 #endregion
 
-                // Set flag to display the loading panel
-                _isRunning = true;
+                #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                //// Set flag to display the loading panel
+                //_isRunning = true;
 
-                // Set the overlay message
-                overlayMessage = "Saving changes, please wait...";
+                //// Set the overlay message
+                //overlayMessage = "Saving changes, please wait...";
 
-                _ = SaveSkillAsync(async () =>
-                {
-                    _isRunning = false;
+                //_ = SaveSkillAsync(async () =>
+                //{
+                //    _isRunning = false;
 
-                    // Shows the spinner overlay
-                    await InvokeAsync(StateHasChanged);
-                }, item);
+                //    // Shows the spinner overlay
+                //    await InvokeAsync(StateHasChanged);
+                //}, item);
+                #endregion
             }
             catch (OperationCanceledException)
             {
@@ -1478,19 +1589,27 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     }
                     #endregion
 
-                    // Set flag to display the loading panel
-                    _isRunning = true;
+                    // Add locally to the list so UI updates immediately
+                    employee.EmployeeSkillList.Add(newSkill);
 
-                    // Set the overlay message
-                    overlayMessage = "Adding skill, please wait...";
+                    // Refresh the page
+                    await InvokeAsync(StateHasChanged);
 
-                    _ = SaveSkillAsync(async () =>
-                    {
-                        _isRunning = false;
+                    #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
 
-                        // Shows the spinner overlay
-                        await InvokeAsync(StateHasChanged);
-                    }, newSkill);
+                    //// Set the overlay message
+                    //overlayMessage = "Adding skill, please wait...";
+
+                    //_ = SaveSkillAsync(async () =>
+                    //{
+                    //    _isRunning = false;
+
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, newSkill);
+                    #endregion
                 }
             }
             catch (Exception ex)
@@ -1591,20 +1710,20 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                         await InvokeAsync(StateHasChanged);
                     }
 
-                    #region Persist changes to DB
-                    // Set flag to display the loading panel
-                    _isRunning = true;
+                    #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
 
-                    // Set the overlay message
-                    overlayMessage = "Saving skill changes, please wait...";
+                    //// Set the overlay message
+                    //overlayMessage = "Saving skill changes, please wait...";
 
-                    _ = SaveSkillAsync(async () =>
-                    {
-                        _isRunning = false;
+                    //_ = SaveSkillAsync(async () =>
+                    //{
+                    //    _isRunning = false;
 
-                        // Shows the spinner overlay
-                        await InvokeAsync(StateHasChanged);
-                    }, updated);
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, updated);
                     #endregion
                 }
             }
@@ -1638,7 +1757,12 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                BeginDeleteSkill(skill);
+                //BeginDeleteSkill(skill);
+
+                // Remove locally from the list so UI updates immediately
+                employee.EmployeeSkillList.Remove(skill);
+
+                await InvokeAsync(StateHasChanged);
             }
         }
 
@@ -1823,19 +1947,21 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 }
                 #endregion
 
-                // Set flag to display the loading panel
-                _isRunning = true;
+                #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                //// Set flag to display the loading panel
+                //_isRunning = true;
 
-                // Set the overlay message
-                overlayMessage = "Saving changes, please wait...";
+                //// Set the overlay message
+                //overlayMessage = "Saving changes, please wait...";
 
-                _ = SaveCertificationAsync(async () =>
-                {
-                    _isRunning = false;
+                //_ = SaveCertificationAsync(async () =>
+                //{
+                //    _isRunning = false;
 
-                    // Shows the spinner overlay
-                    await InvokeAsync(StateHasChanged);
-                }, item);
+                //    // Shows the spinner overlay
+                //    await InvokeAsync(StateHasChanged);
+                //}, item);
+                #endregion
             }
             catch (OperationCanceledException)
             {
@@ -1992,19 +2118,27 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     }
                     #endregion
 
-                    // Set flag to display the loading panel
-                    _isRunning = true;
+                    // Add locally to the list so UI updates immediately
+                    employee.EmployeeCertificationList.Add(newCertification);
 
-                    // Set the overlay message
-                    overlayMessage = "Adding certification, please wait...";
+                    // Refresh the page
+                    await InvokeAsync(StateHasChanged);
 
-                    _ = SaveCertificationAsync(async () =>
-                    {
-                        _isRunning = false;
+                    #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
 
-                        // Shows the spinner overlay
-                        await InvokeAsync(StateHasChanged);
-                    }, newCertification);
+                    //// Set the overlay message
+                    //overlayMessage = "Adding certification, please wait...";
+
+                    //_ = SaveCertificationAsync(async () =>
+                    //{
+                    //    _isRunning = false;
+
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, newCertification);
+                    #endregion
                 }
             }
             catch (Exception ex)
@@ -2133,20 +2267,20 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                         await InvokeAsync(StateHasChanged);
                     }
 
-                    #region Persist changes to DB
-                    // Set flag to display the loading panel
-                    _isRunning = true;
+                    #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
 
-                    // Set the overlay message
-                    overlayMessage = "Saving certification changes, please wait...";
+                    //// Set the overlay message
+                    //overlayMessage = "Saving certification changes, please wait...";
 
-                    _ = SaveCertificationAsync(async () =>
-                    {
-                        _isRunning = false;
+                    //_ = SaveCertificationAsync(async () =>
+                    //{
+                    //    _isRunning = false;
 
-                        // Shows the spinner overlay
-                        await InvokeAsync(StateHasChanged);
-                    }, updated);
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, updated);
                     #endregion
                 }
             }
@@ -2180,7 +2314,12 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                BeginDeleteCertification(certification);
+                //BeginDeleteCertification(certification);
+
+                // Remove locally from the list so UI updates immediately
+                employee.EmployeeCertificationList.Remove(certification);
+
+                await InvokeAsync(StateHasChanged);
             }
         }
 
@@ -2299,19 +2438,21 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 }
                 #endregion
 
-                // Set flag to display the loading panel
-                _isRunning = true;
+                #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                //// Set flag to display the loading panel
+                //_isRunning = true;
 
-                // Set the overlay message
-                overlayMessage = "Saving changes, please wait...";
+                //// Set the overlay message
+                //overlayMessage = "Saving changes, please wait...";
 
-                _ = SaveLanguageAsync(async () =>
-                {
-                    _isRunning = false;
+                //_ = SaveLanguageAsync(async () =>
+                //{
+                //    _isRunning = false;
 
-                    // Shows the spinner overlay
-                    await InvokeAsync(StateHasChanged);
-                }, item);
+                //    // Shows the spinner overlay
+                //    await InvokeAsync(StateHasChanged);
+                //}, item);
+                #endregion
             }
             catch (OperationCanceledException)
             {
@@ -2430,19 +2571,27 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     }
                     #endregion
 
-                    // Set flag to display the loading panel
-                    _isRunning = true;
+                    // Add locally to the list so UI updates immediately
+                    employee.LanguageSkillList.Add(newLanguage);
 
-                    // Set the overlay message
-                    overlayMessage = "Adding language, please wait...";
+                    // Refresh the page
+                    await InvokeAsync(StateHasChanged);
 
-                    _ = SaveLanguageAsync(async () =>
-                    {
-                        _isRunning = false;
+                    #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
 
-                        // Shows the spinner overlay
-                        await InvokeAsync(StateHasChanged);
-                    }, newLanguage);
+                    //// Set the overlay message
+                    //overlayMessage = "Adding language, please wait...";
+
+                    //_ = SaveLanguageAsync(async () =>
+                    //{
+                    //    _isRunning = false;
+
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, newLanguage);
+                    #endregion
                 }
             }
             catch (Exception ex)
@@ -2523,20 +2672,20 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                         await InvokeAsync(StateHasChanged);
                     }
 
-                    #region Persist changes to DB
-                    // Set flag to display the loading panel
-                    _isRunning = true;
+                    #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
 
-                    // Set the overlay message
-                    overlayMessage = "Saving language, please wait...";
+                    //// Set the overlay message
+                    //overlayMessage = "Saving language, please wait...";
 
-                    _ = SaveLanguageAsync(async () =>
-                    {
-                        _isRunning = false;
+                    //_ = SaveLanguageAsync(async () =>
+                    //{
+                    //    _isRunning = false;
 
-                        // Shows the spinner overlay
-                        await InvokeAsync(StateHasChanged);
-                    }, updated);
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, updated);
                     #endregion
                 }
             }
@@ -2570,7 +2719,12 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                BeginDeleteLanguage(language);
+                //BeginDeleteLanguage(language);
+
+                // Remove locally from the list so UI updates immediately
+                employee.LanguageSkillList.Remove(language);
+
+                await InvokeAsync(StateHasChanged);
             }
         }
 
@@ -2666,12 +2820,6 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             if (!string.IsNullOrEmpty(x.FullName) && x.FullName.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            //if (!string.IsNullOrEmpty(x.MiddleName) && x.MiddleName.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
-
-            //if (!string.IsNullOrEmpty(x.LastName) && x.LastName.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
-            //    return true;
-
             if (!string.IsNullOrEmpty(x.Relation) && x.Relation.Contains(_familySearchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
@@ -2752,19 +2900,21 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 }
                 #endregion
 
-                // Set flag to display the loading panel
-                _isRunning = true;
+                #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                //// Set flag to display the loading panel
+                //_isRunning = true;
 
-                // Set the overlay message
-                overlayMessage = "Saving changes, please wait...";
+                //// Set the overlay message
+                //overlayMessage = "Saving changes, please wait...";
 
-                _ = SaveFamilyMemberAsync(async () =>
-                {
-                    _isRunning = false;
+                //_ = SaveFamilyMemberAsync(async () =>
+                //{
+                //    _isRunning = false;
 
-                    // Shows the spinner overlay
-                    await InvokeAsync(StateHasChanged);
-                }, item);
+                //    // Shows the spinner overlay
+                //    await InvokeAsync(StateHasChanged);
+                //}, item);
+                #endregion
             }
             catch (OperationCanceledException)
             {
@@ -2911,19 +3061,27 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     }
                     #endregion
 
-                    // Set flag to display the loading panel
-                    _isRunning = true;
+                    // Add locally to the list so UI updates immediately
+                    employee.FamilyMemberList.Add(newMember);
 
-                    // Set the overlay message
-                    overlayMessage = "Adding family member, please wait...";
+                    // Refresh the page
+                    await InvokeAsync(StateHasChanged);
 
-                    _ = SaveFamilyMemberAsync(async () =>
-                    {
-                        _isRunning = false;
+                    #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
 
-                        // Shows the spinner overlay
-                        await InvokeAsync(StateHasChanged);
-                    }, newMember);
+                    //// Set the overlay message
+                    //overlayMessage = "Adding family member, please wait...";
+
+                    //_ = SaveFamilyMemberAsync(async () =>
+                    //{
+                    //    _isRunning = false;
+
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, newMember);
+                    #endregion
                 }
             }
             catch (Exception ex)
@@ -3045,20 +3203,20 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                         await InvokeAsync(StateHasChanged);
                     }
 
-                    #region Persist changes to DB
-                    // Set flag to display the loading panel
-                    _isRunning = true;
+                    #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
 
-                    // Set the overlay message
-                    overlayMessage = "Saving family member, please wait...";
+                    //// Set the overlay message
+                    //overlayMessage = "Saving family member, please wait...";
 
-                    _ = SaveFamilyMemberAsync(async () =>
-                    {
-                        _isRunning = false;
+                    //_ = SaveFamilyMemberAsync(async () =>
+                    //{
+                    //    _isRunning = false;
 
-                        // Shows the spinner overlay
-                        await InvokeAsync(StateHasChanged);
-                    }, updated);
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, updated);
                     #endregion
                 }
             }
@@ -3092,7 +3250,12 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                BeginDeleteFamilyMember(familyMember);
+                //BeginDeleteFamilyMember(familyMember);
+
+                // Remove locally from the list so UI updates immediately
+                employee.FamilyMemberList.Remove(familyMember);
+
+                await InvokeAsync(StateHasChanged);
             }
         }
 
@@ -3239,19 +3402,21 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 }
                 #endregion
 
-                // Set flag to display the loading panel
-                _isRunning = true;
+                #region Save changes to database
+                //// Set flag to display the loading panel
+                //_isRunning = true;
 
-                // Set the overlay message
-                overlayMessage = "Saving changes, please wait...";
+                //// Set the overlay message
+                //overlayMessage = "Saving changes, please wait...";
 
-                _ = SaveFamilyVisaAsync(async () =>
-                {
-                    _isRunning = false;
+                //_ = SaveFamilyVisaAsync(async () =>
+                //{
+                //    _isRunning = false;
 
-                    // Shows the spinner overlay
-                    await InvokeAsync(StateHasChanged);
-                }, item);
+                //    // Shows the spinner overlay
+                //    await InvokeAsync(StateHasChanged);
+                //}, item);
+                #endregion
             }
             catch (OperationCanceledException)
             {
@@ -3378,19 +3543,27 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     }
                     #endregion
 
-                    // Set flag to display the loading panel
-                    _isRunning = true;
+                    // Add locally to the list so UI updates immediately
+                    employee.FamilyVisaList.Add(newVisa);
 
-                    // Set the overlay message
-                    overlayMessage = "Adding family visa, please wait...";
+                    // Refresh the page
+                    await InvokeAsync(StateHasChanged);
 
-                    _ = SaveFamilyVisaAsync(async () =>
-                    {
-                        _isRunning = false;
+                    #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
 
-                        // Shows the spinner overlay
-                        await InvokeAsync(StateHasChanged);
-                    }, newVisa);
+                    //// Set the overlay message
+                    //overlayMessage = "Adding family visa, please wait...";
+
+                    //_ = SaveFamilyVisaAsync(async () =>
+                    //{
+                    //    _isRunning = false;
+
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, newVisa);
+                    #endregion
                 }
             }
             catch (Exception ex)
@@ -3483,19 +3656,19 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     }
 
                     #region Persist changes to DB (Code commented since data will be saved upon clicking the Save button)
-                    // Set flag to display the loading panel
-                    _isRunning = true;
+                    //// Set flag to display the loading panel
+                    //_isRunning = true;
 
-                    // Set the overlay message
-                    overlayMessage = "Saving family visa, please wait...";
+                    //// Set the overlay message
+                    //overlayMessage = "Saving family visa, please wait...";
 
-                    _ = SaveFamilyVisaAsync(async () =>
-                    {
-                        _isRunning = false;
+                    //_ = SaveFamilyVisaAsync(async () =>
+                    //{
+                    //    _isRunning = false;
 
-                        // Shows the spinner overlay
-                        await InvokeAsync(StateHasChanged);
-                    }, updated);
+                    //    // Shows the spinner overlay
+                    //    await InvokeAsync(StateHasChanged);
+                    //}, updated);
                     #endregion
                 }
             }
@@ -3529,7 +3702,12 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             var result = await dialog.Result;
             if (result != null && !result.Canceled)
             {
-                BeginDeleteFamilyVisa(familyVisa);
+                // Remove locally from the list so UI updates immediately
+                employee.FamilyVisaList.Remove(familyVisa);
+
+                await InvokeAsync(StateHasChanged);
+
+                //BeginDeleteFamilyVisa(familyVisa);
             }
         }
 
@@ -3654,123 +3832,6 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
             await EditEmploymentAsync(item);
         }
 
-        //private void FamilyCommittedItemChanges(EmploymentHistoryDTO item)
-        //{
-        //    try
-        //    {
-        //        if (item == null) return;
-
-        //        #region Get selected relation
-        //        if (!string.IsNullOrEmpty(item.RelationCode))
-        //        {
-        //            UserDefinedCodeDTO? udc = _relationTypeList.Where(d => d.UDCCode == item.RelationCode).FirstOrDefault();
-        //            if (udc != null)
-        //                item.Relation = udc.UDCDesc1;
-        //        }
-        //        #endregion
-
-        //        #region Get selected qualification
-        //        if (!string.IsNullOrEmpty(item.QualificationCode))
-        //        {
-        //            UserDefinedCodeDTO? udc = _qualificationList.Where(d => d.UDCCode == item.QualificationCode).FirstOrDefault();
-        //            if (udc != null)
-        //                item.Qualification = udc.UDCDesc1;
-        //        }
-        //        #endregion
-
-        //        #region Get selected stream
-        //        if (!string.IsNullOrEmpty(item.StreamCode))
-        //        {
-        //            UserDefinedCodeDTO? udc = _streamList.Where(d => d.UDCCode == item.StreamCode).FirstOrDefault();
-        //            if (udc != null)
-        //                item.StreamDesc = udc.UDCDesc1;
-        //        }
-        //        #endregion
-
-        //        #region Get selected specialization
-        //        if (!string.IsNullOrEmpty(item.SpecializationCode))
-        //        {
-        //            UserDefinedCodeDTO? udc = _specializationList.Where(d => d.UDCCode == item.SpecializationCode).FirstOrDefault();
-        //            if (udc != null)
-        //                item.Specialization = udc.UDCDesc1;
-        //        }
-        //        #endregion
-
-        //        #region Get selected country
-        //        if (!string.IsNullOrEmpty(item.CountryCode))
-        //        {
-        //            UserDefinedCodeDTO? udc = _countryList.Where(d => d.UDCCode == item.CountryCode).FirstOrDefault();
-        //            if (udc != null)
-        //                item.Country = udc.UDCDesc1;
-        //        }
-        //        #endregion
-
-        //        // Set flag to display the loading panel
-        //        _isRunning = true;
-
-        //        // Set the overlay message
-        //        overlayMessage = "Saving changes, please wait...";
-
-        //        _ = SaveFamilyMemberAsync(async () =>
-        //        {
-        //            _isRunning = false;
-
-        //            // Shows the spinner overlay
-        //            await InvokeAsync(StateHasChanged);
-        //        }, item);
-        //    }
-        //    catch (OperationCanceledException)
-        //    {
-        //        ShowNotification("Save cancelled (navigated away).", NotificationType.Warning);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ShowNotification($"Error: {ex.Message}", NotificationType.Error);
-        //    }
-        //}
-
-        //private async Task SaveEmploymentAsync(Func<Task> callback, EmploymentHistoryDTO employment)
-        //{
-        //    // Wait for 1 second then gives control back to the runtime
-        //    await Task.Delay(500);
-
-        //    // Reset error messages
-        //    _errorMessage.Clear();
-
-        //    // Initialize the cancellation token
-        //    _cts = new CancellationTokenSource();
-
-        //    var result = await EmployeeService.SaveFamilyMemberAsync(employment, _cts.Token);
-        //    if (!result.Success)
-        //    {
-        //        // Set the error message
-        //        _errorMessage.AppendLine(result.Error!);
-        //        ShowHideError(true);
-        //    }
-        //    else
-        //    {
-        //        if (employment.AutoId == 0)
-        //        {
-        //            // Get the new identity seed
-        //            employment.AutoId = result.Value;
-
-        //            // Add locally to the list so UI updates immediately
-        //            employee.FamilyMemberList.Add(employment);
-
-        //            StateHasChanged();
-        //        }
-
-        //        // Show notification
-        //        ShowNotification("Family member has been saved successfully!", NotificationType.Success);
-        //    }
-
-        //    if (callback != null)
-        //    {
-        //        // Hide the spinner overlay
-        //        await callback.Invoke();
-        //    }
-        //}
-
         private async Task AddEmploymentAsync()
         {
             try
@@ -3849,21 +3910,6 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                     employee.EmploymentHistoryList.Add(newEmployment);
 
                     await InvokeAsync(StateHasChanged);
-
-                    #region Save to database
-                    //_isRunning = true;
-
-                    //// Set the overlay message
-                    //overlayMessage = "Adding employment history, please wait...";
-
-                    //_ = SaveEmploymentAsync(async () =>
-                    //{
-                    //    _isRunning = false;
-
-                    //    // Shows the spinner overlay
-                    //    await InvokeAsync(StateHasChanged);
-                    //}, newEmployment);
-                    #endregion
                 }
             }
             catch (Exception ex)
@@ -3959,22 +4005,6 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                         employee.EmploymentHistoryList[index] = updated;
                         await InvokeAsync(StateHasChanged);
                     }
-
-                    #region Persist changes to DB
-                    //// Set flag to display the loading panel
-                    //_isRunning = true;
-
-                    //// Set the overlay message
-                    //overlayMessage = "Saving family member, please wait...";
-
-                    //_ = SaveFamilyMemberAsync(async () =>
-                    //{
-                    //    _isRunning = false;
-
-                    //    // Shows the spinner overlay
-                    //    await InvokeAsync(StateHasChanged);
-                    //}, updated);
-                    #endregion
                 }
             }
             catch (Exception ex)
@@ -4013,88 +4043,6 @@ namespace KenHRApp.Web.Components.Pages.CoreHR
                 await InvokeAsync(StateHasChanged);
             }
         }
-
-        //private void BeginDeleteEmployment(EmploymentHistoryDTO employment)
-        //{
-        //    try
-        //    {
-        //        // Set flag to display the loading panel
-        //        _isRunning = true;
-
-        //        // Set the overlay message
-        //        overlayMessage = "Deleting employment, please wait...";
-
-        //        _ = DeleteFamilyMemberAsync(async () =>
-        //        {
-        //            _isRunning = false;
-
-        //            // Hide the spinner overlay
-        //            await InvokeAsync(StateHasChanged);
-
-        //            // Remove locally from the list so UI updates immediately
-        //            employee.EmploymentHistoryList.Remove(employment);
-
-        //            StateHasChanged();
-
-        //        }, employment);
-        //    }
-        //    catch (OperationCanceledException)
-        //    {
-        //        ShowNotification("Delete cancelled (navigated away).", NotificationType.Warning);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ShowNotification($"Error: {ex.Message}", NotificationType.Error);
-        //    }
-        //}
-
-        //private async Task DeleteFamilyMemberAsync(Func<Task> callback, FamilyMemberDTO familyMember)
-        //{
-        //    // Wait for 1 second then gives control back to the runtime
-        //    await Task.Delay(500);
-
-        //    // Reset error messages
-        //    _errorMessage.Clear();
-
-        //    // Initialize the cancellation token
-        //    _cts = new CancellationTokenSource();
-
-        //    bool isSuccess = false;
-        //    string errorMsg = string.Empty;
-
-        //    if (familyMember.AutoId == 0)
-        //    {
-        //        errorMsg = "Family Member ID is not defined.";
-        //    }
-        //    else
-        //    {
-        //        var deleteResult = await EmployeeService.DeleteFamilyMemberAsync(familyMember.AutoId, _cts.Token);
-        //        isSuccess = deleteResult.Success;
-        //        if (!isSuccess)
-        //            errorMsg = deleteResult.Error!;
-        //    }
-
-        //    if (isSuccess)
-        //    {
-        //        // Show notification
-        //        ShowNotification("The selected familyMember has been deleted successfully!", NotificationType.Success);
-        //    }
-        //    else
-        //    {
-        //        if (!string.IsNullOrEmpty(errorMsg))
-        //        {
-        //            // Display error message
-        //            _errorMessage.AppendLine(errorMsg);
-        //            ShowHideError(true);
-        //        }
-        //    }
-
-        //    if (callback != null)
-        //    {
-        //        // Hide the spinner overlay
-        //        await callback.Invoke();
-        //    }
-        //}
         #endregion
 
         #endregion

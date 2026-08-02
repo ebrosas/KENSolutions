@@ -532,6 +532,21 @@ h1:focus {
     text-align: left;
 }
 
+.emergency-contact-grid .col-country {
+    width: 150px !important;
+    text-align: left;
+}
+
+.emergency-contact-grid .col-city {
+    width: 170px !important;
+    text-align: left;
+}
+
+.emergency-contact-grid .col-mobile {
+    width: 150px !important;
+    text-align: left;
+}
+
 .emergency-contact-grid .flex-column {
     width: auto; /* allow flex growth */
     flex: 1; /* take remaining space */

@@ -999,6 +999,7 @@
                                     </MudAppBar>
                                     <MudPaper Elevation="4" Square="true" Class="w-100 mb-3">                            
                                         <MudDataGrid T="EmergencyContactDTO" Items="@employee.EmergencyContactList" Hover="true" Striped="true" Class="emergency-contact-grid" 
+                                            TableClass="fixed-table" TableStyle="table-layout: fixed; width: 100%;"
                                             Filterable="@_emergencyFilter" FilterMode="@DataGridFilterMode.ColumnFilterMenu" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.CaseInsensitive"
                                             QuickFilter="@_emergencyQuickFilter" Hideable="true" PageSize="5"
                                             EditTrigger="DataGridEditTrigger.Manual" ReadOnly="@(!_allowGridEdit)" EditMode="DataGridEditMode.Form"
@@ -1009,8 +1010,8 @@
                                                 BackdropClick = false,
                                                 CloseOnEscapeKey = false
                                             }"
-                                            StartedEditingItem="@EmergencyStartedEditingItem" CommittedItemChanges="@EmergencyCommittedItemChanges"
-                                                TableLayout="TableLayout.Fixed" Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
+                                            StartedEditingItem="@EmergencyStartedEditingItem" 
+                                            Bordered="false" Dense="true" ColumnResizeMode="ResizeMode.Column" HorizontalScrollbar="true">
                                             <ToolBarContent>
                                                  <MudPaper Class="d-flex justify-content-start m-0 p-0" Elevation="0">
                                                      <MudTextField @bind-Value="_emergencySearchString" Placeholder="Enter search string" 
@@ -1021,7 +1022,6 @@
                                                  </MudPaper>
                                                 <MudSpacer />
                                                 <MudPaper Class="d-flex justify-content-end m-0 p-0" Elevation="0">
-                                                    @* <MudSwitch @bind-Value="_emergencyFilter" Disabled="@(!_allowGridEdit)" Color="Color.Success" UncheckedColor="Color.Default">Custom Filter</MudSwitch> *@
                                                     <MudSwitch @bind-Value="_emergencyFilter"
                                                         Disabled="@(!_allowGridEdit)"                                                        
                                                         ThumbIcon="@(_emergencyFilter==true ? Icons.Material.Filled.Done : Icons.Material.Filled.Close)"
@@ -1033,18 +1033,12 @@
                                                             StartIcon="@Icons.Material.Filled.Add" 
                                                             Size="Size.Small" title="Add new contact person" 
                                                             Disabled="@(!_allowGridEdit)"
-                                                                 OnClick="AddEmergencyContactAsync" />
+                                                            OnClick="AddEmergencyContactAsync" />
                                                      </MudPaper>                             
                                                 </MudPaper>
                                             </ToolBarContent>
                                             <Columns>
-                                                <PropertyColumn Property="x => x.ContactPerson" Title="Contact Person" Class="col-contact-person" StickyLeft="true">
-                                                    <EditTemplate Context="row">
-                                                        <MudTextField @bind-Value="row.Item.ContactPerson" Label="Contact Person" HelperText="Maximum input is 200 chars."
-                                                            Variant="Variant.Text" HelperTextOnFocus="true" Counter="200" MaxLength="200"
-                                                            Required RequiredError="Contact Person is required"
-                                                            Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                    </EditTemplate>
+                                                 <PropertyColumn Property="x => x.ContactPerson" Title="Contact Person" Class="col-contact-person" StickyLeft="true" Editable="false">
                                                     <CellTemplate Context="row">
                                                         <MudChip T="long" 
                                                             Size=Size.Small
@@ -1056,88 +1050,43 @@
                                                         </MudChip>
                                                     </CellTemplate>
                                                 </PropertyColumn>  
-                                                <PropertyColumn Property="x => x.Address" Class="col-contact-address">
-                                                    <EditTemplate Context="row">
-                                                        <MudTextField @bind-Value="row.Item.Address" Label="Address" HelperText="Maximum input is 300 chars."
-                                                            Variant="Variant.Outlined" HelperTextOnFocus="true" Counter="300" MaxLength="300" Lines="3"
-                                                            Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                    </EditTemplate>
-                                                </PropertyColumn>
-                                                <PropertyColumn Property="x => x.Relation" Title="Relationship" Class="col-relationship">
-                                                    <EditTemplate Context="row">
-                                                        <MudAutocomplete @bind-Value="row.Item.Relation"
-                                                              SearchFunc="SearchRelationship!"
-                                                              Variant="Variant.Text"
-                                                              Label="Relationship"
-                                                              Margin="Margin.Normal"
-                                                              Dense="true"
-                                                              Placeholder="Please Select"
-                                                              HelperText="Type a key to search for relationship"
-                                                              HelperTextOnFocus="true"
-                                                              Clearable="true" Typo="Typo.subtitle2"
-                                                              MaxItems="@(_relationTypeList != null ? _relationTypeList.Count : 10)"
-                                                              Modal="true" />
-                                                    </EditTemplate>
-                                                </PropertyColumn>
-                                                <PropertyColumn Property="x => x.CountryDesc" Title="Country">
-                                                    <EditTemplate Context="row">
-                                                        <MudAutocomplete @bind-Value="row.Item.CountryDesc"
-                                                            SearchFunc="SearchCountry!"
-                                                              Variant="Variant.Text"
-                                                              Label="Country"
-                                                              Margin="Margin.Normal"
-                                                              Dense="true"
-                                                              Placeholder="Please Select"
-                                                              HelperText="Type a key to search for country"
-                                                              HelperTextOnFocus="true"
-                                                              Clearable="true" Typo="Typo.subtitle2"
-                                                              MaxItems="@(_countryList != null ? _countryList.Count : 10)"
-                                                              Modal="true" />
-                                                    </EditTemplate>
-                                                </PropertyColumn> 
-                                                <PropertyColumn Property="x => x.City" Title="City">
-                                                    <EditTemplate Context="row">
-                                                        <MudTextField @bind-Value="row.Item.City" Label="City" HelperText="Maximum input is 100 chars."
-                                                            Variant="Variant.Text" HelperTextOnFocus="true" Counter="100" MaxLength="100"
-                                                            Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                    </EditTemplate>
-                                                </PropertyColumn>
-                                                <PropertyColumn Property="x => x.MobileNo" Title="Mobile No.">
-                                                    <EditTemplate Context="row">
-                                                        <MudTextField @bind-Value="row.Item.MobileNo" Label="Mobile No." HelperText="Maximum input is 20 chars."
-                                                            Variant="Variant.Text" HelperTextOnFocus="true" Counter="20" MaxLength="20"
-                                                            Required RequiredError="Mobile No. is required"
-                                                            Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                    </EditTemplate>
-                                                </PropertyColumn>
-                                                <PropertyColumn Property="x => x.LandlineNo" Title="Landline No.">
-                                                     <EditTemplate Context="row">
-                                                         <MudTextField @bind-Value="row.Item.LandlineNo" Label="Landline No." HelperText="Maximum input is 20 chars."
-                                                            Variant="Variant.Text" HelperTextOnFocus="true" Counter="20" MaxLength="20"
-                                                            Immediate="true" Margin="Margin.Dense" Typo="Typo.subtitle2" />
-                                                     </EditTemplate>
-                                                </PropertyColumn>
-                                                @* <TemplateColumn Hidden="false" CellClass="d-flex justify-end">
+                                                <PropertyColumn Property="x => x.Address" Title="Address" Class="col-contact-address" Editable="false">
                                                     <CellTemplate Context="row">
-                                                         <MudIconButton Color="Color.Info" Disabled="@(!_allowGridEdit)" title="Edit record" Class="show-btn fa-icon-btn" OnClick="@row.Actions.StartEditingItemAsync">
-                                                            <ChildContent>
-                                                                <i class="fas fa-edit fa-1x"></i>
-                                                            </ChildContent>
-                                                        </MudIconButton>
-                                                         <MudIconButton Color="Color.Error" Disabled="@(!_allowGridEdit)" title="Delete selected emergency contact" Class="fa-icon-btn" OnClick="() => ConfirmDeleteEmergency(row.Item)">
-                                                            <ChildContent>
-                                                                <i class="fas fa-trash-alt fa-1x"></i>
-                                                            </ChildContent>
-                                                        </MudIconButton>
+                                                        @row.Item.Address
                                                     </CellTemplate>
-                                                </TemplateColumn> *@
+                                                </PropertyColumn>
+                                                <PropertyColumn Property="x => x.Relation" Title="Role" Class="col-relationship" Editable="false">
+                                                    <CellTemplate Context="row">
+                                                        @row.Item.Relation
+                                                    </CellTemplate>
+                                                </PropertyColumn>
+                                                <PropertyColumn Property="x => x.CountryDesc" Title="Country" Class="col-country" Editable="false">
+                                                    <CellTemplate Context="row">
+                                                        @row.Item.CountryDesc
+                                                    </CellTemplate>
+                                                </PropertyColumn>
+                                                <PropertyColumn Property="x => x.City" Title="City" Class="col-city" Editable="false">
+                                                    <CellTemplate Context="row">
+                                                        @row.Item.City
+                                                    </CellTemplate>
+                                                </PropertyColumn>
+                                                <PropertyColumn Property="x => x.MobileNo" Title="Mobile No." Class="col-mobile" Editable="false">
+                                                    <CellTemplate Context="row">
+                                                        @row.Item.MobileNo
+                                                    </CellTemplate>
+                                                </PropertyColumn>
+                                                <PropertyColumn Property="x => x.LandlineNo" Title="Landline No." Class="col-mobile" Editable="false">
+                                                    <CellTemplate Context="row">
+                                                        @row.Item.LandlineNo
+                                                    </CellTemplate>
+                                                </PropertyColumn>
                                                 <TemplateColumn CellClass="d-flex justify-end" Title="Actions">
                                                     <CellTemplate Context="row">
                                                         <MudIconButton title="Edit details" 
                                                             Class="show-btn fa-icon-btn"
                                                             Color="Color.Surface"
                                                             Disabled="@(!_allowGridEdit)"
-                                                            OnClick="@row.Actions.StartEditingItemAsync">
+                                                                       OnClick="@(() => EditEmergencyContactAsync(row.Item))">
                                                             <ChildContent>
                                                                 <i class="fas fa-pen-alt fa-1x"></i>
                                                             </ChildContent>
@@ -3051,7 +3000,7 @@
                     </MudStack>
                 </div>
             </MudTabPanel>
-            <MudTabPanel Text="Documents" ToolTip="Manage employee-related documents" Icon="@Icons.Material.Rounded.DocumentScanner">
+            <MudTabPanel Text="Documents" ToolTip="Manage employee-related documents" Icon="@Icons.Material.Rounded.DocumentScanner" Visible="false">
                 <div id="otherDocsPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
                     <MudExpansionPanels Elevation="0" MultiExpansion="true">
                         <MudExpansionPanel Class="pt-0 mt-0" Dense Gutters Expanded>
