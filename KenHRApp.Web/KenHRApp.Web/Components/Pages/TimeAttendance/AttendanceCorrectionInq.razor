@@ -4,10 +4,10 @@
 <MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
      <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Attendance Corrections</MudText>
      <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserFullName</MudText>
-    </MudStack>
+</MudStack>
 
-    <MudContainer MaxWidth="MaxWidth.False" Class="px-4">
-        @if (_hasValidationError && _validationMessages.Any())
+<MudContainer MaxWidth="MaxWidth.False" Class="px-4">
+    @if (_hasValidationError && _validationMessages.Any())
     {
         <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
             <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
@@ -32,7 +32,7 @@
 
     <MudPaper class="paper-header w-100 px-4" Elevation="0">
         <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
-                        CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
+            CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
         <MudSpacer></MudSpacer>
 
         <MudPaper Elevation="0">

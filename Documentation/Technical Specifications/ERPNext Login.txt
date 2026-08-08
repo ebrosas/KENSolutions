@@ -1,0 +1,2 @@
+http://erpnext.garmco.com/desk/salary-component
+Pwd: erpadmin

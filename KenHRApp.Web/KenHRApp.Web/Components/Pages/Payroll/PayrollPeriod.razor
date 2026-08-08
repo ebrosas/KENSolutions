@@ -1,0 +1,105 @@
+﻿@page "/Payroll/PayrollPeriod"
+@using KenHRApp.Application.DTOs.Payroll
+
+<MudStack Row AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween" Spacing="0">
+     <MudText Typo="Typo.subtitle1" Align="Align.Left" Class="pb-1 ps-4 fw-bolder" Style="color: #004165;">Payroll Period</MudText>
+     <MudText Typo="Typo.subtitle2" Align="Align.Right" Class="pb-1 pe-4 fw-bold text-muted">Welcome, @UserFullName</MudText>
+</MudStack>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="px-4">
+        @if (_hasValidationError && _validationMessages.Any())
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mb-2">
+            <MudText Typo="Typo.subtitle1"><strong>Please correct the following data entry errors:</strong></MudText>
+            <ul style="margin:0; padding-left:20px;">
+                @foreach (var msg in _validationMessages)
+                {
+                    <li>
+                        <MudText Typo="Typo.subtitle2" Class="text-white">@msg</MudText>
+                        </li>
+                }
+            </ul>
+        </MudAlert>
+    }
+
+    @if (_showErrorAlert)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Left"
+                  ShowCloseIcon="true" CloseIconClicked="(() => ShowHideError(false))">
+            @_errorMessage
+        </MudAlert>
+    }
+
+    <MudPaper class="paper-header w-100 px-4" Elevation="0">
+        <MudBreadcrumbs Items="@_breadcrumbItems" SeparatorIcon="@Icons.Material.Filled.ChevronRight"
+            CollapseIcon="@Icons.Material.Filled.MoreHoriz" MaxItems="4" Class="mud-breadcrumbs" />
+        <MudSpacer></MudSpacer>
+
+        <MudPaper Elevation="0">
+            <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.Start" Class="mud-width-full mt-0" Spacing="2">
+                 <MudButton Variant="Variant.Filled"
+                            Color="Color.Primary"
+                            Style="background-color:#004165;"
+                            Class="mt-1 px-4"
+                            FullWidth="false"
+                            Size="Size.Small"
+                            StartIcon="@Icons.Material.Filled.PersonSearch"
+                            Disabled="@_isRunning">
+                     @if (_isRunning)
+                    {
+                        <span>Searching...</span>
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+                    }
+                    else
+                    {
+                        <span>Search</span>
+                    }
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           ButtonType="ButtonType.Reset"
+                           Color="Color.Warning"
+                           Style="background-color:#004165;"
+                           FullWidth="false"
+                           Class="mt-1 px-4"
+                           Size="Size.Small"
+                           Disabled="@_isRunning"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           OnClick="HandleRefreshButton">
+                    Reset
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    </MudPaper>
+
+    <div id="mainPanel" class="ma-0 full-height" style="overflow-y: scroll; scrollbar-width: none;">
+        <MudStack AlignItems="AlignItems.Start" Justify="Justify.FlexStart" Spacing="0" Wrap="Wrap.NoWrap" Class="pe-2 mb-0">
+            <MudPaper Elevation="0" Square="true" Class="w-100">
+            </MudPaper>
+
+            <MudAppBar Class="rounded-t-lg mt-3 employee-master-appbar" Fixed="false" Dense="true" Style="background-color: #546E7A">
+                <MudText Typo="Typo.button" HtmlTag="h3" Class="text-white">REQUISITIONS LIST</MudText>
+                <MudSpacer />
+                <MudMenu Dense Variant="Variant.Text" Size="Size.Small" Color="Color.Inherit" Icon="@Icons.Material.Filled.Menu" hidden>
+                     <MudMenuItem ForceLoad Icon="@Icons.Material.Filled.AddCircle" IconColor="Color.Dark" Label="Apply Regularization" />
+                 </MudMenu>
+             </MudAppBar>
+
+             <MudScrollToTop TopOffset="100"
+                             Style="position: fixed !important;bottom: 20px;left: 50%;transform: translateX(-50%);right: auto !important;z-index: 2000;"
+                             Selector="#mainPanel"
+                             VisibleCssClass="visible absolute"
+                             HiddenCssClass="hidden absolute">
+                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Error">Go to top</MudButton>
+             </MudScrollToTop>
+        </MudStack>
+    </div>
+</MudContainer>
+
+ <!-- Full-screen overlay -->
+ @if (_isRunning)
+{
+    <div class="fullscreen-overlay">
+        <MudProgressCircular Indeterminate="true" Size="Size.Medium" Color="Color.Info" />
+        <MudText Typo="Typo.h6" Class="mt-2 text-white">@overlayMessage</MudText>
+        </div>
+}
