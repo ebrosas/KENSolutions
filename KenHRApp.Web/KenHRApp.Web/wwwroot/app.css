@@ -3082,5 +3082,12 @@ employee-autocomplete .mud-input-adornment .mud-icon-button {
 }
 /* #endregion*/
 
+/* #region Lovable Stylesheets */
+.hrms-kpi-card {
+    border-radius: var(--hrms-radius);
+    height: 100%;
+}
+/* #endregion */
+
 
 

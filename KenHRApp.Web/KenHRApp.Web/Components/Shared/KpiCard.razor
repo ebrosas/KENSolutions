@@ -1,0 +1,27 @@
+﻿<MudPaper Class="hrms-kpi-card pa-4" Elevation="1">
+    <div class="d-flex align-start justify-space-between">
+        <div>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">@Label</MudText>
+                <MudText Typo="Typo.h2" Class="mt-1">@Value</MudText>
+                @if (!string.IsNullOrWhiteSpace(Trend))
+            {
+                <MudText Typo="Typo.caption" Color="@(TrendPositive ? Color.Success : Color.Error)" Class="mt-1">
+                    <i class="@(TrendPositive ? "fa-solid fa-arrow-trend-up" : "fa-solid fa-arrow-trend-down")" aria-hidden="true"></i>
+                    @Trend
+                </MudText>
+            }
+        </div>
+        <MudAvatar Color="@Color" Variant="Variant.Filled" Size="Size.Medium">
+            <i class="@Icon" aria-hidden="true"></i>
+        </MudAvatar>
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Value { get; set; } = string.Empty;
+    [Parameter] public string Icon { get; set; } = "fa-solid fa-chart-simple";
+    [Parameter] public string? Trend { get; set; }
+    [Parameter] public bool TrendPositive { get; set; } = true;
+    [Parameter] public Color Color { get; set; } = Color.Primary;
+}

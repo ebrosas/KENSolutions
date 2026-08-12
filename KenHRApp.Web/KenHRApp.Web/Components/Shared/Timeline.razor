@@ -1,0 +1,17 @@
+﻿<MudTimeline TimelinePosition="TimelinePosition.Start">
+    @foreach (var entry in Entries)
+    {
+        <MudTimelineItem Color="@entry.Color" Size="Size.Small">
+            <ItemContent>
+                <MudText Typo="Typo.body2"><b>@entry.Title</b></MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@entry.Meta</MudText>
+                </ItemContent>
+            </MudTimelineItem>
+    }
+</MudTimeline>
+
+@code {
+    public sealed record TimelineEntry(string Title, string Meta, Color Color = Color.Primary);
+
+    [Parameter] public IReadOnlyList<TimelineEntry> Entries { get; set; } = Array.Empty<TimelineEntry>();
+}

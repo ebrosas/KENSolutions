@@ -18,6 +18,8 @@ using KenHRApp.Application.Common.Interfaces;
 using KenHRApp.Application.Common.Services;
 using KenHRApp.Infrastructure.Settings;
 using KenHRApp.Infrastructure.Persistence.Seed;
+using KenHRApp.Application.Features.Employees.Interfaces;
+using KenHRApp.Application.Features.Employees.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +64,7 @@ builder.Services.AddScoped<IWorkflowService, WorkflowService>();
 builder.Services.AddScoped<IWorkflowEmailService, WorkflowEmailService>();
 builder.Services.AddScoped<IWorkflowRepository, WorkflowRepository>();
 builder.Services.AddScoped<IUserSessionService, UserSessionService>();
+builder.Services.AddScoped<ILoveEmployeeService, LoveEmployeeService>();
 #endregion
 
 builder.Services.AddAuthentication(options =>
