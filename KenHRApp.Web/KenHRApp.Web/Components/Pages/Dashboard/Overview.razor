@@ -4,64 +4,406 @@
 
 <PageTitle>Dashboard · KEN-HR</PageTitle>
 
-<PageHeader Title="Workforce overview" Description="Live headcount, attendance and payroll signals across the organisation.">
-    <Actions>
-        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Download">Export</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Href="/core-hr/employees">Add employee</MudButton>
-    </Actions>
-</PageHeader>
+<div class="hr-dashboard">
 
-<MudGrid Spacing="3">
-    <MudItem xs="12" sm="6" md="3">
-        <KpiCard Label="Total headcount" Value="@Kpis.Headcount.ToString("N0")" Icon="fa-solid fa-users" Trend="+2.4% MoM" />
-    </MudItem>
-    <MudItem xs="12" sm="6" md="3">
-        <KpiCard Label="Present today" Value="@Kpis.PresentToday.ToString("N0")" Icon="fa-solid fa-user-check" Color="Color.Success" Trend="94.2% attendance" />
-    </MudItem>
-    <MudItem xs="12" sm="6" md="3">
-        <KpiCard Label="On leave" Value="@Kpis.OnLeave.ToString("N0")" Icon="fa-solid fa-umbrella-beach" Color="Color.Warning" Trend="-3 vs. yesterday" TrendPositive="false" />
-    </MudItem>
-    <MudItem xs="12" sm="6" md="3">
-        <KpiCard Label="Open requisitions" Value="@Kpis.OpenRequisitions.ToString("N0")" Icon="fa-solid fa-briefcase" Color="Color.Tertiary" Trend="+6 this month" />
-    </MudItem>
+    <!-- =========================================================
+         Dashboard Header / Welcome Area
+         ========================================================= -->
+    <MudPaper Class="dashboard-hero" Elevation="0">
 
-    <MudItem xs="12" md="8">
-        <MudPaper Class="pa-4" Elevation="1">
-            <MudText Typo="Typo.h3" Class="mb-4">Headcount trend</MudText>
-            <MudChart ChartType="ChartType.Line"
-                      ChartSeries="@HeadcountSeries"
-                      XAxisLabels="@Months"
-                      Width="100%"
-                      Height="320px" />
-        </MudPaper>
-    </MudItem>
+        <div class="dashboard-hero-content">
 
-    <MudItem xs="12" md="4">
-        <MudPaper Class="pa-4" Elevation="1">
-            <MudText Typo="Typo.h3" Class="mb-4">Workforce by division</MudText>
-            <MudChart ChartType="ChartType.Donut"
-                      InputData="@DivisionData"
-                      InputLabels="@DivisionLabels"
-                      Width="100%"
-                      Height="300px" />
-        </MudPaper>
-    </MudItem>
+            <div>
+                <MudText Typo="Typo.h4" Class="dashboard-title">
+                    Workforce overview
+                </MudText>
 
-    <MudItem xs="12" md="7">
-        <MudPaper Class="pa-4" Elevation="1">
-            <MudText Typo="Typo.h3" Class="mb-4">Attendance this week</MudText>
-            <MudChart ChartType="ChartType.Bar"
-                      ChartSeries="@AttendanceSeries"
-                      XAxisLabels="@Weekdays"
-                      Width="100%"
-                      Height="300px" />
-        </MudPaper>
-    </MudItem>
+                <MudText Typo="Typo.body1" Class="dashboard-subtitle">
+                    A gentle view of your organisation's people, attendance
+                    and workforce activity.
+                </MudText>
+            </div>
 
-    <MudItem xs="12" md="5">
-        <MudPaper Class="pa-4" Elevation="1">
-            <MudText Typo="Typo.h3" Class="mb-2">Recent activity</MudText>
-            <Timeline Entries="Activity" />
-        </MudPaper>
-    </MudItem>
-</MudGrid>
+            <div class="dashboard-actions">
+
+                <MudButton Variant="Variant.Outlined"
+                           StartIcon="@Icons.Material.Filled.Download"
+                           Class="soft-action-button">
+                    Export
+                </MudButton>
+
+                <MudButton Variant="Variant.Filled"
+                           StartIcon="@Icons.Material.Filled.PersonAdd"
+                           Href="/core-hr/employees"
+                           Class="primary-action-button">
+                    Add employee
+                </MudButton>
+
+            </div>
+
+        </div>
+
+        <div class="hero-accent">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+    </MudPaper>
+
+
+    <!-- =========================================================
+         KPI Summary
+         ========================================================= -->
+    <MudText Typo="Typo.h6"
+             Class="section-heading">
+        Today at a glance
+    </MudText>
+
+    <MudText Typo="Typo.body2"
+             Class="section-description">
+        A calm snapshot of your workforce today.
+    </MudText>
+
+
+    <MudGrid Spacing="3" Class="kpi-grid">
+
+        <MudItem xs="12" sm="6" md="3">
+
+            <MudPaper Class="wellness-kpi-card kpi-sage" Elevation="0">
+
+                <div class="kpi-card-header">
+
+                    <div>
+                        <MudText Typo="Typo.body2" Class="kpi-label">
+                            Total headcount
+                        </MudText>
+
+                        <MudText Typo="Typo.h4" Class="kpi-value">
+                            @Kpis.Headcount.ToString("N0")
+                        </MudText>
+                    </div>
+
+                    <div class="kpi-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+
+                </div>
+
+                <div class="kpi-footer">
+                    <span class="trend-positive">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                        +2.4% MoM
+                    </span>
+
+                    <span class="trend-label">
+                        workforce
+                    </span>
+                </div>
+
+            </MudPaper>
+
+        </MudItem>
+
+
+        <MudItem xs="12" sm="6" md="3">
+
+            <MudPaper Class="wellness-kpi-card kpi-mint" Elevation="0">
+
+                <div class="kpi-card-header">
+
+                    <div>
+                        <MudText Typo="Typo.body2" Class="kpi-label">
+                            Present today
+                        </MudText>
+
+                        <MudText Typo="Typo.h4" Class="kpi-value">
+                            @Kpis.PresentToday.ToString("N0")
+                        </MudText>
+                    </div>
+
+                    <div class="kpi-icon">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+
+                </div>
+
+                <div class="kpi-footer">
+                    <span class="trend-positive">
+                        <i class="fa-solid fa-circle-check"></i>
+                        94.2%
+                    </span>
+
+                    <span class="trend-label">
+                        attendance
+                    </span>
+                </div>
+
+            </MudPaper>
+
+        </MudItem>
+
+
+        <MudItem xs="12" sm="6" md="3">
+
+            <MudPaper Class="wellness-kpi-card kpi-sand" Elevation="0">
+
+                <div class="kpi-card-header">
+
+                    <div>
+                        <MudText Typo="Typo.body2" Class="kpi-label">
+                            On leave
+                        </MudText>
+
+                        <MudText Typo="Typo.h4" Class="kpi-value">
+                            @Kpis.OnLeave.ToString("N0")
+                        </MudText>
+                    </div>
+
+                    <div class="kpi-icon">
+                        <i class="fa-solid fa-umbrella-beach"></i>
+                    </div>
+
+                </div>
+
+                <div class="kpi-footer">
+                    <span class="trend-neutral">
+                        <i class="fa-solid fa-arrow-down"></i>
+                        -3
+                    </span>
+
+                    <span class="trend-label">
+                        vs. yesterday
+                    </span>
+                </div>
+
+            </MudPaper>
+
+        </MudItem>
+
+
+        <MudItem xs="12" sm="6" md="3">
+
+            <MudPaper Class="wellness-kpi-card kpi-blue" Elevation="0">
+
+                <div class="kpi-card-header">
+
+                    <div>
+                        <MudText Typo="Typo.body2" Class="kpi-label">
+                            Open requisitions
+                        </MudText>
+
+                        <MudText Typo="Typo.h4" Class="kpi-value">
+                            @Kpis.OpenRequisitions.ToString("N0")
+                        </MudText>
+                    </div>
+
+                    <div class="kpi-icon">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+
+                </div>
+
+                <div class="kpi-footer">
+                    <span class="trend-positive">
+                        <i class="fa-solid fa-plus"></i>
+                        +6
+                    </span>
+
+                    <span class="trend-label">
+                        this month
+                    </span>
+                </div>
+
+            </MudPaper>
+
+        </MudItem>
+
+    </MudGrid>
+
+
+    <!-- =========================================================
+         Workforce Insights
+         ========================================================= -->
+    <div class="section-header-row">
+
+        <div>
+            <MudText Typo="Typo.h6" Class="section-heading">
+                Workforce insights
+            </MudText>
+
+            <MudText Typo="Typo.body2" Class="section-description">
+                Trends and patterns across your organisation.
+            </MudText>
+        </div>
+
+        <MudChip T="string"
+                 Variant="Variant.Outlined"
+                 Size="Size.Small"
+                 Class="period-chip">
+            Last 6 months
+        </MudChip>
+
+    </div>
+
+
+    <MudGrid Spacing="3" Class="insights-grid">
+
+        <!-- Headcount Trend -->
+        <MudItem xs="12" md="8">
+
+            <MudPaper Class="wellness-chart-card" Elevation="0">
+
+                <div class="chart-card-header">
+
+                    <div>
+
+                        <MudText Typo="Typo.h6" Class="chart-title">
+                            Headcount trend
+                        </MudText>
+
+                        <MudText Typo="Typo.body2" Class="chart-description">
+                            How your workforce has changed over time.
+                        </MudText>
+
+                    </div>
+
+                    <div class="chart-icon sage-icon">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <MudChart ChartType="ChartType.Line"
+                              ChartSeries="@HeadcountSeries"
+                              XAxisLabels="@Months"
+                              Width="100%"
+                              Height="320px" />
+
+                </div>
+
+            </MudPaper>
+
+        </MudItem>
+
+
+        <!-- Division -->
+        <MudItem xs="12" md="4">
+
+            <MudPaper Class="wellness-chart-card" Elevation="0">
+
+                <div class="chart-card-header">
+
+                    <div>
+
+                        <MudText Typo="Typo.h6" Class="chart-title">
+                            Workforce by division
+                        </MudText>
+
+                        <MudText Typo="Typo.body2" Class="chart-description">
+                            Current workforce distribution.
+                        </MudText>
+
+                    </div>
+
+                    <div class="chart-icon sand-icon">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+
+                </div>
+
+                <div class="donut-container">
+
+                    <MudChart ChartType="ChartType.Donut"
+                              InputData="@DivisionData"
+                              InputLabels="@DivisionLabels"
+                              Width="100%"
+                              Height="300px" />
+
+                </div>
+
+            </MudPaper>
+
+        </MudItem>
+
+
+        <!-- Attendance -->
+        <MudItem xs="12" md="7">
+
+            <MudPaper Class="wellness-chart-card" Elevation="0">
+
+                <div class="chart-card-header">
+
+                    <div>
+
+                        <MudText Typo="Typo.h6" Class="chart-title">
+                            Attendance this week
+                        </MudText>
+
+                        <MudText Typo="Typo.body2" Class="chart-description">
+                            Daily attendance activity across the workforce.
+                        </MudText>
+
+                    </div>
+
+                    <div class="chart-icon mint-icon">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <MudChart ChartType="ChartType.Bar"
+                              ChartSeries="@AttendanceSeries"
+                              XAxisLabels="@Weekdays"
+                              Width="100%"
+                              Height="300px" />
+
+                </div>
+
+            </MudPaper>
+
+        </MudItem>
+
+
+        <!-- Recent Activity -->
+        <MudItem xs="12" md="5">
+
+            <MudPaper Class="wellness-chart-card activity-card" Elevation="0">
+
+                <div class="chart-card-header">
+
+                    <div>
+
+                        <MudText Typo="Typo.h6" Class="chart-title">
+                            Recent activity
+                        </MudText>
+
+                        <MudText Typo="Typo.body2" Class="chart-description">
+                            Latest workforce updates.
+                        </MudText>
+
+                    </div>
+
+                    <div class="chart-icon blue-icon">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+
+                </div>
+
+                <div class="activity-container">
+
+                    <Timeline Entries="Activity" />
+
+                </div>
+
+            </MudPaper>
+
+        </MudItem>
+
+    </MudGrid>
+
+</div>
