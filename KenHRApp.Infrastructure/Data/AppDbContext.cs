@@ -9,6 +9,8 @@ using System.Reflection.Metadata;
 using KenHRApp.Infrastructure.EntityConfiguration;
 using KenHRApp.Domain.Entities.KeylessModels;
 using KenHRApp.Domain.Entities.Workflow;
+using KenHRApp.Domain.Common;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace KenHRApp.Infrastructure.Data
 {
@@ -604,10 +606,19 @@ namespace KenHRApp.Infrastructure.Data
                     .HasDatabaseName("IX_PayrollPeriod_CompoKeys")
                     .IsUnique();
             });
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                // Domain events are in-memory only.
+                if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
+                {
+                    modelBuilder.Entity(entityType.ClrType).Ignore(nameof(BaseEntity.DomainEvents));
+                }
+            }
             #endregion
 
             #region Set Employee navigation                         
-            modelBuilder.Entity<Employee>(
+                modelBuilder.Entity<Employee>(
                 entity =>
                 {
                     entity.ToTable("Employee");

@@ -8,10 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.SymbolStore;
+using KenHRApp.Domain.Common;
+using KenHRApp.Domain.Enums;
 
 namespace KenHRApp.Domain.Entities
 {
-    public class Employee : IContactDetail, IEmploymentDetail, IAttributeDetail, IBankDetail, ISocialConnect, IPrimaryLocation, IAuthenticationDetail
+    public class Employee : AuditableEntity, IContactDetail, IEmploymentDetail, IAttributeDetail, IBankDetail, ISocialConnect, IPrimaryLocation, IAuthenticationDetail 
     {
         #region Personal Detail         
         [Comment("Primary key for Employee entity")]
@@ -21,10 +23,19 @@ namespace KenHRApp.Domain.Entities
         public string FirstName { get; set; } = null!;
 
         [Column(TypeName = "varchar(50)")]
+        public string? FirstNameAr { get; set; } = null;
+
+        [Column(TypeName = "varchar(50)")]
         public string? MiddleName { get; set; }
 
         [Column(TypeName = "varchar(50)")]
+        public string? MiddleNameAr { get; set; }
+
+        [Column(TypeName = "varchar(50)")]
         public string LastName { get; set; } = null!;
+
+        [Column(TypeName = "varchar(50)")]
+        public string LastNameAr { get; set; } = null!;
 
         [Column(TypeName = "varchar(100)")]
         public string Position { get; set; } = null!;
@@ -330,6 +341,20 @@ namespace KenHRApp.Domain.Entities
 
         [Column(TypeName = "bit")]
         public bool IsEmailVerified { get; set; }
+        #endregion
+
+        #region Lovable Properties
+        //public EmployeeStatus Status { get; set; } = EmployeeStatus.Draft;
+        public string? LocationCode { get; set; } = null;
+
+        [NotMapped]
+        public string? LocationDesc { get; set; }
+        //public Guid? ManagerId { get; set; }
+        //public Employee? Manager { get; set; }
+        //public Guid? DepartmentId { get; set; }
+        //public DepartmentMaster? Department { get; set; }
+        //public Guid? PositionId { get; set; }
+        //public Position? PositionType { get; set; }
         #endregion
 
         #region Extended Properties

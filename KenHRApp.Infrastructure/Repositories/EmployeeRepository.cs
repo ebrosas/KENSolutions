@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using KenHRApp.Domain.Entities;
 using KenHRApp.Domain.Models.Common;
 using KenHRApp.Infrastructure.Data;
-
+using KenHRApp.Infrastructure.Persistence.Repositories;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,18 +18,16 @@ using Microsoft.VisualBasic;
 
 namespace KenHRApp.Infrastructure.Repositories
 {
-    public class EmployeeRepository : IEmployeeRepository
+    public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
     {
         #region Fields
         private readonly AppDbContext _db;
-        //private readonly IDbContextFactory<AppDbContext> _contextFactory;
         #endregion
 
         #region Constructors                
-        public EmployeeRepository(AppDbContext db)
+        public EmployeeRepository(AppDbContext db) : base(db)
         {
             _db = db;
-            //_contextFactory = contextFactory;
         }
         #endregion
 
@@ -2792,5 +2790,26 @@ namespace KenHRApp.Infrastructure.Repositories
             }
         }
         #endregion
+
+        #region Lovable Methods
+        public Task<Employee?> GetByEmployeeNumberAsync(int employeeNumber, CancellationToken cancellationToken = default)
+        => _db.Employees
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.EmployeeNo == employeeNumber, cancellationToken);
+
+        public Task<bool> EmployeeNumberExistsAsync(int employeeNumber, Guid? excludeId = null, CancellationToken cancellationToken = default)
+            => _db.Employees.AnyAsync(
+                e => e.EmployeeNo == employeeNumber && (excludeId == null || e.Id != excludeId),
+                cancellationToken);
+
+        public Task<Employee?> GetDetailAsync(Guid id, CancellationToken cancellationToken = default)
+            => _db.Employees
+                .AsNoTracking()
+                .Include(e => e.DepartmentName)
+                .Include(e => e.Position)
+                .Include(e => e.LocationDesc)
+                .Include(e => e.ReportingManager)
+                .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
+    #endregion
 }

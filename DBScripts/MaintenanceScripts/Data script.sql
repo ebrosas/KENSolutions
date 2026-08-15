@@ -9,6 +9,19 @@
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'PAYGRADE')
+	ORDER BY a.SequenceNo
+
+	--Get Employee Status
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'EMPSTATUS')
+	ORDER BY a.SequenceNo
+
+	--Get Employment Types
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'EMPLOYTYPE')
+	ORDER BY a.SequenceNo
 	
 	--Get Role Types
 	SELECT a.* 
@@ -161,12 +174,7 @@
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = 8
-
-	--Get Employee Status
-	SELECT a.* 
-	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
-	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'EMPSTATUS')
-
+		
 	--Get Employment Type
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)

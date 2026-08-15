@@ -107,7 +107,10 @@ namespace KenHRApp.Web.Components.Pages.UserAccount
                     _btnProcessing = false;
 
                     if (State.IsAuthenticated)
-                        Nav.NavigateTo("/TimeAttendance/tnadashboard");
+                    {
+                        //Nav.NavigateTo("/TimeAttendance/tnadashboard");
+                        Nav.NavigateTo("/dashboard");
+                    }
 
                     // Shows the spinner overlay
                     await InvokeAsync(StateHasChanged);

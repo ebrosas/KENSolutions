@@ -12,6 +12,7 @@ namespace KenHRApp.Web.Components.Pages.Dashboard
     {
         #region Parameters and Injections
         [Inject] private ILoveEmployeeService Employees { get; set; } = default!;
+        [Inject] private NavigationManager Nav { get; set; } = default!;
         #endregion
 
         #region Fields
@@ -50,24 +51,31 @@ namespace KenHRApp.Web.Components.Pages.Dashboard
         {
             // Counts come from the Application layer only — no DbContext in the component.
             var active = await Employees
-                .GetEmployeesAsync(new GetEmployeesQuery { Status = EmployeeStatus.Active, PageSize = 1 })
+                .GetEmployeesAsync(new GetEmployeesQuery { Status = EmployeeStatus.STATACTIVE.ToString(), PageSize = 1 })
                 .ConfigureAwait(false);
 
             var onLeave = await Employees
-                .GetEmployeesAsync(new GetEmployeesQuery { Status = EmployeeStatus.OnLeave, PageSize = 1 })
+                .GetEmployeesAsync(new GetEmployeesQuery { Status = EmployeeStatus.STATONLEAVE.ToString(), PageSize = 1 })
                 .ConfigureAwait(false);
 
             var all = await Employees
                 .GetEmployeesAsync(new GetEmployeesQuery { PageSize = 1 })
                 .ConfigureAwait(false);
 
-            //Kpis = new DashboardKpis(
-            //    all.TotalCount,
-            //    Math.Max(active.TotalCount - onLeave.TotalCount, 0),
-            //    onLeave.TotalCount,
-            //    OpenRequisitions: 0);
+            Kpis = new DashboardKpis(
+                all.TotalCount,
+                Math.Max(active.TotalCount - onLeave.TotalCount, 0),
+                onLeave.TotalCount,
+                OpenRequisitions: 0);
 
-            Kpis = new DashboardKpis(15, 100, 86,3);
+            //Kpis = new DashboardKpis(15, 100, 86,3);
         }
+
+        #region Private Methods
+        private void AddNewEmployee()
+        {
+            Nav.NavigateTo($"/employees?EmployeeId=0&ActionType=Add");
+        }
+        #endregion
     }
 }

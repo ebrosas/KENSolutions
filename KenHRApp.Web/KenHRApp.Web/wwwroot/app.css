@@ -3083,456 +3083,512 @@ employee-autocomplete .mud-input-adornment .mud-icon-button {
 /* #endregion*/
 
 /* #region Lovable Stylesheets */
-.hrms-kpi-card {
-    border-radius: var(--hrms-radius);
-    height: 100%;
-}
-/* #endregion */
-
-/* #region Dashboad Stylesheets */
-/* ============================================================
-   KEN-HR Dashboard
-   Wellness / Calm Design System
-   ============================================================ */
+/* =========================================================
+   KEN-HR EXECUTIVE DASHBOARD
+   Wellness-inspired enterprise HR design
+   ========================================================= */
 
 .hr-dashboard {
-    --hr-bg: #f7f6f1;
-    --hr-surface: #ffffff;
-    --hr-text: #34433c;
-    --hr-muted: #7b867f;
-    --hr-border: #e8e8df;
-    --hr-sage: #dfe9df;
-    --hr-sage-dark: #718773;
-    --hr-mint: #deeee7;
-    --hr-mint-dark: #5f8a78;
-    --hr-sand: #f1e8d8;
-    --hr-sand-dark: #a78d67;
-    --hr-blue: #e1e9ee;
-    --hr-blue-dark: #718795;
-    padding: 24px;
-    max-width: 1600px;
-    margin: 0 auto;
+    --hr-blue: #2563eb;
+    --hr-blue-dark: #173b70;
+    --hr-blue-soft: #eaf2ff;
+    --hr-sage: #6f8f82;
+    --hr-sage-soft: #edf4f0;
+    --hr-sand: #a58a67;
+    --hr-sand-soft: #f7f1e8;
+    --hr-indigo: #5367a8;
+    --hr-indigo-soft: #eef0fa;
+    --hr-text: #172033;
+    --hr-muted: #687386;
+    --hr-border: #e5e9ef;
+    --hr-background: #f6f8fb;
+    --hr-white: #ffffff;
     font-family: "Inter", sans-serif;
+    padding: 20px 24px 32px;
     color: var(--hr-text);
 }
 
 
-/* ============================================================
-   Hero
-   ============================================================ */
+/* =========================================================
+   HERO
+   ========================================================= */
 
 .dashboard-hero {
-    position: relative;
-    overflow: hidden;
-    border-radius: 28px;
-    padding: 32px 36px;
-    background: linear-gradient( 135deg, #f0f4ee 0%, #f8f5ed 55%, #eef3f1 100% );
-    border: 1px solid rgba(113, 135, 119, 0.10);
-    margin-bottom: 32px;
-}
-
-.dashboard-hero-content {
-    position: relative;
-    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    padding: 26px 30px;
+    margin-bottom: 22px;
+    border-radius: 20px;
+    background: linear-gradient( 135deg, #edf5ff 0%, #f4f7f8 52%, #f5f4ee 100% );
+    border: 1px solid rgba(62, 91, 126, 0.10);
+    box-shadow: 0 8px 28px rgba(38, 57, 82, 0.06);
 }
 
-.dashboard-title {
-    font-family: "Inter", sans-serif !important;
+
+.hero-content {
+    max-width: 760px;
+}
+
+
+.hero-eyebrow {
+    font-size: 0.67rem !important;
     font-weight: 700 !important;
-    letter-spacing: -0.5px;
-    color: #34433c;
+    letter-spacing: 0.14em;
+    color: var(--hr-blue-dark);
+    margin-bottom: 6px !important;
 }
 
-.dashboard-subtitle {
-    margin-top: 8px;
-    max-width: 650px;
-    color: #78847d;
-    line-height: 1.7;
+
+.hero-title {
+    font-size: 2rem !important;
+    line-height: 1.15 !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.035em;
+    color: #16233a;
+    margin-bottom: 6px !important;
 }
 
-.dashboard-actions {
+
+.hero-description {
+    font-size: 0.88rem !important;
+    line-height: 1.55 !important;
+    color: var(--hr-muted);
+    max-width: 680px;
+}
+
+
+.hero-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 9px;
 }
 
-.soft-action-button {
-    border-radius: 12px !important;
-    padding: 9px 18px !important;
-    color: #65746b !important;
-    border-color: #d5ddd6 !important;
-    background: rgba(255, 255, 255, 0.55) !important;
+
+.dashboard-outline-button,
+.dashboard-primary-button {
+    min-height: 40px !important;
+    padding: 7px 15px !important;
+    border-radius: 11px !important;
+    font-family: "Inter", sans-serif !important;
+    font-size: 0.76rem !important;
+    font-weight: 650 !important;
+    text-transform: none !important;
 }
 
-.primary-action-button {
-    border-radius: 12px !important;
-    padding: 10px 20px !important;
-    background: #718773 !important;
-    color: #ffffff !important;
-    box-shadow: none !important;
+
+.dashboard-outline-button {
+    border-color: rgba(37, 99, 235, 0.28) !important;
+    color: var(--hr-blue-dark) !important;
+    background: rgba(255,255,255,0.55);
 }
 
-    .primary-action-button:hover {
-        background: #617663 !important;
-    }
 
-
-/* Decorative hero elements */
-
-.hero-accent {
-    position: absolute;
-    right: -40px;
-    bottom: -60px;
-    display: flex;
-    gap: 14px;
-    transform: rotate(-18deg);
-    opacity: 0.35;
+.dashboard-primary-button {
+    box-shadow: 0 5px 14px rgba(37, 99, 235, 0.20);
 }
 
-    .hero-accent span {
-        display: block;
-        width: 110px;
-        height: 110px;
-        border-radius: 50%;
-        background: #d9e4da;
-    }
 
-        .hero-accent span:nth-child(2) {
-            width: 75px;
-            height: 75px;
-            margin-top: 30px;
-            background: #eadfcf;
-        }
+/* =========================================================
+   SECTION HEADERS
+   ========================================================= */
 
-        .hero-accent span:nth-child(3) {
-            width: 95px;
-            height: 95px;
-            background: #dce8e4;
-        }
+.kpi-section,
+.analytics-section {
+    margin-bottom: 22px;
+}
 
-
-/* ============================================================
-   Section headings
-   ============================================================ */
 
 .section-heading {
-    margin-top: 8px;
-    font-family: "Inter", sans-serif !important;
-    font-weight: 650 !important;
-    color: #405047;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
 }
+
+
+.section-title {
+    font-size: 0.94rem !important;
+    line-height: 1.3 !important;
+    font-weight: 750 !important;
+    letter-spacing: -0.015em;
+    color: var(--hr-text);
+}
+
 
 .section-description {
-    margin-top: 4px;
-    color: #89928c;
+    font-size: 0.72rem !important;
+    color: var(--hr-muted);
+    margin-top: 2px !important;
 }
 
-.section-header-row {
+
+.live-indicator {
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-top: 36px;
-    margin-bottom: 16px;
-}
-
-.period-chip {
-    border-radius: 20px !important;
-    color: #718078 !important;
-    border-color: #dce1dc !important;
-    background: #fafbf9 !important;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: #eef7f2;
+    color: #507766;
+    font-size: 0.66rem;
+    font-weight: 700;
 }
 
 
-/* ============================================================
-   KPI Cards
-   ============================================================ */
-
-.kpi-grid {
-    margin-top: 4px;
+.live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #5d9979;
+    box-shadow: 0 0 0 3px rgba(93,153,121,0.12);
 }
 
-.wellness-kpi-card {
+
+/* =========================================================
+   KPI CARDS
+   ========================================================= */
+
+.executive-kpi {
     position: relative;
     min-height: 155px;
-    padding: 22px;
-    border-radius: 22px;
-    border: 1px solid rgba(80, 100, 90, 0.08);
-    transition: transform 180ms ease, box-shadow 180ms ease;
+    padding: 18px 19px;
+    border-radius: 17px;
+    overflow: hidden;
+    border: 1px solid rgba(30, 50, 80, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-    .wellness-kpi-card:hover {
+
+    .executive-kpi:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(60, 75, 65, 0.08);
+        box-shadow: 0 10px 26px rgba(35, 52, 75, 0.09);
     }
 
-.kpi-sage {
-    background: linear-gradient( 145deg, #f0f5ef, #e4ece3 );
-}
 
-.kpi-mint {
-    background: linear-gradient( 145deg, #edf6f2, #deeee7 );
-}
+    .executive-kpi::after {
+        content: "";
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        right: -35px;
+        bottom: -45px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.25);
+    }
 
-.kpi-sand {
-    background: linear-gradient( 145deg, #f8f3e9, #f0e6d5 );
-}
 
 .kpi-blue {
-    background: linear-gradient( 145deg, #eff4f6, #e1e9ee );
+    background: linear-gradient( 135deg, #eaf2ff, #f4f7fc );
 }
 
-.kpi-card-header {
+
+.kpi-sage {
+    background: linear-gradient( 135deg, #edf5f0, #f6f8f5 );
+}
+
+
+.kpi-sand {
+    background: linear-gradient( 135deg, #f8f1e7, #fbf8f2 );
+}
+
+
+.kpi-indigo {
+    background: linear-gradient( 135deg, #eef0fa, #f6f7fc );
+}
+
+
+.kpi-top {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+    align-items: center;
+    gap: 9px;
 }
 
-.kpi-label {
-    color: #78847c;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-}
-
-.kpi-value {
-    margin-top: 8px;
-    font-family: "Inter", sans-serif !important;
-    font-weight: 700 !important;
-    letter-spacing: -1px;
-    color: #35443b;
-}
 
 .kpi-icon {
-    width: 44px;
-    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.65);
-    color: #718773;
-    font-size: 17px;
+    width: 31px;
+    height: 31px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.65);
+    font-size: 13px;
+    color: var(--hr-blue-dark);
 }
 
-.kpi-mint .kpi-icon {
-    color: #5f8a78;
+
+.kpi-label {
+    font-size: 0.9rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    color: #657187;
 }
 
-.kpi-sand .kpi-icon {
-    color: #a78d67;
+
+.kpi-value {
+    margin-top: 17px;
+    font-size: 2.2rem;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    color: #17243a;
 }
 
-.kpi-blue .kpi-icon {
-    color: #718795;
-}
 
 .kpi-footer {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 18px;
-    font-size: 12px;
-}
-
-.trend-positive {
-    color: #5d806b;
-    font-weight: 600;
-}
-
-.trend-neutral {
-    color: #9a8060;
-    font-weight: 600;
-}
-
-.trend-label {
-    color: #929b95;
+    gap: 6px;
+    margin-top: 12px;
+    font-size: 0.8rem;
+    color: #7a8493;
 }
 
 
-/* ============================================================
-   Chart Cards
-   ============================================================ */
+.kpi-positive {
+    color: #4e866c;
+    font-weight: 750;
+}
 
-.wellness-chart-card {
+
+.kpi-neutral {
+    color: #a77d55;
+    font-weight: 750;
+}
+
+
+/* =========================================================
+   DASHBOARD SURFACES
+   ========================================================= */
+
+.dashboard-surface {
     height: 100%;
-    padding: 24px;
-    border-radius: 24px;
-    background: #ffffff;
-    border: 1px solid #eceee9;
-    box-shadow: 0 5px 20px rgba(55, 70, 60, 0.035);
+    padding: 20px;
+    border-radius: 18px;
+    background: linear-gradient( 145deg, #ffffff 0%, #fbfcfd 100% );
+    border: 1px solid var(--hr-border);
+    box-shadow: 0 5px 18px rgba(33, 48, 70, 0.035);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.chart-card-header {
+
+    .dashboard-surface:hover {
+        box-shadow: 0 8px 24px rgba(33, 48, 70, 0.06);
+    }
+
+
+.surface-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 14px;
+    margin-bottom: 7px;
 }
 
-.chart-title {
-    font-family: "Inter", sans-serif !important;
-    font-weight: 650 !important;
-    color: #405047;
+
+.surface-title {
+    font-size: 1.2rem !important;
+    line-height: 1.3 !important;
+    font-weight: 750 !important;
+    letter-spacing: -0.015em;
+    color: var(--hr-text);
 }
 
-.chart-description {
-    margin-top: 5px;
-    color: #929a95;
-    font-size: 13px !important;
+
+.surface-description {
+    font-size: 0.9rem !important;
+    color: var(--hr-muted);
+    margin-top: 3px !important;
 }
 
-.chart-icon {
-    width: 40px;
-    height: 40px;
+
+.surface-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    font-size: 15px;
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    font-size: 13px;
 }
 
-.sage-icon {
-    background: #e5eee4;
-    color: #718773;
-}
-
-.mint-icon {
-    background: #e3f1eb;
-    color: #5f8a78;
-}
-
-.sand-icon {
-    background: #f4eadb;
-    color: #a78d67;
-}
 
 .blue-icon {
-    background: #e7eef2;
-    color: #718795;
+    background: var(--hr-blue-soft);
+    color: var(--hr-blue);
 }
 
-.chart-container {
-    width: 100%;
-    padding-top: 4px;
+
+.sage-icon {
+    background: var(--hr-sage-soft);
+    color: var(--hr-sage);
 }
+
+
+.sand-icon {
+    background: var(--hr-sand-soft);
+    color: var(--hr-sand);
+}
+
+
+/* =========================================================
+   CHARTS
+   ========================================================= */
+
+.chart-container {
+    margin-top: 2px;
+}
+
+
+.division-chart {
+    min-height: 365px;
+}
+
 
 .donut-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 300px;
+    min-height: 280px;
 }
 
 
-/* ============================================================
-   Activity
-   ============================================================ */
+/* =========================================================
+   ACTIVITY
+   ========================================================= */
 
-.activity-card {
-    min-height: 360px;
+.activity-surface {
+    min-height: 345px;
 }
+
 
 .activity-container {
-    padding-top: 6px;
+    padding-top: 4px;
 }
 
 
-/* ============================================================
-   MudBlazor overrides
-   ============================================================ */
+/* =========================================================
+   MUD GRID ADJUSTMENTS
+   ========================================================= */
 
-.hr-dashboard .mud-paper {
-    font-family: "Inter", sans-serif;
-}
-
-.hr-dashboard .mud-chart {
-    overflow: visible;
-}
-
-.hr-dashboard .mud-button {
-    text-transform: none !important;
-    font-family: "Inter", sans-serif !important;
-    font-weight: 500 !important;
+.hr-dashboard .mud-grid {
+    margin-top: 0 !important;
 }
 
 
-/* ============================================================
-   Responsive
-   ============================================================ */
+.hr-dashboard .mud-item {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+}
 
-@media (max-width: 960px) {
 
-    .hr-dashboard {
-        padding: 18px;
-    }
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
 
     .dashboard-hero {
-        padding: 26px;
+        padding: 22px 24px;
     }
 
-    .dashboard-hero-content {
-        align-items: flex-start;
+    .hero-title {
+        font-size: 1.75rem !important;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    .hr-dashboard {
+        padding: 14px 14px 24px;
+    }
+
+
+    .dashboard-hero {
         flex-direction: column;
+        align-items: flex-start;
+        gap: 18px;
+        padding: 22px;
+        border-radius: 17px;
     }
 
-    .dashboard-actions {
+
+    .hero-actions {
         width: 100%;
     }
 
-        .dashboard-actions .mud-button {
-            flex: 1;
-        }
-}
 
-
-@media (max-width: 600px) {
-
-    .hr-dashboard {
-        padding: 12px;
+    .dashboard-outline-button,
+    .dashboard-primary-button {
+        flex: 1;
     }
 
-    .dashboard-hero {
-        padding: 22px;
-        border-radius: 22px;
-    }
 
-    .dashboard-title {
+    .hero-title {
         font-size: 1.55rem !important;
     }
 
-    .dashboard-subtitle {
-        font-size: 13px !important;
+
+    .hero-description {
+        font-size: 0.8rem !important;
     }
 
-    .dashboard-actions {
-        flex-direction: column;
-    }
 
-        .dashboard-actions .mud-button {
-            width: 100%;
-        }
-
-    .wellness-kpi-card {
+    .executive-kpi {
         min-height: 140px;
-        padding: 18px;
-        border-radius: 20px;
     }
 
-    .wellness-chart-card {
-        padding: 18px;
-        border-radius: 20px;
+
+    .kpi-value {
+        font-size: 1.8rem;
     }
 
-    .section-header-row {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 12px;
+
+    .dashboard-surface {
+        padding: 16px;
+        border-radius: 15px;
     }
 }
 
+
+@media (max-width: 480px) {
+
+    .hr-dashboard {
+        padding: 10px;
+    }
+
+
+    .dashboard-hero {
+        padding: 18px;
+    }
+
+
+    .hero-title {
+        font-size: 1.4rem !important;
+    }
+
+
+    .hero-actions {
+        flex-direction: column;
+    }
+
+
+    .dashboard-outline-button,
+    .dashboard-primary-button {
+        width: 100%;
+    }
+
+
+    .section-heading {
+        align-items: flex-start;
+    }
+
+
+    .live-indicator {
+        display: none;
+    }
+}
 /* #endregion */
 
 

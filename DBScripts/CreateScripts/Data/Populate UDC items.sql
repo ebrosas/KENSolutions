@@ -43,7 +43,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Existing',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
-				@SequenceNo					= NULL,
+				@SequenceNo					= 1,
 				@IsActive					= 1,
 				@Amount						= NULL 
 
@@ -51,7 +51,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Resigned',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
-				@SequenceNo					= NULL,
+				@SequenceNo					= 2,
 				@IsActive					= 1,
 				@Amount						= NULL 
 
@@ -59,7 +59,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Retired',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
-				@SequenceNo					= NULL,
+				@SequenceNo					= 3,
 				@IsActive					= 1,
 				@Amount						= NULL 
 
@@ -67,7 +67,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'On-Hold',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
-				@SequenceNo					= NULL,
+				@SequenceNo					= 4,
 				@IsActive					= 1,
 				@Amount						= NULL 
 
@@ -75,7 +75,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Abscording',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
-				@SequenceNo					= NULL,
+				@SequenceNo					= 5,
 				@IsActive					= 1,
 				@Amount						= NULL 
 
@@ -83,7 +83,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'New Joinee',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
-				@SequenceNo					= NULL,
+				@SequenceNo					= 6,
 				@IsActive					= 1,
 				@Amount						= NULL
 
@@ -91,7 +91,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Pending',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
-				@SequenceNo					= NULL,
+				@SequenceNo					= 7,
 				@IsActive					= 1,
 				@Amount						= NULL
 
@@ -99,7 +99,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Not Joined',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
-				@SequenceNo					= NULL,
+				@SequenceNo					= 8,
 				@IsActive					= 1,
 				@Amount						= NULL
 
@@ -107,7 +107,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Terminated',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
-				@SequenceNo					= NULL,
+				@SequenceNo					= 9,
 				@IsActive					= 1,
 				@Amount						= NULL
 
@@ -115,7 +115,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Suspended',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
-				@SequenceNo					= NULL,
+				@SequenceNo					= 10,
 				@IsActive					= 1,
 				@Amount						= NULL
 
@@ -123,7 +123,7 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 				@UDCDesc1					= 'Active',
 				@UDCDesc2					= NULL,
 				@UDCSpecialHandlingCode		= NULL,
-				@SequenceNo					= NULL,
+				@SequenceNo					= 11,
 				@IsActive					= 1,
 				@Amount						= NULL
 
@@ -131,7 +131,15 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 			@UDCDesc1						= 'Inactive',
 			@UDCDesc2						= NULL,
 			@UDCSpecialHandlingCode			= NULL,
-			@SequenceNo						= NULL,
+			@SequenceNo						= 12,
+			@IsActive						= 1,
+			@Amount							= NULL
+
+		SELECT	@UDCCode					= 'STATONLEAVE',
+			@UDCDesc1						= 'On-Leave',
+			@UDCDesc2						= NULL,
+			@UDCSpecialHandlingCode			= NULL,
+			@SequenceNo						= 13,
 			@IsActive						= 1,
 			@Amount							= NULL
 		
@@ -3071,6 +3079,12 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'LEAVETYPES')
 
+	--Employee Status
+	SELECT a.* 
+	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
+	WHERE a.GroupID = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'EMPSTATUS')
+
+
 	SELECT a.* 
 	FROM kenuser.UserDefinedCode a WITH (NOLOCK)
 	WHERE RTRIM(a.UDCCode) = 'PH'
@@ -3087,6 +3101,9 @@ DECLARE	@actionType					TINYINT = 1,		--(Notes: 0 = Check records; 1 = Insert ne
 	(
 		4973, 4974
 	)
+
+	DELETE FROM kenuser.UserDefinedCode
+	WHERE GroupID  = (SELECT x.UDCGroupId FROM kenuser.UserDefinedCodeGroup x WITH (NOLOCK) WHERE RTRIM(x.UDCGCode) = 'EMPSTATUS')
 
 	--Disable UDC items
 	UPDATE kenuser.UserDefinedCode

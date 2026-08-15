@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using KenHRApp.Domain.Entities;
+﻿using KenHRApp.Domain.Entities;
 using KenHRApp.Domain.Models.Common;
+using KenHRApp.Infrastructure.Interfaces;
 
 namespace KenHRApp.Infrastructure.Repositories
 {
-    public interface IEmployeeRepository
+    public interface IEmployeeRepository : IRepository<Employee>
     {
         #region Public Methods
         Task<List<Employee>> GetAllAsync();
@@ -113,6 +109,12 @@ namespace KenHRApp.Infrastructure.Repositories
         Task<Result<bool>> DeleteFamilyVisaAsync(
             int autoID,
             CancellationToken cancellationToken = default);
+        #endregion
+
+        #region Lovable Methods
+        Task<Employee?> GetByEmployeeNumberAsync(int employeeNumber, CancellationToken cancellationToken = default);
+        Task<bool> EmployeeNumberExistsAsync(int employeeNumber, Guid? excludeId = null, CancellationToken cancellationToken = default);
+        Task<Employee?> GetDetailAsync(Guid id, CancellationToken cancellationToken = default);
         #endregion
     }
 }
