@@ -108,6 +108,14 @@ switch(env)
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+#region EF Core DbContext Factory
+//builder.Services.AddPooledDbContextFactory<ApplicationDbContext>(options =>
+//{
+//    options.UseSqlServer(
+//        builder.Configuration.GetConnectionString("DefaultConnection"));
+//});
+#endregion
+
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //    options.UseSqlServer(connectionString));
 
